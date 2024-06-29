@@ -1,7 +1,7 @@
 "use client";
 import Head from "next/head";
 import DocWrapper from "../page";
-import SubscriptionPlans from "@/app/components/SubscriptionPlans";
+import SubscriptionPlans from "@/components/SubscriptionPlans";
 
 export default function Pricing() {
   return (

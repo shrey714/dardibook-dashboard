@@ -1,6 +1,5 @@
-import React from 'react'
-import DummyPage from "../../landingPage/MainBox";
+import React from "react";
 
 export default function ContactPage() {
-    return <DummyPage title="Contact Page" />
+  return <div>Contact Page</div>;
 }

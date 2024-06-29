@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { useAppSelector } from "../../../../redux/store";
-import { db } from "../../../../firebase/firebaseConfig";
+import { useAppSelector } from "@/redux/store";
+import { db } from "@/firebase/firebaseConfig";
 import { doc, setDoc } from "firebase/firestore";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
@@ -11,7 +11,7 @@ import Skeleton from "./Skeleton";
 import { checkSubscription } from "@/app/api/check-subscription/route";
 import { createSubscription } from "@/app/api/create-subscription/route";
 import getPlanById from "@/app/api/razorpay/getPlanById";
-import HeaderMain from "@/app/components/HeaderMain";
+import HeaderMain from "@/components/HeaderMain";
 export default function Subscribe() {
   const router = useRouter();
   const searchParams = useSearchParams();

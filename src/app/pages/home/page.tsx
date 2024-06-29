@@ -1,5 +1,5 @@
 import React from "react";
 
 export default function HatsPage() {
-  return <div>Hats Pag</div>;
+  return <div>Home page</div>;
 }

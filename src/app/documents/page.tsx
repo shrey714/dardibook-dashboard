@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
-import HeaderDocument from "../components/HeaderDocument";
-import DocumentLinks from "../components/DocumentLinks";
+import HeaderDocument from "@/components/HeaderDocument";
+import DocumentLinks from "@/components/DocumentLinks";
 import Image from "next/image";
 
 interface props {

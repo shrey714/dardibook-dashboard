@@ -1,6 +1,5 @@
-import React from 'react'
-import DummyPage from "../../landingPage/MainBox";
+import React from "react";
 
 export default function TShirtsPage() {
-    return <DummyPage title="T-Shirts Page" />
+  return <div>T-Shirts Pag</div>;
 }

@@ -45,7 +45,7 @@ export const signInWithGoogle = async (dispatch: AppDispatch, router: string[] |
         dispatch(setUser(extractUserData(user)));
         // Check if router is defined before using it
         if (user && router) {
-            router.push("/"); // Redirect to home page after successful sign-in
+            router.push("/pages/home"); // Redirect to home page after successful sign-in
         }
         return result
     } catch (error) {

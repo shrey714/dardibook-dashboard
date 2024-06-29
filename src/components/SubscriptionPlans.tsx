@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { ExclamationCircleIcon } from "@heroicons/react/24/outline";
-import getplans from "../api/razorpay/getplans";
+import getplans from "../app/api/razorpay/getplans";
 interface SubscriptionPlansProps {
   message?: string | undefined;
 }
@@ -11,14 +11,19 @@ const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ message }) => {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const [loading, setloading] = useState(false);
-  const [allplans, setallplans] = useState([]);
+  const [allplans, setallplans] = useState<any[]>([]);
   useEffect(() => {
     const fetchPlans = async () => {
-      setloading(true);
-      const plans = await getplans();
-      const parsedPlans = await plans.json();
-      setallplans(parsedPlans.items);
-      setloading(false);
+      try {
+        setloading(true);
+        const plans = await getplans();
+        const parsedPlans = await plans.json();
+        setallplans(parsedPlans?.items);
+        setloading(false);
+      } catch (error) {
+        console.log(error);
+        setloading(false);
+      }
     };
     fetchPlans();
   }, []);
@@ -113,9 +118,7 @@ const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ message }) => {
               </ul>
               <button
                 onClick={() => {
-                  router.push(
-                    `/pages/subscription/subscribe?planId=${plan?.id}`
-                  );
+                  router.push(`/subscription/subscribe?planId=${plan?.id}`);
                 }}
                 className="btn btn-sm text-sm"
               >

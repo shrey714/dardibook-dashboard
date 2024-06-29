@@ -1,23 +1,19 @@
 "use client";
-
-import { useAppSelector } from "../redux/store";
-import LandingPage from "./landingPage/layout/page";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { useAppSelector } from "@/redux/store";
 
 const Home = () => {
   const user = useAppSelector((state) => state.auth.user);
+  const router = useRouter();
 
-  if (!user) {
-    return (
-      <div className="full-screen">
-        <span className="loading loading-spinner loading-md"></span>
-      </div>
-    );
-  }
-  return (
-    <div>
-      <LandingPage />
-    </div>
-  );
+  useEffect(() => {
+    if (user) {
+      router.replace("/pages/home");
+    }
+  }, [router, user]);
+
+  return <></>;
 };
 
 export default Home;

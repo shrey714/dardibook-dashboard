@@ -32,6 +32,7 @@ const extractUserData = (user: any) => {
 // };
 
 const AppWrapper = ({ children }: { children: React.ReactNode }) => {
+  // console.log("goin through home layout file")
   const [user, loading, error] = useAuthState(auth);
   const dispatch = useAppDispatch();
   const router = useRouter();
@@ -48,8 +49,8 @@ const AppWrapper = ({ children }: { children: React.ReactNode }) => {
         if (user) {
           dispatch(setUser(extractUserData(user)));
         } else {
-          dispatch(clearUser());
           router.push("/auth/signin");
+          dispatch(clearUser());
         }
       }
     }
