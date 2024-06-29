@@ -4,12 +4,14 @@ import { useAppSelector } from "../../../../redux/store";
 import { db } from "../../../../firebase/firebaseConfig";
 import { doc, setDoc } from "firebase/firestore";
 import { useRouter, useSearchParams } from "next/navigation";
+import Image from "next/image";
 import RightBox from "./RightBox";
 import LeftBox from "./LeftBox";
 import Skeleton from "./Skeleton";
 import { checkSubscription } from "@/app/api/check-subscription/route";
 import { createSubscription } from "@/app/api/create-subscription/route";
 import getPlanById from "@/app/api/razorpay/getPlanById";
+import HeaderMain from "@/app/components/HeaderMain";
 export default function Subscribe() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -20,14 +22,15 @@ export default function Subscribe() {
   const [subscriptionFields, setsubscriptionFields] = useState({
     planId,
     customer_notify: 1,
-    total_count: 6,
+    total_count: 1,
   });
-  const handleSubscription = async (planId: string) => {
+  const handleSubscription = async () => {
     console.log("planid", subscriptionFields);
     try {
       setloading(true);
-      const sub = await createSubscription(planId);
+      const sub = await createSubscription(subscriptionFields);
       const parsedsub = await sub.json();
+      console.log("parsedsub==", parsedsub);
       const options = {
         key: "rzp_test_aKsPMFZwmfbD4d",
         subscription_id: parsedsub.id,
@@ -41,7 +44,7 @@ export default function Subscribe() {
         handler: async (response: any) => {
           setloading(true);
           const legitCheck = await fetch(
-            "https://razorpay-backend-lake.vercel.app/verification",
+            "https://backend.dardibook.in/verification",
             {
               method: "POST",
               headers: {
@@ -122,8 +125,15 @@ export default function Subscribe() {
   }, [planId, router, user]);
 
   return (
-    <div className="flex flex-col justify-evenly items-center h-screen w-screen overflow-hidden">
-      <div className="flex flex-row p-6 mx-auto w-10/12 h-auto text-center text-gray-900 bg-white rounded-lg border border-gray-100 shadow dark:border-gray-600 xl:p-8 dark:bg-gray-800 dark:text-white">
+    <div className="flex pt-24 flex-col justify-evenly items-center h-screen w-screen overflow-hidden">
+      <Image
+        src="/Logo.svg"
+        fill={true}
+        className="document-background-image"
+        alt="logo"
+      />
+      <HeaderMain user={user} />
+      <div className=" flex flex-row p-6 mx-auto w-9/12 h-auto text-center rounded-lg borderborder-gray-600 xl:p-8 bg-gray-800 bg-opacity-95 text-white">
         {loading ? (
           <Skeleton />
         ) : (

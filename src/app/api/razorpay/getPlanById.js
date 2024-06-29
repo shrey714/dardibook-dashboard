@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 const getPlanById = async (subId) => {
   const plans = await fetch(
-    "https://razorpay-backend-lake.vercel.app/getPlansById",
+    "https://backend.dardibook.in/getPlansById",
     {
       method: "POST",
       headers: {

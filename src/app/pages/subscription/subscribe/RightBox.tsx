@@ -56,7 +56,7 @@ const RightBox = ({
         </ul>
         <button
           onClick={() => {
-            handleSubscription(thisPlanDetails?.id);
+            handleSubscription();
           }}
           className="btn btn-sm text-base"
         >

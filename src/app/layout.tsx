@@ -53,10 +53,10 @@ const AppWrapper = ({ children }: { children: React.ReactNode }) => {
         }
       }
     }
-  }, [user, loading, error, dispatch, router, pathRequiresAuth]);
+  }, [user, loading, dispatch, router, pathRequiresAuth]);
 
   {
-    return loading ? (
+    return loading && pathRequiresAuth ? (
       <view className="full-screen">
         <span className="loading loading-dots loading-lg"></span>
       </view>
@@ -74,7 +74,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
         src="https://checkout.razorpay.com/v1/checkout.js"
       />
       <html lang="en" className={alegreya_sans.className}>
-        <body>
+        <body className="min-h-screen">
           <Provider store={store}>
             <AppWrapper>{children}</AppWrapper>
           </Provider>

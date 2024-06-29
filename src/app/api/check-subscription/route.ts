@@ -16,7 +16,7 @@ export const checkSubscription = async (userId: string): Promise<{
   const userDoc = await getDoc(userDocRef);
   if (userDoc.exists()) {
     const details = await fetch(
-      "https://razorpay-backend-lake.vercel.app/getSubDetails",
+      "https://backend.dardibook.in/getSubDetails",
       {
         method: "POST",
         headers: {

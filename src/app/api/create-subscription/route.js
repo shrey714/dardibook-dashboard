@@ -1,11 +1,15 @@
 import { NextResponse } from "next/server";
 
-export async function createSubscription(planId) {
+export async function createSubscription({
+  planId,
+  customer_notify,
+  total_count,
+}) {
   const sub = await fetch(
-    "https://razorpay-backend-lake.vercel.app/create-subscription",
+    "https://backend.dardibook.in/create-subscription",
     {
       method: "POST",
-      body: JSON.stringify({ planId }),
+      body: JSON.stringify({ planId, customer_notify, total_count }),
       headers: {
         "Content-Type": "application/json", // Set the content type to JSON
       },

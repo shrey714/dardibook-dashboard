@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { ExclamationCircleIcon } from "@heroicons/react/24/outline";
 import getplans from "../api/razorpay/getplans";
 interface SubscriptionPlansProps {
-  message: string | undefined;
+  message?: string | undefined;
 }
 import { useRouter } from "next/navigation";
 import { signOutUser } from "@/firebase/firebaseAuth";
@@ -25,19 +25,23 @@ const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ message }) => {
 
   return (
     <>
-      <div className="text-gray font-medium flex-row flex items-center mb-3 justify-between">
-        <span className="flex flex-row gap-1">
-          <ExclamationCircleIcon className="size-5 text-error" /> {message}
-        </span>
-        <button
-          className="btn h-3 btn-sm text-sm"
-          onClick={() => {
-            signOutUser(dispatch)
-          }}
-        >
-          sign out
-        </button>
-      </div>
+      {message ? (
+        <div className="text-gray font-medium flex-row flex items-center mb-3 justify-between">
+          <span className="flex flex-row gap-1">
+            <ExclamationCircleIcon className="size-5 text-error" /> {message}
+          </span>
+          <button
+            className="btn h-3 btn-sm text-sm"
+            onClick={() => {
+              signOutUser(dispatch);
+            }}
+          >
+            sign out
+          </button>
+        </div>
+      ) : (
+        <></>
+      )}
       {loading ? (
         <div className="flex flex-1 flex-row p-6 justify-around">
           <div className="flex flex-col w-full items-center">
@@ -54,7 +58,7 @@ const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ message }) => {
           </div>
         </div>
       ) : (
-        <div className="flex flex-row justify-around gap-2">
+        <div className="flex flex-row flex-wrap justify-around gap-2">
           {allplans.map((plan, key) => (
             <div
               key={key}
@@ -84,9 +88,9 @@ const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ message }) => {
                     xmlns="http://www.w3.org/2000/svg"
                   >
                     <path
-                      fill-rule="evenodd"
+                      fillRule="evenodd"
                       d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                      clip-rule="evenodd"
+                      clipRule="evenodd"
                     ></path>
                   </svg>
                   <span>Individual configuration</span>
@@ -99,9 +103,9 @@ const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ message }) => {
                     xmlns="http://www.w3.org/2000/svg"
                   >
                     <path
-                      fill-rule="evenodd"
+                      fillRule="evenodd"
                       d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                      clip-rule="evenodd"
+                      clipRule="evenodd"
                     ></path>
                   </svg>
                   <span>No setup, or hidden fees</span>

@@ -4,7 +4,7 @@ import { auth, provider } from "../firebase/firebaseConfig";
 import { setUser, clearUser } from "../redux/store"
 import { AppDispatch } from "../redux/store"
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import { getAuth, setPersistence, inMemoryPersistence, browserSessionPersistence, browserLocalPersistence } from "firebase/auth";
+import { getAuth, setPersistence, browserLocalPersistence } from "firebase/auth";
 const extractUserData = (user: any) => {
     return {
         uid: user.uid,
@@ -18,22 +18,39 @@ const extractUserData = (user: any) => {
 export const signInWithGoogle = async (dispatch: AppDispatch, router: string[] | AppRouterInstance) => {
 
 
-    await setPersistence(auth, browserLocalPersistence)
-        .then(async () => {
-            const result = await signInWithPopup(auth, provider);
-            const user = result.user;
-            dispatch(setUser(extractUserData(user)));
-            // Check if router is defined before using it
-            if (user && router) {
-                router.push("/"); // Redirect to home page after successful sign-in
-            }
-            return result
-        }).catch((error) => {
-            // Handle Errors here.
-            const errorCode = error.code;
-            const errorMessage = error.message;
-            return error
-        });
+    // await setPersistence(auth, browserLocalPersistence)
+    //     .then(async () => {
+    //         provider.setCustomParameters({
+    //             prompt: 'select_account',
+    //         })
+    //         const result = await signInWithPopup(auth, provider);
+    //         const user = result.user;
+    //         dispatch(setUser(extractUserData(user)));
+    //         // Check if router is defined before using it
+    //         if (user && router) {
+    //             router.push("/"); // Redirect to home page after successful sign-in
+    //         }
+    //         return result
+    //     }).catch((error) => {
+    //         // Handle Errors here.
+    //         const errorCode = error.code;
+    //         const errorMessage = error.message;
+    //         console.log(errorCode, errorMessage)
+    //         return error
+    //     });
+
+    try {
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
+        dispatch(setUser(extractUserData(user)));
+        // Check if router is defined before using it
+        if (user && router) {
+            router.push("/"); // Redirect to home page after successful sign-in
+        }
+        return result
+    } catch (error) {
+        console.log(error)
+    }
 };
 
 export const signOutUser = async (dispatch: AppDispatch) => {

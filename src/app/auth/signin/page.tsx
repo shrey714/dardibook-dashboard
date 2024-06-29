@@ -4,7 +4,7 @@ import { useAppDispatch } from "../../../redux/store";
 import { signInWithGoogle } from "../../../firebase/firebaseAuth";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-
+import Image from "next/image";
 const SignIn = () => {
   const [loading, setloading] = useState(false);
   const dispatch = useAppDispatch();
@@ -17,8 +17,14 @@ const SignIn = () => {
 
   return (
     <div>
-      <view className="full-screen">
-        <button onClick={handleSignIn} className="btn btn-wide">
+      <view className="full-screen overflow-hidden">
+        <Image
+          src="/Logo.svg"
+          fill={true}
+          className="auth-background-image"
+          alt="logo"
+        />
+        <button onClick={handleSignIn} className="btn btn-wide btn-neutral mx-4 min-w-20">
           {loading ? (
             <span className="loading loading-spinner loading-md"></span>
           ) : (
