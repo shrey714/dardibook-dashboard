@@ -1,4 +1,4 @@
-// pages/about-us.js
+// dashboard/about-us.js
 import Head from "next/head";
 import DocWrapper from "../page";
 

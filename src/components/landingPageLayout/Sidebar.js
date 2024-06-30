@@ -58,11 +58,11 @@ export default function Sidebar({ show, setter }) {
           </Link>
         </div>
         <div className="flex flex-col">
-          <MenuItem name="Home" route="/pages/home" icon={"icon"} />
-          <MenuItem name="T-Shirts" route="/pages/t-shirts" icon={"icon"} />
-          <MenuItem name="Hats" route="/pages/hats" icon={"icon"} />
-          <MenuItem name="About Us" route="/pages/about" icon={"icon"} />
-          <MenuItem name="Contact" route="/pages/contact" icon={"icon"} />
+          <MenuItem name="Home" route="/dashboard/home" icon={"icon"} />
+          <MenuItem name="T-Shirts" route="/dashboard/t-shirts" icon={"icon"} />
+          <MenuItem name="Hats" route="/dashboard/hats" icon={"icon"} />
+          <MenuItem name="About Us" route="/dashboard/about" icon={"icon"} />
+          <MenuItem name="Contact" route="/dashboard/contact" icon={"icon"} />
         </div>
       </div>
       {show ? <ModalOverlay /> : <></>}

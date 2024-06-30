@@ -1,4 +1,4 @@
-// @/pages/index.js
+// @/dashboard/index.js
 import React from "react";
 
 export default function HomePage() {

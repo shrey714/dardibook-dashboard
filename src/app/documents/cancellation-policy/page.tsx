@@ -1,4 +1,4 @@
-// pages/cancellation-policy.js
+// dashboard/cancellation-policy.js
 import Head from "next/head";
 import DocWrapper from "../page";
 export default function CancellationPolicy() {

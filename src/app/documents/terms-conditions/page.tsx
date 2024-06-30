@@ -1,4 +1,4 @@
-// pages/terms-and-conditions.js
+// dashboard/terms-and-conditions.js
 import Head from "next/head";
 import DocWrapper from "../page";
 

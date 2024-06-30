@@ -9,11 +9,26 @@ const Home = () => {
 
   useEffect(() => {
     if (user) {
-      router.replace("/pages/home");
+      router.replace("/dashboard/home");
     }
   }, [router, user]);
 
-  return <></>;
+  return (
+    <view
+      style={{
+        minWidth: "100vw",
+        minHeight: "100vh",
+        overflow: "hidden",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "white",
+        zIndex: 100000,
+      }}
+    >
+      <span className="loading loading-spinner loading-md"></span>
+    </view>
+  );
 };
 
 export default Home;

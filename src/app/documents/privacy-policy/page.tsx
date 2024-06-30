@@ -1,4 +1,4 @@
-// pages/privacy-policy.js
+// dashboard/privacy-policy.js
 import Head from "next/head";
 import DocWrapper from "../page";
 

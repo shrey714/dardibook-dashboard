@@ -19,7 +19,7 @@ const SignIn = () => {
   useEffect(() => {
     setloading(true);
     if (user) {
-      router.replace("/pages/home");
+      router.replace("/dashboard/home");
     } else {
       setloading(false);
     }
