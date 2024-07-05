@@ -22,8 +22,11 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
         id="razorpay-checkout-js"
         src="https://checkout.razorpay.com/v1/checkout.js"
       />
-      <html lang="en" className={alegreya_sans.className}>
-        <body className="min-h-screen">
+      <html
+        lang="en"
+        className={alegreya_sans.className}
+      >
+        <body style={{ minHeight: "100vh" }}>
           <ReduxWrapper>
             <AppWrapper>{children}</AppWrapper>
           </ReduxWrapper>

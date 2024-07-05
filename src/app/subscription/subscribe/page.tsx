@@ -16,7 +16,7 @@ export default function Subscribe() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const planId = searchParams.get("planId");
-  const user = useAppSelector((state) => state.auth.user);
+  const user = useAppSelector<any>((state) => state.auth.user);
   const [thisPlanDetails, setthisPlanDetails] = useState();
   const [loading, setloading] = useState(true);
   const [subscriptionFields, setsubscriptionFields] = useState({

@@ -1,5 +1,9 @@
 import React from "react";
 
-export default function HatsPage() {
-  return <div>Home page</div>;
+export default function Home() {
+  return (
+    <div>
+      Home page 
+    </div>
+  );
 }

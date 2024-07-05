@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 const DocumentLinks = () => {
   const router = useRouter();
   const allPaths = [
-    "about-us",
     "cancellation-policy",
     "contact-us",
     "pricing",

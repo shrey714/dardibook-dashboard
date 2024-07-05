@@ -6,7 +6,6 @@ const HeaderDocument = () => {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const allPaths = [
-    "about-us",
     "cancellation-policy",
     "contact-us",
     "pricing",

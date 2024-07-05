@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
+import TokenBox from "../tokenFramer/TokenBox";
 
 // import { SlHome } from "react-icons/sl";
 // import { BsInfoSquare, BsEnvelopeAt } from "react-icons/bs";
@@ -13,7 +14,7 @@ export default function Sidebar({ show, setter }) {
   const pathname = usePathname();
   // Define our base class
   const className =
-    "bg-base-300 w-[250px] transition-[margin-left] ease-in-out duration-500 fixed md:static top-0 bottom-0 left-0 z-40";
+    "bg-base-300 w-[250px] transition-[margin-left] ease-in-out duration-500 fixed md:static h-screen top-0  z-40";
   // Append class based on state of sidebar visiblity
   const appendClass = show ? " ml-0" : " ml-[-250px] md:ml-0";
 
@@ -51,17 +52,13 @@ export default function Sidebar({ show, setter }) {
   return (
     <>
       <div className={`${className}${appendClass}`}>
-        <div className="p-2 flex">
-          <Link href="/">
-            {/*eslint-disable-next-line*/}
-            {/* <img src={logo.src} alt="Company Logo" width={300} height={300} /> */}
-          </Link>
+        <div className="p-2 flex flex-1 ">
+          <TokenBox />
         </div>
-        <div className="flex flex-col">
+        <div className="flex flex-1 flex-col">
           <MenuItem name="Home" route="/dashboard/home" icon={"icon"} />
-          <MenuItem name="T-Shirts" route="/dashboard/t-shirts" icon={"icon"} />
-          <MenuItem name="Hats" route="/dashboard/hats" icon={"icon"} />
-          <MenuItem name="About Us" route="/dashboard/about" icon={"icon"} />
+          <MenuItem name="New registration" route="/dashboard/appointment" icon={"icon"} />
+          <MenuItem name="Prescribe" route="/dashboard/prescribe" icon={"icon"} />
           <MenuItem name="Contact" route="/dashboard/contact" icon={"icon"} />
         </div>
       </div>
