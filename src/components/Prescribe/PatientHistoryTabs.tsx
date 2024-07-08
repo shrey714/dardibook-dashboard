@@ -14,7 +14,7 @@ const PatientHistoryTabs = () => {
               type="radio"
               name="my_tabs_2"
               role="tab"
-              className="!w-max font-medium tab bg-transparent shadow-none outline-none  [--tab-border-color:transparent]"
+              className="!w-max font-medium hover:bg-[#ddd] tab bg-transparent shadow-none outline-none  [--tab-border-color:transparent]"
               style={{ boxShadow: "none" }}
               aria-label={tab}
               defaultChecked={key === 5 ? true : false}
@@ -31,7 +31,24 @@ const PatientHistoryTabs = () => {
               <div>Tab content {key}</div>
               <div>Tab content {key}</div>
               <div>Tab content {key}</div>
-
+              <div>Tab content {key}</div>
+              <div>Tab content {key}</div>
+              <div>Tab content {key}</div>
+              <div>Tab content {key}</div>
+              <div>Tab content {key}</div>
+              <div>Tab content {key}</div>
+              <div>Tab content {key}</div>
+              <div>Tab content {key}</div>
+              <div>Tab content {key}</div>
+              <div>Tab content {key}</div>
+              <div>Tab content {key}</div>
+              <div>Tab content {key}</div>
+              <div>Tab content {key}</div>
+              <div>Tab content {key}</div>
+              <div>Tab content {key}</div>
+              <div>Tab content {key}</div>
+              <div>Tab content {key}</div>
+              <div>Tab content {key}</div>
             </div>
           </React.Fragment>
         )

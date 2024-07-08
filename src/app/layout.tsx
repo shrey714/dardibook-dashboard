@@ -13,6 +13,9 @@ const alegreya_sans = Alegreya_Sans({
 export const metadata: Metadata = {
   title: "DardiBook",
   description: "App to help doctors to track their patient",
+  icons: {
+    icon: "/Favicon.svg", // /public path
+  },
 };
 
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
@@ -22,10 +25,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
         id="razorpay-checkout-js"
         src="https://checkout.razorpay.com/v1/checkout.js"
       />
-      <html
-        lang="en"
-        className={alegreya_sans.className}
-      >
+      <html lang="en" className={alegreya_sans.className}>
         <body style={{ minHeight: "100vh" }}>
           <ReduxWrapper>
             <AppWrapper>{children}</AppWrapper>

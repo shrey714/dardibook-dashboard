@@ -56,7 +56,7 @@ const PrescribeForm = () => {
     <form onSubmit={handleSubmit}>
       <div className="mx-auto max-w-5xl">
         {/* Disease text area */}
-        <div className="col-span-full bg-white p-4 px-8 rounded-lg shadow-[0_3px_10px_rgb(0,0,0,0.2)] ">
+        <div className="col-span-full bg-white p-4 px-8 rounded-lg ">
           <label
             htmlFor="disease"
             className="block text-lg ext-base font-semibold leading-7 text-gray-900"
@@ -79,7 +79,7 @@ const PrescribeForm = () => {
         </div>
 
         {/* Medicine list */}
-        <div className="mt-6 col-span-full bg-white py-4 rounded-lg shadow-[0_3px_10px_rgb(0,0,0,0.2)] ">
+        <div className="mt-6 col-span-full bg-white py-4 rounded-lg ">
           <label className="block px-8 text-lg ext-base font-semibold leading-7 text-gray-900">
             Medicines
           </label>
@@ -92,7 +92,7 @@ const PrescribeForm = () => {
         </div>
 
         {/* Advice or special instructions text area */}
-        <div className="mt-6 col-span-full bg-white p-4 px-8 rounded-lg shadow-[0_3px_10px_rgb(0,0,0,0.2)] ">
+        <div className="mt-6 col-span-full bg-white p-4 px-8 rounded-lg ">
           <label
             htmlFor="advice"
             className="block text-lg ext-base font-semibold leading-7 text-gray-900"
@@ -130,7 +130,7 @@ const PrescribeForm = () => {
           </div>
         </div>
         {/* Higher hospital Form */}
-        <div className="mt-6 col-span-full bg-white px-8 rounded-lg shadow-[0_3px_10px_rgb(0,0,0,0.2)] ">
+        <div className="mt-6 col-span-full bg-white px-8 rounded-lg ">
           <div className="collapse collapse-arrow text-black ">
             <input type="checkbox" name="my-accordion-2" />
             <div className="collapse-title pr-3 pl-0 text-lg font-semibold text-gray-900">

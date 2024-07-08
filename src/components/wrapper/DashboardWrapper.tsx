@@ -44,7 +44,7 @@ const DashboardWrapper = ({ children }: { children: ReactNode }) => {
       </dialog>
       <div className="h-screen overflow-hidden flex">
         <Navigation />
-        <div className="flex flex-col flex-grow w-screen md:w-full overflow-y-auto">
+        <div className="flex flex-col flex-grow w-screen md:w-full overflow-y-auto bg-gray-300">
           {loading ? (
             <div
               style={{

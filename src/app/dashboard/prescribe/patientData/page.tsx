@@ -5,7 +5,7 @@ import React from "react";
 
 const page = () => {
   return (
-    <div className="self-center flex w-full flex-col bg-[#CCC]">
+    <div className="self-center flex w-full flex-col">
       <div className="p-2 flex gap-8 items-center flex-col-reverse sm:flex-row px-4 ">
         <PatientDataBox />
         <div className="p-4 gap-6 flex flex-col">

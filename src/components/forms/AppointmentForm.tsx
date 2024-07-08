@@ -32,9 +32,9 @@ const AppointmentForm = () => {
 
   return (
     <form onSubmit={handleSubmit}>
-      <div className="mx-auto max-w-4xl">
+      <div className="mx-auto max-w-4xl bg-white rounded-lg pt-6 pb-3">
         {/* token selection form */}
-        <div className="px-4 sm:px-0">
+        <div className="px-4 md:px-8">
           <h3 className="text-base font-semibold leading-7 text-gray-900">
             Appointment
           </h3>
@@ -44,7 +44,7 @@ const AppointmentForm = () => {
         </div>
         <div className="mt-6 border-t border-b border-gray-900/10">
           <dl className="divide-y divide-gray-900/10">
-            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 md:px-8">
               <label
                 htmlFor="token"
                 className="text-sm font-medium leading-6 text-gray-900 flex items-center"
@@ -64,7 +64,7 @@ const AppointmentForm = () => {
                 />
               </div>
             </div>
-            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 md:px-8">
               <label
                 htmlFor="appointment_date"
                 className="text-sm font-medium leading-6 text-gray-900 flex items-center"
@@ -85,7 +85,7 @@ const AppointmentForm = () => {
           </dl>
         </div>
         {/* personal information form */}
-        <div className="px-4 mt-6 sm:px-0">
+        <div className="px-4 mt-6 md:px-8">
           <h3 className="text-base font-semibold leading-7 text-gray-900">
             Personal Information
           </h3>
@@ -95,7 +95,7 @@ const AppointmentForm = () => {
         </div>
         <div className="mt-6 border-t border-b border-gray-900/10">
           <dl className="divide-y divide-gray-900/10">
-            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 md:px-8">
               <label
                 htmlFor="first_name"
                 className="text-sm font-medium leading-6 text-gray-900 flex items-center"
@@ -114,7 +114,7 @@ const AppointmentForm = () => {
                 />
               </div>
             </div>
-            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 md:px-8">
               <label
                 htmlFor="last_name"
                 className="text-sm font-medium leading-6 text-gray-900 flex items-center"
@@ -133,7 +133,7 @@ const AppointmentForm = () => {
                 />
               </div>
             </div>
-            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 md:px-8">
               <label
                 htmlFor="mobile_number"
                 className="text-sm font-medium leading-6 text-gray-900 flex items-center"
@@ -152,7 +152,7 @@ const AppointmentForm = () => {
                 />
               </div>
             </div>
-            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 md:px-8">
               <label
                 htmlFor="gender"
                 className="text-sm font-medium leading-6 text-gray-900 flex items-center"
@@ -173,7 +173,7 @@ const AppointmentForm = () => {
                 </select>
               </div>
             </div>
-            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 md:px-8">
               <label
                 htmlFor="age"
                 className="text-sm font-medium leading-6 text-gray-900 flex items-center"
@@ -195,7 +195,7 @@ const AppointmentForm = () => {
           </dl>
         </div>
         {/* Address information form */}
-        <div className="px-4 mt-6 sm:px-0">
+        <div className="px-4 mt-6 md:px-8">
           <h3 className="text-base font-semibold leading-7 text-gray-900">
             Address Information
           </h3>
@@ -205,7 +205,7 @@ const AppointmentForm = () => {
         </div>
         <div className="mt-6 border-t border-gray-900/10">
           <dl className="divide-y divide-gray-900/10">
-            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 md:px-8">
               <label
                 htmlFor="street_address"
                 className="text-sm font-medium leading-6 text-gray-900 flex items-center"
@@ -224,7 +224,7 @@ const AppointmentForm = () => {
                 />
               </div>
             </div>
-            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 md:px-8">
               <label
                 htmlFor="city"
                 className="text-sm font-medium leading-6 text-gray-900 flex items-center"
@@ -243,7 +243,7 @@ const AppointmentForm = () => {
                 />
               </div>
             </div>
-            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 md:px-8">
               <label
                 htmlFor="state"
                 className="text-sm font-medium leading-6 text-gray-900 flex items-center"
@@ -262,7 +262,7 @@ const AppointmentForm = () => {
                 />
               </div>
             </div>
-            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+            <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 md:px-8">
               <label
                 htmlFor="zip"
                 className="text-sm font-medium leading-6 text-gray-900 flex items-center"
