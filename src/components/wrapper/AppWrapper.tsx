@@ -5,8 +5,6 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase/firebaseConfig";
 import { setUser, clearUser } from "@/redux/store";
 import { useAppDispatch } from "@/redux/store";
-import { Provider } from "react-redux";
-import store from "@/redux/store";
 const extractUserData = (user: any) => {
   return {
     uid: user?.uid,

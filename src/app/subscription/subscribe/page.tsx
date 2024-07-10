@@ -60,7 +60,7 @@ export default function Subscribe() {
           const legit = await legitCheck.json();
 
           if (legit.status === "success") {
-            const userDocRef = doc(db, "payment", user.uid);
+            const userDocRef = doc(db, "doctor", user.uid);
             await setDoc(
               userDocRef,
               {

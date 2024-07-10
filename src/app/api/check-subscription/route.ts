@@ -12,7 +12,7 @@ export const checkSubscription = async (userId: string): Promise<{
   status: boolean,
   message?: string | undefined
 }> => {
-  const userDocRef = doc(db, 'payment', userId);
+  const userDocRef = doc(db, 'doctor', userId);
   const userDoc = await getDoc(userDocRef);
   if (userDoc.exists()) {
     const details = await fetch(
