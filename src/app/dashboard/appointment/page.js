@@ -8,10 +8,7 @@ export default function TShirtsPage() {
 
   const handleInputChange = (e) => {
     const value = e.target.value;
-    // Allow only numbers
-    if (/^\d*$/.test(value)) {
-      setPatientId(value);
-    }
+    setPatientId(value);
   };
 
   return (
@@ -47,12 +44,11 @@ export default function TShirtsPage() {
             pathname: "appointment/appointmentForm",
             query: { patientId: patientId },
           }}
-          className={`btn ${
+          className={`btn animate-none ${
             patientId.length > 3 ? "btn-primary" : "btn-disabled"
-          } md:btn-wide md:btn-md gap-4 md:text-lg`}
+          } md:btn-wide md:btn-md md:text-lg`}
         >
           Get Details
-          <ChevronRightIcon className="size-6 text-white" />
         </Link>
       </div>
       <div className="w-full p-1 bg-white flex rounded-lg flex-col shadow-[0px_0px_0px_1px_#a0aec0]">
