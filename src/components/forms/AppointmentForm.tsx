@@ -4,6 +4,7 @@ import { RegisterPatient } from "@/app/services/registerPatient";
 import { useAppSelector } from "@/redux/store";
 interface PatientFormData {
   last_visited: number;
+  patient_unique_Id: string;
   first_name: string;
   last_name: string;
   mobile_number: string;
@@ -55,7 +56,11 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form
+      onSubmit={handleSubmit}
+      autoFocus={true}
+      autoComplete="off"
+    >
       <fieldset disabled={submissionLoader}>
         <div className="mx-auto max-w-4xl bg-white rounded-lg pt-6 pb-3">
           {/* token selection form */}
@@ -71,10 +76,31 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
             <dl className="divide-y divide-gray-900/10">
               <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 md:px-8">
                 <label
+                  htmlFor="patient_unique_Id"
+                  className="text-sm font-medium leading-6 text-gray-900 flex items-center gap-1"
+                >
+                  Patient ID<p className="text-red-500">*</p>
+                </label>
+                <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+                  <input
+                    required
+                    disabled
+                    type="text"
+                    name="patient_unique_Id"
+                    id="patient_unique_Id"
+                    autoComplete="given-name"
+                    value={patientFormData.patient_unique_Id}
+                    onChange={handleInputChange}
+                    className="form-input block flex-1 border-0 bg-transparent py-1 pl-2 text-gray-500 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
+                  />
+                </div>
+              </div>
+              <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 md:px-8">
+                <label
                   htmlFor="last_visited"
                   className="text-sm font-medium leading-6 text-gray-900 flex items-center gap-1"
                 >
-                  Appointment date <p className="text-red-500">*</p>
+                  Appointment date for <p className="text-red-500">*</p>
                 </label>
                 <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
                   <input
@@ -84,15 +110,18 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
                     id="last_visited"
                     min={new Date().toISOString().split("T")[0]}
                     value={
-                      patientFormData?.last_visited
-                        ? new Date(patientFormData.last_visited)
-                            .toISOString()
-                            .split("T")[0]
-                        : new Date().toISOString().split("T")[0]
+                      new Date(patientFormData.last_visited)
+                        .toISOString()
+                        .split("T")[0]
                     }
                     onChange={(e) => {
+                      let getValue =
+                        e.target.value === ""
+                          ? new Date().toISOString().split("T")[0]
+                          : e.target.value;
+
                       const currentTime = new Date();
-                      const [year, month, day] = e.target.value
+                      const [year, month, day] = getValue
                         .split("-")
                         .map(Number);
                       const dateTime = new Date(

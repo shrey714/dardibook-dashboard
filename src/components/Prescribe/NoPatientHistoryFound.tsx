@@ -1,6 +1,6 @@
 import React from "react";
 
-const FullAreaLoader = () => {
+const NoPatientHistoryFound: React.FC<{ message: string }> = ({ message }) => {
   return (
     <div
       style={{
@@ -10,12 +10,12 @@ const FullAreaLoader = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        zIndex: 100,
+        zIndex: 100000,
       }}
     >
-      <span className="loading loading-spinner loading-md"></span>
+      {message}
     </div>
   );
 };
 
-export default FullAreaLoader;
+export default NoPatientHistoryFound;

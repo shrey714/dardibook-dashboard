@@ -28,7 +28,7 @@ export default function TShirtsPage() {
         <label className="form-control w-full max-w-xs">
           <div className="label">
             <span className="label-text font-bold text-base text-gray-700">
-              Patient ID*
+              Patient ID<span className="text-red-500 ml-1">*</span>
             </span>
           </div>
           <input
@@ -51,7 +51,12 @@ export default function TShirtsPage() {
           Get Details
         </Link>
       </div>
-      <div className="w-full p-1 bg-white flex rounded-lg flex-col shadow-[0px_0px_0px_1px_#a0aec0]">
+      <div className="relative mt-[1.25rem] w-full md:w-3/4 p-1 pt-6 flex rounded-lg border-gray-800 border-[2px] flex-col">
+        <div className="-top-[1.25rem] left-0 w-full absolute flex items-center justify-center">
+          <p className="text-gray-800 w-auto px-3 py-1 font-semibold text-base bg-gray-300 rounded-full border-gray-800 border-[2px]">
+            Today&apos;s Queue
+          </p>
+        </div>
         <ReOrderingList />
       </div>
     </div>

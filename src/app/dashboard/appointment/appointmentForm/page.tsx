@@ -9,6 +9,7 @@ import { getPatientById } from "@/app/services/getPatientById";
 import NoPatientsFound from "@/components/Appointment/NoPatientsFound";
 interface PatientFormDataTypes {
   last_visited: number;
+  patient_unique_Id: string;
   first_name: string;
   last_name: string;
   mobile_number: string;
@@ -29,6 +30,7 @@ const Page: React.FC = () => {
   const [error, setError] = useState<string | null>(null); // State for error
   const [patientFormData, setPatientFormData] = useState<PatientFormDataTypes>({
     last_visited: new Date().getTime(),
+    patient_unique_Id: uniqueId,
     first_name: "",
     last_name: "",
     mobile_number: "",
@@ -41,6 +43,7 @@ const Page: React.FC = () => {
   });
 
   useEffect(() => {
+    console.log("id", uniqueId);
     const getPatientData = async () => {
       if (patientId) {
         setFormLoader(true);
@@ -49,6 +52,7 @@ const Page: React.FC = () => {
           setPatientFormData({
             ...patientData.data,
             last_visited: new Date().getTime(),
+            patient_unique_Id: uniqueId,
           } as PatientFormDataTypes);
         } else {
           setError("No patient data available for the provided PatientID.");
@@ -59,7 +63,7 @@ const Page: React.FC = () => {
       }
     };
     getPatientData();
-  }, [patientId, user.uid]);
+  }, [patientId, uniqueId, user.uid]);
 
   return (
     <>
