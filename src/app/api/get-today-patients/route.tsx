@@ -5,6 +5,7 @@ import {
   DocumentData,
   getDoc,
   getDocs,
+  orderBy,
   query,
   where,
 } from "firebase/firestore";
@@ -65,7 +66,8 @@ export const GET = async (request: NextRequest) => {
     const todaysPatientsDoc = query(
       patientCollection,
       where("last_visited", ">=", timestamps.dayStart),
-      where("last_visited", "<=", timestamps.dayEnd)
+      where("last_visited", "<=", timestamps.dayEnd),
+      orderBy("last_visited", "desc")
     );
     const docSnap = await getDocs(todaysPatientsDoc);
     const patientData: DocumentData[] = [];
