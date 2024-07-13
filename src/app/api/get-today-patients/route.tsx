@@ -10,46 +10,8 @@ import {
   where,
 } from "firebase/firestore";
 import { NextResponse, NextRequest } from "next/server";
-
-function getDayStartAndEndTimestampsIST(
-  currentTimestamp: string | number | Date
-) {
-  // Convert the current timestamp to a Date object
-  const now = new Date(currentTimestamp);
-
-  // Convert current time to IST
-  const istTime = new Date(now.getTime());
-
-  // Get the start of the day in IST
-  const dayStartIST = new Date(
-    istTime.getFullYear(),
-    istTime.getMonth(),
-    istTime.getDate(),
-    0,
-    0,
-    0,
-    0
-  );
-
-  // Get the end of the day in IST
-  const dayEndIST = new Date(
-    istTime.getFullYear(),
-    istTime.getMonth(),
-    istTime.getDate(),
-    23,
-    59,
-    59,
-    999
-  );
-
-  const dayStartUTC = dayStartIST.getTime();
-  const dayEndUTC = dayEndIST.getTime();
-
-  return {
-    dayStart: dayStartUTC,
-    dayEnd: dayEndUTC,
-  };
-}
+import {getDateFromTimeStamp} from "../../utils/dateFromts"
+import {getDayStartAndEndTimestampsIST} from "../../utils/getDayStartEndTs"
 
 export const GET = async (request: NextRequest) => {
   const currentTimestamp = Date.now();
@@ -72,6 +34,15 @@ export const GET = async (request: NextRequest) => {
     const docSnap = await getDocs(todaysPatientsDoc);
     const patientData: DocumentData[] = [];
     docSnap.forEach((doc) => {
+      const pData = doc.data();
+      const currentTs = new Date();
+      const appointed = getDateFromTimeStamp(pData["last_visited"])===getDateFromTimeStamp(currentTs)?true:false;
+      let old = true;
+      if(pData?.visitedDates && pData.visitedDates.length==1 && getDateFromTimeStamp(pData["visitedDates"][0])){
+        console.log(pData.visitedDates)
+        old = false;
+      }
+      patientData.push({...doc.data(),appointed,old});
       patientData.push(doc.data());
     });
 
