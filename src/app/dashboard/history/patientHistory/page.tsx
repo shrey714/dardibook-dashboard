@@ -49,21 +49,7 @@ const Page = () => {
           <div className="p-2 flex gap-8 items-center flex-col-reverse sm:flex-row px-4 ">
             <PatientDataBox patientData={patientData} />
             <div className="p-4 gap-6 flex flex-col">
-              <Link
-                href={{
-                  pathname: "prescribeForm",
-                  query: { patientId: patientId },
-                }}
-                className="btn animate-none btn-primary md:btn-md lg:btn-wide"
-              >
-                Attend
-              </Link>
-              <Link
-                href={"./"}
-                className="btn animate-none md:btn-md lg:btn-wide"
-              >
-                Back to queue
-              </Link>
+
             </div>
           </div>
           <PatientHistoryTabs prescriptionsData={prescriptionsData} />

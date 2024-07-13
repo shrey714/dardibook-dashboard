@@ -1,7 +1,7 @@
 "use client";
 import { RegisterPatient } from "@/app/Services/register-patient";
 import React from "react";
-
+import Temp from "@/components/PrescriptionPrintTemp";
 export default function Home() {
 
   const handleRegisterPatient = async ()=>{
@@ -24,8 +24,7 @@ export default function Home() {
 
   return (
     <div>
-      Home page 
-      <button onClick={handleRegisterPatient}>Register Patient</button>
+      <Temp />
     </div>
   );
 }

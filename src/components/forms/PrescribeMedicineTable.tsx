@@ -16,7 +16,7 @@ interface Dosage {
 
 interface Medicine {
   id: number;
-  name: string;
+  medicineName: string;
   instruction: string;
   dosages: Dosage[];
   duration: string;
@@ -37,7 +37,7 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
   const addRow = () => {
     const newRow = {
       id: rowIdCounter,
-      name: "",
+      medicineName: "",
       instruction: "",
       dosages: [{ id: dosageIdCounter, value: "" }],
       duration: "",
@@ -125,8 +125,8 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
               <td className="align-top p-1">
                 <input
                   type="text"
-                  name="name"
-                  value={row.name}
+                  name="medicineName"
+                  value={row.medicineName}
                   onChange={(event) => handleInputChange(row.id, event)}
                   className="form-input w-full block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
@@ -158,7 +158,7 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
                       type="button"
                       disabled={row.dosages.length > 1 ? false : true}
                       onClick={() => deleteDosage(row.id, dosage.id)}
-                      className="h-full"
+                      className="h-full animate-none"
                     >
                       <XCircleIcon
                         className={`size-5 ${
@@ -200,7 +200,7 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
       <button
         type="button"
         onClick={addRow}
-        className="btn mt-2 btn-neutral btn-sm btn-wide"
+        className="btn mt-2 animate-none btn-neutral btn-sm btn-wide"
       >
         <PlusIcon className="size-4 text-white" />
       </button>

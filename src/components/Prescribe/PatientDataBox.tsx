@@ -1,17 +1,6 @@
 import React from "react";
-const patientData = {
-  first_name: "shrey",
-  last_name: "patel",
-  age: "21",
-  gender: "Male",
-  mobile_number: "9512095862",
-  street_address: "moti vadol",
-  city: "idar",
-  state: "gujarat",
-  zip: "383110",
-};
 
-const PatientDataBox = () => {
+const PatientDataBox = ({ patientData }: any) => {
   return (
     <div className="mx-auto w-full">
       <div className="px-4 sm:px-0 ">
@@ -26,13 +15,13 @@ const PatientDataBox = () => {
               Full name
             </dt>
             <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-              {patientData.first_name} {patientData.last_name}
+              {patientData?.first_name} {patientData?.last_name}
             </dd>
           </div>
           <div className="px-4 py-[6px] sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
             <dt className="text-sm font-medium leading-6 text-gray-900">Age</dt>
             <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-              {patientData.age}
+              {patientData?.age}
             </dd>
           </div>
           <div className="px-4 py-[6px] sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
@@ -40,7 +29,7 @@ const PatientDataBox = () => {
               Gender
             </dt>
             <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-              {patientData.gender}
+              {patientData?.gender}
             </dd>
           </div>
           <div className="px-4 py-[6px] sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
@@ -48,7 +37,7 @@ const PatientDataBox = () => {
               Mobile number
             </dt>
             <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-              {patientData.mobile_number}
+              {patientData?.mobile_number}
             </dd>
           </div>
           <div className="px-4 py-[6px] sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
@@ -56,7 +45,7 @@ const PatientDataBox = () => {
               Address
             </dt>
             <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-              {patientData.street_address}, {patientData.city}
+              {patientData?.street_address}, {patientData?.city}
             </dd>
           </div>
         </dl>
