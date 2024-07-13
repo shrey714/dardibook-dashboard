@@ -1,20 +1,128 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
+import React, { useState, useEffect } from "react";
+import { useAppSelector } from "@/redux/store";
 import MultiLevelList from "@/components/History/MultiLevelList";
-import React, { useState } from "react";
+import { getAllPatients } from "@/app/services/getAllPatients";
+import Loader from "@/components/History/Loader";
+import NoHistoryFound from "@/components/History/NoHistoryFound";
+
+interface PatientData {
+  first_name: string;
+  id: string;
+  last_name: string;
+  age: string;
+  gender: string;
+  visitedDates: number[]; //array of timestamps in milliseconds
+  appointed: boolean;
+  mobile_number: string;
+}
+
+interface Filters {
+  fromDate: string;
+  toDate: string;
+  gender: string;
+  ageFrom: string;
+  ageTo: string;
+  notAppointed: boolean;
+}
 
 export default function HistoryPage() {
+  const user = useAppSelector<any>((state) => state.auth.user);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
+  const [loader, setLoader] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [patients, setPatients] = useState<PatientData[]>([]);
+  const [filters, setFilters] = useState<Filters>({
+    fromDate: "",
+    toDate: "",
+    gender: "All",
+    ageFrom: "",
+    ageTo: "",
+    notAppointed: false,
+  });
+  const [searchQuery, setSearchQuery] = useState("");
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  useEffect(() => {
+    const fetchPatients = async () => {
+      try {
+        setLoader(true);
+        const data = await getAllPatients(user.uid);
+        if (data.data) {
+          setPatients(data.data);
+        } else {
+          setError("Error fetching patients");
+        }
+        setLoader(false);
+      } catch (error) {
+        setError("Error fetching patients");
+        setLoader(false);
+      }
+    };
+
+    fetchPatients();
+  }, [user.uid]);
+
+  const handleFilterChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | any>
+  ) => {
+    const { id, value, type, checked } = e.target;
+    if (id === "searchQuery") {
+      setSearchQuery(value);
+    } else {
+      setFilters((prevFilters) => ({
+        ...prevFilters,
+        [id]: type === "checkbox" ? checked : value,
+      }));
+    }
+  };
+
+  const filterPatients = (patients: PatientData[]) => {
+    const { fromDate, toDate, gender, ageFrom, ageTo, notAppointed } = filters;
+
+    return patients.filter((patient) => {
+      const fromDateTimestamp = fromDate ? new Date(fromDate).getTime() : null;
+      const toDateTimestamp = toDate ? new Date(toDate).getTime() : null;
+
+      const isInDateRange =
+        !fromDateTimestamp ||
+        !toDateTimestamp ||
+        patient.visitedDates.some(
+          (date) => date >= fromDateTimestamp && date <= toDateTimestamp
+        );
+
+      const isGenderMatch = gender === "All" || patient.gender === gender;
+      const isAgeMatch =
+        (ageFrom === "" || parseInt(patient.age) >= parseInt(ageFrom)) &&
+        (ageTo === "" || parseInt(patient.age) <= parseInt(ageTo));
+      const isNotAppointedMatch = !notAppointed || !patient.appointed;
+
+      const searchQueryLower = searchQuery.toLowerCase();
+      const isSearchMatch =
+        patient.id.toLowerCase().includes(searchQueryLower) ||
+        `${patient.first_name} ${patient.last_name}`
+          .toLowerCase()
+          .includes(searchQueryLower) ||
+        patient.mobile_number.includes(searchQueryLower);
+
+      return (
+        isInDateRange &&
+        isGenderMatch &&
+        isAgeMatch &&
+        isNotAppointedMatch &&
+        isSearchMatch
+      );
+    });
   };
 
   return (
     <div className="h-screen overflow-hidden flex flex-1 flex-row">
       {/* Sidebar */}
       <aside
-        className={`z-20 top-0 w-full md:w-72 p-4 pt-16 md:pt-4  md:pr-0 h-screen transition-transform ${
+        className={`z-20 top-0 w-full md:w-72 p-4 pt-16 md:pt-4 md:pr-0 h-screen transition-transform ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         } md:translate-x-0 fixed md:static`}
         aria-label="Sidenav"
@@ -27,7 +135,7 @@ export default function HistoryPage() {
         />
         <div className="flex flex-col justify-between rounded-lg md:rounded-tr-none pt-2 md:pt-14 pb-2 h-full bg-white">
           <ul className="space-y-2 px-2">
-            {/* From TO Date */}
+            {/* From To Date */}
             <li>
               <h6 className="text-base font-medium text-black">
                 Appointment Dates
@@ -35,35 +143,32 @@ export default function HistoryPage() {
               <div className="mt-2 flex items-center flex-row gap-1 max-[900px]:flex-wrap">
                 <div className="w-full">
                   <label
-                    htmlFor="appointment_from"
+                    htmlFor="fromDate"
                     className="block mb-1 text-sm font-medium text-gray-500"
                   >
                     From
                   </label>
-
                   <input
                     type="date"
-                    id="appointment_from"
+                    id="fromDate"
+                    value={filters.fromDate}
                     className="form-input bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-[4px] block w-full py-2 px-0 pl-1"
-                    placeholder=""
-                    required
+                    onChange={handleFilterChange}
                   />
                 </div>
-
                 <div className="w-full">
                   <label
-                    htmlFor="appointment_to"
+                    htmlFor="toDate"
                     className="block mb-1 text-sm font-medium text-gray-500"
                   >
                     To
                   </label>
-
                   <input
                     type="date"
-                    id="appointment_to"
+                    id="toDate"
+                    value={filters.toDate}
                     className="form-input bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-[4px] block w-full py-2 px-0 pl-1"
-                    placeholder=""
-                    required
+                    onChange={handleFilterChange}
                   />
                 </div>
               </div>
@@ -79,10 +184,12 @@ export default function HistoryPage() {
               <select
                 id="gender"
                 className="form-select block w-full p-2 py-2 mt-2 text-xs text-gray-900 border border-gray-300 rounded-[4px] bg-gray-50"
+                onChange={handleFilterChange}
+                value={filters.gender}
               >
-                <option selected>All</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
+                <option value="All">All</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
               </select>
             </li>
             {/* Age From To number */}
@@ -91,69 +198,48 @@ export default function HistoryPage() {
               <div className="flex flex-row items-center justify-around gap-1">
                 <div className="mt-2">
                   <label
-                    htmlFor="age_from"
+                    htmlFor="ageFrom"
                     className="block mb-1 text-sm font-medium text-gray-500"
                   >
                     From
                   </label>
-
                   <input
                     type="number"
-                    id="age_from"
+                    id="ageFrom"
                     className="form-input bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-[4px] block w-full py-2 px-0 pl-1"
-                    placeholder=""
-                    required
+                    value={filters.ageFrom}
+                    onChange={handleFilterChange}
                   />
                 </div>
-
                 <div className="mt-2">
                   <label
-                    htmlFor="age_to"
+                    htmlFor="ageTo"
                     className="block mb-1 text-sm font-medium text-gray-500"
                   >
                     To
                   </label>
-
                   <input
                     type="number"
-                    id="age_to"
+                    id="ageTo"
                     className="form-input bg-gray-50 border border-gray-300 text-gray-900 text-xs rounded-[4px] block w-full py-2 px-0 pl-1"
-                    placeholder=""
-                    required
+                    value={filters.ageTo}
+                    onChange={handleFilterChange}
                   />
                 </div>
-              </div>
-            </li>
-            {/* Refered to another hospital */}
-            <li>
-              <div className="flex items-center ps-4 border border-gray-300 rounded">
-                <input
-                  id="refered"
-                  type="checkbox"
-                  value=""
-                  name="bordered-checkbox"
-                  className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
-                />
-                <label
-                  htmlFor="refered"
-                  className="w-full py-2 ms-2 text-xs font-medium text-gray-500"
-                >
-                  Patients referred to another hospital
-                </label>
               </div>
             </li>
             {/* Registered but not appointed */}
             <li>
               <div className="flex items-center ps-4 border border-gray-300 rounded">
                 <input
-                  id="not_appointed"
+                  id="notAppointed"
                   type="checkbox"
-                  value=""
-                  name="bordered-checkbox"
                   className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                  onChange={handleFilterChange}
+                  checked={filters.notAppointed}
                 />
                 <label
-                  htmlFor="not_appointed"
+                  htmlFor="notAppointed"
                   className="w-full py-2 ms-2 text-xs font-medium text-gray-500"
                 >
                   Patients registered but not appointed
@@ -162,7 +248,19 @@ export default function HistoryPage() {
             </li>
           </ul>
           <div className="w-full flex flex-col">
-            <button className="btn btn-sm mx-2 animate-none btn-neutral btn-outline">
+            <button
+              onClick={() =>
+                setFilters({
+                  fromDate: "",
+                  toDate: "",
+                  gender: "All",
+                  ageFrom: "",
+                  ageTo: "",
+                  notAppointed: false,
+                })
+              }
+              className="btn btn-sm mx-2 animate-none btn-neutral btn-outline"
+            >
               Clear
             </button>
             <button
@@ -231,10 +329,11 @@ export default function HistoryPage() {
               </div>
               <input
                 type="text"
-                name="email"
-                id="topbar-search"
+                id="searchQuery"
+                placeholder="Search by ID, Name, or Mobile"
+                value={searchQuery}
+                onChange={handleFilterChange}
                 className="form-input bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full pl-10 p-2.5"
-                placeholder="Search by patientID or Name...."
               />
             </div>
           </form>
@@ -245,7 +344,16 @@ export default function HistoryPage() {
           className="w-full bg-white overflow-hidden"
         >
           <div className="bg-gray-300 md:rounded-tl-lg p-4 pt-0 w-full h-full overflow-y-auto">
-            <MultiLevelList />
+            {user && loader ? (
+              <Loader />
+            ) : error ? (
+              <NoHistoryFound message={error} />
+            ) : patients.length === 0 ||
+              filterPatients(patients).length === 0 ? (
+              <NoHistoryFound message={"No patients found"} />
+            ) : (
+              <MultiLevelList patients={filterPatients(patients)} />
+            )}
           </div>
         </div>
       </main>

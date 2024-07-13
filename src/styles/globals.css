@@ -85,3 +85,18 @@ body {
   z-index: -1;
   opacity: 1;
 }
+
+
+/* history table responsiveness */
+
+@media (min-width: 768px) and (max-width: 990px) {
+  .hide-between-768-and-990 {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .hide-before-480 {
+    display: none;
+  }
+}

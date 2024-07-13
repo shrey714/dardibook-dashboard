@@ -43,7 +43,7 @@ const Page: React.FC = () => {
   });
 
   useEffect(() => {
-    console.log("id", uniqueId);
+    console.log("id",uniqueId)
     const getPatientData = async () => {
       if (patientId) {
         setFormLoader(true);

@@ -108,7 +108,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
                     type="date"
                     name="last_visited"
                     id="last_visited"
-                    min={new Date().toISOString().split("T")[0]}
+                    // min={new Date().toISOString().split("T")[0]}
                     value={
                       new Date(patientFormData.last_visited)
                         .toISOString()

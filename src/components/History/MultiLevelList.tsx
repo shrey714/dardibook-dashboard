@@ -1,42 +1,42 @@
+import Link from "next/link";
 import React from "react";
-
+import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
 // Define the type for the item
 interface Item {
-  id: number;
+  id: string;
   name: string;
-  timestamp: number;
+  timestamp: number; // Timestamp in milliseconds
+  mobile_number: string;
 }
 
-// Generate a list of items with random data
-const generateItems = (numItems: number): Item[] => {
-  const items: Item[] = [];
-  const names = [
-    "Alice",
-    "Bob",
-    "Charlie",
-    "Dave",
-    "Eve",
-    "Frank",
-    "Grace",
-    "Heidi",
-    "Ivan",
-    "Judy",
-  ];
+// Define the type for the fetched data
+interface PatientData {
+  first_name: string;
+  id: string;
+  last_name: string;
+  age: number;
+  gender: string;
+  visitedDates: number[];
+  appointed: boolean;
+  mobile_number: string;
+}
 
-  for (let i = 0; i < numItems; i++) {
-    items.push({
-      id: i + 1,
-      name: names[Math.floor(Math.random() * names.length)],
-      timestamp:
-        Date.now() - Math.floor(Math.random() * 365 * 24 * 60 * 60 * 1000), // Random timestamp within the last year
+// Transform the fetched data into the required format
+const transformData = (data: PatientData[]): Item[] => {
+  const items: Item[] = [];
+
+  data.forEach((patient) => {
+    const { first_name, last_name, id, visitedDates, mobile_number } = patient;
+    const name = `${first_name} ${last_name}`;
+
+    visitedDates.forEach((timestamp) => {
+      items.push({ id, name, timestamp, mobile_number });
     });
-  }
+  });
 
   return items;
 };
-const printlist = () => {
-  console.log(generateItems(50));
-};
+
 // Group items by month and date, and sort by date
 const groupItemsByMonthAndDate = (items: Item[]) => {
   // Sort items by timestamp in descending order (latest first)
@@ -79,29 +79,51 @@ const ItemList: React.FC<{ items: Item[] }> = ({ items }) => {
   });
 
   return (
-    <div>
-      {sortedMonthYears.map((monthYear) => (
-        <div key={monthYear}>
-          <h2 className="z-[1] h-10 pt-4 sticky top-0 w-full bg-gray-300 text-gray-800">
+    <div className="relative">
+      <li className=" pl-[25%] lg:pl-[15%] z-10 top-6  w-full sticky py-1 list-none flex flex-row items-center font-semibold text-sm text-gray-800 gap-1">
+        <div className="min-w-6"></div>
+        <div className="w-full">ID</div>
+        <div className="w-full">Name</div>
+        <div className="w-full hide-between-768-and-990 hide-before-480">Mobile</div>
+        <div className="min-w-6"></div>
+      </li>
+      {sortedMonthYears.map((monthYear, key) => (
+        <div key={key}>
+          <h2 className="z-[1] h-6 sticky top-0 w-full bg-gray-300 text-gray-800">
             {monthYear}
           </h2>
           {Object.entries(groupedItems[monthYear])
             .sort((a, b) => parseInt(b[0]) - parseInt(a[0]))
             .map(([date, items]) => (
               <div key={date}>
-                <div className="w-full py-1 bg-gray-300 z-[0] sticky top-10">
-                  <p className="text-gray-800 text-sm">{`${date}th ${
-                    monthYear.split(" ")[0]
-                  }`}</p>
+                <div className="w-full py-1 bg-gray-300 z-[0] sticky top-6">
+                  <p className="text-gray-800 text-sm">
+                    {`${date}th ${monthYear.split(" ")[0]}`} ({items.length})
+                  </p>
                 </div>
 
-                <ul>
-                  {items.map((item) => (
+                <ul className="pl-[25%] lg:pl-[15%] p-[2px]">
+                  {items.map((item, index) => (
                     <li
-                      className="p-1 mb-1 list-none flex flex-row items-center border-gray-800 border-[1.5px] color-[#333] rounded bg-white"
-                      key={item.id}
+                      className="py-[2px] odd:bg-gray-400 w-full list-none flex flex-row items-center text-sm  text-gray-800 gap-1 "
+                      key={index}
                     >
-                      {item.name}
+                      <div className="min-w-6 text-center">{index + 1}</div>
+                      <div className="w-full">{item.id}</div>
+                      <div className="w-full">{item.name}</div>
+                      <div className="w-full hide-between-768-and-990 hide-before-480">
+                        {item.mobile_number}
+                      </div>
+                      <Link
+                        href={{
+                          pathname: "history/patientHistory",
+                          query: { patientId: item.id },
+                        }}
+                        type="button"
+                        className="min-w-6"
+                      >
+                        <ArrowTopRightOnSquareIcon className="size-3 text-gray-800" />
+                      </Link>
                     </li>
                   ))}
                 </ul>
@@ -114,12 +136,10 @@ const ItemList: React.FC<{ items: Item[] }> = ({ items }) => {
 };
 
 // Main component
-const App: React.FC = () => {
-  const items = generateItems(50);
-
+const App: React.FC<any> = ({ patients }: any) => {
   return (
     <div className="App">
-      <ItemList items={items} />
+      <ItemList items={transformData(patients)} />
     </div>
   );
 };
