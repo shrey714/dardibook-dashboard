@@ -1,5 +1,5 @@
 import React from "react";
-import Temp from "@/components/Temp";
+import Temp from "@/components/PrescriptionPrintTemp";
 export default function Home() {
   return (
     <div>
