@@ -1,7 +1,5 @@
-import React, { useState } from "react";
+import React from "react";
 import Link from "next/link";
-import { RegisterPatient } from "@/app/services/registerPatient";
-import { useAppSelector } from "@/redux/store";
 interface PatientFormData {
   last_visited: number;
   patient_unique_Id: string;
@@ -19,17 +17,16 @@ interface PatientFormData {
 interface AppointmentFormProps {
   patientFormData: PatientFormData;
   setPatientFormData: React.Dispatch<React.SetStateAction<PatientFormData>>;
-  patientId: string;
+  handleSubmit: any;
+  submissionLoader: boolean;
 }
 
 const AppointmentForm: React.FC<AppointmentFormProps> = ({
   patientFormData,
   setPatientFormData,
-  patientId,
+  handleSubmit,
+  submissionLoader,
 }) => {
-  const [submissionLoader, setSubmissionLoader] = useState(false);
-  const user = useAppSelector<any>((state) => state.auth.user);
-
   const handleInputChange = (e: { target: { name: any; value: any } }) => {
     const { name, value } = e.target;
     setPatientFormData({
@@ -38,25 +35,9 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
     });
   };
 
-  const handleSubmit = async (e: { preventDefault: () => void }) => {
-    setSubmissionLoader(true);
-    e.preventDefault();
-    // console.log("data form==", {
-    //   ...patientFormData,
-    //   uid: user.uid,
-    //   id: patientId,
-    // });
-    const data = await RegisterPatient({
-      ...patientFormData,
-      uid: user.uid,
-      id: patientId,
-    });
-    console.log("status", data);
-    setSubmissionLoader(false);
-  };
-
   return (
     <form
+      className="px-4 sm:px-6 lg:px-8"
       onSubmit={handleSubmit}
       autoFocus={true}
       autoComplete="off"
@@ -165,6 +146,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
                 </label>
                 <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
                   <input
+                  autoFocus={true}
                     required
                     type="text"
                     name="first_name"

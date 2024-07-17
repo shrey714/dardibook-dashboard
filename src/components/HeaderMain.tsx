@@ -4,7 +4,6 @@ import { useRouter, usePathname } from "next/navigation";
 import { signOutUser } from "@/firebase/firebaseAuth";
 import { useAppDispatch } from "@/redux/store";
 const HeaderMain = ({ user }: any) => {
-  console.log("user==", user);
   const router = useRouter();
   const dispatch = useAppDispatch();
   const pathname = usePathname();

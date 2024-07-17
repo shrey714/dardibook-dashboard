@@ -125,7 +125,7 @@ export default function Subscribe() {
   }, [planId, router, user]);
 
   return (
-    <div className="flex pt-24 flex-col justify-evenly items-center h-screen w-screen overflow-hidden">
+    <div className="flex pt-24 overflow-y-auto pb-2 flex-col justify-evenly items-center h-screen w-screen overflow-hidden">
       <Image
         src="/Logo.svg"
         fill={true}
@@ -133,7 +133,7 @@ export default function Subscribe() {
         alt="logo"
       />
       <HeaderMain user={user} />
-      <div className=" flex flex-row p-6 mx-auto w-9/12 h-auto text-center rounded-lg borderborder-gray-600 xl:p-8 bg-gray-800 bg-opacity-95 text-white">
+      <div className=" flex flex-col-reverse md:flex-row p-6 mx-auto w-9/12 h-auto text-center rounded-lg borderborder-gray-600 xl:p-8 bg-gray-800 bg-opacity-95 text-white">
         {loading ? (
           <Skeleton />
         ) : (

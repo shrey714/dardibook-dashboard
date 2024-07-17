@@ -1,16 +1,15 @@
-export const RegisterPatient = async (req: any) => {
+export const createDoctor = async (req: any) => {
     try {
-        const res = await fetch(`/api/register-patient`, {
+        const res = await fetch(`/api/create-doctor`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(req),
+            body: JSON.stringify(req)
         });
         const data = await res.json();
         return { ...data, status: res?.status };
     } catch (error) {
-        return { error: error }
+        return { error: error };
     }
-
-}
+};

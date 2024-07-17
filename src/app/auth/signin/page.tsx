@@ -19,7 +19,7 @@ const SignIn = () => {
   useEffect(() => {
     setloading(true);
     if (user) {
-      router.replace("/dashboard/home");
+      router.replace("/");
     } else {
       setloading(false);
     }
@@ -27,7 +27,7 @@ const SignIn = () => {
 
   return (
     <div>
-      <view className="full-screen overflow-hidden">
+      <div className="w-screen h-screen overflow-hidden flex items-center justify-center">
         <Image
           src="/Logo.svg"
           fill={true}
@@ -44,7 +44,7 @@ const SignIn = () => {
             "Google Login"
           )}
         </button>
-      </view>
+      </div>
     </div>
   );
 };

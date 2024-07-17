@@ -44,7 +44,7 @@ const ReOrderingList: React.FC = () => {
                   className="p-1 m-0 mb-1 list-none flex flex-row items-center border-2 border-transparent text-[#333] rounded"
                 >
                   <div className="rounded-md mx-1 aspect-square h-6 text-white text-center font-medium bg-black">
-                    {key}
+                    {queueItems.length - key}
                   </div>
                 </li>
               ))}
@@ -58,6 +58,15 @@ const ReOrderingList: React.FC = () => {
                   <div className="mx-1">{item.patient_unique_Id}</div>
                   <div className="mx-1">{item.first_name}</div>
                   <div className="mx-1">{item.last_name}</div>
+                  {item.attended ? (
+                    <div className="mx-1 text-green-700 font-semibold">
+                      Attended
+                    </div>
+                  ) : (
+                    <div className="mx-1 text-green-700 font-semibold">
+                      {item.old ? "Old" : "New"}
+                    </div>
+                  )}
                 </li>
               ))}
             </ul>

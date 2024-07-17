@@ -1,5 +1,5 @@
 "use client";
-import { ReactNode, useEffect, useRef, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import Navigation from "@/components/landingPageLayout/Navigation";
 import { checkSubscription } from "@/app/api/check-subscription/route";
 import { useAppSelector } from "@/redux/store";
@@ -7,14 +7,16 @@ import { useRouter } from "next/navigation";
 import SubscriptionPlans from "@/components/SubscriptionPlans";
 import DefaultComponent from "@/components/DefaultDashboard";
 import "@/styles/globals.css";
+import BlockedModal from "@/components/BlockedModal";
 const DashboardWrapper = ({ children }: { children: ReactNode }) => {
   const user = useAppSelector((state) => state.auth.user);
   const router = useRouter();
-  const modalref = useRef<any>(null);
+
   // ======================
   const [loading, setloading] = useState(false);
   const [message, setmessage] = useState<string | undefined>("");
   const [subscription, setsubscription] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   // ======================
   useEffect(() => {
     const checkUserSubscription = async () => {
@@ -28,7 +30,7 @@ const DashboardWrapper = ({ children }: { children: ReactNode }) => {
           setloading(false);
           setmessage(subscriptionStatus?.message);
           setsubscription(false);
-          modalref?.current.showModal();
+          setIsModalOpen(true);
         }
       }
     };
@@ -37,18 +39,20 @@ const DashboardWrapper = ({ children }: { children: ReactNode }) => {
   // ===================
   return (
     <>
-      <dialog id="my_modal_3" className="modal" ref={modalref}>
-        <div className="modal-box flex flex-col pt-2 max-w-screen-md">
+      {isModalOpen && (
+        <BlockedModal isOpen={isModalOpen}>
           <SubscriptionPlans message={message} />
-        </div>
-      </dialog>
+        </BlockedModal>
+      )}
       <div className="h-screen overflow-hidden flex">
         <Navigation />
         <div className="flex flex-col flex-grow w-screen md:w-full overflow-y-auto bg-gray-300">
           {loading ? (
             <div
               style={{
-                width: "100%",
+                left: 0,
+                width: "100vw",
+                position: "absolute",
                 height: "100%",
                 overflow: "hidden",
                 display: "flex",

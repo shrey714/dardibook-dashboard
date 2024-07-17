@@ -1,27 +1,26 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
-import React, { forwardRef, useRef } from "react";
-import { useReactToPrint } from "react-to-print";
+import React, { forwardRef } from "react";
 
 interface Medicine {
   medicineName: string;
   instruction: string;
-  dosages: string[];
+  dosages: [];
   duration: string;
 }
 
 interface PatientInfo {
-  patientID: string;
-  visitedTime: string;
-  firstName: string;
-  lastName: string;
-  mobileNumber: string;
-  gender: string;
-  age: number;
-  streetAddress: string;
-  city: string;
-  state: string;
-  zipcode: string;
+  patient_unique_Id?: string | "";
+  last_visited?: string | "";
+  first_name?: string | "";
+  last_name?: string | "";
+  mobile_number?: string | "";
+  gender?: string | "";
+  age?: number | 0;
+  street_address?: string | "";
+  city?: string | "";
+  state?: string | "";
+  zip?: string | "";
 }
 
 interface PrescriptionInfo {
@@ -32,13 +31,13 @@ interface PrescriptionInfo {
 }
 
 interface HospitalInfo {
-  doctorName: string;
-  clinicName: string;
-  emailId: string;
-  clinicNumber: string;
-  clinicAddress: string;
-  clinicLogo: string;
-  signaturePhoto: string;
+  doctorName?: string | "";
+  clinicName?: string | "";
+  emailId?: string | "";
+  clinicNumber?: string | "";
+  clinicAddress?: string | "";
+  clinicLogo?: string | "/Logo.svg";
+  signaturePhoto?: string | "/Logo.svg";
 }
 
 interface Props {
@@ -47,7 +46,7 @@ interface Props {
   hospitalInfo: HospitalInfo;
 }
 
-const Prescription = forwardRef<HTMLDivElement, Props>((props, ref) => {
+const PrescriptionPrint = forwardRef<HTMLDivElement, Props>((props, ref) => {
   const { patientInfo, prescriptionInfo, hospitalInfo } = props;
 
   return (
@@ -80,7 +79,7 @@ const Prescription = forwardRef<HTMLDivElement, Props>((props, ref) => {
                 ID
               </td>
               <td className="border border-gray-400 p-1 pl-2">
-                {patientInfo.patientID}
+                {patientInfo.patient_unique_Id}
               </td>
             </tr>
             <tr>
@@ -88,7 +87,9 @@ const Prescription = forwardRef<HTMLDivElement, Props>((props, ref) => {
                 Visited Time
               </td>
               <td className="border border-gray-400 p-1 pl-2">
-                {new Date(patientInfo.visitedTime).toLocaleString()}
+                {new Date(
+                  patientInfo.last_visited ? patientInfo.last_visited : ""
+                ).toLocaleString()}
               </td>
             </tr>
             <tr>
@@ -96,7 +97,7 @@ const Prescription = forwardRef<HTMLDivElement, Props>((props, ref) => {
                 Name
               </td>
               <td className="border border-gray-400 p-1 pl-2">
-                {patientInfo.firstName} {patientInfo.lastName}
+                {patientInfo.first_name} {patientInfo.last_name}
               </td>
             </tr>
             <tr>
@@ -104,7 +105,7 @@ const Prescription = forwardRef<HTMLDivElement, Props>((props, ref) => {
                 Mobile
               </td>
               <td className="border border-gray-400 p-1 pl-2">
-                {patientInfo.mobileNumber}
+                {patientInfo.mobile_number}
               </td>
             </tr>
             <tr>
@@ -128,8 +129,8 @@ const Prescription = forwardRef<HTMLDivElement, Props>((props, ref) => {
                 Address
               </td>
               <td className="border border-gray-400 p-1 pl-2">
-                {patientInfo.streetAddress}, {patientInfo.city},{" "}
-                {patientInfo.state}, {patientInfo.zipcode}
+                {patientInfo.street_address}, {patientInfo.city},{" "}
+                {patientInfo.state}, {patientInfo.zip}
               </td>
             </tr>
           </tbody>
@@ -140,7 +141,7 @@ const Prescription = forwardRef<HTMLDivElement, Props>((props, ref) => {
         <h3 className="text-xl font-semibold mb-2">Prescription Information</h3>
         <p className="mb-4">
           <span className="font-medium">Disease Detail:</span>{" "}
-          {prescriptionInfo.diseaseDetail}
+          {prescriptionInfo?.diseaseDetail}
         </p>
 
         <div className="col-span-full pb-4">
@@ -171,19 +172,19 @@ const Prescription = forwardRef<HTMLDivElement, Props>((props, ref) => {
                   <tr key={index}>
                     <td className="align-top py-[2px] border border-gray-400">
                       <div className="w-full border-0 text-gray-900 bg-transparent">
-                        {row.medicineName}
+                        {row?.medicineName}
                       </div>
                     </td>
                     <td className="align-top py-[2px] border border-gray-400">
                       <div className="w-full border-0 text-gray-900 bg-transparent">
-                        {row.instruction}
+                        {row?.instruction}
                       </div>
                     </td>
                     <td className="align-top border py-[2px] border-gray-400 w-1/3">
                       {row?.dosages?.map((dosage: any, index: any) => (
                         <div key={index} className={"flex items-center"}>
                           <div className="w-full border-0 py-[2px] text-gray-900 bg-transparent">
-                            {dosage}
+                            {dosage?.value}
                           </div>
                         </div>
                       ))}
@@ -201,11 +202,14 @@ const Prescription = forwardRef<HTMLDivElement, Props>((props, ref) => {
         </div>
 
         <p className="mb-2">
-          <span className="font-medium">Advice:</span> {prescriptionInfo.advice}
+          <span className="font-medium">Advice:</span>{" "}
+          {prescriptionInfo?.advice}
         </p>
         <p>
           <span className="font-medium">Next Visit:</span>{" "}
-          {new Date(prescriptionInfo.nextVisit).toLocaleDateString()}
+          {prescriptionInfo?.nextVisit
+            ? new Date(prescriptionInfo?.nextVisit).toLocaleDateString()
+            : ""}
         </p>
       </div>
 
@@ -229,118 +233,6 @@ const Prescription = forwardRef<HTMLDivElement, Props>((props, ref) => {
     </div>
   );
 });
-Prescription.displayName = "Prescription";
-const PrintPrescriptionPage: React.FC = () => {
-  const printRef = useRef(null);
+PrescriptionPrint.displayName = "Prescription";
 
-  const handlePrint = useReactToPrint({
-    content: () => printRef.current,
-    pageStyle: `
-      @page { 
-        size: A4; 
-        margin: 5mm; 
-      }
-      body {
-        -webkit-print-color-adjust: exact;
-      }
-      .print-container {
-        position: relative;
-        width: 100%;
-        height: 100%;
-      }
-      .print-footer {
-        content: 'This report generated by DardiBook software';
-        position: absolute;
-        bottom: 10px;
-        left: 0;
-        width: 100%;
-        text-align: center;
-        font-size: 10px;
-        color: gray;
-      }
-      .bg-cover {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-image: url('/Logo.svg');
-        background-size: 60% 60%;
-        opacity: 0.1;
-        z-index: -1;
-      }
-    `,
-  });
-
-  const patientInfo = {
-    patientID: "P12345",
-    visitedTime: new Date().toISOString(),
-    firstName: "John",
-    lastName: "Doe",
-    mobileNumber: "1234567890",
-    gender: "male",
-    age: 30,
-    streetAddress: "123 Main St",
-    city: "Anytown",
-    state: "Anystate",
-    zipcode: "12345",
-  };
-
-  const prescriptionInfo = {
-    diseaseDetail: "Common Cold",
-    medicines: [
-      {
-        medicineName: "Paracetamol",
-        instruction: "Take after meals",
-        dosages: ["Morning", "Afternoon", "Evening"],
-        duration: "5 days",
-      },
-      {
-        medicineName: "Cough Syrup",
-        instruction: "Take before sleep",
-        dosages: ["Evening"],
-        duration: "5 days",
-      },
-      {
-        medicineName: "Paracetamol",
-        instruction: "Take after meals",
-        dosages: ["Morning", "Afternoon", "Evening"],
-        duration: "5 days",
-      },
-    ],
-    advice: "Drink plenty of fluids and rest",
-    nextVisit: new Date(
-      new Date().setDate(new Date().getDate() + 7)
-    ).toISOString(),
-  };
-
-  const hospitalInfo = {
-    doctorName: "Dr. Smith",
-    clinicName: "Good Health Clinic",
-    emailId: "contact@goodhealth.com",
-    clinicNumber: "0987654321",
-    clinicAddress: "456 Health St, Wellcity, Wellness",
-    clinicLogo: "/Logo.svg",
-    signaturePhoto: "/Logo.svg",
-  };
-
-  return (
-    <div className="p-8">
-      <button
-        onClick={handlePrint}
-        className="mb-8 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-      >
-        Print Prescription
-      </button>
-      <div ref={printRef} className="page">
-        <Prescription
-          patientInfo={patientInfo}
-          prescriptionInfo={prescriptionInfo}
-          hospitalInfo={hospitalInfo}
-        />
-      </div>
-    </div>
-  );
-};
-
-export default PrintPrescriptionPage;
+export default PrescriptionPrint;

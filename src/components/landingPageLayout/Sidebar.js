@@ -9,6 +9,15 @@ import TokenBox from "../tokenFramer/TokenBox";
 
 // import logo from "@/img/logo.svg";
 
+const isSubPath = (pathname, route) => {
+  // Ensure both pathname and route end with a slash
+  const formattedPathname = pathname.endsWith("/") ? pathname : pathname + "/";
+  const formattedRoute = route.endsWith("/") ? route : route + "/";
+
+  // Check if the formattedRoute is a prefix of the formattedPathname
+  return formattedPathname.startsWith(formattedRoute);
+};
+
 export default function Sidebar({ show, setter }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -21,21 +30,20 @@ export default function Sidebar({ show, setter }) {
   // Clickable menu items
   const MenuItem = ({ icon, name, route }) => {
     // Highlight menu item based on currently displayed route
-    const colorClass =
-      pathname === route
-        ? "text-black bg-primary"
-        : "text-black/50 hover:text-black";
+    const colorClass = isSubPath(pathname, route)
+      ? "text-black bg-primary"
+      : "text-black/50 hover:text-black";
 
     return (
-      <button
+      <Link
         onClick={() => {
-          router.push(route);
           setter((oldVal) => !oldVal);
         }}
+        href={route}
         className={`font-bold border-2 border-primary text-md my-2 px-5 py-2 rounded-full mx-4  ${colorClass}`}
       >
         {name}
-      </button>
+      </Link>
     );
   };
 
@@ -57,8 +65,16 @@ export default function Sidebar({ show, setter }) {
         </div>
         <div className="flex flex-1 flex-col">
           <MenuItem name="Home" route="/dashboard/home" icon={"icon"} />
-          <MenuItem name="New registration" route="/dashboard/appointment" icon={"icon"} />
-          <MenuItem name="Prescribe" route="/dashboard/prescribe" icon={"icon"} />
+          <MenuItem
+            name="New registration"
+            route="/dashboard/appointment"
+            icon={"icon"}
+          />
+          <MenuItem
+            name="Prescribe"
+            route="/dashboard/prescribe"
+            icon={"icon"}
+          />
           <MenuItem name="History" route="/dashboard/history" icon={"icon"} />
         </div>
       </div>

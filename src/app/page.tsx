@@ -8,13 +8,13 @@ const Home = () => {
   const router = useRouter();
 
   useEffect(() => {
-    if (user) {
+    if (user && user?.verified) {
       router.replace("/dashboard/home");
     }
   }, [router, user]);
 
   return (
-    <view
+    <div
       style={{
         minWidth: "100vw",
         minHeight: "100vh",
@@ -27,7 +27,7 @@ const Home = () => {
       }}
     >
       <span className="loading loading-spinner loading-md"></span>
-    </view>
+    </div>
   );
 };
 

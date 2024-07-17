@@ -10,7 +10,7 @@ import { useAppDispatch } from "@/redux/store";
 const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ message }) => {
   const dispatch = useAppDispatch();
   const router = useRouter();
-  const [loading, setloading] = useState(false);
+  const [loading, setloading] = useState(true);
   const [allplans, setallplans] = useState<any[]>([]);
   useEffect(() => {
     const fetchPlans = async () => {
@@ -63,7 +63,7 @@ const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ message }) => {
           </div>
         </div>
       ) : (
-        <div className="flex flex-row flex-wrap justify-around gap-2">
+        <div className="flex md:flex-row flex-wrap justify-around gap-2">
           {allplans.map((plan, key) => (
             <div
               key={key}

@@ -3,7 +3,7 @@ import React from "react";
 const LeftBox = ({ subscriptionFields, setsubscriptionFields }: any) => {
   return (
     <div className="flex flex-1 flex-col">
-      <div className="mb-3 flex flex-col">
+      <div className="my-3 flex flex-col">
         <span className="label-text text-white text-left mb-2">
           Select range (*months)
         </span>
@@ -53,7 +53,7 @@ const LeftBox = ({ subscriptionFields, setsubscriptionFields }: any) => {
         <br />* According to your inputs, your subscription will end after 6
         months.
       </p>
-      <div className="mb-2 flex flex-col self-start">
+      <div className="mb-2 flex flex-col md:self-start">
         <div className="collapse collapse-arrow border-base-300 border">
           <input type="checkbox" className="min-h-4 h-full" />
           <div className="collapse-title gap-5 text-sm font-medium p-2 min-h-4 no-after-absolute flex flex-row items-center justify-between px-4">

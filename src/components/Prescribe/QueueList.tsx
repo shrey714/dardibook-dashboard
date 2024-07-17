@@ -48,11 +48,35 @@ const QueueList: React.FC = () => {
                   className="p-1 m-0 mb-1 list-none flex flex-row items-center border-2 border-[#CCC] bg-white text-[#333] rounded"
                 >
                   <div className="rounded-md mx-1 aspect-square h-6 text-white text-center font-medium bg-black">
-                    {key}
+                    {queueItems.length - key}
                   </div>
-                  <div className="flex mx-1 flex-1">
-                    {item.patient_unique_Id}
-                  </div>
+                  <div className="mx-1">{item.patient_unique_Id}</div>
+                  <div className="mx-1">{item.first_name}</div>
+                  <div className="mx-1">{item.last_name}</div>
+
+                  <div className="mx-1 flex flex-1"></div>
+                  {item.attended ? (
+                    <div className="mx-1 text-green-700 font-semibold">
+                      Attended
+                    </div>
+                  ) : (
+                    <div className="mx-1 text-green-700 font-semibold">
+                      {item.old ? "Old" : "New"}
+                    </div>
+                  )}
+                  {item.attended ? (
+                    <></>
+                  ) : (
+                    <Link
+                      href={{
+                        pathname: "prescribe/prescribeForm",
+                        query: { patientId: item.patient_unique_Id },
+                      }}
+                      className="mx-1 py-1 px-2 w-auto bg-primary text-white rounded-[4px] font-semibold text-sm"
+                    >
+                      Attend
+                    </Link>
+                  )}
                   <Link
                     href={{
                       pathname: "prescribe/patientData",
@@ -61,15 +85,6 @@ const QueueList: React.FC = () => {
                     className="mx-1 py-1 px-2 w-auto bg-[#ccc] rounded-[4px] font-semibold text-sm"
                   >
                     History
-                  </Link>
-                  <Link
-                    href={{
-                      pathname: "prescribe/prescribeForm",
-                      query: { patientId: item.patient_unique_Id },
-                    }}
-                    className="mx-1 py-1 px-2 w-auto bg-[#ccc] rounded-[4px] font-semibold text-sm"
-                  >
-                    Attend
                   </Link>
                 </li>
               ))}

@@ -2,6 +2,29 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/firebase/firebaseConfig";
 import { collection, doc, getDocs, query, where } from "firebase/firestore";
 
+function getUniqueDateTimestamps(
+  last_visited: number,
+  visitedDates: number[]
+): number[] {
+  // Combine last_visited and visitedDates
+  const allTimestamps = [last_visited, ...visitedDates];
+
+  // Create a Set to track unique dates
+  const uniqueDates = new Set<string>();
+
+  // Filter timestamps to ensure unique dates
+  const uniqueTimestamps = allTimestamps.filter((timestamp) => {
+    const date = new Date(timestamp).toISOString().split("T")[0]; // Convert to date string "YYYY-MM-DD"
+    if (!uniqueDates.has(date)) {
+      uniqueDates.add(date);
+      return true;
+    }
+    return false;
+  });
+
+  return uniqueTimestamps;
+}
+
 export const GET = async (request: NextRequest) => {
   try {
     const { searchParams } = new URL(request.url);
@@ -38,11 +61,13 @@ export const GET = async (request: NextRequest) => {
         age: patient.age,
         gender: patient.gender,
         appointed: patient.visitedDates ? true : false,
-        visitedDates: patient.visitedDates || [patient.last_visited],
+        visitedDates: getUniqueDateTimestamps(
+          patient.last_visited,
+          patient.visitedDates || []
+        ),
         mobile_number: patient.mobile_number,
       });
     });
-
     return NextResponse.json({ data: patientsData }, { status: 200 });
   } catch (error) {
     console.error("Error fetching patient data:", error);

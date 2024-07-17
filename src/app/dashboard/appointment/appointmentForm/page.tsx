@@ -7,6 +7,9 @@ import uniqid from "uniqid";
 import { useAppSelector } from "@/redux/store";
 import { getPatientById } from "@/app/services/getPatientById";
 import NoPatientsFound from "@/components/Appointment/NoPatientsFound";
+import { RegisterPatient } from "@/app/services/registerPatient";
+import CustomModal from "@/components/BlockedModal";
+import RegisteredModal from "@/components/Appointment/RegisteredModal";
 interface PatientFormDataTypes {
   last_visited: number;
   patient_unique_Id: string;
@@ -41,9 +44,11 @@ const Page: React.FC = () => {
     state: "",
     zip: "",
   });
+  const [submissionLoader, setSubmissionLoader] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-    console.log("id",uniqueId)
+    console.log("id", uniqueId);
     const getPatientData = async () => {
       if (patientId) {
         setFormLoader(true);
@@ -65,8 +70,34 @@ const Page: React.FC = () => {
     getPatientData();
   }, [patientId, uniqueId, user.uid]);
 
+  const handleSubmit = async (e: { preventDefault: () => void }) => {
+    setSubmissionLoader(true);
+    e.preventDefault();
+    // console.log("data form==", {
+    //   ...patientFormData,
+    //   uid: user.uid,
+    //   id: uniqueId,
+    // });
+    const data = await RegisterPatient({
+      ...patientFormData,
+      uid: user.uid,
+      id: uniqueId,
+    });
+    // open modal on submitting the register patoent form
+    if (data?.status === 200) {
+      setIsModalOpen(true);
+    }
+    setSubmissionLoader(false);
+  };
+
   return (
-    <>
+    <div className="w-full overflow-y-auto h-screen">
+      <CustomModal isOpen={isModalOpen} mainScreenModal={true}>
+        <RegisteredModal
+          isModalOpen={isModalOpen}
+          setCloseModal={setIsModalOpen}
+        />
+      </CustomModal>
       {patientId && formLoader ? (
         <FullAreaLoader />
       ) : error ? (
@@ -74,13 +105,14 @@ const Page: React.FC = () => {
       ) : (
         <div className="py-12">
           <AppointmentForm
-            patientId={uniqueId}
             patientFormData={patientFormData}
             setPatientFormData={setPatientFormData}
+            handleSubmit={handleSubmit}
+            submissionLoader={submissionLoader}
           />
         </div>
       )}
-    </>
+    </div>
   );
 };
 

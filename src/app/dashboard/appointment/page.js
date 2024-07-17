@@ -1,7 +1,6 @@
 "use client";
 import React, { useState } from "react";
 import Link from "next/link";
-import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import ReOrderingList from "@/components/Appointment/ReOrderingList";
 export default function TShirtsPage() {
   const [patientId, setPatientId] = useState("");
@@ -12,7 +11,7 @@ export default function TShirtsPage() {
   };
 
   return (
-    <div className="self-center py-12 flex flex-1 justify-center flex-col gap-8 items-center">
+    <div className="px-4 sm:px-6 lg:px-8 self-center py-12 flex flex-1 justify-center flex-col gap-8 items-center">
       <div className="join">
         <button className="btn animate-none btn-primary join-item sm:btn-sm md:btn-wide">
           Old Case

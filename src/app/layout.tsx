@@ -25,8 +25,12 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
         id="razorpay-checkout-js"
         src="https://checkout.razorpay.com/v1/checkout.js"
       />
-      <html lang="en" className={manrope.className}>
-        <body style={{ minHeight: "100vh" }}>
+      <html
+        lang="en"
+        className={manrope.className}
+        style={{ scrollbarGutter: "auto" }}
+      >
+        <body style={{ minHeight: "100vh" }} suppressHydrationWarning={true}>
           <ReduxWrapper>
             <AppWrapper>{children}</AppWrapper>
           </ReduxWrapper>

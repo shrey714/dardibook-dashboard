@@ -1,12 +1,80 @@
+"use client";
+import React, { useState } from "react";
+import { createPrescription } from "@/app/services/createPrescription";
 import PrescribeForm from "@/components/forms/PrescribeForm";
-import React from "react";
+import { useAppSelector } from "@/redux/store";
+import uniqid from "uniqid";
+import { useSearchParams } from "next/navigation";
+import CustomModal from "@/components/BlockedModal";
+import AttendedModal from "@/components/Prescribe/AttendedModal";
 
-const page = () => {
+const Page = () => {
+  const searchParams = useSearchParams();
+  const user = useAppSelector<any>((state) => state.auth.user);
+  const [submissionLoader, setSubmissionLoader] = useState(false);
+  const patientId = searchParams.get("patientId");
+  const [uniqueId] = useState(patientId ? patientId : uniqid.time());
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    diseaseDetail: "",
+    advice: "",
+    nextVisit: "",
+    medicines: [
+      {
+        id: 1,
+        medicineName: "",
+        instruction: "",
+        dosages: [{ id: 1, value: "" }],
+        duration: "",
+      },
+    ],
+    refer: {
+      hospitalName: "",
+      doctorName: "",
+      referMessage: "",
+    },
+  });
+
+  const handleSubmit = async (e: { preventDefault: () => void }) => {
+    e.preventDefault();
+    setSubmissionLoader(true);
+    // console.log({
+    //   ...formData,
+    //   uid: user.uid,
+    //   id: patientId,
+    // });
+    const data = await createPrescription({
+      ...formData,
+      uid: user.uid,
+      id: patientId,
+      visitId: uniqueId,
+    });
+    console.log("status", data);
+    if (data?.status === 200) {
+    setIsModalOpen(true);
+    }
+    setSubmissionLoader(false);
+  };
+
   return (
-    <div className="px-4 sm:px-6 lg:px-8 py-12 ">
-      <PrescribeForm />
+    <div className="w-full overflow-y-auto h-screen">
+      <CustomModal isOpen={isModalOpen} mainScreenModal={true}>
+        <AttendedModal
+          isModalOpen={isModalOpen}
+          setCloseModal={setIsModalOpen}
+          patientID={patientId}
+          uID={user.uid}
+          PrescriptionAndReferData={formData}
+        />
+      </CustomModal>
+      <PrescribeForm
+        formData={formData}
+        setFormData={setFormData}
+        submissionLoader={submissionLoader}
+        handleSubmit={handleSubmit}
+      />
     </div>
   );
 };
 
-export default page;
+export default Page;

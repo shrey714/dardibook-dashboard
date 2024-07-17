@@ -35,16 +35,6 @@ body {
 }
 
 
-.full-screen {
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-
 /* subsciption page */
 
 .no-after-absolute::after {
@@ -97,6 +87,13 @@ body {
 
 @media (max-width: 480px) {
   .hide-before-480 {
+    display: none;
+  }
+}
+
+
+@media screen {
+  .hide-this-compo {
     display: none;
   }
 }

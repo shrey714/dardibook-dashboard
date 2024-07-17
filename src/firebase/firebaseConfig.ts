@@ -2,6 +2,7 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 const firebaseConfig = {
     apiKey: "AIzaSyDtsSdADXfaG2t2ncURIExtIJOhDo5anfY",
     authDomain: "dardibook.firebaseapp.com",
@@ -15,5 +16,5 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const provider = new GoogleAuthProvider();
-
-export { auth, provider, firebaseConfig, db };
+const storage = getStorage(app);
+export { auth, provider, firebaseConfig, db, storage };

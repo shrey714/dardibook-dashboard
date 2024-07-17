@@ -34,13 +34,13 @@ const BoxContainer = ({ CurrentToken }: any) => {
               justifyContent: "center",
               backgroundColor: "#000",
               cursor: "none",
-              position: "absolute",
               top: "0px",
               left: "0px",
               right: "0px",
               height: "100vh",
               zIndex: 999,
             }}
+            className="fixed md:absolute"
           >
             <Image
               src="/Logo.svg"

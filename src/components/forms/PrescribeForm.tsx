@@ -1,40 +1,19 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import Link from "next/link";
 import PrescribeMedicineTable from "./PrescribeMedicineTable";
-import { useSearchParams } from "next/navigation";
-import { useAppSelector } from "@/redux/store";
-import { createPrescription } from "@/app/services/createPrescription";
-const PrescribeForm = () => {
-  const searchParams = useSearchParams();
-  const user = useAppSelector<any>((state) => state.auth.user);
-  const [submissionLoader, setSubmissionLoader] = useState(false);
-  const patientId = searchParams.get("patientId");
-  const [formData, setFormData] = useState({
-    diseaseDetail: "",
-    advice: "",
-    nextVisit: undefined,
-    refer: {
-      hospitalName: "",
-      doctorName: "",
-      referMessage: "",
-    },
-    medicines: [
-      {
-        id: 1,
-        medicineName: "",
-        instruction: "",
-        dosages: [{ id: 1, value: "" }],
-        duration: "",
-      },
-    ],
-  });
 
+const PrescribeForm = ({
+  formData,
+  setFormData,
+  submissionLoader,
+  handleSubmit,
+}: any) => {
   const handleInputChange = (
     e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
   ) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({
+    setFormData((prevData: any) => ({
       ...prevData,
       [name]: value,
     }));
@@ -44,7 +23,7 @@ const PrescribeForm = () => {
     e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
   ) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({
+    setFormData((prevData: { refer: any }) => ({
       ...prevData,
       refer: {
         ...prevData.refer,
@@ -53,25 +32,13 @@ const PrescribeForm = () => {
     }));
   };
 
-  const handleSubmit = async (e: { preventDefault: () => void }) => {
-    e.preventDefault();
-    setSubmissionLoader(true);
-    // console.log({
-    //   ...formData,
-    //   uid: user.uid,
-    //   id: patientId,
-    // });
-    const data = await createPrescription({
-      ...formData,
-      uid: user.uid,
-      id: patientId,
-    });
-    console.log("status", data);
-    setSubmissionLoader(false);
-  };
-
   return (
-    <form onSubmit={handleSubmit} autoComplete="off" autoFocus={true}>
+    <form
+      className="px-4 sm:px-6 lg:px-8 py-12"
+      onSubmit={handleSubmit}
+      autoComplete="off"
+      autoFocus={true}
+    >
       <fieldset disabled={submissionLoader}>
         <div className="mx-auto max-w-5xl">
           {/* Disease text area */}
@@ -84,7 +51,8 @@ const PrescribeForm = () => {
             </label>
             <div className="mt-2">
               <textarea
-                required
+                autoFocus={true}
+                required={formData.refer.hospitalName ? false : true}
                 id="diseaseDetail"
                 name="diseaseDetail"
                 rows={5}
@@ -106,7 +74,7 @@ const PrescribeForm = () => {
             <PrescribeMedicineTable
               rows={formData.medicines}
               setRows={(medicines) =>
-                setFormData((prevData) => ({ ...prevData, medicines }))
+                setFormData((prevData: any) => ({ ...prevData, medicines }))
               }
             />
           </div>
@@ -162,11 +130,12 @@ const PrescribeForm = () => {
                     htmlFor="hospitalName"
                     className="text-sm font-medium leading-6 text-gray-900 flex items-center"
                   >
-                    Hospital Name
+                    Hospital Name<span className="text-red-500 ml-1">*</span>
                   </label>
                   <div className="sm:col-span-2 flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
                     <input
                       type="text"
+                      required={formData.diseaseDetail ? false : true}
                       name="hospitalName"
                       id="hospitalName"
                       autoComplete="street-address"
@@ -236,9 +205,6 @@ const PrescribeForm = () => {
               ) : (
                 "Save"
               )}
-            </button>
-            <button type="button" className="btn btn-success md:btn-wide">
-              Print
             </button>
           </div>
         </div>

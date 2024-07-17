@@ -19,7 +19,7 @@ export const createPrescription = async (req: any) => {
             body: JSON.stringify(req)
         });
         const data = await res.json();
-        return data;
+        return { ...data, status: res?.status };
     } catch (error) {
         return { error: error };
     }
