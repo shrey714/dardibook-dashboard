@@ -14,6 +14,7 @@ interface PatientData {
   age: string;
   gender: string;
   visitedDates: number[]; //array of timestamps in milliseconds
+  last_visited: number;
   appointed: boolean;
   mobile_number: string;
 }
@@ -25,6 +26,29 @@ interface Filters {
   ageFrom: string;
   ageTo: string;
   notAppointed: boolean;
+}
+
+function getUniqueDateTimestamps(
+  last_visited: number,
+  visitedDates: number[]
+): number[] {
+  // Combine last_visited and visitedDates
+  const allTimestamps = [last_visited, ...(visitedDates || [])];
+
+  // Create a Set to track unique dates
+  const uniqueDates = new Set<string>();
+
+  // Filter timestamps to ensure unique dates
+  const uniqueTimestamps = allTimestamps.filter((timestamp) => {
+    const date = new Date(timestamp).toISOString().split("T")[0]; // Convert to date string "YYYY-MM-DD"
+    if (!uniqueDates.has(date)) {
+      uniqueDates.add(date);
+      return true;
+    }
+    return false;
+  });
+
+  return uniqueTimestamps;
 }
 
 export default function HistoryPage() {
@@ -90,9 +114,10 @@ export default function HistoryPage() {
       const isInDateRange =
         !fromDateTimestamp ||
         !toDateTimestamp ||
-        patient.visitedDates.some(
-          (date) => date >= fromDateTimestamp && date <= toDateTimestamp
-        );
+        getUniqueDateTimestamps(
+          patient.last_visited,
+          patient.visitedDates
+        ).some((date) => date >= fromDateTimestamp && date <= toDateTimestamp);
 
       const isGenderMatch = gender === "All" || patient.gender === gender;
       const isAgeMatch =

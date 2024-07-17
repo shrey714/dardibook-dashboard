@@ -17,19 +17,49 @@ interface PatientData {
   age: number;
   gender: string;
   visitedDates: number[];
+  last_visited: number;
   appointed: boolean;
   mobile_number: string;
 }
 
+function getUniqueDateTimestamps(
+  last_visited: number,
+  visitedDates: number[]
+): number[] {
+  // Combine last_visited and visitedDates
+  const allTimestamps = [last_visited, ...(visitedDates || [])];
+
+  // Create a Set to track unique dates
+  const uniqueDates = new Set<string>();
+
+  // Filter timestamps to ensure unique dates
+  const uniqueTimestamps = allTimestamps.filter((timestamp) => {
+    const date = new Date(timestamp).toISOString().split("T")[0]; // Convert to date string "YYYY-MM-DD"
+    if (!uniqueDates.has(date)) {
+      uniqueDates.add(date);
+      return true;
+    }
+    return false;
+  });
+
+  return uniqueTimestamps;
+}
 // Transform the fetched data into the required format
 const transformData = (data: PatientData[]): Item[] => {
   const items: Item[] = [];
 
   data.forEach((patient) => {
-    const { first_name, last_name, id, visitedDates, mobile_number } = patient;
+    const {
+      first_name,
+      last_name,
+      id,
+      last_visited,
+      visitedDates,
+      mobile_number,
+    } = patient;
     const name = `${first_name} ${last_name}`;
 
-    visitedDates.forEach((timestamp) => {
+    getUniqueDateTimestamps(last_visited, visitedDates).forEach((timestamp) => {
       items.push({ id, name, timestamp, mobile_number });
     });
   });
@@ -84,7 +114,9 @@ const ItemList: React.FC<{ items: Item[] }> = ({ items }) => {
         <div className="min-w-6"></div>
         <div className="w-full">ID</div>
         <div className="w-full">Name</div>
-        <div className="w-full hide-between-768-and-990 hide-before-480">Mobile</div>
+        <div className="w-full hide-between-768-and-990 hide-before-480">
+          Mobile
+        </div>
         <div className="min-w-6"></div>
       </li>
       {sortedMonthYears.map((monthYear, key) => (
