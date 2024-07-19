@@ -10,8 +10,8 @@ import {
   where,
 } from "firebase/firestore";
 import { NextResponse, NextRequest } from "next/server";
-import {getDateFromTimeStamp} from "../../utils/dateFromts"
-import {getDayStartAndEndTimestampsIST} from "../../utils/getDayStartEndTs"
+import { getDateFromTimeStamp } from "../../utils/dateFromts";
+import { getDayStartAndEndTimestampsIST } from "../../utils/getDayStartEndTs";
 
 export const GET = async (request: NextRequest) => {
   const currentTimestamp = Date.now();
@@ -36,14 +36,24 @@ export const GET = async (request: NextRequest) => {
     docSnap.forEach((doc) => {
       const pData = doc.data();
       const currentTs = new Date();
-      const appointed = getDateFromTimeStamp(pData["last_visited"])===getDateFromTimeStamp(currentTs)?true:false;
       let old = true;
-      if(pData?.visitedDates && pData.visitedDates.length==1 && getDateFromTimeStamp(pData["visitedDates"][0])){
-        console.log(pData.visitedDates)
-        old = false;
+      let attended = false;
+      let visitedDtesArray = pData?.visitedDates;
+      console.log(visitedDtesArray)
+      let todayDate = getDateFromTimeStamp(currentTs);
+      if(visitedDtesArray===undefined)old=false;
+      if (visitedDtesArray !== undefined) {
+        console.log("hi")
+        visitedDtesArray.forEach((dates: number) => {
+          if (getDateFromTimeStamp(dates) == todayDate) {
+            attended = true;
+            return;
+          }
+        });
+        if(visitedDtesArray.length>1)old=true;
+        if(visitedDtesArray.length==1 && getDateFromTimeStamp(visitedDtesArray[0])==todayDate)old=false;
       }
-      patientData.push({...doc.data(),appointed,old});
-      patientData.push(doc.data());
+      patientData.push({ ...doc.data(), attended, old });
     });
 
     return NextResponse.json({ data: patientData }, { status: 200 });
