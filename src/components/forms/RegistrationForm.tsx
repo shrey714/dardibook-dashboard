@@ -8,7 +8,7 @@ interface RegistrationFormProps {
     doctorName: string;
     clinicNumber: string;
     phoneNumber: string;
-    emailId: string;
+    emailId: string | null | undefined;
     clinicAddress: string;
     clinicLogo: File | null;
     signaturePhoto: File | null;
@@ -20,7 +20,7 @@ interface RegistrationFormProps {
       doctorName: string;
       clinicNumber: string;
       phoneNumber: string;
-      emailId: string;
+      emailId: string | null | undefined;
       clinicAddress: string;
       clinicLogo: File | null;
       signaturePhoto: File | null;
@@ -56,7 +56,6 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({
         }
       };
       reader.readAsDataURL(file);
-
       setFormData((prevData) => ({
         ...prevData,
         [name]: file,
@@ -99,12 +98,12 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({
           </label>
           <input
             required
-            autoFocus={true}
             type="text"
             id="clinicName"
             name="clinicName"
             className="form-input py-[6px] mt-1 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
             value={formData.clinicName}
+            autoFocus={true}
             onChange={handleChange}
           />
         </div>
@@ -176,8 +175,9 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({
             id="emailId"
             name="emailId"
             className="form-input py-[6px] mt-1 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
-            value={formData.emailId}
+            value={formData.emailId ? formData.emailId : ""}
             onChange={handleChange}
+            disabled
           />
         </div>
         {/* Clinic Address */}

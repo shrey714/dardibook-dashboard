@@ -93,12 +93,20 @@ const AppWrapper = ({ children }: { children: React.ReactNode }) => {
         }
       }
     }
-  }, [user, loading, dispatch, router, pathRequiresAuth, children, userInfo?.verified]);
+  }, [
+    user,
+    loading,
+    dispatch,
+    router,
+    pathRequiresAuth,
+    children,
+    userInfo?.verified,
+  ]);
 
   {
-    return (loading || firstLoading ) && pathRequiresAuth ? (
+    return loading && pathRequiresAuth ? (
       <div className="w-screen h-screen overflow-hidden flex items-center justify-center bg-white">
-        <div>{(loading || firstLoading ) && <TopBarProgress />}</div>
+        <div>{loading && <TopBarProgress />}</div>
         <img src="/logo.svg" className="h-52" alt="Flowbite Logo" />
       </div>
     ) : (

@@ -3,12 +3,6 @@ import { doc, setDoc } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { NextResponse, NextRequest } from "next/server";
 
-const uploadFile = async (file: File, path: string) => {
-  const fileRef = ref(storage, path);
-  await uploadBytes(fileRef, file);
-  return getDownloadURL(fileRef);
-};
-
 export const POST = async (request: NextRequest) => {
   try {
     // const { searchParams } = new URL(request.url);
@@ -23,35 +17,10 @@ export const POST = async (request: NextRequest) => {
 
     const doctorDocRef = doc(db, "doctor", uid);
 
-    // Upload images and get URLs
-    let clinicLogoUrl = "";
-    let signaturePhotoUrl = "";
-
-    if (formData.clinicLogo) {
-      clinicLogoUrl = await uploadFile(
-        formData.clinicLogo,
-        `clinicLogos/${uid}`
-      );
-    }
-
-    if (formData.signaturePhoto) {
-      signaturePhotoUrl = await uploadFile(
-        formData.signaturePhoto,
-        `signaturePhotos/${uid}/`
-      );
-    }
-
     await setDoc(
       doctorDocRef,
       {
-        clinicName: formData.clinicName,
-        doctorName: formData.doctorName,
-        clinicNumber: formData.clinicNumber,
-        phoneNumber: formData.phoneNumber,
-        emailId: formData.emailId,
-        clinicAddress: formData.clinicAddress,
-        clinicLogo: clinicLogoUrl,
-        signaturePhoto: signaturePhotoUrl,
+        ...formData,
         verified: true,
       },
       { merge: true }
