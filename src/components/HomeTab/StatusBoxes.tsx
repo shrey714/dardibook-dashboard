@@ -21,48 +21,120 @@ const StatusBoxes: React.FC<StatusBoxesProps> = ({
   const [patientsAttendedThisMonth, setPatientsAttendedThisMonth] =
     useState<number>(0);
 
+  // const fetchPatientVisitData = (patientsCollection: any[]) => {
+  //   const today = new Date();
+  //   const todayDate = today.toLocaleDateString();
+  //   const month = today.getMonth() + 1; // Months are 0-based, so add 1
+  //   const year = today.getFullYear();
+
+  //   let registeredTodayCount = 0;
+  //   let attendedTodayCount = 0;
+  //   let newPatientsThisMonthCount = 0;
+  //   let patientsAttendedThisMonthCount = 0;
+
+  //   patientsCollection?.forEach(async (patient) => {
+  //     const lastVisitedDate = new Date(
+  //       patient?.last_visited
+  //     ).toLocaleDateString();
+  //     const visitedDates =
+  //       patient?.visitedDates?.map((date: number) =>
+  //         new Date(date).toLocaleDateString()
+  //       ) || [];
+
+  //     if (lastVisitedDate === todayDate) {
+  //       registeredTodayCount++;
+  //     }
+
+  //     if (visitedDates.includes(todayDate)) {
+  //       attendedTodayCount++;
+  //     }
+
+  //     const visitMonthsAndYears = visitedDates.map(
+  //       (date: string | number | Date) => {
+  //         const visitDate = new Date(date);
+  //         return `${visitDate.getFullYear()}-${visitDate.getMonth() + 1}`;
+  //       }
+  //     );
+
+  //     const currentMonthYear = `${year}-${month}`;
+  //   console.log("visitMonthsAndYears===", visitMonthsAndYears);
+  //   console.log("currentMonthYear===", currentMonthYear);
+
+  //     if (
+  //       visitedDates.length === 1 &&
+  //       visitMonthsAndYears[0] === currentMonthYear
+  //     ) {
+  //       console.log(patient.id);
+  //       newPatientsThisMonthCount++;
+  //     }
+
+  //     patientsAttendedThisMonthCount += visitMonthsAndYears.filter(
+  //       (date: string) => date === currentMonthYear
+  //     ).length;
+  //   });
+  //   // console.log("registeredTodayCount===", registeredTodayCount);
+  //   // console.log("attendedTodayCount===", attendedTodayCount);
+  //   // console.log("newPatientsThisMonthCount===", newPatientsThisMonthCount);
+  //   // console.log(
+  //   //   "patientsAttendedThisMonthCount===",
+  //   //   patientsAttendedThisMonthCount
+  //   // );
+  //   setPatientsRegisteredToday(registeredTodayCount);
+  //   setPatientsAttendedToday(attendedTodayCount);
+  //   setNewPatientsThisMonth(newPatientsThisMonthCount);
+  //   setPatientsAttendedThisMonth(patientsAttendedThisMonthCount);
+  // };
+
   const fetchPatientVisitData = (patientsCollection: any[]) => {
     const today = new Date();
-    const todayDate = today.toISOString().split("T")[0];
-    const yearMonth = today.toISOString().slice(0, 7);
-
+    const todayDate = today.toISOString().split("T")[0]; // Use ISO format YYYY-MM-DD
+    const month = today.getMonth() + 1; // Months are 0-based, so add 1
+    const year = today.getFullYear();
+  
     let registeredTodayCount = 0;
     let attendedTodayCount = 0;
     let newPatientsThisMonthCount = 0;
     let patientsAttendedThisMonthCount = 0;
-
+  
     patientsCollection?.forEach((patient) => {
-      //   console.log(patient);
-      const lastVisitedDate = new Date(patient?.last_visited)
-        .toISOString()
-        .split("T")[0];
-      const visitedDates =
-        patient?.visitedDates?.map(
-          (date: number) => new Date(date).toISOString().split("T")[0]
-        ) || [];
-
+      const lastVisitedDate = new Date(patient?.last_visited).toISOString().split("T")[0];
+      const visitedDates = patient?.visitedDates?.map((date: number) =>
+        new Date(date).toISOString().split("T")[0]
+      ) || [];
+  
       if (lastVisitedDate === todayDate) {
         registeredTodayCount++;
       }
-
+  
       if (visitedDates.includes(todayDate)) {
         attendedTodayCount++;
       }
-
-      if (visitedDates.length === 1 && visitedDates[0].startsWith(yearMonth)) {
+  
+      const visitMonthsAndYears = visitedDates.map((date: string) => {
+        const visitDate = new Date(date);
+        return `${visitDate.getFullYear()}-${visitDate.getMonth() + 1}`;
+      });
+  
+      const currentMonthYear = `${year}-${month}`;
+  
+      if (
+        visitedDates.length === 1 &&
+        visitMonthsAndYears[0] === currentMonthYear
+      ) {
         newPatientsThisMonthCount++;
       }
-
-      if (visitedDates.some((date: string) => date.startsWith(yearMonth))) {
-        patientsAttendedThisMonthCount++;
-      }
+  
+      patientsAttendedThisMonthCount += visitMonthsAndYears.filter(
+        (date: string) => date === currentMonthYear
+      ).length;
     });
-
+  
     setPatientsRegisteredToday(registeredTodayCount);
     setPatientsAttendedToday(attendedTodayCount);
     setNewPatientsThisMonth(newPatientsThisMonthCount);
     setPatientsAttendedThisMonth(patientsAttendedThisMonthCount);
   };
+  
 
   useEffect(() => {
     if (!loader) {

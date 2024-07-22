@@ -2,8 +2,12 @@ import React, { useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { ArrowsPointingInIcon, ArrowsPointingOutIcon } from "@heroicons/react/24/outline";
-const BoxContainer = ({ CurrentToken }: any) => {
+import {
+  ArrowsPointingInIcon,
+  ArrowsPointingOutIcon,
+} from "@heroicons/react/24/outline";
+import { NoSymbolIcon } from "@heroicons/react/24/solid";
+const BoxContainer = ({ CurrentToken, loading }: any) => {
   const [isExpanded, setisExpanded] = useState(false);
   return (
     <>
@@ -62,7 +66,11 @@ const BoxContainer = ({ CurrentToken }: any) => {
                 fontSize: "18rem",
               }}
             >
-              {CurrentToken}
+              {loading || CurrentToken === 0 ? (
+                <NoSymbolIcon className="size-48 text-white" />
+              ) : (
+                CurrentToken
+              )}
             </motion.h3>
           </motion.div>
         )}
@@ -110,7 +118,11 @@ const BoxContainer = ({ CurrentToken }: any) => {
             fontSize: "3rem",
           }}
         >
-          {CurrentToken}
+          {loading || CurrentToken === 0 ? (
+            <NoSymbolIcon className="size-10 text-white" />
+          ) : (
+            CurrentToken
+          )}
         </motion.h3>
       </motion.div>
     </>

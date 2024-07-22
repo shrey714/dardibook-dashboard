@@ -54,7 +54,7 @@ const AttendedModal = ({
         setprintDataLoader(true);
         const patientData = await getDataToPrint(uID, patientID);
         if (patientData.status === 200) {
-          console.log(patientData);
+          // console.log(patientData);
           setdoctorAndPatientData(patientData);
         } else {
           console.log("No data available for the provided PatientID.");

@@ -14,7 +14,7 @@ export const checkSubscription = async (userId: string): Promise<{
 }> => {
   const userDocRef = doc(db, 'doctor', userId);
   const userDoc = await getDoc(userDocRef);
-  if (userDoc.exists()) {
+  if (userDoc.exists() && userDoc.data().subscriptionId) {
     const details = await fetch(
       "https://backend.dardibook.in/getSubDetails",
       {
@@ -26,7 +26,6 @@ export const checkSubscription = async (userId: string): Promise<{
       }
     );
     const subscriptionDetails = await details.json();
-    // console.log("subscriptionDetails===", subscriptionDetails)
     if (
       isCurrentTimeBetween(
         subscriptionDetails?.current_start,

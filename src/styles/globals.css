@@ -90,10 +90,29 @@ body {
   }
 }
 
+@media (min-width: 768px) and (max-width: 990px) {
+  .full-radius-between-768-and-990 {
+    border-start-start-radius: 9999px;
+    border-end-start-radius: 9999px;
+  }
+}
+
+@media (max-width: 480px) {
+  .full-radius-before-480 {
+    border-start-start-radius: 9999px;
+    border-end-start-radius: 9999px;
+  }
+}
 
 @media screen {
   .hide-this-compo {
     display: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .flex-col-below-990 {
+    flex-direction: column;
   }
 }
 
@@ -159,4 +178,12 @@ body {
 
 .custom-button::before:active {
   box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.4);
+}
+
+/* transparent text effect */
+
+.trns-text {
+  -webkit-text-fill-color: transparent;
+  -webkit-background-clip: text;
+  background-size: cover;
 }

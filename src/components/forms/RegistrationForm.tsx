@@ -83,7 +83,6 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({
   return (
     <form
       onSubmit={handleSubmit}
-      noValidate
       autoFocus={true}
       autoComplete="off"
     >

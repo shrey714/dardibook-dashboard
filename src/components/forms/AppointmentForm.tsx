@@ -43,7 +43,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
       autoComplete="off"
     >
       <fieldset disabled={submissionLoader}>
-        <div className="mx-auto max-w-4xl bg-white rounded-lg pt-6 pb-3">
+        <div className="mx-auto max-w-4xl bg-white rounded-lg pt-3 md:pt-6 pb-3">
           {/* token selection form */}
           <div className="px-4 md:px-8">
             <h3 className="text-base font-semibold leading-7 text-gray-900">
@@ -53,9 +53,9 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
               Instant appointment or schedule on date
             </p>
           </div>
-          <div className="mt-6 border-t border-b border-gray-900/10">
+          <div className="mt-3 md:mt-6 border-t border-b border-gray-900/10">
             <dl className="divide-y divide-gray-900/10">
-              <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 md:px-8">
+              <div className="px-4 py-2 md:py-6 sm:grid sm:grid-cols-3 sm:gap-4 md:px-8">
                 <label
                   htmlFor="patient_unique_Id"
                   className="text-sm font-medium leading-6 text-gray-900 flex items-center gap-1"
@@ -76,7 +76,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
                   />
                 </div>
               </div>
-              <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 md:px-8">
+              <div className="px-4 py-2 md:py-6 sm:grid sm:grid-cols-3 sm:gap-4 md:px-8">
                 <label
                   htmlFor="last_visited"
                   className="text-sm font-medium leading-6 text-gray-900 flex items-center gap-1"
@@ -127,7 +127,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
             </dl>
           </div>
           {/* personal information form */}
-          <div className="px-4 mt-6 md:px-8">
+          <div className="px-4 mt-3 md:mt-6 md:px-8">
             <h3 className="text-base font-semibold leading-7 text-gray-900">
               Personal Information
             </h3>
@@ -135,9 +135,9 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
               Please use WhatsApp number where you get the reports
             </p>
           </div>
-          <div className="mt-6 border-t border-b border-gray-900/10">
+          <div className="mt-3 md:mt-6 border-t border-b border-gray-900/10">
             <dl className="divide-y divide-gray-900/10">
-              <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 md:px-8">
+              <div className="px-4 py-2 md:py-6 sm:grid sm:grid-cols-3 sm:gap-4 md:px-8">
                 <label
                   htmlFor="first_name"
                   className="text-sm font-medium leading-6 text-gray-900 flex items-center gap-1"
@@ -158,7 +158,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
                   />
                 </div>
               </div>
-              <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 md:px-8">
+              <div className="px-4 py-2 md:py-6 sm:grid sm:grid-cols-3 sm:gap-4 md:px-8">
                 <label
                   htmlFor="last_name"
                   className="text-sm font-medium leading-6 text-gray-900 flex items-center gap-1"
@@ -178,7 +178,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
                   />
                 </div>
               </div>
-              <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 md:px-8">
+              <div className="px-4 py-2 md:py-6 sm:grid sm:grid-cols-3 sm:gap-4 md:px-8">
                 <label
                   htmlFor="mobile_number"
                   className="text-sm font-medium leading-6 text-gray-900 flex items-center gap-1"
@@ -198,7 +198,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
                   />
                 </div>
               </div>
-              <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 md:px-8">
+              <div className="px-4 py-2 md:py-6 sm:grid sm:grid-cols-3 sm:gap-4 md:px-8">
                 <label
                   htmlFor="gender"
                   className="text-sm font-medium leading-6 text-gray-900 flex items-center gap-1"
@@ -220,7 +220,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
                   </select>
                 </div>
               </div>
-              <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 md:px-8">
+              <div className="px-4 py-2 md:py-6 sm:grid sm:grid-cols-3 sm:gap-4 md:px-8">
                 <label
                   htmlFor="age"
                   className="text-sm font-medium leading-6 text-gray-900 flex items-center gap-1"
@@ -243,7 +243,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
             </dl>
           </div>
           {/* Address information form */}
-          <div className="px-4 mt-6 md:px-8">
+          <div className="px-4 mt-3 md:mt-6 md:px-8">
             <h3 className="text-base font-semibold leading-7 text-gray-900">
               Address Information
             </h3>
@@ -251,9 +251,9 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
               Please Specify full patient address
             </p>
           </div>
-          <div className="mt-6 border-t border-gray-900/10">
+          <div className="mt-3 md:mt-6 border-t border-gray-900/10">
             <dl className="divide-y divide-gray-900/10">
-              <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 md:px-8">
+              <div className="px-4 py-2 md:py-6 sm:grid sm:grid-cols-3 sm:gap-4 md:px-8">
                 <label
                   htmlFor="street_address"
                   className="text-sm font-medium leading-6 text-gray-900 flex items-center"
@@ -272,7 +272,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
                   />
                 </div>
               </div>
-              <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 md:px-8">
+              <div className="px-4 py-2 md:py-6 sm:grid sm:grid-cols-3 sm:gap-4 md:px-8">
                 <label
                   htmlFor="city"
                   className="text-sm font-medium leading-6 text-gray-900 flex items-center"
@@ -291,7 +291,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
                   />
                 </div>
               </div>
-              <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 md:px-8">
+              <div className="px-4 py-2 md:py-6 sm:grid sm:grid-cols-3 sm:gap-4 md:px-8">
                 <label
                   htmlFor="state"
                   className="text-sm font-medium leading-6 text-gray-900 flex items-center"
@@ -310,7 +310,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
                   />
                 </div>
               </div>
-              <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 md:px-8">
+              <div className="px-4 py-2 md:py-6 sm:grid sm:grid-cols-3 sm:gap-4 md:px-8">
                 <label
                   htmlFor="zip"
                   className="text-sm font-medium leading-6 text-gray-900 flex items-center"
@@ -338,7 +338,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
             href={"./"}
             scroll={true}
             type="button"
-            className="btn md:btn-wide text-sm font-semibold leading-6 text-gray-900"
+            className="btn md:btn-wide bg-white border-0 text-sm font-semibold leading-6 text-gray-900"
           >
             Cancel
           </Link>

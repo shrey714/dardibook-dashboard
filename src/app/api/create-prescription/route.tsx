@@ -40,7 +40,7 @@ export const POST = async (request: NextRequest) => {
       const conveirtedDates = patientDoc
         .data()
         ?.visitedDates.map(getDateFromTimeStamp);
-      if (!conveirtedDates.includes) {
+      if (!conveirtedDates.includes(getDateFromTimeStamp(newDate))) {
         await updateDoc(patientDocRef, {
           visitedDates: arrayUnion(newDate),
         });

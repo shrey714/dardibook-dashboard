@@ -64,6 +64,9 @@ export default function Sidebar({ show, setter }) {
 
     return (
       <Link
+        onClick={() => {
+          setter((oldVal) => !oldVal);
+        }}
         href="/dashboard/settings"
         className={`group flex items-center my-4 ${
           status ? "px-1" : "px-2"

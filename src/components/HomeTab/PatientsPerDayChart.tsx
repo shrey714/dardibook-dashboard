@@ -17,6 +17,7 @@ ChartJS.register(
   Tooltip,
   Legend
 );
+
 const PatientsPerDayChart = ({ patientsCollection, loader }: any) => {
   const [chartData, setChartData] = useState<any>({ labels: [], datasets: [] });
   const [availableMonths, setAvailableMonths] = useState<string[]>([]);
@@ -32,9 +33,12 @@ const PatientsPerDayChart = ({ patientsCollection, loader }: any) => {
       if (array) {
         array.forEach((timestamp: number) => {
           const date = new Date(timestamp);
-          const formattedDate = date.toISOString().split("T")[0]; // Convert to YYYY-MM-DD
-          const monthOnly = formattedDate.slice(0, 7); // Get YYYY-MM
-          const dayOnly = formattedDate.slice(8, 10); // Get DD
+          const year = date.getFullYear();
+          const month = (date.getMonth() + 1).toString().padStart(2, "0");
+          const day = date.getDate().toString().padStart(2, "0");
+          const monthOnly = `${year}-${month}`;
+          const dayOnly = day;
+
           monthSet.add(monthOnly);
           if (!visitData[monthOnly]) {
             visitData[monthOnly] = {};
@@ -56,11 +60,8 @@ const PatientsPerDayChart = ({ patientsCollection, loader }: any) => {
     }
 
     if (selectedMonth) {
-      const daysInMonth = new Date(
-        parseInt(selectedMonth.split("-")[0]),
-        parseInt(selectedMonth.split("-")[1]),
-        0
-      ).getDate();
+      const [year, month] = selectedMonth.split("-");
+      const daysInMonth = new Date(parseInt(year), parseInt(month), 0).getDate();
       const labels = Array.from({ length: daysInMonth }, (_, i) =>
         (i + 1).toString().padStart(2, "0")
       ); // Generate 01 to 30/31

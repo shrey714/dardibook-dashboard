@@ -50,12 +50,16 @@ export default function TShirtsPage() {
           Get Details
         </Link>
       </div>
-      <div className="relative mt-[1.25rem] w-full md:w-3/4 p-1 pt-6 flex rounded-lg border-gray-800 border-[2px] flex-col">
-        <div className="-top-[1.25rem] left-0 w-full absolute flex items-center justify-center">
+      <div className="w-full md:w-3/4 p-0 flex flex-row items-center">
+        <span className="flex flex-1 h-[2px] bg-gradient-to-r from-transparent via-primary to-gray-800"></span>
+        <div className=" flex items-center justify-center">
           <p className="text-gray-800 w-auto px-3 py-1 font-semibold text-base bg-gray-300 rounded-full border-gray-800 border-[2px]">
             Today&apos;s Queue
           </p>
         </div>
+        <span className="flex flex-1 h-[2px] bg-gradient-to-l from-transparent via-primary to-gray-800"></span>
+      </div>
+      <div className="w-full md:w-3/4 p-0 -mt-4">
         <ReOrderingList />
       </div>
     </div>
