@@ -11,6 +11,7 @@ const extractUserData = (user: any) => {
         email: user.email,
         displayName: user.displayName,
         photoURL: user.photoURL,
+        verified: false,
         // Add any other serializable properties you need
     };
 };

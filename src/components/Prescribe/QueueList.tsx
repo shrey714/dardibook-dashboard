@@ -2,10 +2,10 @@
 import React, { useEffect, useState } from "react";
 import { getTodayPatients } from "@/app/services/getTodayPatients";
 import { useAppSelector } from "@/redux/store";
-import QueuePrescribeLoader from "./QueuePrescribeLoader";
 import Link from "next/link";
 import StatsHeader from "./StatsHeader";
 import useToken from "@/firebase/useToken";
+import Loader from "../common/Loader";
 const QueueList: React.FC = () => {
   const user = useAppSelector<any>((state) => state.auth.user);
   const [queueItems, setqueueItems] = useState<any>([]);
@@ -49,7 +49,13 @@ const QueueList: React.FC = () => {
       </div>
       <div className="w-full flex flex-row">
         {queueLoader ? (
-          <QueuePrescribeLoader />
+          <div className="w-full h-52 overflow-hidden flex items-center justify-center">
+            <Loader
+              size="medium"
+              color="text-primary"
+              secondaryColor="text-white"
+            />
+          </div>
         ) : queueItems.length === 0 ? (
           <div className="w-full h-52 overflow-hidden flex items-center justify-center">
             Empty
@@ -146,7 +152,7 @@ const QueueList: React.FC = () => {
                               pathname: "prescribe/patientData",
                               query: { patientId: item.patient_unique_Id },
                             }}
-                            className="mx-1 py-1 px-2 w-full m-1 text-gray-800 bg-[#ccc] rounded-[4px] font-semibold text-sm sm:text-base"
+                            className="mx-1 py-1 px-2 w-full m-1 text-gray-800 bg-white shadow-[0px_0px_0px_1px_#a0aec0] rounded-[4px] font-semibold text-sm sm:text-base"
                           >
                             History
                           </Link>

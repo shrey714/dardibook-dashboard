@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import Loader from "../common/Loader";
 interface PatientFormData {
   last_visited: number;
   patient_unique_Id: string;
@@ -146,7 +147,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
                 </label>
                 <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
                   <input
-                  autoFocus={true}
+                    autoFocus={true}
                     required
                     type="text"
                     name="first_name"
@@ -347,7 +348,11 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
             className="btn md:btn-wide rounded-md bg-indigo-600 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             {submissionLoader ? (
-              <span className="loading loading-spinner"></span>
+              <Loader
+                size="medium"
+                color="text-primary"
+                secondaryColor="text-white"
+              />
             ) : (
               "Save"
             )}

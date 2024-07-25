@@ -6,8 +6,8 @@ import {
   ArrowsPointingInIcon,
   ArrowsPointingOutIcon,
 } from "@heroicons/react/24/outline";
-import { NoSymbolIcon } from "@heroicons/react/24/solid";
-const BoxContainer = ({ CurrentToken, loading }: any) => {
+import { NoSymbolIcon, PauseIcon } from "@heroicons/react/24/solid";
+const BoxContainer = ({ CurrentToken, loading, isPaused }: any) => {
   const [isExpanded, setisExpanded] = useState(false);
   return (
     <>
@@ -66,8 +66,8 @@ const BoxContainer = ({ CurrentToken, loading }: any) => {
                 fontSize: "18rem",
               }}
             >
-              {loading || CurrentToken === 0 ? (
-                <NoSymbolIcon className="size-48 text-white" />
+              {loading || isPaused ? (
+                <PauseIcon className="size-48 text-white" />
               ) : (
                 CurrentToken
               )}
@@ -106,6 +106,8 @@ const BoxContainer = ({ CurrentToken, loading }: any) => {
           backgroundColor: "#000",
         }}
       >
+        {/* Add image here also */}
+
         <ArrowsPointingOutIcon className="size-4 text-white absolute top-4 right-4" />
         <motion.h3
           layoutId={`h3-714`}
@@ -118,8 +120,8 @@ const BoxContainer = ({ CurrentToken, loading }: any) => {
             fontSize: "3rem",
           }}
         >
-          {loading || CurrentToken === 0 ? (
-            <NoSymbolIcon className="size-10 text-white" />
+          {loading || isPaused ? (
+            <PauseIcon className="size-10 text-white" />
           ) : (
             CurrentToken
           )}

@@ -8,6 +8,8 @@ import SubscriptionPlans from "@/components/SubscriptionPlans";
 import DefaultComponent from "@/components/DefaultDashboard";
 import "@/styles/globals.css";
 import BlockedModal from "@/components/BlockedModal";
+import Loader from "../common/Loader";
+
 const DashboardWrapper = ({ children }: { children: ReactNode }) => {
   const user = useAppSelector((state) => state.auth.user);
   const router = useRouter();
@@ -63,7 +65,7 @@ const DashboardWrapper = ({ children }: { children: ReactNode }) => {
                 zIndex: 100000,
               }}
             >
-              <span className="loading loading-spinner loading-md"></span>
+              <Loader size="large" color="text-primary" secondaryColor="text-gray-300" />
             </div>
           ) : subscription ? (
             children ? (

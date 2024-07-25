@@ -6,8 +6,8 @@ import React, { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useAppSelector } from "@/redux/store";
 import { getPatientHistory } from "@/app/services/getPatientHistory";
-import FullAreaLoader from "@/components/common/FullAreaLoader";
 import NoPatientHistoryFound from "@/components/Prescribe/NoPatientHistoryFound";
+import Loader from "@/components/common/Loader";
 
 const Page = () => {
   const searchParams = useSearchParams();
@@ -41,16 +41,20 @@ const Page = () => {
   return (
     <div className="self-center flex w-full flex-col">
       {patientId && historyLoader ? (
-        <FullAreaLoader />
+        <div className="w-full h-screen overflow-hidden flex items-center justify-center z-50">
+          <Loader
+            size="medium"
+            color="text-primary"
+            secondaryColor="text-white"
+          />
+        </div>
       ) : error ? (
         <NoPatientHistoryFound message={error} />
       ) : (
         <>
           <div className="p-2 flex gap-8 items-center flex-col-reverse sm:flex-row px-4 ">
             <PatientDataBox patientData={patientData} />
-            <div className="p-4 gap-6 flex flex-col">
-
-            </div>
+            <div className="p-4 gap-6 flex flex-col"></div>
           </div>
           <PatientHistoryTabs prescriptionsData={prescriptionsData} />
         </>

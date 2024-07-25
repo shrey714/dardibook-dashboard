@@ -2,6 +2,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useAppSelector } from "@/redux/store";
+import Loader from "@/components/common/Loader";
 
 const Home = () => {
   const user = useAppSelector((state) => state.auth.user);
@@ -22,11 +23,11 @@ const Home = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: "white",
+        background: "transparent",
         zIndex: 100000,
       }}
     >
-      <span className="loading loading-spinner loading-md"></span>
+      <Loader size="large" color="text-primary" secondaryColor="text-gray-300" />
     </div>
   );
 };

@@ -1,5 +1,6 @@
 // PrescribeMedicineTable
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
+import axios from "axios";
 import {
   ChevronRightIcon,
   XMarkIcon,
@@ -8,6 +9,7 @@ import {
   XCircleIcon,
   PlusCircleIcon,
 } from "@heroicons/react/24/outline";
+import MedicineSuggetion from "../Prescribe/MedicineSuggetion";
 
 interface Dosage {
   id: number;
@@ -52,6 +54,7 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
     event: ChangeEvent<HTMLInputElement>
   ) => {
     const { name, value } = event.target;
+    // console.log("root===", name, value);
     setRows(
       rows.map((row) => (row.id === rowId ? { ...row, [name]: value } : row))
     );
@@ -122,13 +125,12 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
         <tbody>
           {rows?.map((row, index) => (
             <tr key={row.id} className={`${row.id}`}>
-              <td className="align-top p-1">
-                <input
-                  type="text"
-                  name="medicineName"
-                  value={row.medicineName}
-                  onChange={(event) => handleInputChange(row.id, event)}
-                  className="form-input w-full block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              <td className="align-top p-1 relative">
+                {/* implement search functionality here */}
+                <MedicineSuggetion
+                  medicine={row.medicineName}
+                  rowId={row.id}
+                  handleInputChange={handleInputChange}
                 />
               </td>
               <td className="align-top p-1">

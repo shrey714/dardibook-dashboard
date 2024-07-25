@@ -6,11 +6,10 @@ const useToken = (doctorID: string) => {
     const [CurrentToken, setCurrentToken] = useState(0);
     const [loading, setLoading] = useState(true);
     const [allowNotification, setAllowNotification] = useState(false);
+    const [isPaused, setIsPaused] = useState(false); // Add state for pause
     const isClientUpdate = useRef(false);
     const debounceTimeout = useRef<number | null>(null);
     const initialLoad = useRef(true);
-
-
 
     const playNotification = () => {
         const audio = new Audio('/token_sound.mp3');
@@ -19,12 +18,9 @@ const useToken = (doctorID: string) => {
         });
     };
 
-
     const toggleNotification = (allow: boolean) => {
         setAllowNotification(allow);
     };
-
-
 
     useEffect(() => {
         if (doctorID) {
@@ -40,16 +36,18 @@ const useToken = (doctorID: string) => {
                         set(dbRef, {
                             last_time: Date.now().toString(),
                             token_number: 0,
+                            paused: false, // Initialize paused state
                         });
                         setCurrentToken(0);
                     } else {
                         setCurrentToken(data.token_number);
+                        setIsPaused(data.paused); // Set the paused state
                     }
                 } else {
-                    // Data does not exist, create a new entry
                     set(dbRef, {
                         last_time: Date.now().toString(),
                         token_number: 0,
+                        paused: false, // Initialize paused state
                     });
                     setCurrentToken(0);
                 }
@@ -77,11 +75,11 @@ const useToken = (doctorID: string) => {
             const unsubscribe = onValue(dbRef, (snapshot) => {
                 if (snapshot.exists()) {
                     const data = snapshot.val();
-                    // console.log( data.token_number , CurrentToken)
-                    if (!isClientUpdate.current && allowNotification && !initialLoad.current && data.token_number !== CurrentToken) {
+                    if (!isClientUpdate.current && allowNotification && !initialLoad.current && (data.token_number !== CurrentToken || data.paused !== isPaused)) {
                         debouncePlayNotification();
                     }
                     setCurrentToken(data.token_number);
+                    setIsPaused(data.paused); // Update paused state
                     isClientUpdate.current = false;
                 }
             });
@@ -89,12 +87,11 @@ const useToken = (doctorID: string) => {
             // Cleanup listener on component unmount
             return () => unsubscribe();
         }
-    }, [CurrentToken, allowNotification, doctorID])
-
+    }, [CurrentToken, allowNotification, doctorID, isPaused]);
 
     const updateToken = (increment: number) => {
-        if (CurrentToken + increment < 0) {
-            return; // Prevent token number from being negative
+        if (isPaused || CurrentToken + increment < 0) {
+            return; // Prevent token number from being negative or updated if paused
         }
         const dbRef = ref(realtimeDb, doctorID);
         const newTokenNumber = CurrentToken + increment;
@@ -106,9 +103,17 @@ const useToken = (doctorID: string) => {
         });
     };
 
+    const togglePause = () => {
+        const dbRef = ref(realtimeDb, doctorID);
+        const newPauseState = !isPaused;
+        setIsPaused(newPauseState);
+        isClientUpdate.current = true;
+        update(dbRef, {
+            paused: newPauseState,
+        });
+    };
 
-
-    return { CurrentToken, loading, updateToken, allowNotification, toggleNotification };
+    return { CurrentToken, loading, updateToken, allowNotification, toggleNotification, isPaused, togglePause };
 };
 
 export default useToken;

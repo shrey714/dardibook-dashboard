@@ -1,5 +1,4 @@
 "use client";
-import FullAreaLoader from "@/components/common/FullAreaLoader";
 import AppointmentForm from "@/components/forms/AppointmentForm";
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
@@ -10,6 +9,7 @@ import NoPatientsFound from "@/components/Appointment/NoPatientsFound";
 import { RegisterPatient } from "@/app/services/registerPatient";
 import CustomModal from "@/components/BlockedModal";
 import RegisteredModal from "@/components/Appointment/RegisteredModal";
+import Loader from "@/components/common/Loader";
 interface PatientFormDataTypes {
   last_visited: number;
   patient_unique_Id: string;
@@ -99,7 +99,13 @@ const Page: React.FC = () => {
         />
       </CustomModal>
       {patientId && formLoader ? (
-        <FullAreaLoader />
+        <div className="w-full h-screen overflow-hidden flex items-center justify-center z-50">
+          <Loader
+            size="medium"
+            color="text-primary"
+            secondaryColor="text-white"
+          />
+        </div>
       ) : error ? (
         <NoPatientsFound message={error} />
       ) : (

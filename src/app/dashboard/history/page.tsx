@@ -4,8 +4,8 @@ import React, { useState, useEffect } from "react";
 import { useAppSelector } from "@/redux/store";
 import MultiLevelList from "@/components/History/MultiLevelList";
 import { getAllPatients } from "@/app/services/getAllPatients";
-import Loader from "@/components/History/Loader";
 import NoHistoryFound from "@/components/History/NoHistoryFound";
+import Loader from "@/components/common/Loader";
 
 interface PatientData {
   first_name: string;
@@ -370,7 +370,13 @@ export default function HistoryPage() {
         >
           <div className="bg-gray-300 md:rounded-tl-lg p-4 pt-0 w-full h-full overflow-y-auto">
             {user && loader ? (
-              <Loader />
+              <div className="w-full h-full overflow-hidden flex items-center justify-center z-50">
+                <Loader
+                  size="medium"
+                  color="text-primary"
+                  secondaryColor="text-white"
+                />
+              </div>
             ) : error ? (
               <NoHistoryFound message={error} />
             ) : patients.length === 0 ||
