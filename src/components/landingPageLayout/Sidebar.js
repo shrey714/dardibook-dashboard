@@ -31,8 +31,8 @@ export default function Sidebar({ show, setter }) {
   const MenuItem = ({ icon, name, route }) => {
     // Highlight menu item based on currently displayed route
     const colorClass = isSubPath(pathname, route)
-      ? "text-black bg-primary"
-      : "text-black/50 hover:text-black";
+      ? "text-black bg-primary border-2 border-primary text-white"
+      : "text-gray-600 bg-white border-2 border-gray-300 hover:border-primary hover:text-black";
 
     return (
       <Link
@@ -40,7 +40,7 @@ export default function Sidebar({ show, setter }) {
           setter((oldVal) => !oldVal);
         }}
         href={route}
-        className={`font-bold border-2 border-primary text-md my-2 px-5 py-2 rounded-full mx-4  ${colorClass}`}
+        className={`font-bold text-[15px] my-[6px] px-5 py-2 rounded-full mx-4  ${colorClass}`}
       >
         {name}
       </Link>

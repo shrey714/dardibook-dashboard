@@ -2,7 +2,7 @@
 "use client";
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAppSelector } from "@/redux/store";
+import { setUser, useAppDispatch, useAppSelector } from "@/redux/store";
 import RegistrationForm from "@/components/forms/RegistrationForm";
 import { createDoctor } from "@/app/services/createDoctor";
 import AuthHeaderWrapper from "@/components/wrapper/AuthHeaderWrapper";
@@ -11,7 +11,7 @@ const SignIn = () => {
   const [loading, setloading] = useState(false);
   const router = useRouter();
   const [submissionLoader, setSubmissionLoader] = useState(false);
-
+  const dispatch = useAppDispatch();
   useEffect(() => {
     setloading(true);
     if (user?.verified) {
@@ -44,11 +44,14 @@ const SignIn = () => {
       });
       // open modal on submitting the register patoent form
       if (data?.status === 200) {
+        dispatch(setUser({ ...user, verified: true }));
         setTimeout(() => {
+          setSubmissionLoader(false);
           router.push("/");
-        }, 500);
+        }, 1000);
+      } else {
+        setSubmissionLoader(false);
       }
-      setSubmissionLoader(false);
     }
   };
 

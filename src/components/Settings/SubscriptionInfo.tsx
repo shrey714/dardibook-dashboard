@@ -53,7 +53,6 @@ const SubscriptionInfo = ({ subId, mainLoader }: any) => {
         const planDetails = await getPlanById(result?.data?.plan_id);
         const parsedPlanDetails = await planDetails.json();
         setplanData(parsedPlanDetails?.item);
-        console.log(parsedPlanDetails);
         setLoader(false);
       }
     };

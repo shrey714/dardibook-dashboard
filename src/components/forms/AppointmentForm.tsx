@@ -195,6 +195,9 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
                     autoComplete="given-name"
                     value={patientFormData.mobile_number}
                     onChange={handleInputChange}
+                    pattern="^\d{10}$" // Adjust the pattern to match the format you want
+                    title="Please enter a valid 10-digit mobile number."
+                    maxLength={10}
                     className="form-input block flex-1 border-0 bg-transparent py-1 pl-2 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
                   />
                 </div>
@@ -316,7 +319,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
                   htmlFor="zip"
                   className="text-sm font-medium leading-6 text-gray-900 flex items-center"
                 >
-                  ZIP / Postal code
+                  Pin code
                 </label>
                 <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
                   <input
@@ -326,6 +329,9 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
                     autoComplete="zip"
                     value={patientFormData.zip}
                     onChange={handleInputChange}
+                    pattern="^\d{6}$" // Adjust the pattern to match the format you want
+                    title="Please enter a valid 6-digit PIN code."
+                    maxLength={6}
                     className="form-input block w-full flex-1 border-0 bg-transparent py-1 pl-2 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
                   />
                 </div>

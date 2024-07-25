@@ -2,12 +2,12 @@
 "use client"; // Mark the component as a Client Component
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation"; // Correct import for app directory
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "@/firebase/firebaseConfig";
+// import { useAuthState } from "react-firebase-hooks/auth";
 import { setUser, clearUser, useAppSelector } from "@/redux/store";
 import { useAppDispatch } from "@/redux/store";
 import TopBarProgress from "react-topbar-progress-indicator";
 import { checkVerifiedField } from "@/app/services/verifyDoctor";
+import { auth } from "@/firebase/firebaseConfig";
 
 TopBarProgress.config({
   barColors: {
@@ -27,7 +27,7 @@ const extractUserData = (user: any) => {
 
 const AppWrapper = ({ children }: { children: React.ReactNode }) => {
   // console.log("goin through home layout file")
-  const [user, loading, error] = useAuthState(auth);
+  // const [user, loading, error] = useAuthState(auth);
   const userInfo = useAppSelector<any>((state) => state.auth.user);
   const dispatch = useAppDispatch();
   const router = useRouter();
@@ -37,15 +37,17 @@ const AppWrapper = ({ children }: { children: React.ReactNode }) => {
   const pathRequiresAuth = !publicPaths.some((path) =>
     pathname.startsWith(path)
   );
-  const [firstLoading, setfirstLoading] = useState(false);
+  const [firstLoading, setfirstLoading] = useState(true);
 
   useEffect(() => {
     if (pathRequiresAuth) {
-      setfirstLoading(true);
-      if (!loading) {
-        if (user) {
-          try {
-            if (!userInfo?.verified) {
+      if (!userInfo?.verified) {
+        //remove in production
+        setfirstLoading(true);
+        const unsubscribe = auth.onAuthStateChanged(async (user) => {
+          if (user) {
+            try {
+              // if (!userInfo?.verified) {
               checkVerifiedField(user.uid).then((result) => {
                 if (result.exists) {
                   if (result.verified) {
@@ -76,32 +78,30 @@ const AppWrapper = ({ children }: { children: React.ReactNode }) => {
                   // setfirstLoading(false);
                 }
               });
+              // }
+            } catch (error) {
+              console.log(error);
+            } finally {
+              setTimeout(() => {
+                setfirstLoading(false);
+              }, 1000);
             }
-          } catch (error) {
-            console.log(error);
-          } finally {
+          } else {
+            router.push("/auth/signin");
+            dispatch(clearUser());
             setTimeout(() => {
               setfirstLoading(false);
             }, 1000);
           }
-        } else {
-          router.push("/auth/signin");
-          dispatch(clearUser());
-          setTimeout(() => {
-            setfirstLoading(false);
-          }, 1000);
-        }
-      }
+        });
+
+        // Cleanup subscription on unmount
+        return () => unsubscribe();
+      } //remove in production
+    } else {
+      setfirstLoading(false);
     }
-  }, [
-    user,
-    loading,
-    dispatch,
-    router,
-    pathRequiresAuth,
-    children,
-    userInfo?.verified,
-  ]);
+  }, [dispatch, router, pathRequiresAuth, children, userInfo?.verified]);
 
   {
     return firstLoading && pathRequiresAuth ? (

@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import React, { ChangeEvent, FormEvent, useState } from "react";
 import { PhotoIcon, XCircleIcon } from "@heroicons/react/24/solid";
+import Loader from "../common/Loader";
 
 interface RegistrationFormProps {
   formData: {
@@ -81,12 +82,8 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      autoFocus={true}
-      autoComplete="off"
-    >
-      <fieldset disabled={false} className="grid grid-cols-6 gap-6">
+    <form onSubmit={handleSubmit} autoFocus={true} autoComplete="off">
+      <fieldset disabled={submissionLoader} className="grid grid-cols-6 gap-6">
         {/* Clinic Name */}
         <div className="col-span-6 sm:col-span-3">
           <label
@@ -321,9 +318,13 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({
         </div>
 
         <div className="col-span-6 flex justify-center sm:gap-4">
-          <button className="btn btn-neutral w-full max-w-64 animate-none">
+          <button className="btn btn-neutral w-full max-w-64 animate-none text-white relative">
             {submissionLoader ? (
-              <span className="loading loading-spinner"></span>
+              <Loader
+                size="medium"
+                color="text-primary"
+                secondaryColor="text-white"
+              />
             ) : (
               "Add account"
             )}

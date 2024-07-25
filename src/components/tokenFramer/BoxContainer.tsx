@@ -93,7 +93,7 @@ const BoxContainer = ({ CurrentToken, loading, isPaused }: any) => {
         }}
         style={{
           userSelect: "none",
-          borderRadius: "12px",
+          borderRadius: "0px",
           cursor: "pointer",
           position: "relative",
           width: "100%",

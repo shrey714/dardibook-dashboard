@@ -12,7 +12,7 @@ const PersonalInfo = ({ userInfo }: any) => {
           Personal Information
         </h3>
         <button
-          className="btn h-3 btn-sm text-sm btn-error text-white"
+          className="btn animate-none h-3 btn-sm text-sm btn-error text-white"
           onClick={() => {
             signOutUser(dispatch);
           }}
