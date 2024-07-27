@@ -1,5 +1,5 @@
 import { db } from "@/firebase/firebaseConfig";
-import { addDoc, setDoc, collection, doc } from "firebase/firestore";
+import { setDoc, doc } from "firebase/firestore";
 import { NextResponse } from "next/server";
 
 export const POST = async (req: Request) => {

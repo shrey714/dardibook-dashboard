@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import Header from "@/components/HeaderDocument";
 
 export default function Custom404() {

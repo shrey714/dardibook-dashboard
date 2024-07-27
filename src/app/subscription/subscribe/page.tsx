@@ -8,9 +8,9 @@ import Image from "next/image";
 import RightBox from "./RightBox";
 import LeftBox from "./LeftBox";
 import Skeleton from "./Skeleton";
-import { checkSubscription } from "@/app/api/check-subscription/route";
-import { createSubscription } from "@/app/api/create-subscription/route";
-import getPlanById from "@/app/api/razorpay/getPlanById";
+import { checkSubscriptionStatus } from "@/app/services/checkSubscription";
+import { createSubscription } from "@/app/services/create-subscription/create-sub";
+import getPlanById from "@/app/services/razorpay/getPlanById";
 import HeaderMain from "@/components/HeaderMain";
 export default function Subscribe() {
   const router = useRouter();
@@ -106,7 +106,7 @@ export default function Subscribe() {
     const fetchPlans = async () => {
       setloading(true);
       if (user) {
-        const subscriptionStatus = await checkSubscription(user.uid);
+        const subscriptionStatus = await checkSubscriptionStatus(user.uid);
         if (subscriptionStatus?.status) {
           router.push("/");
         } else {

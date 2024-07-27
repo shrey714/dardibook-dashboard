@@ -1,4 +1,4 @@
-import getPlanById from "@/app/api/razorpay/getPlanById";
+import getPlanById from "@/app/services/razorpay/getPlanById";
 import { getSubscription } from "@/app/services/getSubscription";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/solid";
 import React, { useEffect, useState } from "react";

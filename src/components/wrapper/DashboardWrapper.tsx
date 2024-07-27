@@ -1,7 +1,7 @@
 "use client";
 import { ReactNode, useEffect, useState } from "react";
 import Navigation from "@/components/landingPageLayout/Navigation";
-import { checkSubscription } from "@/app/api/check-subscription/route";
+import { checkSubscriptionStatus } from "@/app/services/checkSubscription";
 import { useAppSelector } from "@/redux/store";
 import { useRouter } from "next/navigation";
 import SubscriptionPlans from "@/components/SubscriptionPlans";
@@ -24,7 +24,7 @@ const DashboardWrapper = ({ children }: { children: ReactNode }) => {
     const checkUserSubscription = async () => {
       setloading(true);
       if (user) {
-        const subscriptionStatus = await checkSubscription(user.uid);
+        const subscriptionStatus = await checkSubscriptionStatus(user.uid);
         if (subscriptionStatus?.status) {
           setloading(false);
           setsubscription(true);
@@ -65,7 +65,11 @@ const DashboardWrapper = ({ children }: { children: ReactNode }) => {
                 zIndex: 100000,
               }}
             >
-              <Loader size="large" color="text-primary" secondaryColor="text-gray-300" />
+              <Loader
+                size="large"
+                color="text-primary"
+                secondaryColor="text-gray-300"
+              />
             </div>
           ) : subscription ? (
             children ? (

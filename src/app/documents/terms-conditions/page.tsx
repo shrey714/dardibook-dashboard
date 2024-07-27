@@ -1,6 +1,6 @@
 // dashboard/terms-and-conditions.js
 import Head from "next/head";
-import DocWrapper from "../page";
+import DocWrapper from "../layout";
 
 export default function TermsAndConditions() {
   return (

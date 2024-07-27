@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { ExclamationCircleIcon } from "@heroicons/react/24/outline";
-import getplans from "../app/api/razorpay/getplans";
+import getplans from "../app/services/razorpay/getplans";
 interface SubscriptionPlansProps {
   message?: string | undefined;
 }

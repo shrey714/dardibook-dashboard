@@ -1,13 +1,17 @@
-import React, { ReactNode } from "react";
+
+import { ReactNode } from "react";
 import HeaderDocument from "@/components/HeaderDocument";
 import DocumentLinks from "@/components/DocumentLinks";
 import Image from "next/image";
 
-interface props {
-  children?: ReactNode;
-}
+import type { Metadata } from "next";
 
-const page: React.FC<props> = ({ children }) => {
+export const metadata: Metadata = {
+  title: "DardiBook-Dashboard",
+  description: "App to help doctors to track their patient",
+};
+
+export default function RootLayout({ children }: { children?: ReactNode }) {
   return (
     <div className="pt-24">
       <Image
@@ -22,4 +26,3 @@ const page: React.FC<props> = ({ children }) => {
   );
 };
 
-export default page;

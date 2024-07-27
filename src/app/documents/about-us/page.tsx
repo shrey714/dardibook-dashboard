@@ -1,6 +1,6 @@
 // dashboard/about-us.js
 import Head from "next/head";
-import DocWrapper from "../page";
+import DocWrapper from "../layout";
 
 const AboutUs = () => {
   return (

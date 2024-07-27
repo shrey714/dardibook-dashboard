@@ -1,6 +1,6 @@
 // dashboard/privacy-policy.js
 import Head from "next/head";
-import DocWrapper from "../page";
+import DocWrapper from "../layout";
 
 export default function PrivacyPolicy() {
   return (

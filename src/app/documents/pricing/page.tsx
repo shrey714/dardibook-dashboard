@@ -1,11 +1,9 @@
 "use client";
 import Head from "next/head";
-import DocWrapper from "../page";
 import SubscriptionPlans from "@/components/SubscriptionPlans";
 
 export default function Pricing() {
   return (
-    <DocWrapper>
       <div>
         <Head>
           <title>Pricing - DardiBook</title>
@@ -17,6 +15,5 @@ export default function Pricing() {
           </div>
         </div>
       </div>
-    </DocWrapper>
   );
 }

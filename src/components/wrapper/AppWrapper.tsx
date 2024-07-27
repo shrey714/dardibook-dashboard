@@ -8,6 +8,7 @@ import { useAppDispatch } from "@/redux/store";
 import TopBarProgress from "react-topbar-progress-indicator";
 import { checkVerifiedField } from "@/app/services/verifyDoctor";
 import { auth } from "@/firebase/firebaseConfig";
+import Image from 'next/image';
 
 TopBarProgress.config({
   barColors: {
@@ -107,7 +108,13 @@ const AppWrapper = ({ children }: { children: React.ReactNode }) => {
     return firstLoading && pathRequiresAuth ? (
       <div className="w-screen h-screen overflow-hidden flex items-center justify-center bg-white">
         <div>{firstLoading && <TopBarProgress />}</div>
-        <img src="/logo.svg" className="h-52" alt="Flowbite Logo" />
+        <Image
+        src="/Logo.svg"
+        height={208} // This is equivalent to h-52 in Tailwind CSS (52 * 4 = 208)
+        width={208} // You might want to set a width as well for better layout control
+        alt="Flowbite Logo"
+        className="h-52" // Tailwind CSS class
+      />
       </div>
     ) : (
       <>{children}</>
