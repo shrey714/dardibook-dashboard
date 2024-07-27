@@ -36,7 +36,7 @@ const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ message }) => {
             <ExclamationCircleIcon className="size-5 text-error" /> {message}
           </span>
           <button
-            className="btn h-3 btn-sm text-sm"
+            className="btn animate-none h-3 btn-sm text-sm btn-error text-white"
             onClick={() => {
               signOutUser(dispatch);
             }}

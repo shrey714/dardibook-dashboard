@@ -1,21 +1,19 @@
 // dashboard/terms-and-conditions.js
 import Head from "next/head";
-import DocWrapper from "../layout";
 
 export default function TermsAndConditions() {
   return (
-    <DocWrapper>
       <div>
         <Head>
           <title>Terms and Conditions - DardiBook</title>
         </Head>
-        <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto pb-12 px-4 sm:px-6 lg:px-8 text-gray-800">
           <h1 className="text-3xl font-bold text-center mb-8">
             Terms and Conditions
           </h1>
 
           <div
-            className="bg-white bg-opacity-70 p-6 rounded-lg shadow-lg"
+            className="bg-white p-6 rounded-lg shadow-[0px_0px_0px_1px_#a0aec0]"
             style={{ overflowY: "auto" }}
           >
             <h2 className="text-xl font-semibold mb-4">Proprietary Rights</h2>
@@ -63,6 +61,5 @@ export default function TermsAndConditions() {
           </div>
         </div>
       </div>
-    </DocWrapper>
   );
 }

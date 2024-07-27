@@ -6,7 +6,6 @@ export const GET = async (request: NextRequest) => {
   try {
     const { searchParams } = new URL(request.url);
     const uid = searchParams.get("uid");
-    console.log("uid", uid);
 
     if (!uid) {
       return NextResponse.json({ error: "UID is required." }, { status: 400 });

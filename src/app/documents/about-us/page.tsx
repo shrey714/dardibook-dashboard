@@ -1,10 +1,8 @@
 // dashboard/about-us.js
 import Head from "next/head";
-import DocWrapper from "../layout";
 
 const AboutUs = () => {
   return (
-    <DocWrapper>
       <div>
         <Head>
           <title>About Us - DardiBook</title>
@@ -13,7 +11,7 @@ const AboutUs = () => {
           <h1 className="text-3xl font-bold text-center mb-8">About Us</h1>
 
           <div
-            className="bg-white bg-opacity-70 p-6 rounded-lg shadow-lg"
+            className="bg-white p-6 rounded-lg shadow-lg"
             style={{ overflowY: "auto" }}
           >
             <h2 className="text-xl font-semibold mb-4">Our Product</h2>
@@ -45,7 +43,6 @@ const AboutUs = () => {
           </div>
         </div>
       </div>
-    </DocWrapper>
   );
 };
 

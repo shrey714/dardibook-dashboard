@@ -5,7 +5,6 @@ import { useAppSelector } from "@/redux/store";
 import { getAllPatients } from "@/app/services/getAllPatients";
 import PatientsPerDayChart from "@/components/HomeTab/PatientsPerDayChart";
 import StatusBoxes from "@/components/HomeTab/StatusBoxes";
-import Loader from "@/components/common/Loader";
 
 const Home = () => {
   const user = useAppSelector<any>((state) => state.auth.user);

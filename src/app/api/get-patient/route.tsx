@@ -7,7 +7,6 @@ export const GET = async (request: NextRequest) => {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
     const uid = searchParams.get("uid");
-    console.log("uid", uid)
 
     if (!id || !uid) {
       return NextResponse.json(

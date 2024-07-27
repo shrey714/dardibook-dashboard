@@ -23,7 +23,7 @@ const HeaderMain = ({ user }: any) => {
 
   return (
     <nav className=" fixed w-full z-20 top-0 start-0 p-4">
-      <div className="rounded-2xl shadow-lg bg-gray-900 max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+      <div className="rounded-lg shadow-lg bg-gray-800 max-w-screen-xl flex flex-wrap items-center justify-between mx-auto px-4 py-2">
         <a
           onClick={() => {
             router.push("/");

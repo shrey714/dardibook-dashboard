@@ -133,7 +133,7 @@ export default function Subscribe() {
         alt="logo"
       />
       <HeaderMain user={user} />
-      <div className=" flex flex-col-reverse md:flex-row p-6 mx-auto w-9/12 h-auto text-center rounded-lg borderborder-gray-600 xl:p-8 bg-gray-800 bg-opacity-95 text-white">
+      <div className=" flex flex-col-reverse md:flex-row p-6 mx-auto w-11/12 sm:w-9/12 h-auto text-center rounded-lg borderborder-gray-600 xl:p-8 bg-gray-800 bg-opacity-95 text-white">
         {loading ? (
           <Skeleton />
         ) : (

@@ -1,8 +1,6 @@
 
 import { ReactNode } from "react";
 import HeaderDocument from "@/components/HeaderDocument";
-import DocumentLinks from "@/components/DocumentLinks";
-import Image from "next/image";
 
 import type { Metadata } from "next";
 
@@ -13,15 +11,9 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children?: ReactNode }) {
   return (
-    <div className="pt-24">
-      <Image
-        src="/Logo.svg"
-        fill={true}
-        className="document-background-image"
-        alt="logo"
-      />
+    <div className="pt-24 bg-gray-300 min-h-screen">
       <HeaderDocument />
-      {children ? children : <DocumentLinks />}
+      {children}
     </div>
   );
 };

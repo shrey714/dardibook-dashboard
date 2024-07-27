@@ -1,21 +1,19 @@
 // dashboard/privacy-policy.js
 import Head from "next/head";
-import DocWrapper from "../layout";
 
 export default function PrivacyPolicy() {
   return (
-    <DocWrapper>
       <div>
         <Head>
           <title>Privacy Policy - DardiBook</title>
         </Head>
-        <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto pb-12 px-4 sm:px-6 lg:px-8 text-gray-800">
           <h1 className="text-3xl font-bold text-center mb-8">
             Privacy Policy
           </h1>
 
           <div
-            className="bg-white bg-opacity-70 p-6 rounded-lg shadow-lg"
+            className="bg-white p-6 rounded-lg shadow-[0px_0px_0px_1px_#a0aec0]"
             style={{ overflowY: "auto" }}
           >
             <h2 className="text-xl font-semibold mb-4">
@@ -65,6 +63,5 @@ export default function PrivacyPolicy() {
           </div>
         </div>
       </div>
-    </DocWrapper>
   );
 }
