@@ -38,9 +38,9 @@ const MedicineSuggestion = ({ medicine, rowId, handleInputChange }: any) => {
     }, 300);
   }, []);
 
-  useEffect(() => {
-    debounceSearch(searchTerm);
-  }, [searchTerm, debounceSearch]);
+  // useEffect(() => {
+  // debounceSearch(searchTerm);
+  // }, [searchTerm, debounceSearch]); //api is not working for now
 
   const handleSuggestionClick = (val: string) => {
     handleInputChange(rowId, {

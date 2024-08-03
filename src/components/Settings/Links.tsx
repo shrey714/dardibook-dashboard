@@ -3,6 +3,7 @@ import Link from "next/link";
 
 const Links = () => {
   const allPaths = [
+    "about-us",
     "cancellation-policy",
     "contact-us",
     "pricing",
@@ -23,7 +24,8 @@ const Links = () => {
               <Link
                 className="text-xs sm:text-sm font-medium leading-6 underline text-gray-500 mr-3"
                 key={key}
-                href={`/documents/${path}`}
+                href={`https://www.dardibook.in/documents/${path}`}
+                target="_blank"
               >
                 {path}
               </Link>

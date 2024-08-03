@@ -7,6 +7,9 @@ const StatsHeader = ({ registrations, attended }: any) => {
         <div className=" font-semibold text-sm sm:text-base text-gray-800 whitespace-nowrap">
           Total Registrations
         </div>
+        <div className=" font-semibold text-xs whitespace-nowrap">
+          done by today
+        </div>
         <div className=" font-semibold text-4xl text-primary flex flex-row justify-between ">
           {registrations}
           <div className="stat-figure text-primary">
@@ -25,14 +28,14 @@ const StatsHeader = ({ registrations, attended }: any) => {
             </svg>
           </div>
         </div>
-        <div className=" font-semibold text-xs whitespace-nowrap">
-          done by today
-        </div>
       </div>
 
       <div className="py-4 px-5 sm:py-4 sm:px-6 flex flex-1 flex-col">
         <div className=" font-semibold text-sm sm:text-base text-gray-800 whitespace-nowrap">
           Total Attended
+        </div>
+        <div className=" font-semibold text-xs whitespace-nowrap">
+          patient by today
         </div>
         <div className=" font-semibold text-4xl text-secondary flex flex-row justify-between ">
           {attended}
@@ -51,9 +54,6 @@ const StatsHeader = ({ registrations, attended }: any) => {
               ></path>
             </svg>
           </div>
-        </div>
-        <div className=" font-semibold text-xs whitespace-nowrap">
-          patient by today
         </div>
       </div>
     </div>

@@ -12,6 +12,7 @@ import { checkSubscriptionStatus } from "@/app/services/checkSubscription";
 import { createSubscription } from "@/app/services/create-subscription/create-sub";
 import getPlanById from "@/app/services/razorpay/getPlanById";
 import HeaderMain from "@/components/HeaderMain";
+import { auth } from "@/firebase/firebaseConfig";
 export default function Subscribe() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -19,6 +20,10 @@ export default function Subscribe() {
   const user = useAppSelector<any>((state) => state.auth.user);
   const [thisPlanDetails, setthisPlanDetails] = useState();
   const [loading, setloading] = useState(true);
+  const [mobileNumber, setmobileNumber] = useState(
+    auth?.currentUser?.phoneNumber
+  );
+  const [isValid, setIsValid] = useState(true);
   const [subscriptionFields, setsubscriptionFields] = useState({
     planId,
     customer_notify: 1,
@@ -36,6 +41,7 @@ export default function Subscribe() {
         subscription_id: parsedsub.id,
         name: "DardiBook",
         description: "description",
+        image: "/Logo.svg",
         modal: {
           ondismiss: function () {
             setloading(false);
@@ -80,11 +86,7 @@ export default function Subscribe() {
         prefill: {
           name: user?.displayName,
           email: user?.email,
-          contact: "+919512095862",
-        },
-        notes: {
-          note_key_1: "Tea. Earl Grey. Hot",
-          note_key_2: "Make it so.",
+          contact: `+91${mobileNumber}`,
         },
         theme: {
           color: "blue",
@@ -125,7 +127,7 @@ export default function Subscribe() {
   }, [planId, router, user]);
 
   return (
-    <div className="flex pt-24 overflow-y-auto pb-2 flex-col justify-evenly items-center h-screen w-screen overflow-hidden">
+    <div className="flex pt-24 overflow-y-auto pb-6 flex-col justify-evenly items-center min-h-screen w-full overflow-hidden">
       <Image
         src="/Logo.svg"
         fill={true}
@@ -133,7 +135,7 @@ export default function Subscribe() {
         alt="logo"
       />
       <HeaderMain user={user} />
-      <div className=" flex flex-col-reverse md:flex-row p-6 mx-auto w-11/12 sm:w-9/12 h-auto text-center rounded-lg borderborder-gray-600 xl:p-8 bg-gray-800 bg-opacity-95 text-white">
+      <div className=" flex flex-col md:flex-row p-6 mx-auto w-11/12 sm:w-9/12 h-auto text-center rounded-lg borderborder-gray-600 xl:p-8 bg-gray-800 bg-opacity-95 text-white">
         {loading ? (
           <Skeleton />
         ) : (
@@ -141,12 +143,19 @@ export default function Subscribe() {
             <LeftBox
               subscriptionFields={subscriptionFields}
               setsubscriptionFields={setsubscriptionFields}
+              mobileNumber={mobileNumber}
+              setmobileNumber={setmobileNumber}
+              isValid={isValid}
+              setIsValid={setIsValid}
             />
-            <div className="w-px mx-5 self-stretch bg-gradient-to-tr from-transparent via-neutral-500 to-transparent opacity-25 dark:via-neutral-400"></div>
+            <div className="hidden md:block w-px mx-5 self-stretch bg-gradient-to-tr from-transparent  to-transparent opacity-25 dark:via-neutral-400"></div>
+            <div className="block md:hidden w-full h-px my-5 self-stretch bg-gradient-to-r from-transparent  to-transparent opacity-50 dark:via-neutral-400"></div>
+
             <RightBox
               thisPlanDetails={thisPlanDetails}
               handleSubscription={handleSubscription}
               subscriptionFields={subscriptionFields}
+              isValid={isValid}
             />
           </>
         )}

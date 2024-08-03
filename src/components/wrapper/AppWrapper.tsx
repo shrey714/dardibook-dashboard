@@ -1,14 +1,14 @@
 /* eslint-disable @next/next/no-img-element */
 "use client"; // Mark the component as a Client Component
 import { useEffect, useState } from "react";
-import { useRouter, usePathname } from "next/navigation"; // Correct import for app directory
+import { useRouter } from "next/navigation"; // Correct import for app directory
 // import { useAuthState } from "react-firebase-hooks/auth";
 import { setUser, clearUser, useAppSelector } from "@/redux/store";
 import { useAppDispatch } from "@/redux/store";
 import TopBarProgress from "react-topbar-progress-indicator";
 import { checkVerifiedField } from "@/app/services/verifyDoctor";
 import { auth } from "@/firebase/firebaseConfig";
-import Image from 'next/image';
+import Image from "next/image";
 
 TopBarProgress.config({
   barColors: {
@@ -32,89 +32,79 @@ const AppWrapper = ({ children }: { children: React.ReactNode }) => {
   const userInfo = useAppSelector<any>((state) => state.auth.user);
   const dispatch = useAppDispatch();
   const router = useRouter();
-  const pathname = usePathname();
-  // contains the paths of the pages where authentication is not required
-  const publicPaths = ["/documents"];
-  const pathRequiresAuth = !publicPaths.some((path) =>
-    pathname.startsWith(path)
-  );
   const [firstLoading, setfirstLoading] = useState(true);
 
   useEffect(() => {
-    if (pathRequiresAuth) {
-      if (!userInfo?.verified) {
-        //remove in production
-        setfirstLoading(true);
-        const unsubscribe = auth.onAuthStateChanged(async (user) => {
-          if (user) {
-            try {
-              // if (!userInfo?.verified) {
-              checkVerifiedField(user.uid).then((result) => {
-                if (result.exists) {
-                  if (result.verified) {
-                    // every thing is fine...go ahead
-                    dispatch(
-                      setUser({ ...extractUserData(user), verified: true })
-                    );
-                    console.log("everything is fine...go ahead");
-                    // setfirstLoading(false);
-                  } else {
-                    // account is still not verified..redirect to register page
-                    // setfirstLoading(false);
-                    dispatch(
-                      setUser({ ...extractUserData(user), verified: false })
-                    );
-                    router.push("/auth/register");
-                    console.log(
-                      "account is still not verified..redirect to register page"
-                    );
-                  }
+    if (!userInfo?.verified) {
+      //remove in production
+      setfirstLoading(true);
+      const unsubscribe = auth.onAuthStateChanged(async (user) => {
+        if (user) {
+          try {
+            // if (!userInfo?.verified) {
+            checkVerifiedField(user.uid).then((result) => {
+              if (result.exists) {
+                if (result.verified) {
+                  // every thing is fine...go ahead
+                  dispatch(
+                    setUser({ ...extractUserData(user), verified: true })
+                  );
+                  console.log("everything is fine...go ahead");
+                  // setfirstLoading(false);
                 } else {
-                  // redirect to input doctor form
+                  // account is still not verified..redirect to register page
+                  // setfirstLoading(false);
                   dispatch(
                     setUser({ ...extractUserData(user), verified: false })
                   );
                   router.push("/auth/register");
-                  console.log("redirect to input doctor form");
-                  // setfirstLoading(false);
+                  console.log(
+                    "account is still not verified..redirect to register page"
+                  );
                 }
-              });
-              // }
-            } catch (error) {
-              console.log(error);
-            } finally {
-              setTimeout(() => {
-                setfirstLoading(false);
-              }, 1000);
-            }
-          } else {
-            router.push("/auth/signin");
-            dispatch(clearUser());
+              } else {
+                // redirect to input doctor form
+                dispatch(
+                  setUser({ ...extractUserData(user), verified: false })
+                );
+                router.push("/auth/register");
+                console.log("redirect to input doctor form");
+                // setfirstLoading(false);
+              }
+            });
+            // }
+          } catch (error) {
+            console.log(error);
+          } finally {
             setTimeout(() => {
               setfirstLoading(false);
             }, 1000);
           }
-        });
+        } else {
+          router.push("/auth/signin");
+          dispatch(clearUser());
+          setTimeout(() => {
+            setfirstLoading(false);
+          }, 1000);
+        }
+      });
 
-        // Cleanup subscription on unmount
-        return () => unsubscribe();
-      } //remove in production
-    } else {
-      setfirstLoading(false);
-    }
-  }, [dispatch, router, pathRequiresAuth, children, userInfo?.verified]);
+      // Cleanup subscription on unmount
+      return () => unsubscribe();
+    } //remove in production
+  }, [dispatch, router, children, userInfo?.verified]);
 
   {
-    return firstLoading && pathRequiresAuth ? (
+    return firstLoading ? (
       <div className="w-screen h-screen overflow-hidden flex items-center justify-center bg-white">
         <div>{firstLoading && <TopBarProgress />}</div>
         <Image
-        src="/Logo.svg"
-        height={208} // This is equivalent to h-52 in Tailwind CSS (52 * 4 = 208)
-        width={208} // You might want to set a width as well for better layout control
-        alt="Flowbite Logo"
-        className="h-52" // Tailwind CSS class
-      />
+          src="/Logo.svg"
+          height={208} // This is equivalent to h-52 in Tailwind CSS (52 * 4 = 208)
+          width={208} // You might want to set a width as well for better layout control
+          alt="Flowbite Logo"
+          className="h-52" // Tailwind CSS class
+        />
       </div>
     ) : (
       <>{children}</>

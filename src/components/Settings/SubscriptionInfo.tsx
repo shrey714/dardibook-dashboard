@@ -63,7 +63,7 @@ const SubscriptionInfo = ({ subId, mainLoader }: any) => {
     <div className="mt-3 md:mt-6 mx-auto max-w-4xl bg-white rounded-lg">
       <div className="px-3 py-2 md:px-8 flex flex-row justify-between items-center">
         <h3 className="text-sm sm:text-base font-semibold leading-7 text-gray-900 tracking-wide">
-          Subscription Information
+          Subscription Information <span className="text-sm text-gray-500" >(mm/dd/yyyy)</span>
         </h3>
         {loader || mainLoader ? (
           <span className="relative">

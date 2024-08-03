@@ -3,6 +3,7 @@ const RightBox = ({
   thisPlanDetails,
   handleSubscription,
   subscriptionFields,
+  isValid,
 }: any) => {
   return (
     <>
@@ -55,10 +56,11 @@ const RightBox = ({
           </li>
         </ul>
         <button
+          disabled={!isValid}
           onClick={() => {
             handleSubscription();
           }}
-          className="btn btn-sm text-base"
+          className="btn btn-sm text-base disabled:bg-gray-300"
         >
           Get started
         </button>

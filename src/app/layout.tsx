@@ -11,10 +11,10 @@ const manrope = Alegreya_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "DardiBook",
+  title: "DardiBook | DashBoard",
   description: "App to help doctors to track their patient",
   icons: {
-    icon: "/Favicon.svg", // /public path
+    icon: "/favicon.png", // /public path
   },
 };
 

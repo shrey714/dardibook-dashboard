@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 // import NextBreadcrumb from "@/components/common/NextBreadcrumb";
 
 export const metadata: Metadata = {
-  title: "DardiBook-Dashboard",
+  title: "DardiBook | Dashboard",
   description: "App to help doctors to track their patient",
 };
 export default function RootLayout({ children }: { children?: ReactNode }) {
