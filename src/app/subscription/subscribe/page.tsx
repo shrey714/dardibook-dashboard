@@ -30,14 +30,14 @@ export default function Subscribe() {
     total_count: 1,
   });
   const handleSubscription = async () => {
-    console.log("planid", subscriptionFields);
+    // console.log("planid", subscriptionFields);
     try {
       setloading(true);
       const sub = await createSubscription(subscriptionFields);
       const parsedsub = await sub.json();
-      console.log("parsedsub==", parsedsub);
+      // console.log("parsedsub==", parsedsub);
       const options = {
-        key: "rzp_test_aKsPMFZwmfbD4d",
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         subscription_id: parsedsub.id,
         name: "DardiBook",
         description: "description",

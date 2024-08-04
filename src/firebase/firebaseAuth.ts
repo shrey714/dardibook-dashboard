@@ -4,7 +4,6 @@ import { auth, provider } from "../firebase/firebaseConfig";
 import { setUser, clearUser } from "../redux/store"
 import { AppDispatch } from "../redux/store"
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import { getAuth, setPersistence, browserLocalPersistence } from "firebase/auth";
 const extractUserData = (user: any) => {
     return {
         uid: user.uid,
