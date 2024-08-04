@@ -4,13 +4,13 @@ import { auth, provider } from "../firebase/firebaseConfig";
 import { setUser, clearUser } from "../redux/store"
 import { AppDispatch } from "../redux/store"
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import { getAuth, setPersistence, browserLocalPersistence } from "firebase/auth";
 const extractUserData = (user: any) => {
     return {
         uid: user.uid,
         email: user.email,
         displayName: user.displayName,
         photoURL: user.photoURL,
+        verified: false,
         // Add any other serializable properties you need
     };
 };
@@ -45,7 +45,7 @@ export const signInWithGoogle = async (dispatch: AppDispatch, router: string[] |
         dispatch(setUser(extractUserData(user)));
         // Check if router is defined before using it
         if (user && router) {
-            router.push("/"); // Redirect to home page after successful sign-in
+            router.push("/dashboard/home"); // Redirect to home page after successful sign-in
         }
         return result
     } catch (error) {
