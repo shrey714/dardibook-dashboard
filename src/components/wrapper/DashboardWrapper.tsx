@@ -3,7 +3,6 @@ import { ReactNode, useEffect, useState } from "react";
 import Navigation from "@/components/landingPageLayout/Navigation";
 import { checkSubscriptionStatus } from "@/app/services/checkSubscription";
 import { useAppSelector } from "@/redux/store";
-import { useRouter } from "next/navigation";
 import SubscriptionPlans from "@/components/SubscriptionPlans";
 import DefaultComponent from "@/components/DefaultDashboard";
 import "@/styles/globals.css";
@@ -12,7 +11,6 @@ import Loader from "../common/Loader";
 
 const DashboardWrapper = ({ children }: { children: ReactNode }) => {
   const user = useAppSelector((state) => state.auth.user);
-  const router = useRouter();
 
   // ======================
   const [loading, setloading] = useState(false);
@@ -37,7 +35,7 @@ const DashboardWrapper = ({ children }: { children: ReactNode }) => {
       }
     };
     checkUserSubscription();
-  }, [user, router]);
+  }, [user]);
   // ===================
   return (
     <>
