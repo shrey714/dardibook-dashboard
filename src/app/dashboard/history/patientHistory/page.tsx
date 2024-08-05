@@ -37,8 +37,8 @@ const Page = () => {
           sethistoryLoader(false);
         }
         const doctorData = await getDocotr(user.uid);
-        if (doctorData) {
-          setDoctorData(doctorData);
+        if (doctorData.data) {
+          setDoctorData(doctorData.data);
           setdoctorLoader(false);
         } else {
           setdoctorLoader(false);
