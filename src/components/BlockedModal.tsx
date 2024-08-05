@@ -35,7 +35,7 @@ const CustomModal: React.FC<{
           } inset-0 bg-black opacity-50`}
           onClick={(e) => e.stopPropagation()}
         ></div>
-        <div className="modal-box flex flex-col p-4 max-w-screen-md">
+        <div className="modal-box flex flex-col p-4 max-w-screen-md bg-white">
           {children}
         </div>
       </dialog>

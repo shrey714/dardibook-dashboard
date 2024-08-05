@@ -68,7 +68,7 @@ const PrescribeForm = ({
           </div>
 
           {/* Medicine list */}
-          <div className="mt-6 col-span-full bg-white py-4 rounded-lg ">
+          <div className="mt-4 sm:mt-6 col-span-full bg-white py-4 rounded-lg ">
             <label className="block px-8 text-lg ext-base font-semibold leading-7 text-gray-900">
               Medicines
             </label>
@@ -81,7 +81,7 @@ const PrescribeForm = ({
           </div>
 
           {/* Advice or special instructions text area */}
-          <div className="mt-6 col-span-full bg-white p-4 px-8 rounded-lg ">
+          <div className="mt-4 sm:mt-6 col-span-full bg-white p-4 px-8 rounded-lg ">
             <label
               htmlFor="advice"
               className="block text-lg ext-base font-semibold leading-7 text-gray-900"
@@ -98,7 +98,7 @@ const PrescribeForm = ({
                 onChange={handleInputChange}
               />
             </div>
-            <div className="mt-6 mb-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+            <div className="mt-4 sm:mt-6 mb-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
               <label
                 htmlFor="nextVisit"
                 className="text-lg font-semibold leading-7 text-gray-900 flex items-center"
@@ -119,7 +119,7 @@ const PrescribeForm = ({
             </div>
           </div>
           {/* Higher hospital Form */}
-          <div className="mt-6 col-span-full bg-white px-8 rounded-lg ">
+          <div className="mt-4 sm:mt-6 col-span-full bg-white px-8 rounded-lg ">
             <div className="collapse collapse-arrow text-black ">
               <input type="checkbox" name="my-accordion-2" />
               <div className="collapse-title pr-3 pl-0 text-lg font-semibold text-gray-900">
@@ -192,14 +192,14 @@ const PrescribeForm = ({
             <Link href="./">
               <button
                 type="button"
-                className="btn md:btn-wide text-sm font-semibold leading-6 text-gray-900"
+                className="btn md:btn-wide bg-white border-0 text-sm font-semibold leading-6 text-gray-900"
               >
                 Cancel
               </button>
             </Link>
             <button
               type="submit"
-              className="btn md:btn-wide rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              className="btn md:btn-wide rounded-md bg-indigo-600 border-0 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             >
               {submissionLoader ? (
                 <Loader
