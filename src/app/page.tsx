@@ -23,11 +23,15 @@ const Home = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: "transparent",
+        background: "#ffffff",
         zIndex: 100000,
       }}
     >
-      <Loader size="large" color="text-primary" secondaryColor="text-gray-300" />
+      <Loader
+        size="large"
+        color="text-primary"
+        secondaryColor="text-gray-300"
+      />
     </div>
   );
 };
