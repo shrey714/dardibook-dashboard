@@ -131,11 +131,13 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({
           </label>
           <input
             required
-            type="number"
+            type="tel"
             id="clinicNumber"
             name="clinicNumber"
             className="form-input py-[6px] mt-1 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
             value={formData.clinicNumber}
+            pattern="\d*" // Ensures only numeric input
+            title="Please enter a valid mobile number."
             onChange={handleChange}
           />
         </div>
@@ -149,11 +151,14 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({
           </label>
           <input
             required
-            type="number"
+            type="tel"
             id="phoneNumber"
             name="phoneNumber"
             className="form-input py-[6px] mt-1 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
             value={formData.phoneNumber}
+            pattern="^\d{10}$" // Adjust the pattern to match the format you want
+            title="Please enter a valid 10-digit mobile number."
+            maxLength={10}
             onChange={handleChange}
           />
         </div>
@@ -238,6 +243,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({
                         name="clinicLogo"
                         type="file"
                         className="sr-only"
+                        accept="image/*"
                         onChange={handleChange}
                       />
                     </label>
@@ -292,6 +298,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({
                         name="signaturePhoto"
                         type="file"
                         className="sr-only"
+                        accept="image/*"
                         onChange={handleChange}
                       />
                     </label>
