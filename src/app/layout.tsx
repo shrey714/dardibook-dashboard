@@ -4,6 +4,7 @@ import Script from "next/script";
 import type { Metadata } from "next";
 import AppWrapper from "@/components/wrapper/AppWrapper";
 import ReduxWrapper from "@/components/wrapper/ReduxWrapper";
+import { Toaster } from "react-hot-toast";
 const manrope = Alegreya_Sans({
   subsets: ["latin"],
   display: "swap",
@@ -31,6 +32,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
         style={{ scrollbarGutter: "auto" }}
       >
         <body style={{ minHeight: "100vh" }} suppressHydrationWarning={true}>
+        <Toaster position="top-right" />
           <ReduxWrapper>
             <AppWrapper>{children}</AppWrapper>
           </ReduxWrapper>
