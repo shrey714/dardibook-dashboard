@@ -277,6 +277,7 @@ const ClinicInfo = ({ uid, doctorData, mainLoader, setdoctorData }: any) => {
                             name="clinicLogo"
                             type="file"
                             className="sr-only"
+                            accept="image/*"
                             onChange={handleChange}
                           />
                         </label>
@@ -328,6 +329,7 @@ const ClinicInfo = ({ uid, doctorData, mainLoader, setdoctorData }: any) => {
                             required
                             id="signaturePhoto"
                             name="signaturePhoto"
+                            accept="image/*"
                             type="file"
                             className="sr-only"
                             onChange={handleChange}
