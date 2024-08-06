@@ -60,7 +60,7 @@ const PrintHandeler: React.FC<any> = ({
         Print Prescription
       </button>
       <div ref={printRef} className="hide-this-compo">
-        {printOptions.IsPrescription ? (
+        {printOptions?.IsPrescription ? (
           <PrescriptionPrint
             patientInfo={patientData}
             hospitalInfo={doctorData}
@@ -69,12 +69,12 @@ const PrintHandeler: React.FC<any> = ({
         ) : (
           <></>
         )}
-        {printOptions.IsPrescription && printOptions.IsRefer ? (
+        {printOptions?.IsPrescription && printOptions?.IsRefer ? (
           <div className="page-break"></div>
         ) : (
           <></>
         )}
-        {printOptions.IsRefer ? (
+        {printOptions?.IsRefer ? (
           <RefererPrint
             patientInfo={patientData}
             hospitalInfo={doctorData}

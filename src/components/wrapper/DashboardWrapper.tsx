@@ -8,6 +8,7 @@ import DefaultComponent from "@/components/DefaultDashboard";
 import "@/styles/globals.css";
 import BlockedModal from "@/components/BlockedModal";
 import Loader from "../common/Loader";
+import ConnectionStatus from "../InternetDialog";
 
 const DashboardWrapper = ({ children }: { children: ReactNode }) => {
   const user = useAppSelector((state) => state.auth.user);
@@ -44,6 +45,7 @@ const DashboardWrapper = ({ children }: { children: ReactNode }) => {
           <SubscriptionPlans message={message} />
         </BlockedModal>
       )}
+      <ConnectionStatus />
       <div className="h-screen overflow-hidden flex">
         {/* <div className="md:h-screen md:overflow-hidden flex"> for mobile view */}
         <Navigation />

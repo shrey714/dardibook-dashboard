@@ -351,7 +351,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
           </Link>
           <button
             type="submit"
-            className="btn md:btn-wide rounded-md bg-indigo-600 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            className="btn md:btn-wide rounded-md bg-indigo-600 border-0 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
             {submissionLoader ? (
               <Loader

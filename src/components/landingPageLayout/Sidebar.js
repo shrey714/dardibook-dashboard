@@ -3,11 +3,10 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import TokenBox from "../tokenFramer/TokenBox";
-import { ChevronRightIcon, Cog6ToothIcon } from "@heroicons/react/24/solid";
+import {  Cog6ToothIcon } from "@heroicons/react/24/solid";
 // import { SlHome } from "react-icons/sl";
 // import { BsInfoSquare, BsEnvelopeAt } from "react-icons/bs";
 // import { FaTshirt, FaRedhat } from "react-icons/fa";
-
 // import logo from "@/img/logo.svg";
 
 const isSubPath = (pathname, route) => {

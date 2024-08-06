@@ -49,16 +49,16 @@ const RefererPrint = forwardRef<HTMLDivElement, Props>((props, ref) => {
       <div className="flex justify-between items-center mb-4">
         <div>
           <img
-            src={hospitalInfo.clinicLogo}
+            src={hospitalInfo?.clinicLogo}
             alt="Clinic Logo"
             className="w-24"
           />
         </div>
         <div className="text-right">
-          <h2 className="text-2xl font-bold">{hospitalInfo.clinicName}</h2>
-          <p className="text-sm">{hospitalInfo.clinicAddress}</p>
-          <p className="text-sm">Email: {hospitalInfo.emailId}</p>
-          <p className="text-sm">Phone: {hospitalInfo.clinicNumber}</p>
+          <h2 className="text-2xl font-bold">{hospitalInfo?.clinicName}</h2>
+          <p className="text-sm">{hospitalInfo?.clinicAddress}</p>
+          <p className="text-sm">Email: {hospitalInfo?.emailId}</p>
+          <p className="text-sm">Phone: {hospitalInfo?.clinicNumber}</p>
         </div>
       </div>
 
@@ -71,7 +71,7 @@ const RefererPrint = forwardRef<HTMLDivElement, Props>((props, ref) => {
                 ID
               </td>
               <td className="border border-gray-400 p-1 pl-2">
-                {patientInfo.patient_unique_Id}
+                {patientInfo?.patient_unique_Id}
               </td>
             </tr>
             <tr>
@@ -80,7 +80,7 @@ const RefererPrint = forwardRef<HTMLDivElement, Props>((props, ref) => {
               </td>
               <td className="border border-gray-400 p-1 pl-2">
                 {new Date(
-                  patientInfo.last_visited ? patientInfo.last_visited : ""
+                  patientInfo?.last_visited ? patientInfo?.last_visited : ""
                 ).toLocaleString()}
               </td>
             </tr>
@@ -89,7 +89,7 @@ const RefererPrint = forwardRef<HTMLDivElement, Props>((props, ref) => {
                 Name
               </td>
               <td className="border border-gray-400 p-1 pl-2">
-                {patientInfo.first_name} {patientInfo.last_name}
+                {patientInfo?.first_name} {patientInfo?.last_name}
               </td>
             </tr>
             <tr>
@@ -97,7 +97,7 @@ const RefererPrint = forwardRef<HTMLDivElement, Props>((props, ref) => {
                 Mobile
               </td>
               <td className="border border-gray-400 p-1 pl-2">
-                {patientInfo.mobile_number}
+                {patientInfo?.mobile_number}
               </td>
             </tr>
             <tr>
@@ -105,7 +105,7 @@ const RefererPrint = forwardRef<HTMLDivElement, Props>((props, ref) => {
                 Gender
               </td>
               <td className="border border-gray-400 p-1 pl-2">
-                {patientInfo.gender}
+                {patientInfo?.gender}
               </td>
             </tr>
             <tr>
@@ -113,7 +113,7 @@ const RefererPrint = forwardRef<HTMLDivElement, Props>((props, ref) => {
                 Age
               </td>
               <td className="border border-gray-400 p-1 pl-2">
-                {patientInfo.age}
+                {patientInfo?.age}
               </td>
             </tr>
             <tr>
@@ -121,8 +121,8 @@ const RefererPrint = forwardRef<HTMLDivElement, Props>((props, ref) => {
                 Address
               </td>
               <td className="border border-gray-400 p-1 pl-2">
-                {patientInfo.street_address}, {patientInfo.city},{" "}
-                {patientInfo.state}, {patientInfo.zip}
+                {patientInfo?.street_address}, {patientInfo?.city},{" "}
+                {patientInfo?.state}, {patientInfo?.zip}
               </td>
             </tr>
           </tbody>
@@ -162,9 +162,9 @@ const RefererPrint = forwardRef<HTMLDivElement, Props>((props, ref) => {
       </div>
 
       <div className="text-right mt-0">
-        <p className="font-medium">Doctor: {hospitalInfo.doctorName}</p>
+        <p className="font-medium">Doctor: {hospitalInfo?.doctorName}</p>
         <img
-          src={hospitalInfo.signaturePhoto}
+          src={hospitalInfo?.signaturePhoto}
           alt="Doctor Signature"
           className="w-12 inline-block mt-2"
         />

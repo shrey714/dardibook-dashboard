@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useAppSelector } from "@/redux/store";
 import AuthHeaderWrapper from "@/components/wrapper/AuthHeaderWrapper";
+import Loader from "@/components/common/Loader";
 
 const SignIn = () => {
   const user = useAppSelector((state) => state.auth.user);
@@ -28,7 +29,7 @@ const SignIn = () => {
 
   const header = {
     title: "Welcome to DardiBook",
-    desc: "Lorem, ipsum dolor sit amet consectetur adipisicing elit.Eligendi nam dolorum aliquam, quibusdam aperiam voluptatum.",
+    desc: "Access your DardiBook account to manage appointments, prescriptions, and patient records with ease. Stay connected and streamline your healthcare management.",
   };
   return (
     <AuthHeaderWrapper header={header}>
@@ -39,7 +40,7 @@ const SignIn = () => {
           className="custom-button font-semibold tracking-wide"
         >
           {loading ? (
-            <span className="loading loading-spinner loading-md"></span>
+            <Loader size="medium" color="text-gray-300" secondaryColor="text-primary" />
           ) : (
             "Google Login"
           )}

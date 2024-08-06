@@ -149,7 +149,9 @@ const QueueList: React.FC = () => {
                         <td className="align-top text-center font-medium text-sm sm:text-base flex flex-row flex-col-below-990">
                           <Link
                             href={{
-                              pathname: "history/patientHistory",
+                              pathname: item.attended
+                                ? "history/patientHistory"
+                                : "prescribe/patientData",
                               query: { patientId: item.patient_unique_Id },
                             }}
                             className="mx-1 py-1 px-2 w-full m-1 text-gray-800 bg-white shadow-[0px_0px_0px_1px_#a0aec0] rounded-[4px] font-semibold text-sm sm:text-base"

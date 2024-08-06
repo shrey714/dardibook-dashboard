@@ -15,19 +15,12 @@ const Home = () => {
   }, [router, user]);
 
   return (
-    <div
-      style={{
-        minWidth: "100vw",
-        minHeight: "100vh",
-        overflow: "hidden",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        background: "transparent",
-        zIndex: 100000,
-      }}
-    >
-      <Loader size="large" color="text-primary" secondaryColor="text-gray-300" />
+    <div className="w-screen h-screen overflow-hidden flex items-center justify-center bg-white z-50">
+      <Loader
+        size="large"
+        color="text-primary"
+        secondaryColor="text-gray-300"
+      />
     </div>
   );
 };

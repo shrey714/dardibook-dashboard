@@ -17,7 +17,7 @@ const PatientHistoryTabs = ({ prescriptionsData }: any) => {
                 type="radio"
                 name="my_tabs_2"
                 role="tab"
-                className="!w-max font-medium hover:bg-[#ddd] tab bg-transparent shadow-none outline-none  [--tab-border-color:transparent]"
+                className="!w-max font-medium text-gray-900 tab [--tab-bg:white] shadow-none outline-none  [--tab-border-color:transparent]"
                 style={{ boxShadow: "none" }}
                 aria-label={new Date(history.time).toLocaleDateString("en-GB")}
                 defaultChecked={

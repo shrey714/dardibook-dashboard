@@ -59,7 +59,7 @@ const SignIn = () => {
 
   const header = {
     title: "Welcome to DardiBook",
-    desc: "Lorem, ipsum dolor sit amet consectetur adipisicing elit.Eligendi nam dolorum aliquam, quibusdam aperiam voluptatum.",
+    desc: "Join DardiBook to experience a seamless healthcare management platform. Register today to start scheduling appointments, managing prescriptions, and more.",
   };
 
   return (
