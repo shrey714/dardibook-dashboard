@@ -41,7 +41,7 @@ const Page = () => {
   return (
     <div className="self-center flex w-full flex-col">
       {patientId && historyLoader ? (
-        <div className="w-full h-screen overflow-hidden flex items-center justify-center z-50">
+        <div className="w-full h-svh overflow-hidden flex items-center justify-center z-50">
           <Loader
             size="medium"
             color="text-primary"

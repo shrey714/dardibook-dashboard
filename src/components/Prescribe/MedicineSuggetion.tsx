@@ -89,6 +89,7 @@ const MedicineSuggestion = ({ medicine, rowId, handleInputChange }: any) => {
       <div className="dropdown w-full" onBlur={handleBlur}>
         <div tabIndex={rowId} role="button" className="">
           <input
+            autoComplete="new-off"
             type="text"
             name="medicineName"
             value={medicine}

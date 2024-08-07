@@ -57,7 +57,7 @@ const Page = () => {
   };
 
   return (
-    <div className="w-full overflow-y-auto h-screen">
+    <div className="w-full overflow-y-auto h-svh">
       <CustomModal isOpen={isModalOpen} mainScreenModal={true}>
         <AttendedModal
           isModalOpen={isModalOpen}

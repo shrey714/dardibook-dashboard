@@ -15,7 +15,7 @@ const Home = () => {
   }, [router, user]);
 
   return (
-    <div className="w-screen h-screen overflow-hidden flex items-center justify-center bg-white z-50">
+    <div className="w-screen h-svh overflow-hidden flex items-center justify-center bg-white z-50">
       <Loader
         size="large"
         color="text-primary"

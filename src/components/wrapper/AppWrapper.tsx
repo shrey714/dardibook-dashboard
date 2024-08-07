@@ -96,7 +96,7 @@ const AppWrapper = ({ children }: { children: React.ReactNode }) => {
 
   {
     return firstLoading ? (
-      <div className="w-screen h-screen overflow-hidden flex items-center justify-center bg-white">
+      <div className="w-screen h-svh overflow-hidden flex items-center justify-center bg-white">
         <div>{firstLoading && <TopBarProgress />}</div>
         <Image
           src="/Logo.svg"

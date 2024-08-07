@@ -137,6 +137,7 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
                 <input
                   type="text"
                   name="instruction"
+                  autoComplete="new-off"
                   value={row.instruction}
                   onChange={(event) => handleInputChange(row.id, event)}
                   className="form-input w-full block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
@@ -151,6 +152,7 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
                     <input
                       type="text"
                       value={dosage.value}
+                      autoComplete="new-off"
                       onChange={(event) =>
                         handleDosageChange(row.id, dosage.id, event)
                       }
@@ -182,6 +184,7 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
                 <input
                   type="text"
                   name="duration"
+                  autoComplete="new-off"
                   value={row.duration}
                   onChange={(event) => handleInputChange(row.id, event)}
                   className="form-input w-full block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"

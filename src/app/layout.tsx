@@ -31,7 +31,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
         className={manrope.className}
         style={{ scrollbarGutter: "auto" }}
       >
-        <body style={{ minHeight: "100vh" }} suppressHydrationWarning={true}>
+        <body className="min-h-svh" suppressHydrationWarning={true}>
         <Toaster position="top-right" />
           <ReduxWrapper>
             <AppWrapper>{children}</AppWrapper>
