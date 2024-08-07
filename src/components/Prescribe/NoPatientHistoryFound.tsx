@@ -5,7 +5,7 @@ const NoPatientHistoryFound: React.FC<{ message: string }> = ({ message }) => {
     <div
       style={{
         width: "100%",
-        height: "100vh",
+        height: "100svh",
         overflow: "hidden",
         display: "flex",
         alignItems: "center",

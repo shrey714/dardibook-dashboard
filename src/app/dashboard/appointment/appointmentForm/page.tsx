@@ -91,7 +91,7 @@ const Page: React.FC = () => {
   };
 
   return (
-    <div className="w-full overflow-y-auto h-screen">
+    <div className="w-full overflow-y-auto h-svh">
       <CustomModal isOpen={isModalOpen} mainScreenModal={true}>
         <RegisteredModal
           isModalOpen={isModalOpen}
@@ -99,7 +99,7 @@ const Page: React.FC = () => {
         />
       </CustomModal>
       {patientId && formLoader ? (
-        <div className="w-full h-screen overflow-hidden flex items-center justify-center z-50">
+        <div className="w-full h-svh overflow-hidden flex items-center justify-center z-50">
           <Loader
             size="medium"
             color="text-primary"
@@ -109,7 +109,7 @@ const Page: React.FC = () => {
       ) : error ? (
         <NoPatientsFound message={error} />
       ) : (
-        <div className="py-12">
+        <div className="my-12">
           <AppointmentForm
             patientFormData={patientFormData}
             setPatientFormData={setPatientFormData}

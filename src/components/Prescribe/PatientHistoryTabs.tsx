@@ -9,7 +9,7 @@ const PatientHistoryTabs = ({ prescriptionsData }: any) => {
           No history available
         </div>
       ) : (
-        <div role="tablist" className="tabs tabs-lifted w-full max-h-screen">
+        <div role="tablist" className="tabs tabs-lifted w-full max-h-svh">
           {prescriptionsData?.map((history: any, key: number) => (
             <React.Fragment key={key}>
               <input
@@ -26,7 +26,7 @@ const PatientHistoryTabs = ({ prescriptionsData }: any) => {
               />
               <div
                 role="tabpanel"
-                style={{ maxHeight: "calc(100vh - 2rem)" }}
+                style={{ maxHeight: "calc(100svh - 2rem)" }}
                 className="tab-content bg-white overflow-y-auto rounded-none p-6"
               >
                 <PatientHistoryData history={history} />

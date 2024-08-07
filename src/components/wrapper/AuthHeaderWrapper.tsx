@@ -12,8 +12,8 @@ interface authProps {
 const AuthHeaderWrapper: React.FC<authProps> = ({ header, children }) => {
   return (
     <section className="bg-white">
-      <div className="lg:grid h-screen overflow-hidden lg:grid-cols-12">
-        <section className="relative flex h-10 items-end bg-white lg:col-span-4 lg:h-screen xl:col-span-3">
+      <div className="lg:grid h-svh overflow-hidden lg:grid-cols-12">
+        <section className="relative flex h-10 items-end bg-white lg:col-span-4 lg:h-svh xl:col-span-3">
           <div className="hidden lg:relative lg:block lg:p-12">
             <a className="block text-gray-800" href="#">
               <span className="sr-only">Home</span>
@@ -34,7 +34,7 @@ const AuthHeaderWrapper: React.FC<authProps> = ({ header, children }) => {
           </div>
         </section>
 
-        <main className="h-[calc(100vh-40px)] lg:h-screen grid justify-center overflow-y-auto bg-gray-300 px-8 sm:px-12 lg:col-span-8 lg:px-16 xl:col-span-9">
+        <main className="h-[calc(100svh-40px)] lg:h-svh grid justify-center overflow-y-auto bg-gray-300 px-8 sm:px-12 lg:col-span-8 lg:px-16 xl:col-span-9">
           <div className="my-8 flex flex-col lg:my-12 max-w-xl lg:max-w-3xl">
             <div className="relative -mt-16 block lg:hidden">
               <a
@@ -49,11 +49,11 @@ const AuthHeaderWrapper: React.FC<authProps> = ({ header, children }) => {
                 />
               </a>
 
-              <h1 className="mt-16 sm:mt-20 text-2xl font-bold text-gray-800 sm:text-2xl md:text-4xl">
+              <h1 className="mt-20 sm:mt-20 text-2xl font-bold text-gray-800 sm:text-2xl md:text-4xl">
                 {header.title}
               </h1>
 
-              <p className="mt-1 leading-relaxed text-gray-800/90">
+              <p className="my-1 leading-normal text-gray-800/90">
                 {header.desc}
               </p>
             </div>

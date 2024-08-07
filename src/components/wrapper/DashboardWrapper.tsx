@@ -46,7 +46,7 @@ const DashboardWrapper = ({ children }: { children: ReactNode }) => {
         </BlockedModal>
       )}
       <ConnectionStatus />
-      <div className="h-screen overflow-hidden flex">
+      <div className="h-svh overflow-hidden flex">
         {/* <div className="md:h-screen md:overflow-hidden flex"> for mobile view */}
         <Navigation />
         <div className="flex flex-col flex-grow w-screen md:w-full overflow-y-auto bg-gray-300">

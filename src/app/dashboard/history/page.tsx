@@ -144,10 +144,10 @@ export default function HistoryPage() {
   };
 
   return (
-    <div className="h-screen overflow-hidden flex flex-1 flex-row">
+    <div className="h-svh overflow-hidden flex flex-1 flex-row">
       {/* Sidebar */}
       <aside
-        className={`z-20 top-0 w-full md:w-72 p-4 pt-[50px] md:pt-4 md:pr-0 h-screen transition-transform ${
+        className={`z-20 top-0 w-full md:w-72 p-4 pt-[50px] md:pt-4 md:pr-0 h-svh transition-transform ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         } md:translate-x-0 fixed md:static`}
         aria-label="Sidenav"
@@ -298,7 +298,7 @@ export default function HistoryPage() {
         </div>
       </aside>
 
-      <main className="h-screen mt-[50px] md:mt-4 w-auto flex flex-col flex-1">
+      <main className="h-svh mt-[50px] md:mt-4 w-auto flex flex-col flex-1">
         <nav className="z-10 bg-white px-2 flex mr-4 ml-4 md:ml-0 rounded-lg md:rounded-none md:rounded-tr-lg md:rounded-br-lg py-2">
           <button
             onClick={toggleSidebar}
@@ -366,7 +366,7 @@ export default function HistoryPage() {
 
         <div
           // style={{ height: "calc(100vh - 5.5rem)" }}
-          className="w-full bg-white overflow-hidden h-[calc(100vh-4.5rem-50px)] md:h-[calc(100vh-5.5rem)] "
+          className="w-full bg-white overflow-hidden h-[calc(100svh-4.5rem-50px)] md:h-[calc(100svh-5.5rem)] "
         >
           <div className="bg-gray-300 md:rounded-tl-lg p-4 pt-0 w-full h-full overflow-y-auto">
             {user && loader ? (
