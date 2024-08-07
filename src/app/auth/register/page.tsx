@@ -25,6 +25,8 @@ const SignIn = () => {
   const [formData, setFormData] = useState({
     clinicName: "",
     doctorName: "",
+    degree:"",
+    registrationNumber:"",
     clinicNumber: "",
     phoneNumber: "",
     emailId: user?.email,

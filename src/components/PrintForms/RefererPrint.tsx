@@ -19,6 +19,8 @@ interface PatientInfo {
 interface HospitalInfo {
   doctorName?: string | "";
   clinicName?: string | "";
+  degree? :string | ""; 
+  registrationNumber? :string | ""; 
   emailId?: string | "";
   clinicNumber?: string | "";
   clinicAddress?: string | "";
@@ -162,12 +164,14 @@ const RefererPrint = forwardRef<HTMLDivElement, Props>((props, ref) => {
       </div>
 
       <div className="text-right mt-0">
-        <p className="font-medium">Doctor: {hospitalInfo?.doctorName}</p>
-        <img
+      <img
           src={hospitalInfo?.signaturePhoto}
           alt="Doctor Signature"
           className="w-12 inline-block mt-2"
         />
+        <p className="font-medium">{hospitalInfo?.doctorName}</p>
+        <p className="font-medium">{hospitalInfo?.degree}</p>
+        <p className="font-medium">{hospitalInfo?.registrationNumber}</p>
       </div>
 
       <div className="fixed bottom-0 w-full text-center print-footer">

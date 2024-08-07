@@ -7,6 +7,8 @@ import Loader from "../common/Loader";
 interface DoctorInfo {
   clinicName: string;
   doctorName: string;
+  degree: string;
+  registrationNumber: string;
   clinicNumber: string;
   phoneNumber: string;
   emailId: string;
@@ -115,7 +117,11 @@ const ClinicInfo = ({ uid, doctorData, mainLoader, setdoctorData }: any) => {
           <h3 className="text-sm sm:text-base font-semibold leading-7 text-gray-900 tracking-wide flex flex-row justify-between items-center">
             Clinic Information
             {mainLoader && (
-              <Loader size="medium" color="text-primary" secondaryColor="text-gray-300" />
+              <Loader
+                size="medium"
+                color="text-primary"
+                secondaryColor="text-gray-300"
+              />
             )}
           </h3>
         </div>
@@ -159,6 +165,45 @@ const ClinicInfo = ({ uid, doctorData, mainLoader, setdoctorData }: any) => {
                   onChange={handleChange}
                 />
               </div>
+
+              {/* Degree */}
+              <div className="col-span-6 sm:col-span-3">
+                <label
+                  htmlFor="clinicName"
+                  className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
+                >
+                  Degree
+                </label>
+                <input
+                  autoFocus={true}
+                  required
+                  type="text"
+                  id="degree"
+                  name="degree"
+                  className="disabled:text-gray-500 form-input py-[6px] mt-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold leading-4 text-gray-700"
+                  value={formdata?.degree}
+                  onChange={handleChange}
+                />
+              </div>
+              {/* Registraion number */}
+              <div className="col-span-6 sm:col-span-3">
+                <label
+                  htmlFor="doctorName"
+                  className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
+                >
+                  Registration Number
+                </label>
+                <input
+                  required
+                  type="text"
+                  id="registrationNumber"
+                  name="registrationNumber"
+                  className="disabled:text-gray-500 form-input py-[6px] mt-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold leading-4 text-gray-700"
+                  value={formdata?.registrationNumber}
+                  onChange={handleChange}
+                />
+              </div>
+
               {/* Clinic Number */}
               <div className="col-span-6 sm:col-span-3">
                 <label
