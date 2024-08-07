@@ -9,6 +9,8 @@ interface RegistrationFormProps {
   formData: {
     clinicName: string;
     doctorName: string;
+    degree: string;
+    registrationNumber: string;
     clinicNumber: string;
     phoneNumber: string;
     emailId: string | null | undefined;
@@ -21,6 +23,8 @@ interface RegistrationFormProps {
     React.SetStateAction<{
       clinicName: string;
       doctorName: string;
+      degree: string;
+      registrationNumber: string;
       clinicNumber: string;
       phoneNumber: string;
       emailId: string | null | undefined;
@@ -125,6 +129,45 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({
             onChange={handleChange}
           />
         </div>
+
+        {/* Degree */}
+        <div className="col-span-6 sm:col-span-3">
+          <label
+            htmlFor="degree"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Degree<span className="text-red-500 ml-1">*</span>
+          </label>
+          <input
+            required
+            type="text"
+            id="degree"
+            name="degree"
+            className="form-input py-[6px] mt-1 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
+            value={formData.degree}
+            autoFocus={true}
+            onChange={handleChange}
+          />
+        </div>
+        {/* Registraion number */}
+        <div className="col-span-6 sm:col-span-3">
+          <label
+            htmlFor="registrationNumber"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Registration Number<span className="text-red-500 ml-1">*</span>
+          </label>
+          <input
+            required
+            type="text"
+            id="registrationNumber"
+            name="registrationNumber"
+            className="form-input py-[6px] mt-1 w-full rounded-md border-gray-200 bg-white text-sm text-gray-700"
+            value={formData.registrationNumber}
+            onChange={handleChange}
+          />
+        </div>
+
         {/* Clinic Number */}
         <div className="col-span-6 sm:col-span-3">
           <label

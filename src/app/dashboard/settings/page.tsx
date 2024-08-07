@@ -11,6 +11,8 @@ import { getDocotr } from "@/app/services/getDoctor";
 interface DoctorInfo {
   clinicName: string;
   doctorName: string;
+  degree:string;
+  registrationNumber:string;
   clinicNumber: string;
   phoneNumber: string;
   emailId: string;
@@ -26,6 +28,8 @@ const Page = () => {
   const [doctorData, setdoctorData] = useState<DoctorInfo>({
     clinicName: "",
     doctorName: "",
+    degree:"",
+    registrationNumber:"",
     clinicNumber: "",
     phoneNumber: "",
     emailId: userInfo?.email,
