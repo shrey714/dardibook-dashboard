@@ -57,6 +57,7 @@ const PrescribeForm = ({
                 id="diseaseDetail"
                 name="diseaseDetail"
                 rows={5}
+                autoComplete="new-off"
                 className="form-textarea block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 value={formData.diseaseDetail}
                 onChange={handleInputChange}
@@ -91,6 +92,7 @@ const PrescribeForm = ({
             <div className="mt-2">
               <textarea
                 id="advice"
+                autoComplete="new-off"
                 name="advice"
                 rows={3}
                 className="form-textarea block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
@@ -109,6 +111,7 @@ const PrescribeForm = ({
                 <input
                   type="date"
                   name="nextVisit"
+                  autoComplete="new-off"
                   id="nextVisit"
                   min={new Date().toISOString().split("T")[0]}
                   className="form-input block flex-1 border-0 bg-transparent py-1 pl-2 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
@@ -121,7 +124,7 @@ const PrescribeForm = ({
           {/* Higher hospital Form */}
           <div className="mt-4 sm:mt-6 col-span-full bg-white px-8 rounded-lg ">
             <div className="collapse collapse-arrow text-black ">
-              <input type="checkbox" name="my-accordion-2" />
+              <input type="checkbox" name="my-accordion-2" autoComplete="new-off" />
               <div className="collapse-title pr-3 pl-0 text-lg font-semibold text-gray-900">
                 Refer to higher hospital
               </div>
@@ -139,7 +142,7 @@ const PrescribeForm = ({
                       required={formData.diseaseDetail ? false : true}
                       name="hospitalName"
                       id="hospitalName"
-                      autoComplete="street-address"
+                      autoComplete="new-off"
                       className="form-input block w-full flex-1 border-0 bg-transparent py-1 pl-2 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
                       value={formData.refer.hospitalName}
                       onChange={handleHigherHospitalChange}
@@ -158,7 +161,7 @@ const PrescribeForm = ({
                       type="text"
                       name="doctorName"
                       id="doctorName"
-                      autoComplete="street-address"
+                      autoComplete="new-off"
                       className="form-input block w-full flex-1 border-0 bg-transparent py-1 pl-2 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
                       value={formData.refer.doctorName}
                       onChange={handleHigherHospitalChange}
@@ -176,6 +179,7 @@ const PrescribeForm = ({
                     <textarea
                       id="referMessage"
                       name="referMessage"
+                      autoComplete="new-off"
                       rows={3}
                       className="form-textarea block w-full rounded-md flex-1 border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                       value={formData.refer.referMessage}

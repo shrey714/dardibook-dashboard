@@ -2,6 +2,8 @@
 import React, { ChangeEvent, FormEvent, useState } from "react";
 import { PhotoIcon, XCircleIcon } from "@heroicons/react/24/solid";
 import Loader from "../common/Loader";
+import { useAppDispatch } from "@/redux/store";
+import { signOutUser } from "@/firebase/firebaseAuth";
 
 interface RegistrationFormProps {
   formData: {
@@ -36,6 +38,8 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({
   setFormData,
   submissionLoader,
 }) => {
+  const dispatch = useAppDispatch();
+
   const [clinicLogoPreview, setClinicLogoPreview] = useState<string | null>(
     null
   );
@@ -336,6 +340,20 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({
               "Add account"
             )}
           </button>
+        </div>
+
+        <div className="col-span-6">
+          <p className="text-xs sm:text-sm text-gray-500">
+            Want to use another account :{" "}
+            <a
+              className="text-error font-medium underline cursor-pointer"
+              onClick={() => {
+                signOutUser(dispatch);
+              }}
+            >
+              SignOut
+            </a>
+          </p>
         </div>
       </fieldset>
     </form>
