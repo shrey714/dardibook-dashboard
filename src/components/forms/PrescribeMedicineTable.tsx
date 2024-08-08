@@ -1,26 +1,31 @@
 // PrescribeMedicineTable
-import { ChangeEvent, useEffect, useState } from "react";
-import axios from "axios";
 import {
-  ChevronRightIcon,
+  ChangeEvent,
+  useState,
+  FocusEvent,
+  MouseEvent,
+  KeyboardEvent,
+} from "react";
+import {
   XMarkIcon,
   PlusIcon,
-  MinusIcon,
   XCircleIcon,
   PlusCircleIcon,
 } from "@heroicons/react/24/outline";
 import MedicineSuggetion from "../Prescribe/MedicineSuggetion";
 
 interface Dosage {
-  id: number;
-  value: string;
+  morning: string;
+  afternoon: string;
+  evening: string;
+  night: string;
 }
 
 interface Medicine {
   id: number;
   medicineName: string;
   instruction: string;
-  dosages: Dosage[];
+  dosages: Dosage;
   duration: string;
 }
 
@@ -34,18 +39,21 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
   setRows,
 }) => {
   const [rowIdCounter, setRowIdCounter] = useState(2);
-  const [dosageIdCounter, setDosageIdCounter] = useState(2);
 
   const addRow = () => {
     const newRow = {
       id: rowIdCounter,
       medicineName: "",
       instruction: "",
-      dosages: [{ id: dosageIdCounter, value: "" }],
+      dosages: {
+        morning: "",
+        afternoon: "",
+        evening: "",
+        night: "",
+      },
       duration: "",
     };
     setRowIdCounter(rowIdCounter + 1);
-    setDosageIdCounter(dosageIdCounter + 1);
     setRows([...rows, newRow]);
   };
 
@@ -59,58 +67,100 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
       rows.map((row) => (row.id === rowId ? { ...row, [name]: value } : row))
     );
   };
-
-  const handleDosageChange = (
-    rowId: number,
-    dosageId: number,
-    event: ChangeEvent<HTMLInputElement>
-  ) => {
-    const { value } = event.target;
-    setRows(
-      rows.map((row) =>
-        row.id === rowId
-          ? {
-              ...row,
-              dosages: row.dosages.map((dosage) =>
-                dosage.id === dosageId ? { ...dosage, value } : dosage
-              ),
-            }
-          : row
-      )
-    );
-  };
-
-  const addDosage = (rowId: number) => {
-    setRows(
-      rows.map((row) =>
-        row.id === rowId
-          ? {
-              ...row,
-              dosages: [...row.dosages, { id: dosageIdCounter, value: "" }],
-            }
-          : row
-      )
-    );
-    setDosageIdCounter(dosageIdCounter + 1);
-  };
-
-  const deleteDosage = (rowId: number, dosageId: number) => {
-    setRows(
-      rows.map((row) =>
-        row.id === rowId
-          ? {
-              ...row,
-              dosages: row.dosages.filter((dosage) => dosage.id !== dosageId),
-            }
-          : row
-      )
-    );
-  };
-
   const deleteRow = (id: number) => {
     setRows(rows.filter((row) => row.id !== id));
   };
 
+  const [currentDodageStatus, setcurrentDodageStatus] = useState<number | null>(
+    null
+  );
+  const statusLabels = ["morning", "afternoon", "evening", "night"];
+
+  const handleDosageChange = (
+    rowId: number,
+    event: ChangeEvent<HTMLInputElement>
+  ) => {
+    const { value, selectionStart } = event.target;
+    // Split the input value by commas and trim spaces
+    const dosageValues = value.split("-").map((dosage) => dosage.trim());
+
+    // Determine which dosage is currently being edited based on caret position
+    const commaPositions = [
+      0,
+      ...value.split("").reduce<number[]>((acc, char, index) => {
+        if (char === "-") acc.push(index + 1);
+        return acc;
+      }, []),
+      value.length + 1,
+    ];
+
+    const activeIndex = commaPositions.findIndex(
+      (pos, i) =>
+        selectionStart !== null &&
+        selectionStart >= pos &&
+        selectionStart < commaPositions[i + 1]
+    );
+    setcurrentDodageStatus(activeIndex === -1 ? null : activeIndex);
+
+    // Create a new dosage object based on the input values
+    const newDosages = {
+      morning: dosageValues[0] || "",
+      afternoon: dosageValues[1] || "",
+      evening: dosageValues[2] || "",
+      night: dosageValues[3] || "",
+    };
+    setRows(
+      rows.map((row) =>
+        row.id === rowId ? { ...row, ["dosages"]: newDosages } : row
+      )
+    );
+  };
+
+  const handleCursorMovement = (
+    rowId: number,
+    event:
+      | MouseEvent<HTMLInputElement>
+      | FocusEvent<HTMLInputElement>
+      | KeyboardEvent<HTMLInputElement>
+  ) => {
+    const { value, selectionStart } = event.currentTarget;
+    // Split the input value by commas and trim spaces
+    const dosageValues = value.split("-").map((dosage) => dosage.trim());
+
+    // Determine which dosage is currently being edited based on caret position
+    const commaPositions = [
+      0,
+      ...value.split("").reduce<number[]>((acc, char, index) => {
+        if (char === "-") acc.push(index + 1);
+        return acc;
+      }, []),
+      value.length + 1,
+    ];
+
+    const activeIndex = commaPositions.findIndex(
+      (pos, i) =>
+        selectionStart !== null &&
+        selectionStart >= pos &&
+        selectionStart < commaPositions[i + 1]
+    );
+    setcurrentDodageStatus(activeIndex === -1 ? null : activeIndex);
+
+    // Create a new dosage object based on the input values
+    const newDosages = {
+      morning: dosageValues[0] || "",
+      afternoon: dosageValues[1] || "",
+      evening: dosageValues[2] || "",
+      night: dosageValues[3] || "",
+    };
+    setRows(
+      rows.map((row) =>
+        row.id === rowId ? { ...row, ["dosages"]: newDosages } : row
+      )
+    );
+  };
+  const handleBlur = () => {
+    setcurrentDodageStatus(null);
+  };
   return (
     <div className="container mx-auto pt-4 px-1 text-center">
       <table className="table w-full">
@@ -118,7 +168,22 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
           <tr>
             <th>Medicine Name</th>
             <th>Instruction</th>
-            <th>Dosages</th>
+            <th className="pb-0">
+              Dosages <br />
+              {statusLabels.map((label, index) => (
+                <span
+                  key={label}
+                  className={`inline-block cursor-pointer transition-all duration-300 ${
+                    currentDodageStatus === index
+                      ? "text-blue-600"
+                      : "text-gray-600"
+                  }`}
+                >
+                  {currentDodageStatus === index ? label : label.charAt(0)}
+                  {index < statusLabels.length - 1 ? "-" : ""}
+                </span>
+              ))}
+            </th>
             <th>Duration</th>
           </tr>
         </thead>
@@ -143,42 +208,19 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
                   className="form-input w-full block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
               </td>
-              <td className="align-top p-1 w-1/3">
-                {row.dosages.map((dosage, dosageIndex) => (
-                  <div
-                    key={dosage.id}
-                    className={`flex items-center mb-1 ${dosage.id}`}
-                  >
-                    <input
-                      type="text"
-                      value={dosage.value}
-                      autoComplete="new-off"
-                      onChange={(event) =>
-                        handleDosageChange(row.id, dosage.id, event)
-                      }
-                      className="form-input w-full block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                    />
-                    <button
-                      type="button"
-                      disabled={row.dosages.length > 1 ? false : true}
-                      onClick={() => deleteDosage(row.id, dosage.id)}
-                      className="h-full animate-none"
-                    >
-                      <XCircleIcon
-                        className={`size-5 ${
-                          row.dosages.length > 1
-                            ? "text-red-600"
-                            : "text-gray-500"
-                        } ml-1`}
-                      />
-                    </button>
-                  </div>
-                ))}
-                <div className="w-full flex justify-end">
-                  <button type="button" onClick={() => addDosage(row.id)}>
-                    <PlusCircleIcon className="size-5 text-primary" />
-                  </button>
-                </div>
+              <td className="align-top p-1">
+                {/* w-1/3 for bigger space */}
+                <input
+                  type="text"
+                  // value={`${row.dosages.morning}, ${row.dosages.afternoon}, ${row.dosages.evening}, ${row.dosages.night}`}
+                  autoComplete="new-off"
+                  onChange={(event) => handleDosageChange(row.id, event)}
+                  onFocus={(event) => handleCursorMovement(row.id, event)}
+                  onClick={(event) => handleCursorMovement(row.id, event)}
+                  onKeyUp={(event) => handleCursorMovement(row.id, event)}
+                  onBlur={handleBlur}
+                  className="form-input w-full block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                />
               </td>
               <td className="align-top p-1 flex flex-row items-center gap-2">
                 <input

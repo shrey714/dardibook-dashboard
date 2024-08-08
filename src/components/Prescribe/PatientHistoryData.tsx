@@ -64,20 +64,31 @@ const PatientHistoryData = ({ history }: any) => {
                     />
                   </td>
                   <td className="align-top p-1 w-1/3">
-                    {row?.dosages?.map((dosage: any, dosageIndex: any) => (
-                      <div
-                        key={dosage.id}
-                        className={`flex items-center mb-1 ${dosage.id}`}
-                      >
-                        <input
-                          disabled
-                          readOnly
-                          type="text"
-                          value={dosage.value}
-                          className="form-input w-full block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                        />
-                      </div>
-                    ))}
+                    {["morning", "afternoon", "evening", "night"].map(
+                      (status) => {
+                        const value = row?.dosages[status];
+                        if (value) {
+                          return (
+                            <div
+                              key={status}
+                              className={`flex items-center mb-1`}
+                            >
+                              <input
+                                disabled
+                                readOnly
+                                type="text"
+                                value={`${
+                                  status.charAt(0).toUpperCase() +
+                                  status.slice(1)
+                                }: ${value}`}
+                                className="form-input w-full block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                              />
+                            </div>
+                          );
+                        }
+                        return null;
+                      }
+                    )}
                   </td>
                   <td className="align-top p-1 flex flex-row items-center gap-2">
                     <input

@@ -24,7 +24,12 @@ const Page = () => {
         id: 1,
         medicineName: "",
         instruction: "",
-        dosages: [{ id: 1, value: "" }],
+        dosages: {
+          morning: "",
+          afternoon: "",
+          evening: "",
+          night: "",
+        },
         duration: "",
       },
     ],
@@ -51,7 +56,7 @@ const Page = () => {
     });
     console.log("status", data);
     if (data?.status === 200) {
-    setIsModalOpen(true);
+      setIsModalOpen(true);
     }
     setSubmissionLoader(false);
   };
