@@ -20,6 +20,7 @@ const Loader: React.FC<LoaderProps> = ({ size, color, secondaryColor }) => {
 
   return (
     <div role="status">
+      <span className="sr-only">Loading...</span>
       <svg
         aria-hidden="true"
         className={`inline ${sizeClass} animate-spin ${secondaryColor} fill-current`}
@@ -36,7 +37,6 @@ const Loader: React.FC<LoaderProps> = ({ size, color, secondaryColor }) => {
           className={color}
         />
       </svg>
-      <span className="sr-only">Loading...</span>
     </div>
   );
 };

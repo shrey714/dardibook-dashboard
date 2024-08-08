@@ -3,12 +3,15 @@ import React from "react";
 import Link from "next/link";
 import PrescribeMedicineTable from "./PrescribeMedicineTable";
 import Loader from "../common/Loader";
+import ReceiptForm from "./ReceiptForm";
 
 const PrescribeForm = ({
   formData,
   setFormData,
   submissionLoader,
   handleSubmit,
+  receiptInfo,
+  setReceiptInfo,
 }: any) => {
   const handleInputChange = (
     e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
@@ -124,7 +127,11 @@ const PrescribeForm = ({
           {/* Higher hospital Form */}
           <div className="mt-4 sm:mt-6 col-span-full bg-white px-8 rounded-lg ">
             <div className="collapse collapse-arrow text-black ">
-              <input type="checkbox" name="my-accordion-2" autoComplete="new-off" />
+              <input
+                type="checkbox"
+                name="my-accordion-2"
+                autoComplete="new-off"
+              />
               <div className="collapse-title pr-3 pl-0 text-lg font-semibold text-gray-900">
                 Refer to higher hospital
               </div>
@@ -190,6 +197,41 @@ const PrescribeForm = ({
               </div>
             </div>
           </div>
+
+          {/* fees inputs */}
+          {/* <div className="mt-4 sm:mt-6 col-span-full bg-white p-4 px-8 rounded-lg ">
+            <label
+              className="block text-lg ext-base font-semibold leading-7 text-gray-900"
+            >
+              Receipt details
+            </label>
+            
+            <div className="py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                  <label
+                    htmlFor="fees"
+                    className="text-sm font-medium leading-6 text-gray-900 flex items-center"
+                  >
+                    CONSULTATION FEES<span className="text-red-500 ml-1">*</span>
+                  </label>
+                  <div className="sm:col-span-1 flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+                    <input
+                      type="text"
+                      name="fees"
+                      id="fees"
+                      autoComplete="new-off"
+                      className="form-input block w-full flex-1 border-0 bg-transparent py-1 pl-2 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
+                      value={}
+                      onChange={}
+                    />
+                  </div>
+                </div>
+
+
+          </div> */}
+          <ReceiptForm
+            setReceiptInfo={setReceiptInfo}
+            receiptInfo={receiptInfo}
+          />
 
           {/* Submit button */}
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
