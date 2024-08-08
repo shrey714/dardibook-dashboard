@@ -2,10 +2,17 @@
 "use client";
 import React, { forwardRef } from "react";
 
+interface Dosage {
+  morning?: string | "";
+  afternoon?: string | "";
+  evening?: string | "";
+  night?: string | "";
+}
+
 interface Medicine {
   medicineName: string;
   instruction: string;
-  dosages: [];
+  dosages: Dosage;
   duration: string;
 }
 
@@ -33,8 +40,8 @@ interface PrescriptionInfo {
 interface HospitalInfo {
   doctorName?: string | "";
   clinicName?: string | "";
-  degree? :string | ""; 
-  registrationNumber? :string | ""; 
+  degree?: string | "";
+  registrationNumber?: string | "";
   emailId?: string | "";
   clinicNumber?: string | "";
   clinicAddress?: string | "";
@@ -183,13 +190,27 @@ const PrescriptionPrint = forwardRef<HTMLDivElement, Props>((props, ref) => {
                       </div>
                     </td>
                     <td className="align-top border py-[2px] border-gray-400 w-1/3">
-                      {row?.dosages?.map((dosage: any, index: any) => (
-                        <div key={index} className={"flex items-center"}>
-                          <div className="w-full border-0 py-[2px] text-gray-900 bg-transparent">
-                            {dosage?.value}
-                          </div>
-                        </div>
-                      ))}
+                      <div key={index} className={"flex flex-col items-center"}>
+                        {["morning", "afternoon", "evening", "night"].map(
+                          (status) => {
+                            const value = row?.dosages[status];
+                            if (value) {
+                              return (
+                                <div
+                                  key={status}
+                                  className="w-full border-0 py-[1px] text-gray-900 bg-transparent"
+                                >
+                                  {`${
+                                    status.charAt(0).toUpperCase() +
+                                    status.slice(1)
+                                  }: ${value}`}
+                                </div>
+                              );
+                            }
+                            return null;
+                          }
+                        )}
+                      </div>
                     </td>
                     <td className="align-top py-[2px] border border-gray-400">
                       <div className="w-full border-0 text-gray-900 bg-transparent">
