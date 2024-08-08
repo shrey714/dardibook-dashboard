@@ -15,6 +15,15 @@ const Page = () => {
   const patientId = searchParams.get("patientId");
   const [uniqueId] = useState(patientId ? patientId : uniqid.time());
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [receiptInfo, setReceiptInfo] = useState({
+    particulars: [
+      {
+        title: "CONSULTATION FEES",
+        amount: "",
+      },
+    ],
+    totalAmount: "0.00",
+  });
   const [formData, setFormData] = useState({
     diseaseDetail: "",
     advice: "",
@@ -70,6 +79,7 @@ const Page = () => {
           patientID={patientId}
           uID={user.uid}
           PrescriptionAndReferData={formData}
+          receiptInfo={receiptInfo}
         />
       </CustomModal>
       <PrescribeForm
@@ -77,6 +87,8 @@ const Page = () => {
         setFormData={setFormData}
         submissionLoader={submissionLoader}
         handleSubmit={handleSubmit}
+        receiptInfo={receiptInfo as any}
+        setReceiptInfo={setReceiptInfo}
       />
     </div>
   );

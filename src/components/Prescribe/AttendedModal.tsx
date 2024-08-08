@@ -10,18 +10,21 @@ const AttendedModal = ({
   patientID,
   uID,
   PrescriptionAndReferData,
+  receiptInfo,
 }: any) => {
   const [startAnimation, setStartAnimation] = useState(false);
   const [printDataLoader, setprintDataLoader] = useState(false);
   const [printOptions, setprintOptions] = useState({
     IsPrescription: PrescriptionAndReferData.diseaseDetail ? true : false,
     IsRefer: PrescriptionAndReferData.refer.hospitalName ? true : false,
+    IsReceipt: true,
   });
   const [doctorAndPatientData, setdoctorAndPatientData] = useState<any>({});
   useEffect(() => {
     setprintOptions({
       IsPrescription: PrescriptionAndReferData.diseaseDetail ? true : false,
       IsRefer: PrescriptionAndReferData.refer.hospitalName ? true : false,
+      IsReceipt: true,
     });
   }, [
     PrescriptionAndReferData.diseaseDetail,
@@ -104,6 +107,7 @@ const AttendedModal = ({
                   setprintOptions({
                     IsPrescription: e.target.checked,
                     IsRefer: printOptions.IsRefer,
+                    IsReceipt: printOptions.IsReceipt,
                   })
                 }
               />
@@ -124,6 +128,7 @@ const AttendedModal = ({
                   setprintOptions({
                     IsPrescription: printOptions.IsPrescription,
                     IsRefer: e.target.checked,
+                    IsReceipt: printOptions.IsReceipt,
                   })
                 }
               />
@@ -132,6 +137,27 @@ const AttendedModal = ({
                 className="w-full py-2 ms-2 text-xs font-medium text-gray-500"
               >
                 Refer Report
+              </label>
+            </div>
+            <div className="join-item flex items-center ps-4 border border-t-0">
+              <input
+                id="Receipt"
+                type="checkbox"
+                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                checked={printOptions.IsReceipt}
+                onChange={(e) =>
+                  setprintOptions({
+                    IsPrescription: printOptions.IsPrescription,
+                    IsRefer: printOptions.IsRefer,
+                    IsReceipt: e.target.checked,
+                  })
+                }
+              />
+              <label
+                htmlFor="Receipt"
+                className="w-full py-2 ms-2 text-xs font-medium text-gray-500"
+              >
+                Receipt
               </label>
             </div>
           </div>
@@ -149,6 +175,7 @@ const AttendedModal = ({
               PrescriptionAndReferData={PrescriptionAndReferData}
               patientData={doctorAndPatientData?.patientData?.data}
               doctorData={doctorAndPatientData?.doctorData?.data}
+              receiptInfo={receiptInfo}
             />
           )}
         </div>

@@ -3,6 +3,7 @@ import React, { useRef } from "react";
 import { useReactToPrint } from "react-to-print";
 import RefererPrint from "./RefererPrint";
 import PrescriptionPrint from "./PrescriptionPrint";
+import ReceiptPrint from "./ReceiptPrint";
 
 const PrintHandeler: React.FC<any> = ({
   styleForBtn,
@@ -10,6 +11,7 @@ const PrintHandeler: React.FC<any> = ({
   PrescriptionAndReferData,
   doctorData,
   patientData,
+  receiptInfo,
 }: any) => {
   const printRef = useRef(null);
   const handlePrint = useReactToPrint({
@@ -79,6 +81,23 @@ const PrintHandeler: React.FC<any> = ({
             patientInfo={patientData}
             hospitalInfo={doctorData}
             refererInfo={PrescriptionAndReferData.refer}
+          />
+        ) : (
+          <></>
+        )}
+
+        {(printOptions?.IsPrescription || printOptions?.IsRefer) &&
+        printOptions?.IsReceipt ? (
+          <div className="page-break"></div>
+        ) : (
+          <></>
+        )}
+
+        {printOptions?.IsReceipt ? (
+          <ReceiptPrint
+            patientInfo={patientData}
+            hospitalInfo={doctorData}
+            receiptInfo={receiptInfo}
           />
         ) : (
           <></>
