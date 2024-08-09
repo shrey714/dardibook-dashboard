@@ -14,6 +14,8 @@ interface Medicine {
   instruction: string;
   dosages: Dosage;
   duration: string;
+  durationType: string;
+  type: string;
 }
 
 interface PatientInfo {
@@ -53,6 +55,45 @@ interface Props {
   patientInfo: PatientInfo;
   prescriptionInfo: PrescriptionInfo;
   hospitalInfo: HospitalInfo;
+}
+
+const countableTypes = ["TAB", "CAP", "DROP", "INJECTION", "SUPPOSITORY"]; // Add more types as needed
+
+function calculateTotalMedicinesRequired(medicine: Medicine): any {
+  let totalMedicines = 0;
+
+  if (countableTypes.includes(medicine?.type)) {
+    const {
+      morning = "",
+      afternoon = "",
+      evening = "",
+      night = "",
+    } = medicine?.dosages;
+
+    const totalDosage =
+      (parseInt(morning) || 0) +
+      (parseInt(afternoon) || 0) +
+      (parseInt(evening) || 0) +
+      (parseInt(night) || 0);
+
+    let durationDays = parseInt(medicine?.duration) || 1;
+    switch (medicine.durationType) {
+      case "month":
+        durationDays *= 30; // Assuming an average of 30 days in a month
+        break;
+      case "year":
+        durationDays *= 365; // Assuming 365 days in a year
+        break;
+      // No need to adjust for "day" since it's already in days
+      default:
+        break;
+    }
+    totalMedicines += totalDosage * durationDays;
+  } else {
+    return "";
+  }
+
+  return totalMedicines;
 }
 
 const PrescriptionPrint = forwardRef<HTMLDivElement, Props>((props, ref) => {
@@ -98,7 +139,7 @@ const PrescriptionPrint = forwardRef<HTMLDivElement, Props>((props, ref) => {
               <td className="border border-gray-400 p-1 pl-2">
                 {new Date(
                   patientInfo?.last_visited ? patientInfo?.last_visited : ""
-                ).toLocaleString()}
+                ).toLocaleString("en-GB")}
               </td>
             </tr>
             <tr>
@@ -111,10 +152,10 @@ const PrescriptionPrint = forwardRef<HTMLDivElement, Props>((props, ref) => {
             </tr>
             <tr>
               <td className="border border-gray-400 p-1 pl-2 font-medium">
-                Mobile
+                Age
               </td>
               <td className="border border-gray-400 p-1 pl-2">
-                {patientInfo?.mobile_number}
+                {patientInfo?.age}
               </td>
             </tr>
             <tr>
@@ -127,19 +168,25 @@ const PrescriptionPrint = forwardRef<HTMLDivElement, Props>((props, ref) => {
             </tr>
             <tr>
               <td className="border border-gray-400 p-1 pl-2 font-medium">
-                Age
+                Address
               </td>
               <td className="border border-gray-400 p-1 pl-2">
-                {patientInfo?.age}
+                {[
+                  patientInfo?.street_address,
+                  patientInfo?.city,
+                  patientInfo?.state,
+                  patientInfo?.zip,
+                ]
+                  .filter(Boolean)
+                  .join(", ")}
               </td>
             </tr>
             <tr>
               <td className="border border-gray-400 p-1 pl-2 font-medium">
-                Address
+                Mobile
               </td>
               <td className="border border-gray-400 p-1 pl-2">
-                {patientInfo?.street_address}, {patientInfo?.city},{" "}
-                {patientInfo?.state}, {patientInfo?.zip}
+                {patientInfo?.mobile_number}
               </td>
             </tr>
           </tbody>
@@ -158,7 +205,7 @@ const PrescriptionPrint = forwardRef<HTMLDivElement, Props>((props, ref) => {
             Medicines
           </label>
 
-          <div className="container text-center">
+          <div className="text-center">
             <table className="table w-full border border-gray-400 ">
               <thead>
                 <tr>
@@ -173,6 +220,9 @@ const PrescriptionPrint = forwardRef<HTMLDivElement, Props>((props, ref) => {
                   </th>
                   <th className="font-medium text-base text-gray-800 border border-gray-400 py-[6px]">
                     Duration
+                  </th>
+                  <th className="font-medium text-base text-gray-800 border border-gray-400 py-[6px]">
+                    Quantity
                   </th>
                 </tr>
               </thead>
@@ -189,12 +239,12 @@ const PrescriptionPrint = forwardRef<HTMLDivElement, Props>((props, ref) => {
                         {row?.instruction}
                       </div>
                     </td>
-                    <td className="align-top border py-[2px] border-gray-400 w-1/3">
+                    <td className="align-top py-[2px] border border-gray-400 w-1/3">
                       <div key={index} className={"flex flex-col items-center"}>
                         {["morning", "afternoon", "evening", "night"].map(
                           (status) => {
                             const value = row?.dosages[status];
-                            if (value) {
+                            if (value && value !== "0" && value.trim() !== "") {
                               return (
                                 <div
                                   key={status}
@@ -203,7 +253,7 @@ const PrescriptionPrint = forwardRef<HTMLDivElement, Props>((props, ref) => {
                                   {`${
                                     status.charAt(0).toUpperCase() +
                                     status.slice(1)
-                                  }: ${value}`}
+                                  }: ${value} ${row?.type || ""}`}
                                 </div>
                               );
                             }
@@ -214,7 +264,15 @@ const PrescriptionPrint = forwardRef<HTMLDivElement, Props>((props, ref) => {
                     </td>
                     <td className="align-top py-[2px] border border-gray-400">
                       <div className="w-full border-0 text-gray-900 bg-transparent">
-                        {row.duration}
+                        {row?.duration || ""}{" "}
+                        {row.durationType
+                          ? `${row.durationType}${row.duration > 1 ? "s" : ""}`
+                          : ""}
+                      </div>
+                    </td>
+                    <td className="align-top py-[2px] border border-gray-400">
+                      <div className="w-full border-0 text-gray-900 bg-transparent">
+                        {calculateTotalMedicinesRequired(row)}
                       </div>
                     </td>
                   </tr>
