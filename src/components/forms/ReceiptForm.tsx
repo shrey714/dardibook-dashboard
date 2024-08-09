@@ -1,17 +1,6 @@
 import React, { useState } from "react";
 
 const ReceiptForm: React.FC<any> = ({ receiptInfo, setReceiptInfo }: any) => {
-  //   const [receiptInfo, setReceiptInfo] = useState({
-  //     particulars: [
-  //       {
-  //         title: "",
-  //         amount: "",
-  //       },
-  //     ],
-  //     totalAmount: "",
-  //   });
-
-  // Update the state when the input changes
   const handleInputChange = (
     index: number,
     field: "title" | "amount",
@@ -74,10 +63,11 @@ const ReceiptForm: React.FC<any> = ({ receiptInfo, setReceiptInfo }: any) => {
           <div className="sm:col-span-1 flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
             <input
               type="text"
+              required
               name={`title-${index}`}
               id={`title-${index}`}
               autoComplete="off"
-              placeholder="Title"
+              placeholder="Title*"
               className="form-input block font-medium w-full flex-1 border-0 bg-transparent py-1 pl-2 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
               value={particular.title}
               onChange={(e) =>
@@ -117,7 +107,7 @@ const ReceiptForm: React.FC<any> = ({ receiptInfo, setReceiptInfo }: any) => {
         Add More
       </button>
 
-      <div className="mt-4 text-right">
+      <div className="mt-4 text-right text-gray-900">
         <strong>Total Amount: </strong>
         {receiptInfo.totalAmount}
       </div>

@@ -44,36 +44,33 @@ const PrescribeForm = ({
       autoFocus={true}
     >
       <fieldset disabled={submissionLoader}>
-        <div className="mx-auto max-w-5xl">
+        <div className="mx-auto max-w-5xl rounded-lg bg-white">
           {/* Disease text area */}
-          <div className="col-span-full bg-white p-4 px-8 rounded-lg ">
+          <div className="sm:grid sm:grid-cols-3 sm:gap-4 p-4 px-8">
             <label
               htmlFor="diseaseDetail"
-              className="block text-lg ext-base font-semibold leading-7 text-gray-900"
+              className="flex items-center text-lg font-semibold text-gray-900 "
             >
               Disease and Diagnosis<span className="text-red-500 ml-1">*</span>
             </label>
-            <div className="mt-2">
+            <div className="sm:col-span-2">
               <textarea
                 autoFocus={true}
                 required={formData.refer.hospitalName ? false : true}
                 id="diseaseDetail"
                 name="diseaseDetail"
-                rows={5}
+                rows={1}
                 autoComplete="new-off"
                 className="form-textarea block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 value={formData.diseaseDetail}
                 onChange={handleInputChange}
               />
             </div>
-            <p className="mt-1 text-sm leading-6 text-gray-600">
-              Write a few sentences about Disease.
-            </p>
           </div>
 
           {/* Medicine list */}
-          <div className="mt-4 sm:mt-6 col-span-full bg-white py-4 rounded-lg ">
-            <label className="block px-8 text-lg ext-base font-semibold leading-7 text-gray-900">
+          <div className="col-span-full py-4 sm:px-8 border-t border-gray-900/10">
+            <label className="px-8 sm:px-0 block text-lg font-semibold leading-7 text-gray-900">
               Medicines
             </label>
             <PrescribeMedicineTable
@@ -85,25 +82,27 @@ const PrescribeForm = ({
           </div>
 
           {/* Advice or special instructions text area */}
-          <div className="mt-4 sm:mt-6 col-span-full bg-white p-4 px-8 rounded-lg ">
-            <label
-              htmlFor="advice"
-              className="block text-lg ext-base font-semibold leading-7 text-gray-900"
-            >
-              Advice or special instructions
-            </label>
-            <div className="mt-2">
-              <textarea
-                id="advice"
-                autoComplete="new-off"
-                name="advice"
-                rows={3}
-                className="form-textarea block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                value={formData.advice}
-                onChange={handleInputChange}
-              />
+          <div className="p-4 px-8 border-t border-gray-900/10">
+            <div className="py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+              <label
+                htmlFor="advice"
+                className="block text-lg font-semibold leading-7 text-gray-900"
+              >
+                Advice or special instructions
+              </label>
+              <div className="sm:col-span-2">
+                <textarea
+                  id="advice"
+                  autoComplete="new-off"
+                  name="advice"
+                  rows={1}
+                  className="form-textarea block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  value={formData.advice}
+                  onChange={handleInputChange}
+                />
+              </div>
             </div>
-            <div className="mt-4 sm:mt-6 mb-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+            <div className="py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0 border-t border-gray-900/10">
               <label
                 htmlFor="nextVisit"
                 className="text-lg font-semibold leading-7 text-gray-900 flex items-center"
@@ -124,8 +123,10 @@ const PrescribeForm = ({
               </div>
             </div>
           </div>
+        </div>
+        <div className="mt-4 sm:mt-6 mx-auto max-w-5xl rounded-lg bg-white">
           {/* Higher hospital Form */}
-          <div className="mt-4 sm:mt-6 col-span-full bg-white px-8 rounded-lg ">
+          <div className="mt-4 sm:mt-6 col-span-full px-8 ">
             <div className="collapse collapse-arrow text-black ">
               <input
                 type="checkbox"
@@ -187,7 +188,7 @@ const PrescribeForm = ({
                       id="referMessage"
                       name="referMessage"
                       autoComplete="new-off"
-                      rows={3}
+                      rows={1}
                       className="form-textarea block w-full rounded-md flex-1 border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                       value={formData.refer.referMessage}
                       onChange={handleHigherHospitalChange}
@@ -197,67 +198,40 @@ const PrescribeForm = ({
               </div>
             </div>
           </div>
-
+        </div>
+        <div className="mt-4 sm:mt-6 mx-auto max-w-5xl rounded-lg bg-white">
           {/* fees inputs */}
-          {/* <div className="mt-4 sm:mt-6 col-span-full bg-white p-4 px-8 rounded-lg ">
-            <label
-              className="block text-lg ext-base font-semibold leading-7 text-gray-900"
-            >
-              Receipt details
-            </label>
-            
-            <div className="py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                  <label
-                    htmlFor="fees"
-                    className="text-sm font-medium leading-6 text-gray-900 flex items-center"
-                  >
-                    CONSULTATION FEES<span className="text-red-500 ml-1">*</span>
-                  </label>
-                  <div className="sm:col-span-1 flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
-                    <input
-                      type="text"
-                      name="fees"
-                      id="fees"
-                      autoComplete="new-off"
-                      className="form-input block w-full flex-1 border-0 bg-transparent py-1 pl-2 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
-                      value={}
-                      onChange={}
-                    />
-                  </div>
-                </div>
 
-
-          </div> */}
           <ReceiptForm
             setReceiptInfo={setReceiptInfo}
             receiptInfo={receiptInfo}
           />
+        </div>
 
-          {/* Submit button */}
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-            <Link href="./">
-              <button
-                type="button"
-                className="btn md:btn-wide bg-white border-0 text-sm font-semibold leading-6 text-gray-900"
-              >
-                Cancel
-              </button>
-            </Link>
+        {/* Submit button */}
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+          <Link href="./">
             <button
-              type="submit"
-              className="btn md:btn-wide rounded-md bg-indigo-600 border-0 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              type="button"
+              className="btn md:btn-wide bg-white border-0 text-sm font-semibold leading-6 text-gray-900"
             >
-              {submissionLoader ? (
-                <Loader
-                  size="medium"
-                  color="text-primary"
-                  secondaryColor="text-white"
-                />
-              ) : (
-                "Save"
-              )}
+              Cancel
             </button>
-          </div>
+          </Link>
+          <button
+            type="submit"
+            className="btn md:btn-wide rounded-md bg-indigo-600 border-0 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          >
+            {submissionLoader ? (
+              <Loader
+                size="medium"
+                color="text-primary"
+                secondaryColor="text-white"
+              />
+            ) : (
+              "Save"
+            )}
+          </button>
         </div>
       </fieldset>
     </form>

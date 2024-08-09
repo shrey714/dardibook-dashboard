@@ -39,7 +39,9 @@ const Page = () => {
           evening: "",
           night: "",
         },
-        duration: "",
+        duration: 1,
+        durationType: "day",
+        type: "",
       },
     ],
     refer: {

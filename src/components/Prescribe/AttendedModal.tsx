@@ -93,7 +93,7 @@ const AttendedModal = ({
           href={"./"}
           className="flex flex-1 btn rounded-md bg-indigo-600 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
         >
-          Go to queue
+          Go to list
         </Link>
         <div className="join join-vertical flex flex-1">
           <div className="join-item bg-gray-300">

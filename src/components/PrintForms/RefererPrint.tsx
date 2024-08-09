@@ -67,7 +67,7 @@ const RefererPrint = forwardRef<HTMLDivElement, Props>((props, ref) => {
       <div className="mb-4">
         <h3 className="text-xl font-semibold mb-2">Patient Information</h3>
         <table className="w-full border-collapse border border-gray-400">
-          <tbody>
+        <tbody>
             <tr>
               <td className="border border-gray-400 p-1 pl-2 font-medium">
                 ID
@@ -83,7 +83,7 @@ const RefererPrint = forwardRef<HTMLDivElement, Props>((props, ref) => {
               <td className="border border-gray-400 p-1 pl-2">
                 {new Date(
                   patientInfo?.last_visited ? patientInfo?.last_visited : ""
-                ).toLocaleString()}
+                ).toLocaleString("en-GB")}
               </td>
             </tr>
             <tr>
@@ -96,10 +96,10 @@ const RefererPrint = forwardRef<HTMLDivElement, Props>((props, ref) => {
             </tr>
             <tr>
               <td className="border border-gray-400 p-1 pl-2 font-medium">
-                Mobile
+                Age
               </td>
               <td className="border border-gray-400 p-1 pl-2">
-                {patientInfo?.mobile_number}
+                {patientInfo?.age}
               </td>
             </tr>
             <tr>
@@ -112,19 +112,25 @@ const RefererPrint = forwardRef<HTMLDivElement, Props>((props, ref) => {
             </tr>
             <tr>
               <td className="border border-gray-400 p-1 pl-2 font-medium">
-                Age
+                Address
               </td>
               <td className="border border-gray-400 p-1 pl-2">
-                {patientInfo?.age}
+                {[
+                  patientInfo?.street_address,
+                  patientInfo?.city,
+                  patientInfo?.state,
+                  patientInfo?.zip,
+                ]
+                  .filter(Boolean)
+                  .join(", ")}
               </td>
             </tr>
             <tr>
               <td className="border border-gray-400 p-1 pl-2 font-medium">
-                Address
+                Mobile
               </td>
               <td className="border border-gray-400 p-1 pl-2">
-                {patientInfo?.street_address}, {patientInfo?.city},{" "}
-                {patientInfo?.state}, {patientInfo?.zip}
+                {patientInfo?.mobile_number}
               </td>
             </tr>
           </tbody>
