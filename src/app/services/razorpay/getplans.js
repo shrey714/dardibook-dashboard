@@ -4,8 +4,8 @@ const getPlans = async () => {
   const plans = await fetch("https://backend.dardibook.in/allPlans", {
     method: "GET",
     headers: {
-      // You can include any additional headers if needed
-    },
+        "Content-Type": "application/json", // Set the content type to JSON
+      },
   });
 
   
