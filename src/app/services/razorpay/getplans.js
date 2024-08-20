@@ -4,7 +4,6 @@ const getPlans = async () => {
 
  const plans = await fetch("https://backend.dardibook.in/allPlans", {
       method: "GET",
-      mode: "no-cors",
       headers: {
         "Content-Type": "application/json",
       },
