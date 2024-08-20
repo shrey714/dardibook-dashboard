@@ -1,12 +1,7 @@
 import { NextResponse } from "next/server";
 
 const getPlans = async () => {
-  const plans = await fetch("https://backend.dardibook.in/allPlans", {
-    method: "GET",
-    headers: {
-        "Content-Type": "application/json", // Set the content type to JSON
-      },
-  });
+  const plans = await fetch("https://backend.dardibook.in/allPlans");
 
   
   const parsedPlans = await plans.json();
