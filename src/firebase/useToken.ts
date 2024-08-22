@@ -12,7 +12,7 @@ const useToken = (doctorID: string) => {
     const initialLoad = useRef(true);
 
     const playNotification = () => {
-        const audio = new Audio('/token_sound.mp3');
+        const audio = new Audio('/token_sound_2.mp3');
         audio.play().catch(error => {
             console.error('Error playing notification sound:', error);
         });
