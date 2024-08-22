@@ -1,52 +1,77 @@
 import axios from "axios";
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import Loader from "../common/Loader";
+import { collection, getDocs, query, where } from "firebase/firestore";
+import { db } from "@/firebase/firebaseConfig";
+import { useAppSelector } from "@/redux/store";
 
 const MedicineSuggestion = ({ medicine, rowId, handleInputChange }: any) => {
-  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [suggestions, setSuggestions] = useState<any>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [focusedIndex, setFocusedIndex] = useState<number>(-1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const suggestionsRef = useRef<HTMLUListElement | null>(null);
   const searchTimeoutRef = useRef<number | null>(null);
+  const user = useAppSelector<any>((state) => state.auth.user);
 
-  const debounceSearch = useCallback((term: string) => {
-    if (searchTimeoutRef.current) {
-      clearTimeout(searchTimeoutRef.current);
-    }
-    searchTimeoutRef.current = window.setTimeout(() => {
-      if (term.length > 2) {
-        setLoading(true);
-        setError(null);
-        axios
-          .get(`https://backend.dardibook.in/searchMedicine?q=${term}`)
-          .then((response) => {
-            setSuggestions(
-              response.data.map((item: { name: string }) => item.name)
+  const debounceSearch = useCallback(
+    (term: string) => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+
+      searchTimeoutRef.current = window.setTimeout(async () => {
+        if (term.length > 2) {
+          setLoading(true);
+          setError(null);
+
+          try {
+            // Firestore query
+            const medicinesRef = collection(
+              db,
+              "doctor",
+              user?.uid,
+              "medicinesData"
             );
-            setLoading(false);
-          })
-          .catch((error) => {
+            const q = query(
+              medicinesRef,
+              where("medicineName", ">=", term),
+              where("medicineName", "<=", term + "\uf8ff")
+            );
+            const querySnapshot = await getDocs(q);
+
+            const fetchedSuggestions = querySnapshot.docs.map((doc) => ({
+              id: doc.id,
+              ...doc.data(),
+            }));
+
+            setSuggestions(fetchedSuggestions);
+            console.log("fetchedSuggestions==", fetchedSuggestions);
+          } catch (error) {
             console.error("Search error:", error);
             setError("An error occurred while searching. Please try again.");
+          } finally {
             setLoading(false);
-          });
-      } else {
-        setSuggestions([]);
-      }
-    }, 300);
-  }, []);
+          }
+        } else {
+          setSuggestions([]);
+        }
+      }, 300);
+    },
+    [user?.uid]
+  );
 
-  // useEffect(() => {
-  // debounceSearch(searchTerm);
-  // }, [searchTerm, debounceSearch]); //api is not working for now
+  useEffect(() => {
+    debounceSearch(searchTerm);
+  }, [searchTerm, debounceSearch]); //api is not working for now
 
-  const handleSuggestionClick = (val: string) => {
+  const handleSuggestionClick = (val: any) => {
+    console.log("clicked");
     handleInputChange(rowId, {
       target: {
         name: "medicineName",
-        value: val,
+        value: val.medicineName,
       },
     });
     setSearchTerm("");
@@ -88,8 +113,8 @@ const MedicineSuggestion = ({ medicine, rowId, handleInputChange }: any) => {
     <>
       <div className="dropdown w-full" onBlur={handleBlur}>
         <div tabIndex={rowId} role="button" className="">
+          </div>
           <input
-            autoComplete="new-off"
             type="text"
             name="medicineName"
             value={medicine}
@@ -100,8 +125,8 @@ const MedicineSuggestion = ({ medicine, rowId, handleInputChange }: any) => {
             }}
             onKeyDown={handleKeyDown}
             className="form-input w-full block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+            autoComplete="new-off"
           />
-        </div>
         {loading ? (
           <ul
             tabIndex={rowId}
@@ -119,7 +144,7 @@ const MedicineSuggestion = ({ medicine, rowId, handleInputChange }: any) => {
             tabIndex={rowId}
             className="dropdown-content bg-gray-300 menu mt-1 md:mt-2 rounded-lg z-[1] w-52 p-1 md:p-2 shadow"
           >
-            {suggestions.map((suggestion, index) => (
+            {suggestions.map((suggestion: any, index: number) => (
               <li
                 key={index}
                 onClick={() => handleSuggestionClick(suggestion)}
@@ -127,7 +152,7 @@ const MedicineSuggestion = ({ medicine, rowId, handleInputChange }: any) => {
                   index === focusedIndex ? "bg-gray-400/40 rounded-lg" : ""
                 }`}
               >
-                <a className="py-1 text-gray-800">{suggestion}</a>
+                <a className="py-1 text-gray-800">{suggestion.medicineName}</a>
               </li>
             ))}
           </ul>

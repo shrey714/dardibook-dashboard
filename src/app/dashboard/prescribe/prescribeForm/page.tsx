@@ -30,7 +30,7 @@ const Page = () => {
     nextVisit: "",
     medicines: [
       {
-        id: 1,
+        id: uniqid(),
         medicineName: "",
         instruction: "",
         dosages: {
