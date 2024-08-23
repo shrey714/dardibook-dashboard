@@ -1,10 +1,8 @@
 import React, { ChangeEvent, useEffect, useState } from "react";
-import Link from "next/link";
 import { PlusIcon } from "@heroicons/react/24/solid";
 
 const MedicineInfo = () => {
   interface Medicine {
-    id: string;
     medicineName: string;
     type: string;
   }
@@ -29,7 +27,7 @@ const MedicineInfo = () => {
   ];
 
   // from backend
-  const mockedMedicines = [
+  const mockedMedicines: any[] = [
     { id: "1", medicineName: "abcabcabcabcabcabcabcabcabc", type: "Tablet" },
     { id: "2", medicineName: "dolo", type: "Tablet" },
     { id: "3", medicineName: "grilinctus", type: "Tablet" },
@@ -72,7 +70,6 @@ const MedicineInfo = () => {
   const [editable, setEditable] = useState(false);
   const [saveLoader, setSaveLoader] = useState(false);
   const [medicineData, setmedicineData] = useState<Medicine>({
-    id: "1",
     medicineName: "",
     type: "Type",
   });
@@ -94,6 +91,10 @@ const MedicineInfo = () => {
     // add patient api
     setTimeout(() => {
       setAddLoader(false);
+      setmedicineData({
+        medicineName: "",
+        type: "Type",
+      })
     }, 3000);
   };
   const handleInputChange = (
@@ -193,7 +194,7 @@ const MedicineInfo = () => {
                   />
                   <button
                     type="button"
-                    className="btn btn-sm mx-1"
+                    className="btn btn-sm mx-1 btn-primary"
                     onClick={saveEditHandler}
                   >
                     {editable ? saveLoader?(<span className="loading loading-spinner loading-sm"></span>):"save" : "Edit"}
@@ -202,7 +203,7 @@ const MedicineInfo = () => {
                     type="button"
                     className={`btn btn-sm mx-1 ${
                       editable ? "block" : "hidden"
-                    }`}
+                    } btn-error`}
                     onClick={() => {
                       setmedicines(medFromDb);
                       setEditable(false);
@@ -215,12 +216,12 @@ const MedicineInfo = () => {
               {/* diaplay medicine */}
               <div
                 className={`w-full h-[calc(100vh-3rem-41.6px)] bg-gray-300 mt-4 rounded-lg  ${
-                  searchLoader ? "flex justify-center items-center" : ""
+                  searchLoader || false ? "flex justify-center items-center" : ""
                 }`}
               >
                 {searchLoader ? (
                   <span className="loading loading-spinner loading-sm"></span>
-                ) : (
+                ) : false?(<p>errormsg</p>):(
                   <>
                     <form>
                       <div className="flex items-center w-full top-0 bg-gray-300 font-bold py-2 rounded-lg">
@@ -238,14 +239,14 @@ const MedicineInfo = () => {
                         {filteredMedicine(medicines).map(
                           (medicine: any, index: any) => {
                             return (
-                              <div className="flex items-center w-full">
+                              <div className="grid grid-cols-3 gap-1 w-full my-1">
                                 <input
                                   autoFocus={true}
                                   required
                                   type="text"
                                   id={medicine.id}
                                   name="medicineName"
-                                  className="disabled:text-gray-500 form-input py-[8.4px] md:py-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold leading-4 text-gray-700 flex-1 mx-1 text-center"
+                                  className="col-span-2 disabled:text-gray-500 form-input py-[8.4px] md:py-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold leading-4 text-gray-700 flex-1 mx-1 text-center"
                                   value={medicine.medicineName}
                                   onChange={(e) => {
                                     handleChange(e, index);
@@ -258,7 +259,7 @@ const MedicineInfo = () => {
                                     handleChange(e, index);
                                   }}
                                   value={medicine.type}
-                                  className="form-select border-0 rounded-[6px] flex flex-1 py-[6px] text-gray-900 placeholder:text-gray-400 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 mx-1 text-center"
+                                  className="col-span-1 form-select border-0 rounded-[6px] flex flex-1 py-[6px] text-gray-900 placeholder:text-gray-400 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 mx-1 text-center"
                                 >
                                   {medicineTypes.map((type, index) => (
                                     <option
