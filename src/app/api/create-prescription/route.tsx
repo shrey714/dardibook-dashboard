@@ -24,6 +24,24 @@ export const POST = async (request: NextRequest) => {
     const historyData = await request.json();
     const { id, uid, visitId, ...mainHistoryData } = historyData;
 
+    //uploading medicines in medicine database
+
+    for (const medicine of mainHistoryData?.medicines) {
+      if (medicine.medicineName || medicine.medicineName.trim() !== "") {
+        // Get the medicine ID and prepare the Firestore document reference
+        const medicineRef = doc(
+          db,
+          "doctor",
+          uid,
+          "medicinesData",
+          medicine?.id
+        );
+
+        // Upload the medicine object to Firestore
+        await setDoc(medicineRef, medicine, { merge: true });
+      }
+    }
+
     if (!uid || !id || !visitId) {
       return NextResponse.json(
         { error: "UID or PatientID or visitID is missing." },

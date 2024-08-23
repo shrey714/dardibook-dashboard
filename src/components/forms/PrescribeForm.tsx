@@ -232,6 +232,15 @@ const PrescribeForm = ({
               "Save"
             )}
           </button>
+          <button
+            type="button"
+            onClick={() => {
+              console.log("formData==", formData);
+            }}
+            className="btn md:btn-wide bg-white border-0 text-sm font-semibold leading-6 text-gray-900"
+          >
+            Print
+          </button>
         </div>
       </fieldset>
     </form>
