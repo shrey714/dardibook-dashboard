@@ -1,9 +1,10 @@
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import { PlusIcon } from "@heroicons/react/24/solid";
 
 const MedicineInfo = () => {
   interface Medicine {
+    id: string;
     medicineName: string;
     type: string;
   }
@@ -27,46 +28,66 @@ const MedicineInfo = () => {
     { label: "Suppository", value: "SUPPOSITORY" },
   ];
 
-  const medicines = [
-    { medicineName: "abcabcabcabcabcabcabcabcabc", type: "Tablet" },
-    { medicineName: "abc", type: "Tablet" },
-    { medicineName: "abc", type: "Tablet" },
-    { medicineName: "abc", type: "Tablet" },
-    { medicineName: "abc", type: "Tablet" },
-    { medicineName: "abc", type: "Tablet" },
-    { medicineName: "abc", type: "Tablet" },
-    { medicineName: "abc", type: "Tablet" },
-    { medicineName: "abc", type: "Tablet" },
-    { medicineName: "abc", type: "Tablet" },
-    { medicineName: "abc", type: "Tablet" },
-    { medicineName: "abc", type: "Tablet" },
-    { medicineName: "abc", type: "Tablet" },
-    { medicineName: "abc", type: "Tablet" },
-    { medicineName: "abc", type: "Tablet" },
-    { medicineName: "abc", type: "Tablet" },
-    { medicineName: "abc", type: "Tablet" },
-    { medicineName: "abc", type: "Tablet" },
-    { medicineName: "abc", type: "Tablet" },
-    { medicineName: "abc", type: "Tablet" },
-    { medicineName: "abc", type: "Tablet" },
-    { medicineName: "abc", type: "Tablet" },
-    { medicineName: "abc", type: "Tablet" },
-    { medicineName: "abc", type: "Tablet" },
-    { medicineName: "abc", type: "Tablet" },
-    { medicineName: "abc", type: "Tablet" },
-    { medicineName: "abc", type: "Tablet" },
-    { medicineName: "abc", type: "Tablet" },
-    { medicineName: "abc", type: "Tablet" },
-    { medicineName: "abc", type: "Tablet" },
-    { medicineName: "abc", type: "Tablet" },
-    { medicineName: "abc", type: "Tablet" },
-    { medicineName: "abc", type: "Tablet" },
+  // from backend
+  const mockedMedicines = [
+    { id: "1", medicineName: "abcabcabcabcabcabcabcabcabc", type: "Tablet" },
+    { id: "2", medicineName: "dolo", type: "Tablet" },
+    { id: "3", medicineName: "grilinctus", type: "Tablet" },
+    { id: "4", medicineName: "moxikindcv", type: "Tablet" },
+    { id: "5", medicineName: "amoxiciline", type: "Tablet" },
+    { id: "6", medicineName: "charas", type: "Syrup" },
+    { id: "7", medicineName: "ganja", type: "Syrup" },
+    { id: "8", medicineName: "vodka", type: "Syrup" },
+    { id: "9", medicineName: "abc", type: "Tablet" },
+    { id: "10", medicineName: "abc", type: "Tablet" },
+    { id: "11", medicineName: "abc", type: "Tablet" },
+    { id: "12", medicineName: "abc", type: "Tablet" },
+    { id: "13", medicineName: "abc", type: "Tablet" },
+    { id: "14", medicineName: "abc", type: "Tablet" },
+    { id: "15", medicineName: "abc", type: "Tablet" },
+    { id: "16", medicineName: "abc", type: "Tablet" },
+    { id: "17", medicineName: "abc", type: "Tablet" },
+    { id: "18", medicineName: "abc", type: "Tablet" },
+    { id: "19", medicineName: "abc", type: "Tablet" },
+    { id: "20", medicineName: "abc", type: "Tablet" },
+    { id: "21", medicineName: "abc", type: "Tablet" },
+    { id: "22", medicineName: "abc", type: "Tablet" },
+    { id: "23", medicineName: "abc", type: "Tablet" },
+    { id: "24", medicineName: "abc", type: "Tablet" },
+    { id: "25", medicineName: "abc", type: "Tablet" },
+    { id: "26", medicineName: "abc", type: "Tablet" },
+    { id: "27", medicineName: "abc", type: "Tablet" },
+    { id: "28", medicineName: "abc", type: "Tablet" },
+    { id: "29", medicineName: "abc", type: "Tablet" },
+    { id: "30", medicineName: "abc", type: "Tablet" },
+    { id: "31", medicineName: "abc", type: "Tablet" },
+    { id: "32", medicineName: "abc", type: "Tablet" },
+    { id: "33", medicineName: "abc", type: "Tablet" },
   ];
+  const [medFromDb, setmedFromDb] = useState<any>([]);
+  const [medicines, setmedicines] = useState<any>([]);
+  const [seachMedicine, setseachMedicine] = useState("");
   const [addLoader, setAddLoader] = useState(false);
+  const [searchLoader, setsearchLoader] = useState(true);
+  const [editable, setEditable] = useState(false);
+  const [saveLoader, setSaveLoader] = useState(false);
   const [medicineData, setmedicineData] = useState<Medicine>({
+    id: "1",
     medicineName: "",
     type: "Type",
   });
+
+  const filteredMedicine = (medicines: any) => {
+    return medicines.filter((mname: any) =>
+      mname.medicineName.includes(seachMedicine)
+    );
+  };
+
+  const handleFilterChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    setseachMedicine(value);
+  };
+
   const submitHandler = async (e: { preventDefault: () => void }) => {
     setAddLoader(true);
     e.preventDefault();
@@ -81,6 +102,43 @@ const MedicineInfo = () => {
     const { name, value } = e.target;
     setmedicineData({ ...medicineData, [name]: value });
   };
+
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>,
+    index: any
+  ) => {
+    const { name, value } = e.target;
+    console.log(name, value, medicines, index);
+    setmedicines((prev: any) =>
+      prev.map((item: any, i: any) =>
+        i === index ? { ...item, [name]: value } : item
+      )
+    );
+  };
+
+  const saveEditHandler = ()=>{
+    if(editable){
+      //make save api call
+      setSaveLoader(true);
+      setTimeout(()=>{
+        setSaveLoader(false)
+        setEditable(false);
+      },3000) 
+    }
+    else{
+      setEditable(true);
+    }
+  }
+
+  useEffect(() => {
+    setsearchLoader(true);
+    setTimeout(() => {
+      setmedFromDb(mockedMedicines);
+      setmedicines(mockedMedicines);
+      setsearchLoader(false);
+    }, 3000);
+  }, []);
+
   return (
     <div className="mt-3 md:mt-6 mx-auto max-w-4xl bg-white rounded-lg">
       <div className="px-3 py-2 md:px-8 flex justify-between items-center">
@@ -93,7 +151,7 @@ const MedicineInfo = () => {
             {/* Page content here */}
             <label
               htmlFor="my-drawer-4"
-              className="drawer-button btn btn-primary"
+              className="drawer-button btn btn-primary btn-sm text-sm"
             >
               Open drawer
             </label>
@@ -104,10 +162,10 @@ const MedicineInfo = () => {
               aria-label="close sidebar"
               className="drawer-overlay"
             ></label>
-            <div className="menu bg-base-200 text-base-content min-h-full w-80 p-4 relative">
+            <div className="menu bg-base-200 text-base-content min-h-full w-50 sm:w-80 p-4 relative">
               {/* Sidebar content here */}
               {/*serach bar */}
-              
+
               <div className="relative w-full">
                 <div className="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
                   <svg
@@ -123,35 +181,103 @@ const MedicineInfo = () => {
                     ></path>
                   </svg>
                 </div>
-                <input
-                  type="text"
-                  id="searchQuery"
-                  placeholder="Search by ID, Name, or Mobile"
-                  // value={searchQuery}
-                  // onChange={handleFilterChange}
-                  className="form-input bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full pl-10 p-2.5"
-                />
+                <div className="flex items-center">
+                  <input
+                    type="text"
+                    id="searchQuery"
+                    placeholder="Search by ID, Name, or Mobile"
+                    value={seachMedicine}
+                    onChange={handleFilterChange}
+                    className="form-input bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full pl-10 p-2.5"
+                    disabled={editable}
+                  />
+                  <button
+                    type="button"
+                    className="btn btn-sm mx-1"
+                    onClick={saveEditHandler}
+                  >
+                    {editable ? saveLoader?(<span className="loading loading-spinner loading-sm"></span>):"save" : "Edit"}
+                  </button>
+                  <button
+                    type="button"
+                    className={`btn btn-sm mx-1 ${
+                      editable ? "block" : "hidden"
+                    }`}
+                    onClick={() => {
+                      setmedicines(medFromDb);
+                      setEditable(false);
+                    }}
+                  >
+                    cancel
+                  </button>
+                </div>
               </div>
               {/* diaplay medicine */}
-              <div className="w-full h-[calc(100vh-6rem)] bg-gray-300 mt-4 rounded-lg overflow-y-auto">
-                <div className="flex items-center w-full sticky top-0 bg-gray-300 font-bold py-2">
-                  <p className="w-full text-center text-wrap flex-1">
-                    Medicine Name
-                  </p>
-                  <p className="w-full text-center text-wrap flex-1">Type</p>
-                </div>
-                {medicines.map((medicine) => {
-                  return (
-                    <div className="flex items-center w-full">
-                      <p className="w-full text-center text-wrap flex-1">
-                        {medicine.medicineName}
-                      </p>
-                      <p className="w-full text-center text-wrap flex-1">
-                        {medicine.type}
-                      </p>
-                    </div>
-                  );
-                })}
+              <div
+                className={`w-full h-[calc(100vh-3rem-41.6px)] bg-gray-300 mt-4 rounded-lg  ${
+                  searchLoader ? "flex justify-center items-center" : ""
+                }`}
+              >
+                {searchLoader ? (
+                  <span className="loading loading-spinner loading-sm"></span>
+                ) : (
+                  <>
+                    <form>
+                      <div className="flex items-center w-full top-0 bg-gray-300 font-bold py-2 rounded-lg">
+                        <p className="text-center break-words overflow-hidden flex-1 px-2">
+                          Medicine
+                        </p>
+                        <p className="text-center break-words overflow-hidden flex-1 px-2">
+                          Type
+                        </p>
+                      </div>
+                      <fieldset
+                        disabled={!editable}
+                        className="h-[calc(100vh-6rem-41.6px)] overflow-y-auto"
+                      >
+                        {filteredMedicine(medicines).map(
+                          (medicine: any, index: any) => {
+                            return (
+                              <div className="flex items-center w-full">
+                                <input
+                                  autoFocus={true}
+                                  required
+                                  type="text"
+                                  id={medicine.id}
+                                  name="medicineName"
+                                  className="disabled:text-gray-500 form-input py-[8.4px] md:py-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold leading-4 text-gray-700 flex-1 mx-1 text-center"
+                                  value={medicine.medicineName}
+                                  onChange={(e) => {
+                                    handleChange(e, index);
+                                  }}
+                                />
+                                <select
+                                  name="type"
+                                  id={medicine.id}
+                                  onChange={(e) => {
+                                    handleChange(e, index);
+                                  }}
+                                  value={medicine.type}
+                                  className="form-select border-0 rounded-[6px] flex flex-1 py-[6px] text-gray-900 placeholder:text-gray-400 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 mx-1 text-center"
+                                >
+                                  {medicineTypes.map((type, index) => (
+                                    <option
+                                      key={index}
+                                      value={type.value}
+                                      selected={type.isDefault || false}
+                                    >
+                                      {type.label}
+                                    </option>
+                                  ))}
+                                </select>
+                              </div>
+                            );
+                          }
+                        )}
+                      </fieldset>
+                    </form>
+                  </>
+                )}
               </div>
             </div>
           </div>
