@@ -10,6 +10,7 @@ const MedicineSuggestion = ({ medicine, rowId, handleInputChange }: any) => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [focusedIndex, setFocusedIndex] = useState<number>(-1);
   const [loading, setLoading] = useState(false);
+  const [openDropDown, setopenDropDown] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const suggestionsRef = useRef<HTMLUListElement | null>(null);
   const searchTimeoutRef = useRef<number | null>(null);
@@ -25,7 +26,7 @@ const MedicineSuggestion = ({ medicine, rowId, handleInputChange }: any) => {
         if (term.length > 2) {
           setLoading(true);
           setError(null);
-
+          setopenDropDown(true);
           try {
             // Firestore query
             const medicinesRef = collection(
@@ -77,6 +78,7 @@ const MedicineSuggestion = ({ medicine, rowId, handleInputChange }: any) => {
     setSearchTerm("");
     setSuggestions([]);
     setFocusedIndex(-1);
+    setopenDropDown(false);
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -111,7 +113,7 @@ const MedicineSuggestion = ({ medicine, rowId, handleInputChange }: any) => {
 
   return (
     <>
-      <div className="dropdown w-full" onBlur={handleBlur}>
+      <div className={`dropdown w-full ${openDropDown?"dropdown-open":""}`}>
         <div tabIndex={rowId} role="button" className="">
           </div>
           <input
