@@ -45,37 +45,29 @@ interface DisplayMedicineProps {
     id: string;
     instruction: string;
   };
-  index: number;
   deleteHandler: any;
   cancelHandler: any;
   setSearchEnable: any;
-  setseachMedicine:any;
+  seteditmedicineData:any;
+  editmedicineData:any;
+  saveHandler:any;
 }
 
 const DisplayMedicine: React.FC<DisplayMedicineProps> = ({
   handleChange,
   medicine,
-  index,
   deleteHandler,
   cancelHandler,
   setSearchEnable,
-  setseachMedicine
+  seteditmedicineData,
+  saveHandler,
+  editmedicineData
 }) => {
   const [editable, setEditable] = useState(false);
   const [loader, setloader] = useState(false);
 
   const submitHandler = (e: FormEvent) => {
     e.preventDefault();
-  };
-
-  const saveHandler = (id: any) => {
-    // make api call
-    setloader(true);
-    setTimeout(() => {
-      setloader(false);
-      setEditable(false);
-      setSearchEnable(true);
-    }, 3000);
   };
 
   return (
@@ -99,7 +91,7 @@ const DisplayMedicine: React.FC<DisplayMedicineProps> = ({
             id={medicine.id}
             name="medicineName"
             className="col-span-6 md:col-span-2 disabled:text-gray-500 form-input py-[4px] md:py-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold leading-4 text-gray-700 flex-1 mx-1 text-center"
-            value={medicine.medicineName}
+            value={editable?editmedicineData.medicineName:medicine.medicineName}
             onChange={(e) => {
               handleChange(e, medicine.id);
             }}
@@ -110,7 +102,7 @@ const DisplayMedicine: React.FC<DisplayMedicineProps> = ({
             onChange={(e) => {
               handleChange(e, medicine.id);
             }}
-            value={medicine.type}
+            value={editable?editmedicineData.type:medicine.type}
             className="col-span-6 md:col-span-2 form-select border-0 rounded-[6px] flex flex-1 py-[0px] md:py-[5.5px] text-gray-900 placeholder:text-gray-400 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 mx-1 text-center w-full pr-3"
           >
             {medicineTypes.map((type, index) => (
@@ -130,7 +122,7 @@ const DisplayMedicine: React.FC<DisplayMedicineProps> = ({
             id={medicine.id}
             name="instruction"
             className="col-span-6 md:col-span-2 disabled:text-gray-500 form-input py-[4px] md:py-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold leading-4 text-gray-700 flex-1 mx-1 text-center"
-            value={medicine.instruction}
+            value={editable?editmedicineData.instruction:medicine.instruction}
             onChange={(e) => {
               handleChange(e, medicine.id);
             }}
@@ -145,7 +137,7 @@ const DisplayMedicine: React.FC<DisplayMedicineProps> = ({
             onClick={() => {
               setEditable(true);
               setSearchEnable(false);
-              setseachMedicine("");
+              seteditmedicineData(medicine)
             }}
           >
             <PencilSquareIcon height={15} width={15} color="black" />
@@ -167,6 +159,7 @@ const DisplayMedicine: React.FC<DisplayMedicineProps> = ({
             onClick={() => {
               saveHandler(medicine.id);
               setEditable(false);
+              setSearchEnable(true);
             }}
           >
             {loader ? (
@@ -249,7 +242,7 @@ const MedicineInfo = () => {
   ];
   const [medFromDb, setmedFromDb] = useState<any>([]);
   const [medicines, setmedicines] = useState<any>([]);
-  const [seachMedicine, setseachMedicine] = useState("");
+  const [searchMedicine, setsearchMedicine] = useState("");
   const [addLoader, setAddLoader] = useState(false);
   const [searchLoader, setsearchLoader] = useState(true);
   const [searchEnable, setSearchEnable] = useState(true);
@@ -259,16 +252,40 @@ const MedicineInfo = () => {
     instruction: "",
     id: uniqid.time(),
   });
+  const [editmedicineData, seteditmedicineData] = useState<Medicine>({
+    medicineName: "",
+    type: "Type",
+    instruction: "",
+    id: ""
+  });
 
   const filteredMedicine = (medicines: any) => {
     return medicines.filter((mname: any) =>
-      mname?.medicineName.includes(seachMedicine)
+      mname?.medicineName.includes(searchMedicine)
+    );
+  };
+
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>,
+    id: any
+  ) => {
+    const { name, value } = e.target;
+    seteditmedicineData({ ...editmedicineData, [name]: value })
+  };
+
+  const saveHandler = (
+    id: any
+  ) => {
+    setmedicines((prev: any) =>
+      prev.map((item: any, i: any) =>
+        item.id === id ? editmedicineData : item
+      )
     );
   };
 
   const handleFilterChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
-    setseachMedicine(value);
+    setsearchMedicine(value);
   };
 
   const submitHandler = async (e: { preventDefault: () => void }) => {
@@ -290,18 +307,6 @@ const MedicineInfo = () => {
   ) => {
     const { name, value } = e.target;
     setmedicineData({ ...medicineData, [name]: value });
-  };
-
-  const handleChange = (
-    e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>,
-    id: any
-  ) => {
-    const { name, value } = e.target;
-    setmedicines((prev: any) =>
-      prev.map((item: any, i: any) =>
-        item.id === id ? { ...item, [name]: value } : item
-      )
-    );
   };
 
   const deleteHandler = (id: any) => {
@@ -380,7 +385,7 @@ const MedicineInfo = () => {
                     type="text"
                     id="searchQuery"
                     placeholder="Search by ID, Name, or Mobile"
-                    value={seachMedicine}
+                    value={searchMedicine}
                     onChange={handleFilterChange}
                     className="form-input bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full pl-10 p-2.5"
                     disabled={!searchEnable}
@@ -479,11 +484,12 @@ const MedicineInfo = () => {
                             <DisplayMedicine
                               handleChange={handleChange}
                               medicine={medicine}
-                              index={index}
                               deleteHandler={deleteHandler}
                               cancelHandler={cancelHandler}
                               setSearchEnable={setSearchEnable}
-                              setseachMedicine={setseachMedicine}
+                              seteditmedicineData={seteditmedicineData}
+                              editmedicineData={editmedicineData}
+                              saveHandler={saveHandler}
                             />
                           );
                         }
