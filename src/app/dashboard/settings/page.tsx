@@ -70,7 +70,7 @@ const Page = () => {
         subId={doctorData?.subscriptionId}
         mainLoader={mainLoader}
       />
-      <MedicineInfo />
+      <MedicineInfo uid={userInfo?.uid}/>
       <Links />
       <FooterLine />
     </div>

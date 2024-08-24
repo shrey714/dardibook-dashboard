@@ -5,6 +5,8 @@ import { TrashIcon } from "@heroicons/react/24/outline";
 import { XCircleIcon } from "@heroicons/react/24/outline";
 import { BookmarkIcon } from "@heroicons/react/24/outline";
 import uniqid from "uniqid";
+import { addMedicine, getMedicines } from "@/app/services/crudMedicine";
+import { useAppSelector } from "@/redux/store";
 
 interface Medicine {
   medicineName: string;
@@ -188,7 +190,7 @@ const DisplayMedicine: React.FC<DisplayMedicineProps> = ({
   );
 };
 
-const MedicineInfo = () => {
+const MedicineInfo = ({uid}:any) => {
   // from backend
   const mockedMedicines: any[] = [
     {
@@ -256,12 +258,12 @@ const MedicineInfo = () => {
     medicineName: "",
     type: "Type",
     instruction: "",
-    id: ""
+    id: uniqid.time()
   });
 
   const filteredMedicine = (medicines: any) => {
     return medicines.filter((mname: any) =>
-      mname?.medicineName.includes(searchMedicine)
+      mname?.medicineName?.includes(searchMedicine)
     );
   };
 
@@ -273,9 +275,18 @@ const MedicineInfo = () => {
     seteditmedicineData({ ...editmedicineData, [name]: value })
   };
 
-  const saveHandler = (
+  const saveHandler = async (
     id: any
   ) => {
+    // api call
+    const data = await addMedicine(editmedicineData,uid);
+
+    setmedFromDb((prev: any) =>
+      prev.map((item: any, i: any) =>
+        item.id === id ? editmedicineData : item
+      )
+    );
+    console.log(data)
     setmedicines((prev: any) =>
       prev.map((item: any, i: any) =>
         item.id === id ? editmedicineData : item
@@ -292,6 +303,10 @@ const MedicineInfo = () => {
     setAddLoader(true);
     e.preventDefault();
     // add patient api
+    const data = await addMedicine(medicineData,uid);
+    console.log(data);
+    setmedicines([...medicines,medicineData]);
+    setmedFromDb([...medFromDb,medicineData]);
     setTimeout(() => {
       setAddLoader(false);
       setmedicineData({
@@ -329,8 +344,15 @@ const MedicineInfo = () => {
     );
   };
 
-  useEffect(() => {
+  const fetchmedicine = async ()=>{
+    console.log("hello")
     setsearchLoader(true);
+    const data = await getMedicines(uid);
+    console.log(data);
+  }
+
+  useEffect(() => {
+    fetchmedicine();
     setTimeout(() => {
       setmedFromDb(mockedMedicines);
       setmedicines(mockedMedicines);
@@ -361,7 +383,7 @@ const MedicineInfo = () => {
               aria-label="close sidebar"
               className="drawer-overlay"
             ></label>
-            <div className="menu bg-base-200 text-base-content min-h-full w-50 sm:w-[60vw] p-4 relative">
+            <div className="menu bg-base-200 text-base-content min-h-full w-full sm:w-[60vw] p-4 relative">
               {/* Sidebar content here */}
               {/*serach bar */}
 
@@ -450,9 +472,9 @@ const MedicineInfo = () => {
                   onChange={(e) => {
                     handleInputChange(e);
                   }}
-                  name="medicineName"
-                  id="medicineName"
-                  value={medicineData.medicineName}
+                  name="instruction"
+                  id="instruction"
+                  value={medicineData.instruction}
                 />
                 <button className="btn btn-square btn-sm m-auto bg-blue-500" type="submit">
                   {addLoader ? (
