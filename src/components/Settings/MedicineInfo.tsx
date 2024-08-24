@@ -5,7 +5,7 @@ import { TrashIcon } from "@heroicons/react/24/outline";
 import { XCircleIcon } from "@heroicons/react/24/outline";
 import { BookmarkIcon } from "@heroicons/react/24/outline";
 import uniqid from "uniqid";
-import { addMedicine, getMedicines } from "@/app/services/crudMedicine";
+import { addMedicine, delMedicines, getMedicines } from "@/app/services/crudMedicine";
 import { useAppSelector } from "@/redux/store";
 
 interface Medicine {
@@ -324,8 +324,9 @@ const MedicineInfo = ({uid}:any) => {
     setmedicineData({ ...medicineData, [name]: value });
   };
 
-  const deleteHandler = (id: any) => {
+  const deleteHandler = async(id: any) => {
     // make api call
+    await delMedicines(id,uid);
     setmedicines(
       medicines.filter((medicine: { id: any }) => medicine.id != id)
     );
@@ -348,14 +349,15 @@ const MedicineInfo = ({uid}:any) => {
     console.log("hello")
     setsearchLoader(true);
     const data = await getMedicines(uid);
+    setmedFromDb(data.data);
+      setmedicines(data.data);
     console.log(data);
   }
 
   useEffect(() => {
     fetchmedicine();
     setTimeout(() => {
-      setmedFromDb(mockedMedicines);
-      setmedicines(mockedMedicines);
+      
       setsearchLoader(false);
     }, 3000);
   }, []);
