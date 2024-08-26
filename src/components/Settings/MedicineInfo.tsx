@@ -28,7 +28,7 @@ const MedicineInfo = () => {
 
   // from backend
   const mockedMedicines: any[] = [
-    { id: "1", medicineName: "abcabcabcabcabcabcabcabcabc", type: "Tablet" },
+    { id: "1", medicineName: "abcabcabcabcabcabcabcabcabc", type: "TAB" },
     { id: "2", medicineName: "dolo", type: "Tablet" },
     { id: "3", medicineName: "grilinctus", type: "Tablet" },
     { id: "4", medicineName: "moxikindcv", type: "Tablet" },
@@ -239,7 +239,7 @@ const MedicineInfo = () => {
                         {filteredMedicine(medicines).map(
                           (medicine: any, index: any) => {
                             return (
-                              <div className="grid grid-cols-3 gap-1 w-full my-1">
+                              <div key={index} className="grid grid-cols-3 gap-1 w-full my-1">
                                 <input
                                   autoFocus={true}
                                   required

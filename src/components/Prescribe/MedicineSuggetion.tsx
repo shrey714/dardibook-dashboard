@@ -1,168 +1,125 @@
-import axios from "axios";
-import React, { useEffect, useState, useRef, useCallback } from "react";
-import Loader from "../common/Loader";
+import React, { useCallback, useState } from "react";
 import { collection, getDocs, query, where } from "firebase/firestore";
+import AsyncCreatableSelect from "react-select/async-creatable";
 import { db } from "@/firebase/firebaseConfig";
 import { useAppSelector } from "@/redux/store";
 
+
+// Custom components to hide the dropdown arrow
+const customComponents = {
+  DropdownIndicator: () => null,
+  IndicatorSeparator: () => null,
+};
+
+const customStyles = {
+  control: (provided: any) => ({
+    ...provided,
+    padding: "0.375rem 0.75rem", // Matches your form-input padding
+    borderRadius: "0.375rem", // Matches your rounded-md class
+    border: "none",
+    minHeight:"auto",
+    // boxShadow: "none",
+    backgroundColor: "#f8fafc", // Matches your input background color
+    fontSize: "0.875rem", // Matches sm:text-sm class
+    lineHeight: "1.25rem", // Matches sm:leading-6 class
+    boxShadow: "0 0 0 1px #d1d5db", // Matches ring-1 and ring-gray-300 classes
+    "&:hover": {
+      boxShadow: "0 0 0 2px #6366f1", // Matches focus:ring-indigo-600 class
+    },
+  }),
+  input: (provided: any) => ({
+    ...provided,
+    margin: 0,
+    padding: 0,
+  }),
+  placeholder: (provided: any) => ({
+    ...provided,
+    color: "#9ca3af", // Matches placeholder:text-gray-400 class
+  }),
+  menu: (provided: any) => ({
+    ...provided,
+    marginTop: "0.25rem", // Matches mt-1 class
+    borderRadius: "0.375rem", // Matches rounded-lg class
+    boxShadow: "0px 5px 15px rgba(0, 0, 0, 0.1)", // Matches shadow class
+    zIndex: 9999, // Ensures the dropdown stays on top
+  }),
+  option: (provided: any, state: any) => ({
+    ...provided,
+    backgroundColor: state.isFocused ? "#e5e7eb" : "#f3f4f6", // Matches bg-gray-300 and bg-gray-400
+    color: "#1f2937", // Matches text-gray-800
+    padding: "0.5rem 1rem", // Matches py-1 class
+    cursor: "pointer",
+  }),
+  singleValue: (provided: any) => ({
+    ...provided,
+    color: "#111827", // Matches text-gray-900
+  }),
+};
+
 const MedicineSuggestion = ({ medicine, rowId, handleInputChange }: any) => {
-  const [suggestions, setSuggestions] = useState<any>([]);
-  const [searchTerm, setSearchTerm] = useState<string>("");
-  const [focusedIndex, setFocusedIndex] = useState<number>(-1);
-  const [loading, setLoading] = useState(false);
-  const [openDropDown, setopenDropDown] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const suggestionsRef = useRef<HTMLUListElement | null>(null);
-  const searchTimeoutRef = useRef<number | null>(null);
   const user = useAppSelector<any>((state) => state.auth.user);
 
-  const debounceSearch = useCallback(
-    (term: string) => {
-      if (searchTimeoutRef.current) {
-        clearTimeout(searchTimeoutRef.current);
+  // Function to load options based on user input
+  const loadOptions = useCallback(
+    async (inputValue: string) => {
+      if (!inputValue || inputValue.length < 3) {
+        return [];
       }
 
-      searchTimeoutRef.current = window.setTimeout(async () => {
-        if (term.length > 2) {
-          setLoading(true);
-          setError(null);
-          setopenDropDown(true);
-          try {
-            // Firestore query
-            const medicinesRef = collection(
-              db,
-              "doctor",
-              user?.uid,
-              "medicinesData"
-            );
-            const q = query(
-              medicinesRef,
-              where("medicineName", ">=", term),
-              where("medicineName", "<=", term + "\uf8ff")
-            );
-            const querySnapshot = await getDocs(q);
+      try {
+        // Firestore query to get medicine suggestions
+        const medicinesRef = collection(
+          db,
+          "doctor",
+          user?.uid,
+          "medicinesData"
+        );
+        const q = query(
+          medicinesRef,
+          where("medicineName", ">=", inputValue),
+          where("medicineName", "<=", inputValue + "\uf8ff")
+        );
+        const querySnapshot = await getDocs(q);
 
-            const fetchedSuggestions = querySnapshot.docs.map((doc) => ({
-              id: doc.id,
-              ...doc.data(),
-            }));
+        const fetchedSuggestions = querySnapshot.docs.map((doc) => ({
+          label: doc.data().medicineName, // Setting the label for react-select
+          value: doc.data().medicineName, // Setting the value for react-select
+        }));
 
-            setSuggestions(fetchedSuggestions);
-            console.log("fetchedSuggestions==", fetchedSuggestions);
-          } catch (error) {
-            console.error("Search error:", error);
-            setError("An error occurred while searching. Please try again.");
-          } finally {
-            setLoading(false);
-          }
-        } else {
-          setSuggestions([]);
-        }
-      }, 300);
+        return fetchedSuggestions;
+      } catch (error) {
+        console.error("Search error:", error);
+        return [];
+      }
     },
     [user?.uid]
   );
 
-  useEffect(() => {
-    debounceSearch(searchTerm);
-  }, [searchTerm, debounceSearch]); //api is not working for now
-
-  const handleSuggestionClick = (val: any) => {
-    console.log("clicked");
+  const handleChange = (selectedOption: any) => {
     handleInputChange(rowId, {
       target: {
         name: "medicineName",
-        value: val.medicineName,
+        value: selectedOption?.value || "",
       },
     });
-    setSearchTerm("");
-    setSuggestions([]);
-    setFocusedIndex(-1);
-    setopenDropDown(false);
-  };
-
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "ArrowDown") {
-      setFocusedIndex((prevIndex) =>
-        prevIndex < suggestions.length - 1 ? prevIndex + 1 : prevIndex
-      );
-    } else if (event.key === "ArrowUp") {
-      setFocusedIndex((prevIndex) =>
-        prevIndex > 0 ? prevIndex - 1 : prevIndex
-      );
-    } else if (event.key === "Enter" && focusedIndex >= 0) {
-      event.preventDefault();
-      handleSuggestionClick(suggestions[focusedIndex]);
-    }
-  };
-
-  useEffect(() => {
-    if (focusedIndex >= 0 && suggestionsRef.current) {
-      const focusedElement = suggestionsRef.current.children[focusedIndex];
-      if (focusedElement) {
-        (focusedElement as HTMLElement).scrollIntoView({
-          block: "nearest",
-        });
-      }
-    }
-  }, [focusedIndex]);
-
-  const handleBlur = () => {
-    setTimeout(() => setSuggestions([]), 100); // Delay to allow click event to register
   };
 
   return (
-    <>
-      <div className={`dropdown w-full ${openDropDown?"dropdown-open":""}`}>
-        <div tabIndex={rowId} role="button" className="">
-          </div>
-          <input
-            type="text"
-            name="medicineName"
-            value={medicine}
-            onChange={(event) => {
-              handleInputChange(rowId, event);
-              setSearchTerm(event.currentTarget.value);
-              setFocusedIndex(-1); // Reset focused index when input changes
-            }}
-            onKeyDown={handleKeyDown}
-            className="form-input w-full block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-            autoComplete="new-off"
-          />
-        {loading ? (
-          <ul
-            tabIndex={rowId}
-            className="dropdown-content flex items-center bg-gray-300 menu mt-1 md:mt-2 rounded-lg z-[1] w-52 p-1 md:p-2 shadow"
-          >
-            <Loader
-              size="small"
-              color="text-primary"
-              secondaryColor="text-white"
-            />
-          </ul>
-        ) : suggestions.length > 0 ? (
-          <ul
-            ref={suggestionsRef}
-            tabIndex={rowId}
-            className="dropdown-content bg-gray-300 menu mt-1 md:mt-2 rounded-lg z-[1] w-52 p-1 md:p-2 shadow"
-          >
-            {suggestions.map((suggestion: any, index: number) => (
-              <li
-                key={index}
-                onClick={() => handleSuggestionClick(suggestion)}
-                className={`my-[1px] ${
-                  index === focusedIndex ? "bg-gray-400/40 rounded-lg" : ""
-                }`}
-              >
-                <a className="py-1 text-gray-800">{suggestion.medicineName}</a>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          error && <div className="text-red-500 mt-1">{error}</div>
-        )}
-      </div>
-    </>
+    <div>
+      <AsyncCreatableSelect
+        className="w-60"
+        backspaceRemovesValue={true}
+        cacheOptions
+        defaultOptions
+        loadOptions={loadOptions}
+        onChange={handleChange}
+        value={medicine ? { label: medicine, value: medicine } : null}
+        placeholder="Search.."
+        components={customComponents}
+        styles={customStyles}
+        isClearable
+      />
+    </div>
   );
 };
 
