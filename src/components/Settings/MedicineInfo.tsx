@@ -1,12 +1,15 @@
 import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
-import { PlusIcon } from "@heroicons/react/24/solid";
-import { PencilSquareIcon } from "@heroicons/react/24/solid";
+import { CheckIcon, PlusIcon, XMarkIcon } from "@heroicons/react/24/solid";
+import { PencilSquareIcon } from "@heroicons/react/24/outline";
 import { TrashIcon } from "@heroicons/react/24/outline";
 import { XCircleIcon } from "@heroicons/react/24/outline";
-import { BookmarkIcon } from "@heroicons/react/24/outline";
 import uniqid from "uniqid";
-import { addMedicine, delMedicines, getMedicines } from "@/app/services/crudMedicine";
-import { useAppSelector } from "@/redux/store";
+import {
+  addMedicine,
+  delMedicines,
+  getMedicines,
+} from "@/app/services/crudMedicine";
+import Loader from "../common/Loader";
 
 interface Medicine {
   medicineName: string;
@@ -50,9 +53,10 @@ interface DisplayMedicineProps {
   deleteHandler: any;
   cancelHandler: any;
   setSearchEnable: any;
-  seteditmedicineData:any;
-  editmedicineData:any;
-  saveHandler:any;
+  seteditmedicineData: any;
+  editmedicineData: any;
+  saveHandler: any;
+  index: number;
 }
 
 const DisplayMedicine: React.FC<DisplayMedicineProps> = ({
@@ -63,7 +67,8 @@ const DisplayMedicine: React.FC<DisplayMedicineProps> = ({
   setSearchEnable,
   seteditmedicineData,
   saveHandler,
-  editmedicineData
+  editmedicineData,
+  index,
 }) => {
   const [editable, setEditable] = useState(false);
   const [loader, setloader] = useState(false);
@@ -78,13 +83,13 @@ const DisplayMedicine: React.FC<DisplayMedicineProps> = ({
         submitHandler(e);
       }}
     >
-      <div className="grid grid-cols-12 gap-1 w-full my-1">
-        <div className="col-span-1 flex justify-center items-center">
-          {medicine.id}
+      <div className="grid grid-cols-12 gap-1 w-full mb-1">
+        <div className="col-span-1 flex justify-center items-center bg-white rounded-md">
+          {index + 1}
         </div>
         <fieldset
           disabled={!editable}
-          className="col-span-9 grid grid-cols-6 justify-center items-center"
+          className="col-span-9 sm:grid sm:grid-cols-6 justify-center items-center flex-col sm:flex-row gap-1 sm:gap-2"
         >
           <input
             autoFocus={true}
@@ -92,8 +97,10 @@ const DisplayMedicine: React.FC<DisplayMedicineProps> = ({
             type="text"
             id={medicine.id}
             name="medicineName"
-            className="col-span-6 md:col-span-2 disabled:text-gray-500 form-input py-[4px] md:py-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold leading-4 text-gray-700 flex-1 mx-1 text-center"
-            value={editable?editmedicineData.medicineName:medicine.medicineName}
+            className="col-span-2 disabled:text-gray-500 form-input py-[4px] md:py-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold leading-4 text-gray-700 flex-1 mx-1 text-center"
+            value={
+              editable ? editmedicineData.medicineName : medicine.medicineName
+            }
             onChange={(e) => {
               handleChange(e, medicine.id);
             }}
@@ -104,8 +111,8 @@ const DisplayMedicine: React.FC<DisplayMedicineProps> = ({
             onChange={(e) => {
               handleChange(e, medicine.id);
             }}
-            value={editable?editmedicineData.type:medicine.type}
-            className="col-span-6 md:col-span-2 form-select border-0 rounded-[6px] flex flex-1 py-[0px] md:py-[5.5px] text-gray-900 placeholder:text-gray-400 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 mx-1 text-center w-full pr-3"
+            value={editable ? editmedicineData.type : medicine.type}
+            className="col-span-2 form-select border-0 rounded-[6px] flex flex-1 py-[0px] md:py-[5.5px] text-gray-900 placeholder:text-gray-400 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 mx-1 text-center w-full pr-3"
           >
             {medicineTypes.map((type, index) => (
               <option
@@ -123,31 +130,28 @@ const DisplayMedicine: React.FC<DisplayMedicineProps> = ({
             type="text"
             id={medicine.id}
             name="instruction"
-            className="col-span-6 md:col-span-2 disabled:text-gray-500 form-input py-[4px] md:py-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold leading-4 text-gray-700 flex-1 mx-1 text-center"
-            value={editable?editmedicineData.instruction:medicine.instruction}
+            className="col-span-2 disabled:text-gray-500 form-input py-[4px] md:py-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold leading-4 text-gray-700 flex-1 mx-1 text-center"
+            value={
+              editable ? editmedicineData.instruction : medicine.instruction
+            }
             onChange={(e) => {
               handleChange(e, medicine.id);
             }}
           />
-
         </fieldset>
-        <div className="col-span-2 flex justify-center items-center flex-col md:flex-row gap-1">
+        <div className="col-span-2 flex justify-center items-center flex-col sm:flex-row gap-1 sm:gap-2">
           <button
-            className={`btn btn-square btn-sm m-auto ${
-              editable ? "hidden" : ""
-            }`}
+            className={`btn btn-square btn-sm animate-none ${editable ? "hidden" : ""}`}
             onClick={() => {
               setEditable(true);
               setSearchEnable(false);
-              seteditmedicineData(medicine)
+              seteditmedicineData(medicine);
             }}
           >
             <PencilSquareIcon height={15} width={15} color="black" />
           </button>
           <button
-            className={`btn btn-square btn-sm m-auto ${
-              editable ? "hidden" : ""
-            }`}
+            className={`btn btn-square btn-sm animate-none ${editable ? "hidden" : ""}`}
             onClick={() => {
               deleteHandler(medicine.id);
             }}
@@ -155,9 +159,7 @@ const DisplayMedicine: React.FC<DisplayMedicineProps> = ({
             <TrashIcon height={15} width={15} color="red" />
           </button>
           <button
-            className={`btn btn-square btn-sm m-auto ${
-              !editable ? "hidden" : ""
-            }`}
+            className={`btn btn-square btn-sm animate-none ${!editable ? "hidden" : ""}`}
             onClick={() => {
               saveHandler(medicine.id);
               setEditable(false);
@@ -169,13 +171,11 @@ const DisplayMedicine: React.FC<DisplayMedicineProps> = ({
                 <span className="loading loading-spinner loading-sm"></span>
               </>
             ) : (
-              <BookmarkIcon height={15} width={15} color="black" />
+              <CheckIcon height={15} width={15} color="black" />
             )}
           </button>
           <button
-            className={`btn btn-square btn-sm m-auto ${
-              !editable ? "hidden" : ""
-            }`}
+            className={`btn btn-square btn-sm animate-none ${!editable ? "hidden" : ""}`}
             onClick={() => {
               cancelHandler(medicine.id);
               setEditable(false);
@@ -190,58 +190,7 @@ const DisplayMedicine: React.FC<DisplayMedicineProps> = ({
   );
 };
 
-const MedicineInfo = ({uid}:any) => {
-  // from backend
-  const mockedMedicines: any[] = [
-    {
-      id: "1",
-      medicineName: "abcabcabcabcabcabcabcabcabc",
-      type: "TAB",
-      instruction: "kajnfkna",
-    },
-    {
-      id: "2",
-      medicineName: "dolo",
-      type: "TAB",
-      instruction: "vdthsegjkenvfknskrvjnksejnrvkjsnvrkjndx,jvnkxnrg",
-    },
-    { id: "3", medicineName: "grilinctus", type: "TAB", instruction: "skfjnl" },
-    { id: "4", medicineName: "moxikindcv", type: "TAB", instruction: "skfjnl" },
-    {
-      id: "5",
-      medicineName: "amoxiciline",
-      type: "TAB",
-      instruction: "skfjnl",
-    },
-    { id: "6", medicineName: "charas", type: "SYRUP", instruction: "skfjnl" },
-    { id: "7", medicineName: "ganja", type: "SYRUP", instruction: "skfjnl" },
-    { id: "8", medicineName: "vodka", type: "SYRUP", instruction: "skfjnl" },
-    { id: "9", medicineName: "abc", type: "TAB", instruction: "skfjnl" },
-    { id: "10", medicineName: "abc", type: "TAB", instruction: "skfjnl" },
-    { id: "11", medicineName: "abc", type: "TAB", instruction: "skfjnl" },
-    { id: "12", medicineName: "abc", type: "TAB", instruction: "skfjnl" },
-    { id: "13", medicineName: "abc", type: "TAB", instruction: "skfjnl" },
-    { id: "14", medicineName: "abc", type: "TAB", instruction: "skfjnl" },
-    { id: "15", medicineName: "abc", type: "TAB", instruction: "skfjnl" },
-    { id: "16", medicineName: "abc", type: "TAB", instruction: "skfjnl" },
-    { id: "17", medicineName: "abc", type: "TAB", instruction: "skfjnl" },
-    { id: "18", medicineName: "abc", type: "TAB", instruction: "skfjnl" },
-    { id: "19", medicineName: "abc", type: "TAB", instruction: "skfjnl" },
-    { id: "20", medicineName: "abc", type: "TAB", instruction: "skfjnl" },
-    { id: "21", medicineName: "abc", type: "TAB", instruction: "skfjnl" },
-    { id: "22", medicineName: "abc", type: "TAB", instruction: "skfjnl" },
-    { id: "23", medicineName: "abc", type: "TAB", instruction: "skfjnl" },
-    { id: "24", medicineName: "abc", type: "TAB", instruction: "skfjnl" },
-    { id: "25", medicineName: "abc", type: "TAB", instruction: "skfjnl" },
-    { id: "26", medicineName: "abc", type: "TAB", instruction: "skfjnl" },
-    { id: "27", medicineName: "abc", type: "TAB", instruction: "skfjnl" },
-    { id: "28", medicineName: "abc", type: "TAB", instruction: "skfjnl" },
-    { id: "29", medicineName: "abc", type: "TAB", instruction: "skfjnl" },
-    { id: "30", medicineName: "abc", type: "TAB", instruction: "skfjnl" },
-    { id: "31", medicineName: "abc", type: "TAB", instruction: "skfjnl" },
-    { id: "32", medicineName: "abc", type: "TAB", instruction: "skfjnl" },
-    { id: "33", medicineName: "abc", type: "TAB", instruction: "skfjnl" },
-  ];
+const MedicineInfo = ({ uid }: any) => {
   const [medFromDb, setmedFromDb] = useState<any>([]);
   const [medicines, setmedicines] = useState<any>([]);
   const [searchMedicine, setsearchMedicine] = useState("");
@@ -252,13 +201,13 @@ const MedicineInfo = ({uid}:any) => {
     medicineName: "",
     type: "Type",
     instruction: "",
-    id: uniqid.time(),
+    id: uniqid(),
   });
   const [editmedicineData, seteditmedicineData] = useState<Medicine>({
     medicineName: "",
     type: "Type",
     instruction: "",
-    id: uniqid.time()
+    id: uniqid(),
   });
 
   const filteredMedicine = (medicines: any) => {
@@ -272,21 +221,18 @@ const MedicineInfo = ({uid}:any) => {
     id: any
   ) => {
     const { name, value } = e.target;
-    seteditmedicineData({ ...editmedicineData, [name]: value })
+    seteditmedicineData({ ...editmedicineData, [name]: value });
   };
 
-  const saveHandler = async (
-    id: any
-  ) => {
-    // api call
-    const data = await addMedicine(editmedicineData,uid);
+  const saveHandler = async (id: any) => {
+    const data = await addMedicine(editmedicineData, uid);
 
     setmedFromDb((prev: any) =>
       prev.map((item: any, i: any) =>
         item.id === id ? editmedicineData : item
       )
     );
-    console.log(data)
+    console.log(data);
     setmedicines((prev: any) =>
       prev.map((item: any, i: any) =>
         item.id === id ? editmedicineData : item
@@ -303,16 +249,16 @@ const MedicineInfo = ({uid}:any) => {
     setAddLoader(true);
     e.preventDefault();
     // add patient api
-    const data = await addMedicine(medicineData,uid);
+    const data = await addMedicine(medicineData, uid);
     console.log(data);
-    setmedicines([...medicines,medicineData]);
-    setmedFromDb([...medFromDb,medicineData]);
+    setmedicines([...medicines, medicineData]);
+    setmedFromDb([...medFromDb, medicineData]);
     setTimeout(() => {
       setAddLoader(false);
       setmedicineData({
         medicineName: "",
         type: "Type",
-        id: uniqid.time(),
+        id: uniqid(),
         instruction: "",
       });
     }, 3000);
@@ -324,9 +270,9 @@ const MedicineInfo = ({uid}:any) => {
     setmedicineData({ ...medicineData, [name]: value });
   };
 
-  const deleteHandler = async(id: any) => {
+  const deleteHandler = async (id: any) => {
     // make api call
-    await delMedicines(id,uid);
+    await delMedicines(id, uid);
     setmedicines(
       medicines.filter((medicine: { id: any }) => medicine.id != id)
     );
@@ -345,28 +291,22 @@ const MedicineInfo = ({uid}:any) => {
     );
   };
 
-  const fetchmedicine = async ()=>{
-    console.log("hello")
-    setsearchLoader(true);
-    const data = await getMedicines(uid);
-    setmedFromDb(data.data);
-      setmedicines(data.data);
-    console.log(data);
-  }
-
   useEffect(() => {
-    fetchmedicine();
-    setTimeout(() => {
-      
+    const fetchmedicine = async () => {
+      setsearchLoader(true);
+      const data = await getMedicines(uid);
+      setmedFromDb(data?.data);
+      setmedicines(data?.data);
       setsearchLoader(false);
-    }, 3000);
-  }, []);
+    };
+    fetchmedicine();
+  }, [uid]);
 
   return (
     <div className="mt-3 md:mt-6 mx-auto max-w-4xl bg-white rounded-lg">
       <div className="px-3 py-2 md:px-8 flex justify-between items-center">
         <h3 className="text-sm sm:text-base font-semibold leading-7 text-gray-900 tracking-wide">
-          Medicine Info
+          Manage medicines
         </h3>
         <div className="drawer drawer-end w-auto">
           <input id="my-drawer-4" type="checkbox" className="drawer-toggle" />
@@ -376,7 +316,7 @@ const MedicineInfo = ({uid}:any) => {
               htmlFor="my-drawer-4"
               className="drawer-button btn btn-primary btn-sm text-sm"
             >
-              Open drawer
+              Show
             </label>
           </div>
           <div className="drawer-side">
@@ -385,9 +325,77 @@ const MedicineInfo = ({uid}:any) => {
               aria-label="close sidebar"
               className="drawer-overlay"
             ></label>
-            <div className="menu bg-base-200 text-base-content min-h-full w-full sm:w-[60vw] p-4 relative">
+            <div className="menu bg-base-200 text-base-content h-svh overflow-hidden flex-col w-full md:w-[70vw] lg:w-[60vw] p-4 pt-2 relative">
               {/* Sidebar content here */}
               {/*serach bar */}
+
+              <div className="w-full mb-2 flex justify-end md:justify-start">
+                <label
+                  htmlFor="my-drawer-4"
+                  className="drawer-button btn animate-none btn-circle btn-sm bg-gray-300"
+                >
+                  <XMarkIcon height={18} width={18} color="red" />
+                </label>
+              </div>
+
+              <form
+                className="px-1 mb-2 py-1 flex flex-col md:items-center md:flex-row gap-1 w-full bg-gray-300 rounded-lg"
+                onSubmit={submitHandler}
+              >
+                <input
+                  className="form-input w-full block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  onChange={(e) => {
+                    handleInputChange(e);
+                  }}
+                  name="medicineName"
+                  id="medicineName"
+                  placeholder="Medicine name.."
+                  value={medicineData.medicineName}
+                />
+                <select
+                  value={medicineData.type}
+                  name="type"
+                  onChange={(e) => {
+                    handleInputChange(e);
+                  }}
+                  className="form-select border-0 rounded-[6px] flex flex-1 py-1.5 text-gray-900 placeholder:text-gray-400 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                >
+                  {medicineTypes.map((type, index) => (
+                    <option
+                      key={index}
+                      value={type.value}
+                      selected={type.isDefault || false}
+                    >
+                      {type.label}
+                    </option>
+                  ))}
+                </select>
+                <input
+                  className="form-input w-full block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  onChange={(e) => {
+                    handleInputChange(e);
+                  }}
+                  name="instruction"
+                  id="instruction"
+                  placeholder="Instruction.."
+                  value={medicineData.instruction}
+                />
+                <button
+                  className="btn-square animate-none m-auto bg-primary border-0 btn btn-primary btn-sm text-sm"
+                  type="submit"
+                  disabled={addLoader}
+                >
+                  {addLoader ? (
+                    <Loader
+                      size="small"
+                      color="text-primary"
+                      secondaryColor="text-gray-300"
+                    />
+                  ) : (
+                    <PlusIcon width={20} height={20} color="white" />
+                  )}
+                </button>
+              </form>
 
               <div className="relative w-full">
                 <div className="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
@@ -407,118 +415,52 @@ const MedicineInfo = ({uid}:any) => {
                 <div className="flex items-center gap-1">
                   <input
                     type="text"
-                    id="searchQuery"
-                    placeholder="Search by ID, Name, or Mobile"
+                    id="searchMedicine"
+                    placeholder="Search by medicine name.."
                     value={searchMedicine}
                     onChange={handleFilterChange}
-                    className="form-input bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full pl-10 p-2.5"
+                    className="form-input bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full pl-10"
                     disabled={!searchEnable}
                   />
-                  <label
-              htmlFor="my-drawer-4"
-              className="drawer-button btn bg-red-500 btn-sm text-sm"
-            >
-              Close
-            </label>
                 </div>
               </div>
-              <form
-                className=" px-3 py-2 md:px-8 flex flex-col md:items-center md:flex-row gap-1"
-                onSubmit={submitHandler}
-              >
-                {/* <form> */}
-                {/* <label
-          className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-          htmlFor="medicineName"
-        >
-          Medicine Name
-        </label> */}
-                <input
-                  className="form-input min-h-[2.5rem] py-2 mt-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold leading-4 text-gray-700"
-                  onChange={(e) => {
-                    handleInputChange(e);
-                  }}
-                  name="medicineName"
-                  id="medicineName"
-                  value={medicineData.medicineName}
-                />
-                {/* <label className="text-xs sm:text-sm font-medium leading-3 text-gray-500">
-          Type
-        </label> */}
-                <select
-                  value={medicineData.type}
-                  name="type"
-                  onChange={(e) => {
-                    handleInputChange(e);
-                  }}
-                  className="form-select border-0 rounded-[6px] flex flex-1 py-1 text-gray-900 placeholder:text-gray-400 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                >
-                  {medicineTypes.map((type, index) => (
-                    <option
-                      key={index}
-                      value={type.value}
-                      selected={type.isDefault || false}
-                    >
-                      {type.label}
-                    </option>
-                  ))}
-                </select>
-                {/* <label
-          className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-          htmlFor="medicineName"
-        >
-          Medicine Name
-        </label> */}
-                <input
-                  className="form-input min-h-[2.5rem] py-2 mt-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold leading-4 text-gray-700"
-                  onChange={(e) => {
-                    handleInputChange(e);
-                  }}
-                  name="instruction"
-                  id="instruction"
-                  value={medicineData.instruction}
-                />
-                <button className="btn btn-square btn-sm m-auto bg-blue-500" type="submit">
-                  {addLoader ? (
-                    <span className="loading loading-spinner loading-sm"></span>
-                  ) : (
-                    <PlusIcon width={20} height={20} color="white"/>
-                  )}
-                </button>
-                {/* </form> */}
-              </form>
+
               {/* diaplay medicine */}
-              <div
-                className={`w-full h-[calc(100vh-4rem-87.2px)] bg-gray-300 mt-4 rounded-lg overflow-y-auto ${
-                  searchLoader || false
-                    ? "flex justify-center items-center"
-                    : ""
-                }`}
-              >
+              <div className="w-full flex flex-col flex-1 bg-gray-300 mt-1 p-2 pb-1 rounded-lg overflow-y-auto">
                 {searchLoader ? (
-                  <span className="loading loading-spinner loading-sm"></span>
-                ) : false ? (
-                  <p>errormsg</p>
+                  <div className="flex flex-1 items-center justify-center">
+                    <Loader
+                      size="medium"
+                      color="text-primary"
+                      secondaryColor="text-white"
+                    />
+                  </div>
+                ) : filteredMedicine(medicines).length === 0 ? (
+                  <>
+                    <div className="flex flex-1 items-center justify-center">
+                      empty
+                    </div>
+                  </>
                 ) : (
                   <>
-                    <div className="mt-4">
-                      {filteredMedicine(medicines).map(
-                        (medicine: any, index: any) => {
-                          return (
-                            <DisplayMedicine
-                              handleChange={handleChange}
-                              medicine={medicine}
-                              deleteHandler={deleteHandler}
-                              cancelHandler={cancelHandler}
-                              setSearchEnable={setSearchEnable}
-                              seteditmedicineData={seteditmedicineData}
-                              editmedicineData={editmedicineData}
-                              saveHandler={saveHandler}
-                            />
-                          );
-                        }
-                      )}
-                    </div>
+                    {filteredMedicine(medicines).map(
+                      (medicine: any, index: any) => {
+                        return (
+                          <DisplayMedicine
+                            key={index}
+                            index={index}
+                            handleChange={handleChange}
+                            medicine={medicine}
+                            deleteHandler={deleteHandler}
+                            cancelHandler={cancelHandler}
+                            setSearchEnable={setSearchEnable}
+                            seteditmedicineData={seteditmedicineData}
+                            editmedicineData={editmedicineData}
+                            saveHandler={saveHandler}
+                          />
+                        );
+                      }
+                    )}
                   </>
                 )}
               </div>
