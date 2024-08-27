@@ -316,7 +316,9 @@ const MedicineInfo = ({ uid }: any) => {
               htmlFor="my-drawer-4"
               className="drawer-button btn btn-primary btn-sm text-sm"
             >
-              Show
+                            <h3 className="font-semibold leading-4 text-white tracking-wide">
+                Show
+              </h3>
             </label>
           </div>
           <div className="drawer-side">
