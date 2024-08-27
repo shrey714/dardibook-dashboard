@@ -2,7 +2,7 @@
 import { ChangeEvent, useState } from "react";
 import { XMarkIcon, PlusIcon } from "@heroicons/react/24/outline";
 import MedicineSuggetion from "../Prescribe/MedicineSuggetion";
-
+import uniqid from "uniqid";
 interface Dosage {
   morning: string;
   afternoon: string;
@@ -11,7 +11,7 @@ interface Dosage {
 }
 
 interface Medicine {
-  id: number;
+  id: string;
   medicineName: string;
   instruction: string;
   dosages: Dosage;
@@ -52,7 +52,7 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
   rows,
   setRows,
 }) => {
-  const [rowIdCounter, setRowIdCounter] = useState(2);
+  const [rowIdCounter, setRowIdCounter] = useState(uniqid());
 
   const addRow = () => {
     const newRow = {
@@ -69,12 +69,12 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
       durationType: "day",
       type: "",
     };
-    setRowIdCounter(rowIdCounter + 1);
+    setRowIdCounter(uniqid());
     setRows([...rows, newRow]);
   };
 
   const handleInputChange = (
-    rowId: number,
+    rowId: string,
     event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>
   ) => {
     const { name, value } = event.target;
@@ -83,7 +83,7 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
       rows.map((row) => (row.id === rowId ? { ...row, [name]: value } : row))
     );
   };
-  const deleteRow = (id: number) => {
+  const deleteRow = (id: string) => {
     setRows(rows.filter((row) => row.id !== id));
   };
 
@@ -95,7 +95,7 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
   ];
 
   const handleDosageChange = (
-    rowId: number,
+    rowId: string,
     event: ChangeEvent<HTMLInputElement>
   ) => {
     const { value } = event.target;

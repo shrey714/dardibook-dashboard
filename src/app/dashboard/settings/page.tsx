@@ -7,6 +7,7 @@ import SubscriptionInfo from "@/components/Settings/SubscriptionInfo";
 import Links from "@/components/Settings/Links";
 import FooterLine from "@/components/Settings/FooterLine";
 import { getDocotr } from "@/app/services/getDoctor";
+import MedicineInfo from "@/components/Settings/MedicineInfo";
 
 interface DoctorInfo {
   clinicName: string;
@@ -69,6 +70,7 @@ const Page = () => {
         subId={doctorData?.subscriptionId}
         mainLoader={mainLoader}
       />
+      <MedicineInfo uid={userInfo?.uid}/>
       <Links />
       <FooterLine />
     </div>
