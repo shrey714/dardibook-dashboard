@@ -126,7 +126,6 @@ const DisplayMedicine: React.FC<DisplayMedicineProps> = ({
           </select>
           <input
             autoFocus={true}
-            required
             type="text"
             id={medicine.id}
             name="instruction"
