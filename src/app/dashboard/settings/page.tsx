@@ -7,7 +7,7 @@ import SubscriptionInfo from "@/components/Settings/SubscriptionInfo";
 import Links from "@/components/Settings/Links";
 import FooterLine from "@/components/Settings/FooterLine";
 import { getDocotr } from "@/app/services/getDoctor";
-import MedicineInfo from "@/components/Settings/MedicineInfo";
+import MedicineInfo from "@/components/Settings/MedicineInfo/MedicineInfo";
 
 interface DoctorInfo {
   clinicName: string;
