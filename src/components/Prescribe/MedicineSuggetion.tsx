@@ -19,7 +19,7 @@ const customStyles = {
     border: "none",
     minHeight:"auto",
     // boxShadow: "none",
-    backgroundColor: "#f8fafc", // Matches your input background color
+    backgroundColor: "white", // Matches your input background color
     fontSize: "0.875rem", // Matches sm:text-sm class
     lineHeight: "1.25rem", // Matches sm:leading-6 class
     boxShadow: "0 0 0 1px #d1d5db", // Matches ring-1 and ring-gray-300 classes
