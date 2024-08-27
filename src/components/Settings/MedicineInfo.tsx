@@ -212,7 +212,7 @@ const MedicineInfo = ({ uid }: any) => {
 
   const filteredMedicine = (medicines: any) => {
     return medicines.filter((mname: any) =>
-      mname?.medicineName?.includes(searchMedicine)
+      mname?.medicineName?toLowerCase()?.includes(searchMedicine?.toLowerCase())
     );
   };
 
