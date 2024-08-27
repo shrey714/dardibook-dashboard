@@ -349,8 +349,8 @@ const MedicineInfo = ({ uid }: any) => {
                   }}
                   name="medicineName"
                   id="medicineName"
-                  placeholder="Medicine name.."
-                  value={medicineData.medicineName}
+                  placeholder="Medicine name.." required
+value={medicineData.medicineName}
                 />
                 <select
                   value={medicineData.type}
