@@ -164,6 +164,7 @@ const DisplayMedicine: React.FC<DisplayMedicineProps> = ({
               setEditable(false);
               setSearchEnable(true);
             }}
+type="submit"
           >
             {loader ? (
               <>
