@@ -43,6 +43,7 @@ const MedicineInfo = ({ uid }: any) => {
   const [addLoader, setAddLoader] = useState(false);
   const [searchLoader, setsearchLoader] = useState(true);
   const [searchEnable, setSearchEnable] = useState(true);
+  const [duplicate, setduplicate] = useState(false);
   const [medicineData, setmedicineData] = useState<Medicine>({
     medicineName: "",
     type: "Type",
@@ -73,6 +74,13 @@ const MedicineInfo = ({ uid }: any) => {
   };
 
   const saveHandler = async (id: any) => {
+    // to be implemented
+    // for(let med of medicines){
+    //   if((med.medicineName + med.type)===(editmedicineData.medicineName+editmedicineData.type)){
+    //     setduplicate(true);
+    //     return;
+    //   }
+    // }
     const data = await addMedicine(editmedicineData, uid);
 
     setmedFromDb((prev: any) =>
@@ -94,9 +102,17 @@ const MedicineInfo = ({ uid }: any) => {
   };
 
   const submitHandler = async (e: { preventDefault: () => void }) => {
-    setAddLoader(true);
     e.preventDefault();
     // add patient api
+    for(let med of medicines){
+      if((med.medicineName + med.type)===(medicineData.medicineName+medicineData.type)){
+        setduplicate(true);
+        return;
+      }
+    }
+    setAddLoader(true);
+
+    console.log(medicines);
     const data = await addMedicine(medicineData, uid);
     console.log(data);
     setmedicines([...medicines, medicineData]);
@@ -231,7 +247,9 @@ const MedicineInfo = ({ uid }: any) => {
                   placeholder="Instruction.."
                   value={medicineData.instruction}
                 />
+                <div className="dropdown dropdown-end dropdown-open w-fit m-auto">
                 <button
+                tabIndex={0} role="button"
                   className="btn-square animate-none m-auto bg-primary border-0 btn btn-primary btn-sm text-sm"
                   type="submit"
                   disabled={addLoader}
@@ -246,6 +264,13 @@ const MedicineInfo = ({ uid }: any) => {
                     <PlusIcon width={20} height={20} color="white" />
                   )}
                 </button>
+  <div tabIndex={0} className={`dropdown-content flex items-center justify-center bg-base-100 rounded-box z-[1] w-52 p-2 shadow ${duplicate?"block":"hidden"}`}>
+    <p className="text-center">Medicine already exists</p>
+    {/* doubt */}
+    <button className="btn btn-sm m-auto" disabled={!duplicate} onClick={()=>{setduplicate(false)}}>Ok</button>  
+  </div>
+</div>
+               
               </form>
 
               <div className="relative w-full">

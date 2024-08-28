@@ -142,17 +142,10 @@ const MedicineRow: React.FC<DisplayMedicineProps> = ({
           >
             <PencilSquareIcon height={15} width={15} color="black" />
           </button>
-          <button
-            className={`btn btn-square btn-sm animate-none ${
+          <details className="dropdown dropdown-end">
+          <summary id={medicine.id+"btn"} className={`btn btn-square btn-sm animate-none ${
               editable ? "hidden" : ""
-            }`}
-            onClick={async() => {
-              setdeleteLoader(true);
-              await deleteHandler(medicine.id);
-              setdeleteLoader(false);
-            }}
-            disabled={deleteLoader}
-          >
+            }`} >
             {deleteLoader ? (
               <>
                 <Loader size="small" color="text-error" secondaryColor="text-gray-300" />
@@ -160,8 +153,27 @@ const MedicineRow: React.FC<DisplayMedicineProps> = ({
             ) : (
               <TrashIcon height={15} width={15} color="red" />
             )}
-          </button>
-          <button
+          </summary>
+  
+  <div className="dropdown-content bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
+    <p className="text-center">Are you sure you want to delete?</p>
+    <div className="flex gap-2 justify-center items-center mt-1">
+    <button className="btn btn-sm" onClick={async() => {
+              setdeleteLoader(true);
+              await deleteHandler(medicine.id);
+              setdeleteLoader(false);
+      document.getElementById(`${medicine.id}btn`)?.click();
+
+            }}><a>Yes</a></button>
+    <button className="btn btn-sm" onClick={()=>{
+            document.getElementById(`${medicine.id}btn`)?.click();
+
+    }}><a>No</a></button>
+    </div>
+  </div>
+</details>
+          
+<button
             className={`btn btn-square btn-sm animate-none ${
               !editable ? "hidden" : ""
             }`}
@@ -187,6 +199,7 @@ const MedicineRow: React.FC<DisplayMedicineProps> = ({
               <CheckIcon height={15} width={15} color="black" />
             )}
           </button>
+          
           <button
             className={`btn btn-square btn-sm animate-none ${
               !editable ? "hidden" : ""
