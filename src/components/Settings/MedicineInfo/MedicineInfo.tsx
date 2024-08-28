@@ -1,15 +1,13 @@
-import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
-import { CheckIcon, PlusIcon, XMarkIcon } from "@heroicons/react/24/solid";
-import { PencilSquareIcon } from "@heroicons/react/24/outline";
-import { TrashIcon } from "@heroicons/react/24/outline";
-import { XCircleIcon } from "@heroicons/react/24/outline";
+import React, { ChangeEvent, useEffect, useState } from "react";
+import { PlusIcon, XMarkIcon } from "@heroicons/react/24/solid";
+import MedicineRow from "./MedicineRow";
 import uniqid from "uniqid";
 import {
   addMedicine,
   delMedicines,
   getMedicines,
 } from "@/app/services/crudMedicine";
-import Loader from "../common/Loader";
+import Loader from "@/components/common/Loader";
 
 interface Medicine {
   medicineName: string;
@@ -37,158 +35,6 @@ const medicineTypes = [
   { label: "Suppository", value: "SUPPOSITORY" },
 ];
 
-interface DisplayMedicineProps {
-  handleChange: (
-    event:
-      | React.ChangeEvent<HTMLInputElement>
-      | React.ChangeEvent<HTMLSelectElement>,
-    id: string
-  ) => void;
-  medicine: {
-    medicineName: string;
-    type: string;
-    id: string;
-    instruction: string;
-  };
-  deleteHandler: any;
-  cancelHandler: any;
-  setSearchEnable: any;
-  seteditmedicineData: any;
-  editmedicineData: any;
-  saveHandler: any;
-  index: number;
-}
-
-const DisplayMedicine: React.FC<DisplayMedicineProps> = ({
-  handleChange,
-  medicine,
-  deleteHandler,
-  cancelHandler,
-  setSearchEnable,
-  seteditmedicineData,
-  saveHandler,
-  editmedicineData,
-  index,
-}) => {
-  const [editable, setEditable] = useState(false);
-  const [loader, setloader] = useState(false);
-
-  const submitHandler = (e: FormEvent) => {
-    e.preventDefault();
-  };
-
-  return (
-    <form
-      onSubmit={(e) => {
-        submitHandler(e);
-      }}
-    >
-      <div className="grid grid-cols-12 gap-1 w-full mb-1">
-        <div className="col-span-1 flex justify-center items-center bg-white rounded-md">
-          {index + 1}
-        </div>
-        <fieldset
-          disabled={!editable}
-          className="col-span-9 sm:grid sm:grid-cols-6 justify-center items-center flex-col sm:flex-row gap-1 sm:gap-2"
-        >
-          <input
-            autoFocus={true}
-            required
-            type="text"
-            id={medicine.id}
-            name="medicineName"
-            className="col-span-2 disabled:text-gray-500 form-input py-[4px] md:py-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold leading-4 text-gray-700 flex-1 mx-1 text-center"
-            value={
-              editable ? editmedicineData.medicineName : medicine.medicineName
-            }
-            onChange={(e) => {
-              handleChange(e, medicine.id);
-            }}
-          />
-          <select
-            name="type"
-            id={medicine.id}
-            onChange={(e) => {
-              handleChange(e, medicine.id);
-            }}
-            value={editable ? editmedicineData.type : medicine.type}
-            className="col-span-2 form-select border-0 rounded-[6px] flex flex-1 py-[0px] md:py-[5.5px] text-gray-900 placeholder:text-gray-400 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 mx-1 text-center w-full pr-3"
-          >
-            {medicineTypes.map((type, index) => (
-              <option
-                key={index}
-                value={type.value}
-                selected={type.isDefault || false}
-              >
-                {type.label}
-              </option>
-            ))}
-          </select>
-          <input
-            autoFocus={true}
-            type="text"
-            id={medicine.id}
-            name="instruction"
-            className="col-span-2 disabled:text-gray-500 form-input py-[4px] md:py-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold leading-4 text-gray-700 flex-1 mx-1 text-center"
-            value={
-              editable ? editmedicineData.instruction : medicine.instruction
-            }
-            onChange={(e) => {
-              handleChange(e, medicine.id);
-            }}
-          />
-        </fieldset>
-        <div className="col-span-2 flex justify-center items-center flex-col sm:flex-row gap-1 sm:gap-2">
-          <button
-            className={`btn btn-square btn-sm animate-none ${editable ? "hidden" : ""}`}
-            onClick={() => {
-              setEditable(true);
-              setSearchEnable(false);
-              seteditmedicineData(medicine);
-            }}
-          >
-            <PencilSquareIcon height={15} width={15} color="black" />
-          </button>
-          <button
-            className={`btn btn-square btn-sm animate-none ${editable ? "hidden" : ""}`}
-            onClick={() => {
-              deleteHandler(medicine.id);
-            }}
-          >
-            <TrashIcon height={15} width={15} color="red" />
-          </button>
-          <button
-            className={`btn btn-square btn-sm animate-none ${!editable ? "hidden" : ""}`}
-            onClick={() => {
-              saveHandler(medicine.id);
-              setEditable(false);
-              setSearchEnable(true);
-            }}
-type="submit"
-          >
-            {loader ? (
-              <>
-                <span className="loading loading-spinner loading-sm"></span>
-              </>
-            ) : (
-              <CheckIcon height={15} width={15} color="black" />
-            )}
-          </button>
-          <button
-            className={`btn btn-square btn-sm animate-none ${!editable ? "hidden" : ""}`}
-            onClick={() => {
-              cancelHandler(medicine.id);
-              setEditable(false);
-              setSearchEnable(true);
-            }}
-          >
-            <XCircleIcon height={15} width={15} color="red" />
-          </button>
-        </div>
-      </div>
-    </form>
-  );
-};
 
 const MedicineInfo = ({ uid }: any) => {
   const [medFromDb, setmedFromDb] = useState<any>([]);
@@ -211,7 +57,10 @@ const MedicineInfo = ({ uid }: any) => {
   });
 
   const filteredMedicine = (medicines: any) => {
-    return medicines.filter((mname: any) => mname?.medicineName?.toLowerCase()?.includes(searchMedicine?.toLowerCase())
+    return medicines.filter((mname: any) =>
+      mname?.medicineName
+        ?.toLowerCase()
+        ?.includes(searchMedicine?.toLowerCase())
     );
   };
 
@@ -294,8 +143,8 @@ const MedicineInfo = ({ uid }: any) => {
     const fetchmedicine = async () => {
       setsearchLoader(true);
       const data = await getMedicines(uid);
-      setmedFromDb(data?.data);
-      setmedicines(data?.data);
+      setmedFromDb(data?.data || []);
+      setmedicines(data?.data || []);
       setsearchLoader(false);
     };
     fetchmedicine();
@@ -315,7 +164,7 @@ const MedicineInfo = ({ uid }: any) => {
               htmlFor="my-drawer-4"
               className="drawer-button btn btn-primary btn-sm text-sm"
             >
-                            <h3 className="font-semibold leading-4 text-white tracking-wide">
+              <h3 className="font-semibold leading-4 text-white tracking-wide">
                 Show
               </h3>
             </label>
@@ -350,8 +199,9 @@ const MedicineInfo = ({ uid }: any) => {
                   }}
                   name="medicineName"
                   id="medicineName"
-                  placeholder="Medicine name.." required
-value={medicineData.medicineName}
+                  placeholder="Medicine name.."
+                  required
+                  value={medicineData.medicineName}
                 />
                 <select
                   value={medicineData.type}
@@ -447,17 +297,17 @@ value={medicineData.medicineName}
                     {filteredMedicine(medicines).map(
                       (medicine: any, index: any) => {
                         return (
-                          <DisplayMedicine
+                          <MedicineRow
                             key={index}
                             index={index}
                             handleChange={handleChange}
                             medicine={medicine}
-                            deleteHandler={deleteHandler}
                             cancelHandler={cancelHandler}
                             setSearchEnable={setSearchEnable}
                             seteditmedicineData={seteditmedicineData}
                             editmedicineData={editmedicineData}
                             saveHandler={saveHandler}
+                            deleteHandler={deleteHandler}
                           />
                         );
                       }
