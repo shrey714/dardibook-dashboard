@@ -143,8 +143,8 @@ const MedicineInfo = ({ uid }: any) => {
     const fetchmedicine = async () => {
       setsearchLoader(true);
       const data = await getMedicines(uid);
-      setmedFromDb(data?.data);
-      setmedicines(data?.data);
+      setmedFromDb(data?.data || []);
+      setmedicines(data?.data || []);
       setsearchLoader(false);
     };
     fetchmedicine();
