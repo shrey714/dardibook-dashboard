@@ -63,6 +63,7 @@ const MedicineRow: React.FC<DisplayMedicineProps> = ({
   const [editable, setEditable] = useState(false);
   const [editLoader, seteditLoader] = useState(false);
   const [deleteLoader, setdeleteLoader] = useState(false);
+  const [isDropdownVisible, setIsDropdownVisible] = useState(true);
 
   const submitHandler = (e: FormEvent) => {
     e.preventDefault();
@@ -142,38 +143,58 @@ const MedicineRow: React.FC<DisplayMedicineProps> = ({
           >
             <PencilSquareIcon height={15} width={15} color="black" />
           </button>
-          <details className="dropdown dropdown-end">
-          <summary id={medicine.id+"btn"} className={`btn btn-square btn-sm animate-none ${
-              editable ? "hidden" : ""
-            }`} >
-            {deleteLoader ? (
-              <>
-                <Loader size="small" color="text-error" secondaryColor="text-gray-300" />
-              </>
-            ) : (
-              <TrashIcon height={15} width={15} color="red" />
+          <div className={`dropdown dropdown-end ${editable ? "hidden" : ""}`}>
+            <div
+              tabIndex={0}
+              role="button"
+              onClick={() => setIsDropdownVisible(true)}
+              className="btn btn-sm animate-none btn-square"
+            >
+              {deleteLoader ? (
+                <>
+                  <Loader
+                    size="small"
+                    color="text-error"
+                    secondaryColor="text-gray-300"
+                  />
+                </>
+              ) : (
+                <TrashIcon height={15} width={15} color="red" />
+              )}
+            </div>
+
+            {isDropdownVisible && (
+              <ul
+                tabIndex={0}
+                className="dropdown-content menu bg-base-100 rounded-md z-[1] w-52 mt-1 p-2 shadow"
+              >
+                <p className="text-center text-xs sm:text-sm font-medium">
+                  Are you sure you want to delete?
+                </p>
+                <div className="flex gap-2 justify-center items-center mt-1">
+                  <button
+                    className="btn btn-xs animate-none sm:btn-sm bg-red-400 text-white font-medium hover:bg-red-500"
+                    onClick={async () => {
+                      setIsDropdownVisible(false);
+                      setdeleteLoader(true);
+                      await deleteHandler(medicine.id);
+                      setdeleteLoader(false);
+                    }}
+                  >
+                    <a>Yes</a>
+                  </button>
+                  <button
+                    className="btn btn-xs animate-none sm:btn-sm bg-gray-300"
+                    onClick={() => setIsDropdownVisible(false)}
+                  >
+                    <a>No</a>
+                  </button>
+                </div>
+              </ul>
             )}
-          </summary>
-  
-  <div className="dropdown-content bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
-    <p className="text-center">Are you sure you want to delete?</p>
-    <div className="flex gap-2 justify-center items-center mt-1">
-    <button className="btn btn-sm" onClick={async() => {
-              setdeleteLoader(true);
-              await deleteHandler(medicine.id);
-              setdeleteLoader(false);
-      document.getElementById(`${medicine.id}btn`)?.click();
+          </div>
 
-            }}><a>Yes</a></button>
-    <button className="btn btn-sm" onClick={()=>{
-            document.getElementById(`${medicine.id}btn`)?.click();
-
-    }}><a>No</a></button>
-    </div>
-  </div>
-</details>
-          
-<button
+          <button
             className={`btn btn-square btn-sm animate-none ${
               !editable ? "hidden" : ""
             }`}
@@ -199,7 +220,7 @@ const MedicineRow: React.FC<DisplayMedicineProps> = ({
               <CheckIcon height={15} width={15} color="black" />
             )}
           </button>
-          
+
           <button
             className={`btn btn-square btn-sm animate-none ${
               !editable ? "hidden" : ""

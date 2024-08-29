@@ -3,7 +3,6 @@ import {
     collection,
   deleteDoc,
   doc,
-  getDoc,
   getDocs,
   setDoc,
 } from "firebase/firestore";
@@ -12,13 +11,10 @@ import { NextResponse, NextRequest } from "next/server";
 export const POST = async (request: NextRequest) => {
   try {
     const { searchParams } = new URL(request.url);
-    console.log(searchParams)
     // const id = searchParams.get("id");
     const uid = searchParams.get("uid");
-    console.log(uid)
     const medicineData = await request.json();
     const { id } = medicineData;
-    console.log(id)
 
     if (!uid) {
       return NextResponse.json(
@@ -34,7 +30,6 @@ export const POST = async (request: NextRequest) => {
         "medicinesData",
         id
       );
-      console.log(medicineRef)
 
       // Upload the medicine object to Firestore
       await setDoc(medicineRef, medicineData, { merge: true });
@@ -71,7 +66,6 @@ export const GET = async (request: NextRequest) => {
         // Upload the medicine object to Firestore
         const snapshot = await getDocs(medicineRef);
         const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        console.log(data)
 
         if(data.length==0){
             return NextResponse.json({ es:1,msg:"Please add some medicines" }, { status: 200 });
