@@ -63,6 +63,7 @@ const MedicineRow: React.FC<DisplayMedicineProps> = ({
   const [editable, setEditable] = useState(false);
   const [editLoader, seteditLoader] = useState(false);
   const [deleteLoader, setdeleteLoader] = useState(false);
+  const [isDropdownVisible, setIsDropdownVisible] = useState(true);
 
   const submitHandler = (e: FormEvent) => {
     e.preventDefault();
@@ -142,25 +143,57 @@ const MedicineRow: React.FC<DisplayMedicineProps> = ({
           >
             <PencilSquareIcon height={15} width={15} color="black" />
           </button>
-          <button
-            className={`btn btn-square btn-sm animate-none ${
-              editable ? "hidden" : ""
-            }`}
-            onClick={async() => {
-              setdeleteLoader(true);
-              await deleteHandler(medicine.id);
-              setdeleteLoader(false);
-            }}
-            disabled={deleteLoader}
-          >
-            {deleteLoader ? (
-              <>
-                <Loader size="small" color="text-error" secondaryColor="text-gray-300" />
-              </>
-            ) : (
-              <TrashIcon height={15} width={15} color="red" />
+          <div className={`dropdown dropdown-end ${editable ? "hidden" : ""}`}>
+            <div
+              tabIndex={0}
+              role="button"
+              onClick={() => setIsDropdownVisible(true)}
+              className="btn btn-sm animate-none btn-square"
+            >
+              {deleteLoader ? (
+                <>
+                  <Loader
+                    size="small"
+                    color="text-error"
+                    secondaryColor="text-gray-300"
+                  />
+                </>
+              ) : (
+                <TrashIcon height={15} width={15} color="red" />
+              )}
+            </div>
+
+            {isDropdownVisible && (
+              <ul
+                tabIndex={0}
+                className="dropdown-content menu bg-base-100 rounded-md z-[1] w-52 mt-1 p-2 shadow"
+              >
+                <p className="text-center text-xs sm:text-sm font-medium">
+                  Are you sure you want to delete?
+                </p>
+                <div className="flex gap-2 justify-center items-center mt-1">
+                  <button
+                    className="btn btn-xs animate-none sm:btn-sm bg-red-400 text-white font-medium hover:bg-red-500"
+                    onClick={async () => {
+                      setIsDropdownVisible(false);
+                      setdeleteLoader(true);
+                      await deleteHandler(medicine.id);
+                      setdeleteLoader(false);
+                    }}
+                  >
+                    <a>Yes</a>
+                  </button>
+                  <button
+                    className="btn btn-xs animate-none sm:btn-sm bg-gray-300"
+                    onClick={() => setIsDropdownVisible(false)}
+                  >
+                    <a>No</a>
+                  </button>
+                </div>
+              </ul>
             )}
-          </button>
+          </div>
+
           <button
             className={`btn btn-square btn-sm animate-none ${
               !editable ? "hidden" : ""
@@ -187,6 +220,7 @@ const MedicineRow: React.FC<DisplayMedicineProps> = ({
               <CheckIcon height={15} width={15} color="black" />
             )}
           </button>
+
           <button
             className={`btn btn-square btn-sm animate-none ${
               !editable ? "hidden" : ""

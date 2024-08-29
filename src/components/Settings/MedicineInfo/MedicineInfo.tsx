@@ -35,7 +35,6 @@ const medicineTypes = [
   { label: "Suppository", value: "SUPPOSITORY" },
 ];
 
-
 const MedicineInfo = ({ uid }: any) => {
   const [medFromDb, setmedFromDb] = useState<any>([]);
   const [medicines, setmedicines] = useState<any>([]);
@@ -43,6 +42,7 @@ const MedicineInfo = ({ uid }: any) => {
   const [addLoader, setAddLoader] = useState(false);
   const [searchLoader, setsearchLoader] = useState(true);
   const [searchEnable, setSearchEnable] = useState(true);
+  const [duplicate, setduplicate] = useState(false);
   const [medicineData, setmedicineData] = useState<Medicine>({
     medicineName: "",
     type: "Type",
@@ -73,14 +73,12 @@ const MedicineInfo = ({ uid }: any) => {
   };
 
   const saveHandler = async (id: any) => {
-    const data = await addMedicine(editmedicineData, uid);
-
+    await addMedicine(editmedicineData, uid);
     setmedFromDb((prev: any) =>
       prev.map((item: any, i: any) =>
         item.id === id ? editmedicineData : item
       )
     );
-    console.log(data);
     setmedicines((prev: any) =>
       prev.map((item: any, i: any) =>
         item.id === id ? editmedicineData : item
@@ -94,22 +92,31 @@ const MedicineInfo = ({ uid }: any) => {
   };
 
   const submitHandler = async (e: { preventDefault: () => void }) => {
-    setAddLoader(true);
     e.preventDefault();
     // add patient api
-    const data = await addMedicine(medicineData, uid);
-    console.log(data);
+    for (let med of medicines) {
+      if (
+        med.medicineName + med.type ===
+        medicineData.medicineName.trim() + medicineData.type
+      ) {
+        setduplicate(true);
+        setTimeout(() => {
+          setduplicate(false);
+        }, 2000);
+        return;
+      }
+    }
+    setAddLoader(true);
+    await addMedicine(medicineData, uid);
     setmedicines([...medicines, medicineData]);
     setmedFromDb([...medFromDb, medicineData]);
-    setTimeout(() => {
-      setAddLoader(false);
-      setmedicineData({
-        medicineName: "",
-        type: "Type",
-        id: uniqid(),
-        instruction: "",
-      });
-    }, 3000);
+    setAddLoader(false);
+    setmedicineData({
+      medicineName: "",
+      type: "Type",
+      id: uniqid(),
+      instruction: "",
+    });
   };
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>
@@ -131,7 +138,6 @@ const MedicineInfo = ({ uid }: any) => {
     medFromDb.forEach((x: any) => {
       if (x.id == id) oldMedicine = x;
     });
-    console.log(oldMedicine);
     setmedicines(
       medicines.map((medicine: { id: any }) =>
         medicine.id == id ? oldMedicine : medicine
@@ -231,21 +237,33 @@ const MedicineInfo = ({ uid }: any) => {
                   placeholder="Instruction.."
                   value={medicineData.instruction}
                 />
-                <button
-                  className="btn-square animate-none m-auto bg-primary border-0 btn btn-primary btn-sm text-sm"
-                  type="submit"
-                  disabled={addLoader}
-                >
-                  {addLoader ? (
-                    <Loader
-                      size="small"
-                      color="text-primary"
-                      secondaryColor="text-gray-300"
-                    />
-                  ) : (
-                    <PlusIcon width={20} height={20} color="white" />
-                  )}
-                </button>
+                <div className="dropdown dropdown-end dropdown-open w-fit m-auto">
+                  <button
+                    tabIndex={0}
+                    role="button"
+                    className="btn-square animate-none m-auto bg-primary border-0 btn btn-primary btn-sm text-sm"
+                    type="submit"
+                    disabled={addLoader}
+                  >
+                    {addLoader ? (
+                      <Loader
+                        size="small"
+                        color="text-primary"
+                        secondaryColor="text-gray-300"
+                      />
+                    ) : (
+                      <PlusIcon width={20} height={20} color="white" />
+                    )}
+                  </button>
+                  <div
+                    tabIndex={0}
+                    className={`dropdown-content rounded-md mt-1 flex flex-col items-center justify-center bg-red-400 text-white font-medium z-[1] w-max py-[6px] px-1 shadow ${
+                      duplicate ? "block" : "hidden"
+                    }`}
+                  >
+                    <p className="text-center">Medicine already exists</p>
+                  </div>
+                </div>
               </form>
 
               <div className="relative w-full">
