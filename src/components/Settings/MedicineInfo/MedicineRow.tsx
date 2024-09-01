@@ -27,6 +27,8 @@ interface DisplayMedicineProps {
   saveHandler: any;
   index: number;
   deleteHandler: any;
+  globalClickable:boolean;
+  setGlobalClickable:any;
 }
 
 const medicineTypes = [
@@ -59,6 +61,8 @@ const MedicineRow: React.FC<DisplayMedicineProps> = ({
   editmedicineData,
   index,
   deleteHandler,
+  globalClickable,
+  setGlobalClickable
 }) => {
   const [editable, setEditable] = useState(false);
   const [editLoader, seteditLoader] = useState(false);
@@ -135,8 +139,10 @@ const MedicineRow: React.FC<DisplayMedicineProps> = ({
             className={`btn btn-square btn-sm animate-none ${
               editable ? "hidden" : ""
             }`}
+            disabled={!globalClickable && !editable}
             onClick={() => {
               setEditable(true);
+              setGlobalClickable(false);
               setSearchEnable(false);
               seteditmedicineData(medicine);
             }}
@@ -144,9 +150,10 @@ const MedicineRow: React.FC<DisplayMedicineProps> = ({
             <PencilSquareIcon height={15} width={15} color="black" />
           </button>
           <div className={`dropdown dropdown-end ${editable ? "hidden" : ""}`}>
-            <div
+            <button
               tabIndex={0}
               role="button"
+            disabled={!globalClickable && !editable}
               onClick={() => setIsDropdownVisible(true)}
               className="btn btn-sm animate-none btn-square"
             >
@@ -161,7 +168,7 @@ const MedicineRow: React.FC<DisplayMedicineProps> = ({
               ) : (
                 <TrashIcon height={15} width={15} color="red" />
               )}
-            </div>
+            </button>
 
             {isDropdownVisible && (
               <ul
@@ -200,6 +207,7 @@ const MedicineRow: React.FC<DisplayMedicineProps> = ({
             }`}
             onClick={async () => {
               seteditLoader(true);
+              setGlobalClickable(true);
               await saveHandler(medicine.id);
               seteditLoader(false);
               setEditable(false);
@@ -229,6 +237,7 @@ const MedicineRow: React.FC<DisplayMedicineProps> = ({
               cancelHandler(medicine.id);
               setEditable(false);
               setSearchEnable(true);
+              setGlobalClickable(true);
             }}
           >
             <XCircleIcon height={15} width={15} color="red" />
