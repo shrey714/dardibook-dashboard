@@ -4,17 +4,33 @@ import { signOutUser } from "@/firebase/firebaseAuth";
 import { useAppDispatch } from "@/redux/store";
 import { ArrowRightStartOnRectangleIcon } from "@heroicons/react/24/solid";
 import CustomModal from "@/components/BlockedModal";
+import Lottie from "react-lottie";
+import * as animationData from "@/lottieFiles/SignOut.json";
+
 
 const PersonalInfo = ({ userInfo }: any) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const dispatch = useAppDispatch();
+  const defaultOptions = {
+    loop: true,
+    autoplay: true,
+    animationData: animationData,
+    rendererSettings: {
+      preserveAspectRatio: "xMidYMid slice",
+    },
+  };
   return (
     <>
       <CustomModal isOpen={isModalOpen} mainScreenModal={false}>
-        <h3 className="text-base py-10 md:text-lg font-semibold self-center text-gray-800">
+      <Lottie
+        options={defaultOptions}
+        height={100}
+        width={100}
+      />
+        <h3 className="text-base pb-8 md:text-lg font-semibold self-center text-gray-800">
           Are you sure you want to Logout?
         </h3>
-        <div className="mt-6 flex items-center gap-x-4">
+        <div className="mt-3 flex items-center gap-x-4">
           <button
             type="button"
             onClick={() => setIsModalOpen(false)}
