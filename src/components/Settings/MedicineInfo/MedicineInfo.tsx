@@ -43,6 +43,7 @@ const MedicineInfo = ({ uid }: any) => {
   const [searchLoader, setsearchLoader] = useState(true);
   const [searchEnable, setSearchEnable] = useState(true);
   const [duplicate, setduplicate] = useState(false);
+  const [globalClickable, setGlobalClickable] = useState(true);
   const [medicineData, setmedicineData] = useState<Medicine>({
     medicineName: "",
     type: "Type",
@@ -326,6 +327,8 @@ const MedicineInfo = ({ uid }: any) => {
                             editmedicineData={editmedicineData}
                             saveHandler={saveHandler}
                             deleteHandler={deleteHandler}
+                            globalClickable={globalClickable}
+                            setGlobalClickable={setGlobalClickable}
                           />
                         );
                       }
