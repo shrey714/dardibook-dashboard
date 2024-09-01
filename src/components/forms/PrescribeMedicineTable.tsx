@@ -138,7 +138,7 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
   return (
     <div className="container mx-auto pt-4 px-1 text-center">
       <table className="table w-full">
-        <thead>
+        <thead className="hidden sm:table-header-group">
           <tr className="border-gray-300">
             <th>Medicine Name</th>
             <th>Instruction</th>
@@ -148,7 +148,7 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
         </thead>
         <tbody>
           {rows?.map((row, index) => (
-            <tr key={row.id} className={"border-0"}>
+            <tr key={row.id} className={"border-gray-300 border-b-[1px] sm:border-0 flex flex-col sm:table-row"}>
               <td className="align-top p-1 relative">
                 {/* implement search functionality here */}
                 <MedicineSuggetion
@@ -161,6 +161,7 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
                 <input
                   type="text"
                   name="instruction"
+                  placeholder="instruction.."
                   autoComplete="new-off"
                   value={row.instruction}
                   onChange={(event) => handleInputChange(row.id, event)}
