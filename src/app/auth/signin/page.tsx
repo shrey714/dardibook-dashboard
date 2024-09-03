@@ -44,8 +44,8 @@ const SignIn = () => {
         />
         <div className="h-svh flex flex-col items-center justify-center w-full sm:w-4/5">
           <div className="z-50 flex flex-1 items-center justify-center">
-            <div className="w-max">
-              <h1 className="h-auto font-sans select-none animate-typing overflow-hidden whitespace-nowrap border-r-4 border-r-gray-700 pr-5 sm:pr-8 text-3xl sm:text-5xl text-gray-800 font-bold">
+            <div className="w-max flex items-center justify-center">
+              <h1 className="h-auto font-sans select-none animate-typing overflow-hidden whitespace-nowrap border-r-4 border-r-gray-700 pr-4 sm:pr-8 text-[28px] sm:text-5xl text-gray-800 font-bold">
                 {header.title}
               </h1>
             </div>
@@ -72,7 +72,8 @@ const SignIn = () => {
                     height={20}
                     priority
                   />
-                  Continue with Google
+                  <p className="hidden sm:contents" >Continue with Google</p>
+                  <p className="sm:hidden" >Google</p>
                 </>
               )}
             </button>
