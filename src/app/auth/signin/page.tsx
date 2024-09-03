@@ -3,10 +3,10 @@ import { useEffect, useState } from "react";
 import { useAppDispatch } from "../../../redux/store";
 import { signInWithGoogle } from "../../../firebase/firebaseAuth";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import { useAppSelector } from "@/redux/store";
-import AuthHeaderWrapper from "@/components/wrapper/AuthHeaderWrapper";
 import Loader from "@/components/common/Loader";
+import FlickeringGrid from "@/components/AuthPage/FlickeringGrid";
+import Image from "next/image";
 
 const SignIn = () => {
   const user = useAppSelector((state) => state.auth.user);
@@ -32,35 +32,64 @@ const SignIn = () => {
     desc: "Access your DardiBook account to manage appointments, prescriptions, and patient records with ease. Stay connected and streamline your healthcare management.",
   };
   return (
-    <AuthHeaderWrapper header={header}>
-      <div className="flex items-center justify-center flex-1">
-        <button
-          onClick={handleSignIn}
-          disabled={loading}
-          className="custom-button font-semibold tracking-wide"
-        >
-          {loading ? (
-            <Loader size="medium" color="text-gray-300" secondaryColor="text-primary" />
-          ) : (
-            "Google Login"
-          )}
-        </button>
-      </div>
-    </AuthHeaderWrapper>
+    <>
+      <section className="relative bg-gray-300 h-svh w-full overflow-hidden flex justify-center">
+        <FlickeringGrid
+          className="z-0 absolute inset-0 size-full"
+          squareSize={4}
+          gridGap={6}
+          color="#60A5FA"
+          maxOpacity={0.5}
+          flickerChance={0.1}
+        />
+        <div className="h-svh flex flex-col items-center justify-center w-full sm:w-4/5">
+          <div className="z-50 flex flex-1 items-center justify-center">
+            <div className="w-max">
+              <h1 className="h-auto font-sans select-none animate-typing overflow-hidden whitespace-nowrap border-r-4 border-r-gray-700 pr-5 sm:pr-8 text-3xl sm:text-5xl text-gray-800 font-bold">
+                {header.title}
+              </h1>
+            </div>
+          </div>
+
+          <div className="z-50 max-h-52 py-8 px-[12.5%] bg-gray-900 w-full flex flex-1 flex-col items-center justify-between rounded-t-3xl overflow-hidden hover:max-h-56 hover:pt-12 hover:px-[calc(12.5%+8px)] hover:w-[calc(100%+16px)] hover:shadow-[0_20px_50px_rgba(8,_112,_184,_0.7)] transition-all">
+            <button
+              onClick={handleSignIn}
+              disabled={loading}
+              className="bg-gray-300 border-0 animate-none btn px-5 py-[10px] text-gray-800 outline-none min-w-40 transition-all flex items-center justify-center h-10 text-base sm:text-lg font-bold tracking-wide w-full rounded-full select-none font-sans"
+            >
+              {loading ? (
+                <Loader
+                  size="medium"
+                  color="text-gray-300"
+                  secondaryColor="text-primary"
+                />
+              ) : (
+                <>
+                  <Image
+                    alt="Google"
+                    src="/google.svg"
+                    width={20}
+                    height={20}
+                    priority
+                  />
+                  Continue with Google
+                </>
+              )}
+            </button>
+
+            <Image
+              alt="Logo"
+              src="/Logo.svg"
+              width={56}
+              height={56}
+              className="h-12 sm:h-14 aspect-square mt-3"
+              priority
+            />
+          </div>
+        </div>
+      </section>
+    </>
   );
 };
 
 export default SignIn;
-
-{
-  /* <div>
-  <div className="w-screen h-screen bg-gray-300 overflow-hidden flex items-center justify-center">
-    <Image
-      src="/Logo.svg"
-      fill={true}
-      className="auth-background-image z-1 hidden 0 md:block"
-      alt="logo"
-    />
-  </div>
-</div>; */
-}
