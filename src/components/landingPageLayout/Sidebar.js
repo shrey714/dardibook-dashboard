@@ -3,7 +3,21 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import TokenBox from "../tokenFramer/TokenBox";
-import {  Cog6ToothIcon } from "@heroicons/react/24/solid";
+import {
+  Cog6ToothIcon,
+  HomeIcon,
+  CalendarIcon,
+  ClipboardDocumentCheckIcon,
+  ClockIcon,
+} from "@heroicons/react/24/solid";
+import {
+  Cog6ToothIcon as Cog6ToothIconOutline,
+  HomeIcon as HomeIconOutline,
+  CalendarIcon as CalendarIconOutline,
+  ClipboardDocumentCheckIcon as ClipboardDocumentCheckIconOutline,
+  ClockIcon as ClockIconOutline,
+} from "@heroicons/react/24/outline";
+// import { HomeIcon as HomeIconoutline } from "@heroicons/react/24/outline";
 // import { SlHome } from "react-icons/sl";
 // import { BsInfoSquare, BsEnvelopeAt } from "react-icons/bs";
 // import { FaTshirt, FaRedhat } from "react-icons/fa";
@@ -33,14 +47,98 @@ export default function Sidebar({ show, setter }) {
       ? "text-black bg-primary border-2 border-primary text-white"
       : "text-gray-600 bg-white border-2 border-gray-300 hover:border-primary hover:text-black";
 
+    const renderIcon = (icon) => {
+      switch (icon) {
+        case "home":
+          return (
+            <>
+              <HomeIconOutline
+                className={`h-5 w-5 transition-transform duration-300 ${
+                  isSubPath(pathname, route)
+                    ? "hidden"
+                    : "block group-hover:hidden"
+                }`}
+              />
+              <HomeIcon
+                className={`h-5 w-5 transition-transform duration-300 ${
+                  isSubPath(pathname, route)
+                    ? "block"
+                    : "hidden group-hover:block"
+                }`}
+              />
+            </>
+          );
+        case "new-registration":
+          return (
+            <>
+              <CalendarIconOutline
+                className={`h-5 w-5 transition-transform duration-300 ${
+                  isSubPath(pathname, route)
+                    ? "hidden"
+                    : "block group-hover:hidden"
+                }`}
+              />
+              <CalendarIcon
+                className={`h-5 w-5 transition-transform duration-300 ${
+                  isSubPath(pathname, route)
+                    ? "block"
+                    : "hidden group-hover:block"
+                }`}
+              />
+            </>
+          );
+        case "prescribe":
+          return (
+            <>
+              <ClipboardDocumentCheckIconOutline
+                className={`h-5 w-5 transition-transform duration-300 ${
+                  isSubPath(pathname, route)
+                    ? "hidden"
+                    : "block group-hover:hidden"
+                }`}
+              />
+              <ClipboardDocumentCheckIcon
+                className={`h-5 w-5 transition-transform duration-300 ${
+                  isSubPath(pathname, route)
+                    ? "block"
+                    : "hidden group-hover:block"
+                }`}
+              />
+            </>
+          );
+        case "history":
+          return (
+            <>
+              <ClockIconOutline
+                className={`h-5 w-5 transition-transform duration-300 ${
+                  isSubPath(pathname, route)
+                    ? "hidden"
+                    : "block group-hover:hidden"
+                }`}
+              />
+              <ClockIcon
+                className={`h-5 w-5 transition-transform duration-300 ${
+                  isSubPath(pathname, route)
+                    ? "block"
+                    : "hidden group-hover:block"
+                }`}
+              />
+            </>
+          );
+        default:
+          return null; // Fallback for unknown icons
+      }
+    };
+
     return (
       <Link
         onClick={() => {
           setter((oldVal) => !oldVal);
         }}
         href={route}
-        className={`font-bold text-[15px] my-[6px] px-5 py-2 rounded-full mx-4  ${colorClass}`}
+        className={`group transition-all duration-200 font-bold text-[15px] my-[6px] px-5 py-2 rounded-full mx-4 flex flex-row items-center leading-3 gap-1 ${colorClass}`}
       >
+        {renderIcon(icon)}
         {name}
       </Link>
     );
@@ -59,29 +157,26 @@ export default function Sidebar({ show, setter }) {
   // Settings button
   const Settings = () => {
     const route = "/dashboard/settings";
-    const status = !isSubPath(pathname, route);
-
+    const colorClassBg = isSubPath(pathname, route)
+      ? "bg-primary border-primary text-white"
+      : "bg-white border-gray-300 hover:border-primary text-gray-600 hover:text-black";
     return (
       <Link
         onClick={() => {
           setter((oldVal) => !oldVal);
         }}
         href="/dashboard/settings"
-        className={`group flex items-center my-4 ${
-          status ? "px-1" : "px-2"
-        } py-1 rounded-full mx-4 border-2 border-gray-800 self-center transition-all duration-300 hover:px-2`}
+        className={`group flex items-center my-4 px-1 py-1 rounded-full mx-4 self-center transition-all duration-200 border-2 ${colorClassBg}`}
       >
-        <Cog6ToothIcon
-          className={`w-5 h-5 text-gray-800 transition-transform duration-300 ${
-            status ? "rotate-0" : "rotate-45"
-          } group-hover:rotate-45`}
+        <Cog6ToothIconOutline
+          className={`w-5 h-5 transition-transform duration-300 ${
+            isSubPath(pathname, route) ? "hidden" : "block group-hover:hidden"
+          }`}
         />
-        <img
-          src="/Right_arrow.svg"
-          className={`transition-all duration-300 ${
-            status ? "w-0" : "w-4"
-          } h-4 group-hover:w-4`}
-          alt="a"
+        <Cog6ToothIcon
+          className={`w-5 h-5 transition-transform duration-300 ${
+            isSubPath(pathname, route) ? "block" : "hidden group-hover:block"
+          }`}
         />
       </Link>
     );
@@ -94,18 +189,18 @@ export default function Sidebar({ show, setter }) {
           <TokenBox />
         </div>
         <div className="flex flex-col">
-          <MenuItem name="Home" route="/dashboard/home" icon={"icon"} />
+          <MenuItem name="Home" route="/dashboard/home" icon="home" />
           <MenuItem
             name="New registration"
             route="/dashboard/appointment"
-            icon={"icon"}
+            icon="new-registration"
           />
           <MenuItem
             name="Prescribe"
             route="/dashboard/prescribe"
-            icon={"icon"}
+            icon="prescribe"
           />
-          <MenuItem name="History" route="/dashboard/history" icon={"icon"} />
+          <MenuItem name="History" route="/dashboard/history" icon="history" />
         </div>
         <div className="flex flex-1 flex-col justify-end pb-[calc(100vh-100svh)]">
           {/* <MenuItem name="Settings" route="/dashboard/home" icon={"icon"} /> */}
