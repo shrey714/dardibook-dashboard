@@ -136,7 +136,7 @@ export default function Sidebar({ show, setter }) {
           setter((oldVal) => !oldVal);
         }}
         href={route}
-        className={`group transition-all duration-200 font-bold text-[15px] my-[6px] px-5 py-2 rounded-full mx-4 flex flex-row items-center leading-3 gap-1 ${colorClass}`}
+        className={`group tracking-[0.0125em] transition-all duration-200 font-bold text-[15px] my-[6px] px-5 py-2 rounded-full mx-4 flex flex-row items-center leading-3 gap-1 ${colorClass}`}
       >
         {renderIcon(icon)}
         {name}
@@ -191,7 +191,7 @@ export default function Sidebar({ show, setter }) {
         <div className="flex flex-col">
           <MenuItem name="Home" route="/dashboard/home" icon="home" />
           <MenuItem
-            name="New registration"
+            name="Register"
             route="/dashboard/appointment"
             icon="new-registration"
           />

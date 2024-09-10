@@ -57,8 +57,8 @@ const QueueList: React.FC = () => {
             />
           </div>
         ) : queueItems.length === 0 ? (
-          <div className="w-full h-52 overflow-hidden flex items-center justify-center">
-            Empty
+          <div className="w-full h-52 overflow-hidden flex items-end justify-center">
+            <img className="w-full max-w-[16rem]" src="/empty.svg" alt="" />
           </div>
         ) : (
           <>
