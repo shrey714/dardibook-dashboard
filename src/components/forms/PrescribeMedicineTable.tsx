@@ -78,7 +78,7 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
     event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>
   ) => {
     const { name, value } = event.target;
-    // console.log("root===", name, value);
+    console.log("fsef==", name, value);
     setRows(
       rows.map((row) => (row.id === rowId ? { ...row, [name]: value } : row))
     );
@@ -135,6 +135,21 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
     );
   };
 
+  const handleComingData = (rowId: any, selectedOption: any) => {
+    setRows(
+      rows?.map((row) =>
+        row.id === rowId
+          ? {
+              ...row,
+              medicineName: selectedOption?.value || "",
+              type: selectedOption?.type || "",
+              instruction: selectedOption?.instruction || "",
+              id: selectedOption?.id || uniqid(),
+            }
+          : row
+      )
+    );
+  };
   return (
     <div className="container mx-auto pt-4 px-1 text-center">
       <table className="table w-full">
@@ -148,13 +163,19 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
         </thead>
         <tbody>
           {rows?.map((row, index) => (
-            <tr key={row.id} className={"border-gray-300 border-b-[1px] sm:border-0 flex flex-col sm:table-row"}>
+            <tr
+              key={row.id}
+              className={
+                "border-gray-300 border-b-[1px] sm:border-0 flex flex-col sm:table-row"
+              }
+            >
               <td className="align-top p-1 relative">
                 {/* implement search functionality here */}
                 <MedicineSuggetion
                   medicine={row.medicineName}
                   rowId={row.id}
                   handleInputChange={handleInputChange}
+                  handleComingData={handleComingData}
                 />
               </td>
               <td className="align-top p-1">

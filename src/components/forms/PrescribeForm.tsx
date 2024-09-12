@@ -4,7 +4,8 @@ import Link from "next/link";
 import PrescribeMedicineTable from "./PrescribeMedicineTable";
 import Loader from "../common/Loader";
 import ReceiptForm from "./ReceiptForm";
-
+import DiseaseSuggetion from "../Prescribe/DiseaseSuggetion";
+import uniqid from "uniqid";
 const PrescribeForm = ({
   formData,
   setFormData,
@@ -36,6 +37,14 @@ const PrescribeForm = ({
     }));
   };
 
+  const handleDiseaseComingData = (data: any) => {
+    setFormData((prevData: any) => ({
+      ...prevData,
+      diseaseId: data.diseaseId || uniqid(),
+      diseaseDetail: data.diseaseDetail || "",
+    }));
+  };
+
   return (
     <form
       className="px-4 sm:px-6 lg:px-8 py-12"
@@ -54,7 +63,7 @@ const PrescribeForm = ({
               Disease and Diagnosis<span className="text-red-500 ml-1">*</span>
             </label>
             <div className="sm:col-span-2">
-              <textarea
+              {/* <textarea
                 autoFocus={true}
                 required={formData.refer.hospitalName ? false : true}
                 id="diseaseDetail"
@@ -64,6 +73,13 @@ const PrescribeForm = ({
                 className="form-textarea block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 value={formData.diseaseDetail}
                 onChange={handleInputChange}
+              /> */}
+              <DiseaseSuggetion
+                required={formData.refer.hospitalName ? false : true}
+                diseaseValue={formData.diseaseDetail}
+                diseaseId={formData.diseaseId}
+                handleDiseaseComingData={handleDiseaseComingData}
+                handleInputChange={handleInputChange}
               />
             </div>
           </div>
@@ -231,6 +247,15 @@ const PrescribeForm = ({
             ) : (
               "Save"
             )}
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              console.log(formData);
+            }}
+            className="btn md:btn-wide bg-white border-0 text-sm font-semibold leading-6 text-gray-900"
+          >
+            Print
           </button>
         </div>
       </fieldset>

@@ -4,7 +4,6 @@ import AsyncCreatableSelect from "react-select/async-creatable";
 import { db } from "@/firebase/firebaseConfig";
 import { useAppSelector } from "@/redux/store";
 import uniqid from "uniqid";
-
 // Custom components to hide the dropdown arrow
 const customComponents = {
   DropdownIndicator: () => null,
@@ -56,11 +55,12 @@ const customStyles = {
   }),
 };
 
-const MedicineSuggestion = ({
-  medicine,
-  rowId,
+const DiseaseSuggetion = ({
+  required,
+  diseaseValue,
+  diseaseId,
+  handleDiseaseComingData,
   handleInputChange,
-  handleComingData,
 }: any) => {
   const [currentVal, setcurrentVal] = useState({
     label: "",
@@ -77,25 +77,19 @@ const MedicineSuggestion = ({
 
       try {
         // Firestore query to get medicine suggestions
-        const medicinesRef = collection(
-          db,
-          "doctor",
-          user?.uid,
-          "medicinesData"
-        );
+        const diseaseRef = collection(db, "doctor", user?.uid, "diseaseData");
         const q = query(
-          medicinesRef,
+          diseaseRef,
           where("searchableString", ">=", inputValue.toLowerCase()),
           where("searchableString", "<=", inputValue.toLowerCase() + "\uf8ff")
         );
         const querySnapshot = await getDocs(q);
 
         const fetchedSuggestions = querySnapshot.docs.map((doc) => ({
-          label: doc.data().medicineName, // Setting the label for react-select
-          value: doc.data().medicineName, // Setting the value for react-select
-          instruction: doc.data().instruction,
-          type: doc.data().type,
-          id: doc.data().id,
+          label: doc.data().diseaseDetail, // Setting the label for react-select
+          value: doc.data().diseaseDetail, // Setting the value for react-select
+          diseaseId: doc.data().diseaseId,
+          // medicines: doc.data().medicines,
         }));
 
         return fetchedSuggestions;
@@ -108,11 +102,14 @@ const MedicineSuggestion = ({
   );
 
   const handleChange = (selectedOption: any) => {
-    handleComingData(rowId, selectedOption);
+    handleDiseaseComingData({
+      diseaseDetail: selectedOption?.value,
+      diseaseId: selectedOption?.diseaseId,
+    });
     setcurrentVal({
       label: selectedOption?.value || "",
       value: selectedOption?.value || "",
-      id: selectedOption?.id || "",
+      id: selectedOption?.diseaseId || "",
     });
   };
 
@@ -125,25 +122,29 @@ const MedicineSuggestion = ({
         defaultOptions
         loadOptions={loadOptions}
         onBlur={() => {
-          handleInputChange(rowId, {
+          handleInputChange({
             target: {
-              name: "medicineName",
+              name: "diseaseDetail",
               value: currentVal?.value || "",
             },
           });
         }}
         onChange={handleChange}
         onInputChange={(e) => {
-          setcurrentVal({ label: e, value: e ,id:uniqid()});
+          setcurrentVal({ label: e, value: e, id: uniqid() });
+          handleInputChange({
+            target: {
+              name: "diseaseId",
+              value: uniqid(),
+            },
+          });
         }}
         value={
-          medicine
+          diseaseValue
             ? {
-                label: medicine,
-                value: medicine,
-                instruction: medicine.instruction,
-                type: medicine.type,
-                id: medicine.id,
+                label: diseaseValue,
+                value: diseaseValue,
+                diseaseId: diseaseId,
               }
             : null
         }
@@ -151,9 +152,10 @@ const MedicineSuggestion = ({
         components={customComponents}
         styles={customStyles}
         isClearable
+        required={required}
       />
     </div>
   );
 };
 
-export default MedicineSuggestion;
+export default DiseaseSuggetion;
