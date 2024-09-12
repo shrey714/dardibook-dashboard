@@ -79,7 +79,7 @@ const SignIn = () => {
       <div className=" flex flex-col items-center w-full sm:w-4/5">
         <div className="z-50 h-52 flex items-center justify-center">
           <div className="w-max">
-            <h1 className="h-auto font-sans select-none animate-typing overflow-hidden whitespace-nowrap border-r-4 border-r-gray-700 pr-5 sm:pr-8 text-3xl sm:text-5xl text-gray-800 font-bold leading-[normal] sm:leading-[normal]">
+            <h1 className="h-auto select-none animate-typing overflow-hidden whitespace-nowrap border-r-4 border-r-gray-700 pr-5 sm:pr-8 text-3xl sm:text-5xl text-gray-800 font-bold leading-[normal] sm:leading-[normal]">
               {header.title}
             </h1>
           </div>

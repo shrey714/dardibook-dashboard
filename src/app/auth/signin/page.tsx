@@ -45,7 +45,7 @@ const SignIn = () => {
         <div className="h-svh flex flex-col items-center justify-center w-full sm:w-4/5">
           <div className="z-50 flex flex-1 items-center justify-center">
             <div className="w-max flex items-center justify-center">
-              <h1 className="h-auto font-sans select-none animate-typing overflow-hidden whitespace-nowrap border-r-4 border-r-gray-700 pr-4 sm:pr-8 text-[28px] sm:text-5xl text-gray-800 font-bold">
+              <h1 className="h-auto select-none animate-typing overflow-hidden whitespace-nowrap border-r-4 border-r-gray-700 pr-4 sm:pr-8 text-[28px] sm:text-5xl text-gray-800 font-bold">
                 {header.title}
               </h1>
             </div>
@@ -55,7 +55,7 @@ const SignIn = () => {
             <button
               onClick={handleSignIn}
               disabled={loading}
-              className="bg-gray-300 border-0 animate-none btn px-5 py-[10px] text-gray-800 outline-none min-w-40 transition-all flex items-center justify-center h-10 text-base sm:text-lg font-bold tracking-wide w-full rounded-full select-none font-sans"
+              className="bg-gray-300 border-0 animate-none btn px-5 py-[10px] text-gray-800 outline-none min-w-40 transition-all flex items-center justify-center h-10 text-base sm:text-lg font-bold tracking-wide w-full rounded-full select-none"
             >
               {loading ? (
                 <Loader
