@@ -380,7 +380,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({
         </div>
 
         <div className="col-span-12 flex justify-center sm:gap-6">
-          <button disabled={submissionLoader} className="bg-gray-300 border-0 animate-none btn px-5 py-[10px] text-gray-800 outline-none min-w-40 transition-all flex items-center justify-center h-10 text-base sm:text-lg font-bold tracking-wide w-full rounded-full select-none font-sans">
+          <button disabled={submissionLoader} className="bg-gray-300 border-0 animate-none btn px-5 py-[10px] text-gray-800 outline-none min-w-40 transition-all flex items-center justify-center h-10 text-base sm:text-lg font-bold tracking-wide w-full rounded-full select-none">
             {submissionLoader ? (
               <Loader
                 size="medium"

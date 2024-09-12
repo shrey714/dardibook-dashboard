@@ -1,11 +1,11 @@
 import "@/styles/globals.css";
-import { Alegreya_Sans } from "next/font/google";
+import { DM_Sans } from "next/font/google";
 import Script from "next/script";
 import type { Metadata } from "next";
 import AppWrapper from "@/components/wrapper/AppWrapper";
 import ReduxWrapper from "@/components/wrapper/ReduxWrapper";
 import { Toaster } from "react-hot-toast";
-const manrope = Alegreya_Sans({
+const DM_Sans_Font = DM_Sans({
   subsets: ["latin"],
   display: "swap",
   weight: ["300", "400", "500", "700"],
@@ -28,11 +28,11 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
       />
       <html
         lang="en"
-        className={manrope.className}
+        className={DM_Sans_Font.className}
         style={{ scrollbarGutter: "auto" }}
       >
         <body className="min-h-svh" suppressHydrationWarning={true}>
-        <Toaster position="top-right" />
+          <Toaster position="top-right" />
           <ReduxWrapper>
             <AppWrapper>{children}</AppWrapper>
           </ReduxWrapper>
