@@ -72,7 +72,7 @@ const Page = () => {
         mainLoader={mainLoader}
       />
       <MedicineInfo uid={userInfo?.uid}/>
-      <DiseaseInfo uid={userInfo?.uid}/>
+      {/* <DiseaseInfo uid={userInfo?.uid}/> */}
       <Links />
       <FooterLine />
     </div>
