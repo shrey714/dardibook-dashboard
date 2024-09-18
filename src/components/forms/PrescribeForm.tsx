@@ -265,7 +265,7 @@ const PrescribeForm = ({
               "Save"
             )}
           </button>
-          {/* <button
+          <button
             type="button"
             onClick={() => {
               console.log(formData);
@@ -273,7 +273,7 @@ const PrescribeForm = ({
             className="btn md:btn-wide bg-white border-0 text-sm font-semibold leading-6 text-gray-900"
           >
             Print
-          </button> */}
+          </button>
         </div>
       </fieldset>
     </form>
