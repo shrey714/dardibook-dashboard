@@ -154,7 +154,7 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
       <table className="table w-full">
         <thead className="hidden sm:table-header-group">
           <tr className="border-gray-300">
-            <th>Medicine Name</th>
+            <th>Medicine Name*</th>
             <th>Instruction</th>
             <th>Dosages</th>
             <th>Duration</th>

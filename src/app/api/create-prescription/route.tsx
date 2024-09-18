@@ -23,7 +23,12 @@ export const POST = async (request: NextRequest) => {
     // const uid = searchParams.get("uid");
     const Data = await request.json();
     const { id, uid, visitId, ...mainData } = Data;
-
+    if (!uid || !id || !visitId) {
+      return NextResponse.json(
+        { error: "UID or PatientID or visitID is missing." },
+        { status: 400 }
+      );
+    }
     //uploading  in medicine database
 
     for (const medicine of mainData?.medicines) {
@@ -66,18 +71,15 @@ export const POST = async (request: NextRequest) => {
       {
         searchableString: mainData?.diseaseDetail.toLowerCase().trim(),
         diseaseDetail: mainData?.diseaseDetail,
-        medicines: mainData?.medicines?.map((medicine: any) => medicine.id),
+        medicines: mainData?.medicines
+          ?.filter((medicine: any) =>
+            medicine.medicineName.toLowerCase().trim()
+          )
+          .map((medicine: any) => medicine.id),
         diseaseId: mainData?.diseaseId,
       },
       { merge: true }
     );
-
-    if (!uid || !id || !visitId) {
-      return NextResponse.json(
-        { error: "UID or PatientID or visitID is missing." },
-        { status: 400 }
-      );
-    }
 
     const patientDocRef = doc(db, "doctor", uid, "patients", id); // Adjust 'uid' if needed
     const newDate = Date.now();

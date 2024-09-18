@@ -108,6 +108,7 @@ const MedicineSuggestion = ({ medicine, rowId, handleComingData }: any) => {
   return (
     <div>
       <AsyncCreatableSelect
+        required={true}
         className="w-60"
         backspaceRemovesValue={true}
         cacheOptions
