@@ -8,6 +8,7 @@ import Links from "@/components/Settings/Links";
 import FooterLine from "@/components/Settings/FooterLine";
 import { getDocotr } from "@/app/services/getDoctor";
 import MedicineInfo from "@/components/Settings/MedicineInfo/MedicineInfo";
+import DiseaseInfo from "@/components/Settings/DiseaseInfo/DiseaseInfo";
 
 interface DoctorInfo {
   clinicName: string;
@@ -71,6 +72,7 @@ const Page = () => {
         mainLoader={mainLoader}
       />
       <MedicineInfo uid={userInfo?.uid}/>
+      {/* <DiseaseInfo uid={userInfo?.uid}/> */}
       <Links />
       <FooterLine />
     </div>

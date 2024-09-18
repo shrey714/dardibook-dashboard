@@ -21,12 +21,12 @@ export const POST = async (request: NextRequest) => {
     // const { searchParams } = new URL(request.url);
     // const id = searchParams.get("id");
     // const uid = searchParams.get("uid");
-    const historyData = await request.json();
-    const { id, uid, visitId, ...mainHistoryData } = historyData;
+    const Data = await request.json();
+    const { id, uid, visitId, ...mainData } = Data;
 
-    //uploading medicines in medicine database
+    //uploading  in medicine database
 
-    for (const medicine of mainHistoryData?.medicines) {
+    for (const medicine of mainData?.medicines) {
       if (medicine.medicineName || medicine.medicineName.trim() !== "") {
         // Get the medicine ID and prepare the Firestore document reference
         const medicineRef = doc(
@@ -38,9 +38,39 @@ export const POST = async (request: NextRequest) => {
         );
 
         // Upload the medicine object to Firestore
-        await setDoc(medicineRef, medicine, { merge: true });
+        await setDoc(
+          medicineRef,
+          {
+            searchableString: medicine.medicineName.toLowerCase().trim(),
+            id: medicine.id,
+            medicineName: medicine.medicineName,
+            instruction: medicine.instruction,
+            type: medicine.type,
+          },
+          { merge: true }
+        );
       }
     }
+
+    //uploading Disease in Diseases database
+
+    const diseaseRef = doc(
+      db,
+      "doctor",
+      uid,
+      "diseaseData",
+      mainData?.diseaseId
+    );
+    await setDoc(
+      diseaseRef,
+      {
+        searchableString: mainData?.diseaseDetail.toLowerCase().trim(),
+        diseaseDetail: mainData?.diseaseDetail,
+        medicines: mainData?.medicines?.map((medicine: any) => medicine.id),
+        diseaseId: mainData?.diseaseId,
+      },
+      { merge: true }
+    );
 
     if (!uid || !id || !visitId) {
       return NextResponse.json(
@@ -70,7 +100,7 @@ export const POST = async (request: NextRequest) => {
     }
 
     const visitDocRef = doc(collection(patientDocRef, "visits"), visitId);
-    await setDoc(visitDocRef, { ...mainHistoryData, time: newDate });
+    await setDoc(visitDocRef, { ...mainData, time: newDate });
     // const patientData = docSnap.data();
 
     // const patientHistories = [];

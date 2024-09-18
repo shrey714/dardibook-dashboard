@@ -1,6 +1,6 @@
 import React, { ChangeEvent, useEffect, useState } from "react";
 import { PlusIcon, XMarkIcon } from "@heroicons/react/24/solid";
-import MedicineRow from "./MedicineRow";
+import MedicineRow from "./DiseaseRow";
 import uniqid from "uniqid";
 import {
   addMedicine,
@@ -35,7 +35,7 @@ const medicineTypes = [
   { label: "Suppository", value: "SUPPOSITORY" },
 ];
 
-const MedicineInfo = ({ uid }: any) => {
+const DiseaseInfo = ({ uid }: any) => {
   const [medFromDb, setmedFromDb] = useState<any>([]);
   const [medicines, setmedicines] = useState<any>([]);
   const [searchMedicine, setsearchMedicine] = useState("");
@@ -161,14 +161,14 @@ const MedicineInfo = ({ uid }: any) => {
     <div className="mt-3 md:mt-6 mx-auto max-w-4xl bg-white rounded-lg">
       <div className="px-3 py-2 md:px-8 flex justify-between items-center">
         <h3 className="text-sm sm:text-base font-semibold leading-7 text-gray-900 tracking-wide">
-          Manage medicines
+          Manage diseases
         </h3>
         <div className="drawer drawer-end w-auto static">
-          <input id="my-drawer-4" type="checkbox" className="drawer-toggle" />
+          <input id="my-drawer-5" type="checkbox" className="drawer-toggle" />
           <div className="drawer-content">
             {/* Page content here */}
             <label
-              htmlFor="my-drawer-4"
+              htmlFor="my-drawer-5"
               className="drawer-button btn btn-primary btn-sm text-sm"
             >
               <h3 className="font-semibold leading-4 text-white tracking-wide">
@@ -178,7 +178,7 @@ const MedicineInfo = ({ uid }: any) => {
           </div>
           <div className="drawer-side">
             <label
-              htmlFor="my-drawer-4"
+              htmlFor="my-drawer-5"
               aria-label="close sidebar"
               className="drawer-overlay"
             ></label>
@@ -188,7 +188,7 @@ const MedicineInfo = ({ uid }: any) => {
 
               <div className="w-full mb-2 flex justify-end md:justify-start">
                 <label
-                  htmlFor="my-drawer-4"
+                  htmlFor="my-drawer-5"
                   className="drawer-button btn animate-none btn-circle btn-sm bg-gray-300"
                 >
                   <XMarkIcon height={18} width={18} color="red" />
@@ -344,4 +344,4 @@ const MedicineInfo = ({ uid }: any) => {
   );
 };
 
-export default MedicineInfo;
+export default DiseaseInfo;

@@ -1,9 +1,11 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import PrescribeMedicineTable from "./PrescribeMedicineTable";
 import Loader from "../common/Loader";
 import ReceiptForm from "./ReceiptForm";
+import DiseaseSuggetion from "../Prescribe/DiseaseSuggetion";
+import uniqid from "uniqid";
 
 const PrescribeForm = ({
   formData,
@@ -13,6 +15,7 @@ const PrescribeForm = ({
   receiptInfo,
   setReceiptInfo,
 }: any) => {
+  const [medicinesLoading, setmedicinesLoading] = useState(false);
   const handleInputChange = (
     e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
   ) => {
@@ -36,6 +39,14 @@ const PrescribeForm = ({
     }));
   };
 
+  const handleDiseaseComingData = (data: any) => {
+    setFormData((prevData: any) => ({
+      ...prevData,
+      diseaseId: data.diseaseId || uniqid(),
+      diseaseDetail: data.diseaseDetail || "",
+    }));
+  };
+
   return (
     <form
       className="px-4 sm:px-6 lg:px-8 py-12"
@@ -54,7 +65,7 @@ const PrescribeForm = ({
               Disease and Diagnosis<span className="text-red-500 ml-1">*</span>
             </label>
             <div className="sm:col-span-2">
-              <textarea
+              {/* <textarea
                 autoFocus={true}
                 required={formData.refer.hospitalName ? false : true}
                 id="diseaseDetail"
@@ -64,12 +75,34 @@ const PrescribeForm = ({
                 className="form-textarea block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 value={formData.diseaseDetail}
                 onChange={handleInputChange}
+              /> */}
+              <DiseaseSuggetion
+                required={formData.refer.hospitalName ? false : true}
+                diseaseValue={formData.diseaseDetail}
+                diseaseId={formData.diseaseId}
+                medicines={formData.medicines}
+                handleDiseaseComingData={handleDiseaseComingData}
+                handleInputChange={handleInputChange}
+                setmedicinesLoading={setmedicinesLoading}
               />
             </div>
           </div>
 
           {/* Medicine list */}
-          <div className="col-span-full py-4 sm:px-8 border-t border-gray-900/10">
+          {medicinesLoading ? (
+            <div className="w-full">
+              <div className="h-1 w-full bg-gray-300 overflow-hidden">
+                <div className="progress w-full h-full bg-primary left-right"></div>
+              </div>
+            </div>
+          ) : (
+            <></>
+          )}
+          <div
+            className={`col-span-full py-4 sm:px-8 border-t border-gray-900/10 relative ${
+              medicinesLoading ? "opacity-50 pointer-events-none" : ""
+            }`}
+          >
             <label className="px-8 sm:px-0 block text-lg font-semibold leading-7 text-gray-900">
               Medicines
             </label>
@@ -231,6 +264,15 @@ const PrescribeForm = ({
             ) : (
               "Save"
             )}
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              console.log(formData);
+            }}
+            className="btn md:btn-wide bg-white border-0 text-sm font-semibold leading-6 text-gray-900"
+          >
+            Print
           </button>
         </div>
       </fieldset>
