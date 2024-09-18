@@ -12,7 +12,7 @@ const customComponents = {
 };
 
 const customStyles = {
-  control: (provided: any) => ({
+  control: (provided: any, state: any) => ({
     ...provided,
     padding: "0.375rem 0.75rem", // Matches your form-input padding
     borderRadius: "0.375rem", // Matches your rounded-md class
@@ -22,9 +22,9 @@ const customStyles = {
     backgroundColor: "white", // Matches your input background color
     fontSize: "0.875rem", // Matches sm:text-sm class
     lineHeight: "1.25rem", // Matches sm:leading-6 class
-    boxShadow: "0 0 0 1px #d1d5db", // Matches ring-1 and ring-gray-300 classes
+    boxShadow: state.isFocused ? "0 0 0 2px #6366f1" : "0 0 0 1px #d1d5db", // Matches ring-1 and ring-gray-300 classes
     "&:hover": {
-      boxShadow: "0 0 0 2px #6366f1", // Matches focus:ring-indigo-600 class
+      // boxShadow: "none", // Matches focus:ring-indigo-600 class
     },
   }),
   input: (provided: any) => ({
@@ -54,19 +54,13 @@ const customStyles = {
     ...provided,
     color: "#111827", // Matches text-gray-900
   }),
+  clearIndicator: (provided: any) => ({
+    ...provided,
+    padding: 0, // Matches text-gray-900
+  }),
 };
 
-const MedicineSuggestion = ({
-  medicine,
-  rowId,
-  handleInputChange,
-  handleComingData,
-}: any) => {
-  const [currentVal, setcurrentVal] = useState({
-    label: "",
-    value: "",
-    id: uniqid(),
-  });
+const MedicineSuggestion = ({ medicine, rowId, handleComingData }: any) => {
   const user = useAppSelector<any>((state) => state.auth.user);
   // Function to load options based on user input
   const loadOptions = useCallback(
@@ -109,11 +103,6 @@ const MedicineSuggestion = ({
 
   const handleChange = (selectedOption: any) => {
     handleComingData(rowId, selectedOption);
-    setcurrentVal({
-      label: selectedOption?.value || "",
-      value: selectedOption?.value || "",
-      id: selectedOption?.id || "",
-    });
   };
 
   return (
@@ -124,18 +113,7 @@ const MedicineSuggestion = ({
         cacheOptions
         defaultOptions
         loadOptions={loadOptions}
-        onBlur={() => {
-          handleInputChange(rowId, {
-            target: {
-              name: "medicineName",
-              value: currentVal?.value || "",
-            },
-          });
-        }}
         onChange={handleChange}
-        onInputChange={(e) => {
-          setcurrentVal({ label: e, value: e ,id:uniqid()});
-        }}
         value={
           medicine
             ? {
@@ -149,6 +127,14 @@ const MedicineSuggestion = ({
         }
         placeholder="Search.."
         components={customComponents}
+        onCreateOption={(selectedOption: any) => {
+          handleComingData(rowId, {
+            value: selectedOption,
+            type: "",
+            instruction: "",
+            id: uniqid(),
+          });
+        }}
         styles={customStyles}
         isClearable
       />

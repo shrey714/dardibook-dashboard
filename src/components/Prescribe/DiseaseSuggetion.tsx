@@ -10,8 +10,13 @@ const customComponents = {
   IndicatorSeparator: () => null,
 };
 
+// classNames={{
+//   control: (state) =>
+//     state.isFocused ? "border-red-600" : "border-grey-300",
+// }}
+
 const customStyles = {
-  control: (provided: any) => ({
+  control: (provided: any, state: any) => ({
     ...provided,
     padding: "0.375rem 0.75rem", // Matches your form-input padding
     borderRadius: "0.375rem", // Matches your rounded-md class
@@ -21,9 +26,9 @@ const customStyles = {
     backgroundColor: "white", // Matches your input background color
     fontSize: "0.875rem", // Matches sm:text-sm class
     lineHeight: "1.25rem", // Matches sm:leading-6 class
-    boxShadow: "0 0 0 1px #d1d5db", // Matches ring-1 and ring-gray-300 classes
+    boxShadow: state.isFocused ? "0 0 0 2px #6366f1" : "0 0 0 1px #d1d5db", // Matches ring-1 and ring-gray-300 classes
     "&:hover": {
-      boxShadow: "0 0 0 2px #6366f1", // Matches focus:ring-indigo-600 class
+      // boxShadow: "none", // Matches focus:ring-indigo-600 class
     },
   }),
   input: (provided: any) => ({
@@ -53,20 +58,21 @@ const customStyles = {
     ...provided,
     color: "#111827", // Matches text-gray-900
   }),
+  clearIndicator: (provided: any) => ({
+    ...provided,
+    padding: 0, // Matches text-gray-900
+  }),
 };
 
 const DiseaseSuggetion = ({
   required,
   diseaseValue,
   diseaseId,
+  medicines,
   handleDiseaseComingData,
   handleInputChange,
+  setmedicinesLoading,
 }: any) => {
-  const [currentVal, setcurrentVal] = useState({
-    label: "",
-    value: "",
-    id: uniqid(),
-  });
   const user = useAppSelector<any>((state) => state.auth.user);
   // Function to load options based on user input
   const loadOptions = useCallback(
@@ -89,7 +95,7 @@ const DiseaseSuggetion = ({
           label: doc.data().diseaseDetail, // Setting the label for react-select
           value: doc.data().diseaseDetail, // Setting the value for react-select
           diseaseId: doc.data().diseaseId,
-          // medicines: doc.data().medicines,
+          medicines: doc.data().medicines,
         }));
 
         return fetchedSuggestions;
@@ -101,58 +107,130 @@ const DiseaseSuggetion = ({
     [user?.uid]
   );
 
-  const handleChange = (selectedOption: any) => {
+  const handleChange = async (selectedOption: any) => {
     handleDiseaseComingData({
       diseaseDetail: selectedOption?.value,
       diseaseId: selectedOption?.diseaseId,
     });
-    setcurrentVal({
-      label: selectedOption?.value || "",
-      value: selectedOption?.value || "",
-      id: selectedOption?.diseaseId || "",
-    });
+
+    if (selectedOption?.medicines && selectedOption?.medicines?.length > 0) {
+      const tempObject = {
+        dosages: {
+          morning: "",
+          afternoon: "",
+          evening: "",
+          night: "",
+        },
+        duration: 1,
+        durationType: "day",
+      };
+      try {
+        setmedicinesLoading(true);
+        const collectionRef = collection(
+          db,
+          "doctor",
+          user?.uid,
+          "medicinesData"
+        );
+        const q = query(
+          collectionRef,
+          where("__name__", "in", selectedOption.medicines)
+        ); // __name__ refers to the document ID
+
+        const querySnapshot = await getDocs(q);
+        const documents = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+          ...tempObject,
+        }));
+
+        handleInputChange({
+          target: {
+            name: "medicines",
+            value: documents,
+          },
+        });
+        setmedicinesLoading(false);
+      } catch (error) {
+        console.error("Error fetching documents:", error);
+      }
+    } else {
+      handleInputChange({
+        target: {
+          name: "medicines",
+          value: [
+            {
+              id: uniqid(),
+              medicineName: "",
+              instruction: "",
+              dosages: {
+                morning: "",
+                afternoon: "",
+                evening: "",
+                night: "",
+              },
+              duration: 1,
+              durationType: "day",
+              type: "",
+            },
+          ],
+        },
+      });
+    }
   };
 
   return (
     <div>
       <AsyncCreatableSelect
-        className="w-60"
+        className="w-full"
         backspaceRemovesValue={true}
         cacheOptions
         defaultOptions
         loadOptions={loadOptions}
-        onBlur={() => {
-          handleInputChange({
-            target: {
-              name: "diseaseDetail",
-              value: currentVal?.value || "",
-            },
-          });
-        }}
         onChange={handleChange}
-        onInputChange={(e) => {
-          setcurrentVal({ label: e, value: e, id: uniqid() });
-          handleInputChange({
-            target: {
-              name: "diseaseId",
-              value: uniqid(),
-            },
-          });
-        }}
         value={
           diseaseValue
             ? {
                 label: diseaseValue,
                 value: diseaseValue,
                 diseaseId: diseaseId,
+                medicines: medicines,
               }
             : null
         }
         placeholder="Search.."
+        onCreateOption={(selectedOption: any) => {
+          handleDiseaseComingData({
+            diseaseDetail: selectedOption,
+            diseaseId: uniqid(),
+          });
+          handleInputChange({
+            target: {
+              name: "medicines",
+              value: [
+                {
+                  id: uniqid(),
+                  medicineName: "",
+                  instruction: "",
+                  dosages: {
+                    morning: "",
+                    afternoon: "",
+                    evening: "",
+                    night: "",
+                  },
+                  duration: 1,
+                  durationType: "day",
+                  type: "",
+                },
+              ],
+            },
+          });
+        }}
         components={customComponents}
-        styles={customStyles}
         isClearable
         required={required}
+        styles={customStyles}
+        autoFocus={true}
       />
     </div>
   );

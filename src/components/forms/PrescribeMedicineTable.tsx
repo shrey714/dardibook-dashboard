@@ -78,7 +78,6 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
     event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>
   ) => {
     const { name, value } = event.target;
-    console.log("fsef==", name, value);
     setRows(
       rows.map((row) => (row.id === rowId ? { ...row, [name]: value } : row))
     );
@@ -174,7 +173,6 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
                 <MedicineSuggetion
                   medicine={row.medicineName}
                   rowId={row.id}
-                  handleInputChange={handleInputChange}
                   handleComingData={handleComingData}
                 />
               </td>
