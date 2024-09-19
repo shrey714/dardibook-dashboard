@@ -7,23 +7,22 @@ import {
 import { CheckIcon } from "@heroicons/react/24/solid";
 import Loader from "@/components/common/Loader";
 
-interface DisplayMedicineProps {
+interface DisplayDiseaseProps {
   handleChange: (
     event:
       | React.ChangeEvent<HTMLInputElement>
       | React.ChangeEvent<HTMLSelectElement>,
     id: string
   ) => void;
-  medicine: {
-    medicineName: string;
-    type: string;
-    id: string;
-    instruction: string;
+  disease: {
+    diseaseDetail: string;
+    medicines: [];
+    diseaseId: string;
   };
   cancelHandler: any;
   setSearchEnable: any;
-  seteditmedicineData: any;
-  editmedicineData: any;
+  seteditdiseaseData: any;
+  editdiseaseeData: any;
   saveHandler: any;
   index: number;
   deleteHandler: any;
@@ -31,35 +30,15 @@ interface DisplayMedicineProps {
   setGlobalClickable:any;
 }
 
-const medicineTypes = [
-  { label: "Type", value: "", isDefault: true },
-  { label: "Tablet", value: "TAB" },
-  { label: "Capsule", value: "CAP" },
-  { label: "Syrup", value: "SYRUP" },
-  { label: "Drop", value: "DROP" },
-  { label: "Cream", value: "CREAM" },
-  { label: "Lotion", value: "LOTION" },
-  { label: "Serum", value: "SERUM" },
-  { label: "Soap", value: "SOAP" },
-  { label: "Spray", value: "SPRAY" },
-  { label: "Gel", value: "GEL" },
-  { label: "Ointment", value: "OINTMENT" },
-  { label: "Inhaler", value: "INHALER" },
-  { label: "Injection", value: "INJECTION" },
-  { label: "Powder", value: "POWDER" },
-  { label: "Patch", value: "PATCH" },
-  { label: "Suppository", value: "SUPPOSITORY" },
-];
-
-const MedicineRow: React.FC<DisplayMedicineProps> = ({
+const DiseaseRow: React.FC<DisplayDiseaseProps> = ({
+  index,
   handleChange,
-  medicine,
+  disease,
   cancelHandler,
   setSearchEnable,
-  seteditmedicineData,
+  seteditdiseaseData,
   saveHandler,
-  editmedicineData,
-  index,
+  editdiseaseeData,
   deleteHandler,
   globalClickable,
   setGlobalClickable
@@ -85,54 +64,24 @@ const MedicineRow: React.FC<DisplayMedicineProps> = ({
         </div>
         <fieldset
           disabled={!editable}
-          className="col-span-9 sm:grid sm:grid-cols-6 justify-center items-center flex-col sm:flex-row gap-1 sm:gap-2"
+          className="col-span-9 justify-center items-center"
         >
+
           <input
             autoFocus={true}
             required
             type="text"
-            id={medicine.id}
-            name="medicineName"
-            className="col-span-2 disabled:text-gray-500 form-input py-[4px] md:py-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold leading-4 text-gray-700 flex-1 mx-1 text-center"
+            id={disease.diseaseId}
+            name="diseaseDetail"
+            className="col-span-6 h-8 md:h-auto w-full disabled:text-gray-500 form-input py-[4px] md:py-1 rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold leading-4 text-gray-700 flex-1 mx-1 text-center"
             value={
-              editable ? editmedicineData.medicineName : medicine.medicineName
+              editable ? editdiseaseeData.diseaseDetail : disease.diseaseDetail
             }
             onChange={(e) => {
-              handleChange(e, medicine.id);
+              handleChange(e, disease.diseaseId);
             }}
           />
-          <select
-            name="type"
-            id={medicine.id}
-            onChange={(e) => {
-              handleChange(e, medicine.id);
-            }}
-            value={editable ? editmedicineData.type : medicine.type}
-            className="col-span-2 form-select border-0 rounded-[6px] flex flex-1 py-[0px] md:py-[5.5px] text-gray-900 placeholder:text-gray-400 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 mx-1 text-center w-full pr-3"
-          >
-            {medicineTypes.map((type, index) => (
-              <option
-                key={index}
-                value={type.value}
-                selected={type.isDefault || false}
-              >
-                {type.label}
-              </option>
-            ))}
-          </select>
-          <input
-            autoFocus={true}
-            type="text"
-            id={medicine.id}
-            name="instruction"
-            className="col-span-2 disabled:text-gray-500 form-input py-[4px] md:py-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold leading-4 text-gray-700 flex-1 mx-1 text-center"
-            value={
-              editable ? editmedicineData.instruction : medicine.instruction
-            }
-            onChange={(e) => {
-              handleChange(e, medicine.id);
-            }}
-          />
+
         </fieldset>
         <div className="col-span-2 flex justify-center items-center flex-col sm:flex-row gap-1 sm:gap-2">
           <button
@@ -144,7 +93,7 @@ const MedicineRow: React.FC<DisplayMedicineProps> = ({
               setEditable(true);
               setGlobalClickable(false);
               setSearchEnable(false);
-              seteditmedicineData(medicine);
+              seteditdiseaseData(disease);
             }}
           >
             <PencilSquareIcon height={15} width={15} color="black" />
@@ -184,7 +133,7 @@ const MedicineRow: React.FC<DisplayMedicineProps> = ({
                     onClick={async () => {
                       setIsDropdownVisible(false);
                       setdeleteLoader(true);
-                      await deleteHandler(medicine.id);
+                      await deleteHandler(disease.diseaseId);
                       setdeleteLoader(false);
                     }}
                   >
@@ -208,7 +157,7 @@ const MedicineRow: React.FC<DisplayMedicineProps> = ({
             onClick={async () => {
               seteditLoader(true);
               setGlobalClickable(true);
-              await saveHandler(medicine.id);
+              await saveHandler(disease.diseaseId);
               seteditLoader(false);
               setEditable(false);
               setSearchEnable(true);
@@ -234,7 +183,7 @@ const MedicineRow: React.FC<DisplayMedicineProps> = ({
               !editable ? "hidden" : ""
             }`}
             onClick={() => {
-              cancelHandler(medicine.id);
+              cancelHandler(disease.diseaseId);
               setEditable(false);
               setSearchEnable(true);
               setGlobalClickable(true);
@@ -248,4 +197,4 @@ const MedicineRow: React.FC<DisplayMedicineProps> = ({
   );
 };
 
-export default MedicineRow;
+export default DiseaseRow;
