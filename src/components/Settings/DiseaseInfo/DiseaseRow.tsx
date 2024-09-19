@@ -59,7 +59,7 @@ const DiseaseRow: React.FC<DisplayDiseaseProps> = ({
       }}
     >
       <div className="grid grid-cols-12 gap-1 w-full mb-1">
-        <div className="col-span-1 flex justify-center items-center bg-white rounded-md">
+        <div className="col-span-1 h-8 md:h-auto flex justify-center items-center bg-white rounded-md">
           {index + 1}
         </div>
         <fieldset
