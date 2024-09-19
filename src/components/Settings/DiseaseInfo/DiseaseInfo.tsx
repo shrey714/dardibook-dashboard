@@ -1,67 +1,45 @@
 import React, { ChangeEvent, useEffect, useState } from "react";
 import { PlusIcon, XMarkIcon } from "@heroicons/react/24/solid";
-import MedicineRow from "./DiseaseRow";
+import DiseaseRow from "./DiseaseRow";
 import uniqid from "uniqid";
 import {
-  addMedicine,
-  delMedicines,
-  getMedicines,
-} from "@/app/services/crudMedicine";
+  addDisease,
+  delDisease,
+  getDiseases,
+} from "@/app/services/crudDisease";
 import Loader from "@/components/common/Loader";
 
-interface Medicine {
-  medicineName: string;
-  type: string;
-  id: string;
-  instruction: string;
+interface Disease {
+  diseaseDetail: string;
+  medicines: [];
+  diseaseId: string;
 }
-const medicineTypes = [
-  { label: "Type", value: "", isDefault: true },
-  { label: "Tablet", value: "TAB" },
-  { label: "Capsule", value: "CAP" },
-  { label: "Syrup", value: "SYRUP" },
-  { label: "Drop", value: "DROP" },
-  { label: "Cream", value: "CREAM" },
-  { label: "Lotion", value: "LOTION" },
-  { label: "Serum", value: "SERUM" },
-  { label: "Soap", value: "SOAP" },
-  { label: "Spray", value: "SPRAY" },
-  { label: "Gel", value: "GEL" },
-  { label: "Ointment", value: "OINTMENT" },
-  { label: "Inhaler", value: "INHALER" },
-  { label: "Injection", value: "INJECTION" },
-  { label: "Powder", value: "POWDER" },
-  { label: "Patch", value: "PATCH" },
-  { label: "Suppository", value: "SUPPOSITORY" },
-];
 
 const DiseaseInfo = ({ uid }: any) => {
-  const [medFromDb, setmedFromDb] = useState<any>([]);
-  const [medicines, setmedicines] = useState<any>([]);
-  const [searchMedicine, setsearchMedicine] = useState("");
+  const [disFromDb, setdisFromDb] = useState<any>([]);
+  const [diseases, setdiseases] = useState<any>([]);
+  const [searchDisease, setsearchDisease] = useState("");
   const [addLoader, setAddLoader] = useState(false);
   const [searchLoader, setsearchLoader] = useState(true);
   const [searchEnable, setSearchEnable] = useState(true);
   const [duplicate, setduplicate] = useState(false);
   const [globalClickable, setGlobalClickable] = useState(true);
-  const [medicineData, setmedicineData] = useState<Medicine>({
-    medicineName: "",
-    type: "Type",
-    instruction: "",
-    id: uniqid(),
+  const [diseaseData, setdiseaseData] = useState<Disease>({
+    diseaseDetail: "",
+    medicines: [],
+    diseaseId: uniqid(),
   });
-  const [editmedicineData, seteditmedicineData] = useState<Medicine>({
-    medicineName: "",
-    type: "Type",
-    instruction: "",
-    id: uniqid(),
+  const [editdiseaseData, seteditdiseaseData] = useState<Disease>({
+    diseaseDetail: "",
+    medicines: [],
+    diseaseId: uniqid(),
   });
 
-  const filteredMedicine = (medicines: any) => {
-    return medicines.filter((mname: any) =>
-      mname?.medicineName
+  const filteredDIsease = (disease: any) => {
+    return disease.filter((dname: any) =>
+      dname?.diseaseDetail
         ?.toLowerCase()
-        ?.includes(searchMedicine?.toLowerCase())
+        ?.includes(searchDisease?.toLowerCase())
     );
   };
 
@@ -70,36 +48,29 @@ const DiseaseInfo = ({ uid }: any) => {
     id: any
   ) => {
     const { name, value } = e.target;
-    seteditmedicineData({ ...editmedicineData, [name]: value });
+    seteditdiseaseData({ ...editdiseaseData, [name]: value });
   };
 
   const saveHandler = async (id: any) => {
-    await addMedicine(editmedicineData, uid);
-    setmedFromDb((prev: any) =>
-      prev.map((item: any, i: any) =>
-        item.id === id ? editmedicineData : item
-      )
+    await addDisease(editdiseaseData, uid);
+    setdisFromDb((prev: any) =>
+      prev.map((item: any, i: any) => (item.id === id ? editdiseaseData : item))
     );
-    setmedicines((prev: any) =>
-      prev.map((item: any, i: any) =>
-        item.id === id ? editmedicineData : item
-      )
+    setdiseases((prev: any) =>
+      prev.map((item: any, i: any) => (item.id === id ? editdiseaseData : item))
     );
   };
 
   const handleFilterChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
-    setsearchMedicine(value);
+    setsearchDisease(value);
   };
 
   const submitHandler = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
     // add patient api
-    for (let med of medicines) {
-      if (
-        med.medicineName + med.type ===
-        medicineData.medicineName.trim() + medicineData.type
-      ) {
+    for (let dis of diseases) {
+      if (dis.diseaseDetail === diseaseData.diseaseDetail.trim()) {
         setduplicate(true);
         setTimeout(() => {
           setduplicate(false);
@@ -108,53 +79,52 @@ const DiseaseInfo = ({ uid }: any) => {
       }
     }
     setAddLoader(true);
-    await addMedicine(medicineData, uid);
-    setmedicines([...medicines, medicineData]);
-    setmedFromDb([...medFromDb, medicineData]);
+    await addDisease(diseaseData, uid);
+    setdiseases([...diseases, diseaseData]);
+    setdisFromDb([...disFromDb, diseaseData]);
     setAddLoader(false);
-    setmedicineData({
-      medicineName: "",
-      type: "Type",
-      id: uniqid(),
-      instruction: "",
+    setdiseaseData({
+      diseaseDetail: "",
+      medicines: [],
+      diseaseId: uniqid(),
     });
   };
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setmedicineData({ ...medicineData, [name]: value });
+    setdiseaseData({ ...diseaseData, [name]: value });
   };
 
   const deleteHandler = async (id: any) => {
     // make api call
-    await delMedicines(id, uid);
-    setmedicines(
-      medicines.filter((medicine: { id: any }) => medicine.id != id)
+    await delDisease(id, uid);
+    setdiseases(
+      diseases.filter((disease: { diseaseId: any }) => disease.diseaseId != id)
     );
   };
 
   const cancelHandler = (id: any) => {
-    let oldMedicine: any = {};
-    medFromDb.forEach((x: any) => {
-      if (x.id == id) oldMedicine = x;
+    let oldDisease: any = {};
+    disFromDb.forEach((x: any) => {
+      if (x.id == id) oldDisease = x;
     });
-    setmedicines(
-      medicines.map((medicine: { id: any }) =>
-        medicine.id == id ? oldMedicine : medicine
+    setdiseases(
+      diseases.map((disease: { diseaseId: any }) =>
+        disease.diseaseId == id ? oldDisease : disease
       )
     );
   };
 
   useEffect(() => {
-    const fetchmedicine = async () => {
+    const fetchdisease = async () => {
       setsearchLoader(true);
-      const data = await getMedicines(uid);
-      setmedFromDb(data?.data || []);
-      setmedicines(data?.data || []);
+      const data = await getDiseases(uid);
+      setdisFromDb(data?.data || []);
+      setdiseases(data?.data || []);
       setsearchLoader(false);
     };
-    fetchmedicine();
+    fetchdisease();
   }, [uid]);
 
   return (
@@ -204,40 +174,13 @@ const DiseaseInfo = ({ uid }: any) => {
                   onChange={(e) => {
                     handleInputChange(e);
                   }}
-                  name="medicineName"
-                  id="medicineName"
-                  placeholder="Medicine name.."
+                  name="diseaseDetail"
+                  id="diseaseDetail"
+                  placeholder="Disease name.."
                   required
-                  value={medicineData.medicineName}
+                  value={diseaseData.diseaseDetail}
                 />
-                <select
-                  value={medicineData.type}
-                  name="type"
-                  onChange={(e) => {
-                    handleInputChange(e);
-                  }}
-                  className="form-select border-0 rounded-[6px] flex flex-1 py-1.5 text-gray-900 placeholder:text-gray-400 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                >
-                  {medicineTypes.map((type, index) => (
-                    <option
-                      key={index}
-                      value={type.value}
-                      selected={type.isDefault || false}
-                    >
-                      {type.label}
-                    </option>
-                  ))}
-                </select>
-                <input
-                  className="form-input w-full block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                  onChange={(e) => {
-                    handleInputChange(e);
-                  }}
-                  name="instruction"
-                  id="instruction"
-                  placeholder="Instruction.."
-                  value={medicineData.instruction}
-                />
+
                 <div className="dropdown dropdown-end dropdown-open w-fit m-auto">
                   <button
                     tabIndex={0}
@@ -262,7 +205,7 @@ const DiseaseInfo = ({ uid }: any) => {
                       duplicate ? "block" : "hidden"
                     }`}
                   >
-                    <p className="text-center">Medicine already exists</p>
+                    <p className="text-center">Disease already exists</p>
                   </div>
                 </div>
               </form>
@@ -285,9 +228,9 @@ const DiseaseInfo = ({ uid }: any) => {
                 <div className="flex items-center gap-1">
                   <input
                     type="text"
-                    id="searchMedicine"
-                    placeholder="Search by medicine name.."
-                    value={searchMedicine}
+                    id="searchDisease"
+                    placeholder="Search by disease name.."
+                    value={searchDisease}
                     onChange={handleFilterChange}
                     className="form-input bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full pl-10"
                     disabled={!searchEnable}
@@ -295,7 +238,7 @@ const DiseaseInfo = ({ uid }: any) => {
                 </div>
               </div>
 
-              {/* diaplay medicine */}
+              {/* diaplay disease */}
               <div className="w-full flex flex-col flex-1 bg-gray-300 mt-1 p-2 pb-1 rounded-lg overflow-y-auto">
                 {searchLoader ? (
                   <div className="flex flex-1 items-center justify-center">
@@ -305,7 +248,7 @@ const DiseaseInfo = ({ uid }: any) => {
                       secondaryColor="text-white"
                     />
                   </div>
-                ) : filteredMedicine(medicines).length === 0 ? (
+                ) : filteredDIsease(diseases).length === 0 ? (
                   <>
                     <div className="flex flex-1 items-center justify-center">
                       empty
@@ -313,18 +256,18 @@ const DiseaseInfo = ({ uid }: any) => {
                   </>
                 ) : (
                   <>
-                    {filteredMedicine(medicines).map(
-                      (medicine: any, index: any) => {
+                    {filteredDIsease(diseases).map(
+                      (disease: any, index: any) => {
                         return (
-                          <MedicineRow
+                          <DiseaseRow
                             key={index}
                             index={index}
                             handleChange={handleChange}
-                            medicine={medicine}
+                            disease={disease}
                             cancelHandler={cancelHandler}
                             setSearchEnable={setSearchEnable}
-                            seteditmedicineData={seteditmedicineData}
-                            editmedicineData={editmedicineData}
+                            seteditdiseaseData={seteditdiseaseData}
+                            editdiseaseeData={editdiseaseData}
                             saveHandler={saveHandler}
                             deleteHandler={deleteHandler}
                             globalClickable={globalClickable}
