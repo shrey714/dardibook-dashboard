@@ -13,6 +13,7 @@ const Page = () => {
   const user = useAppSelector<any>((state) => state.auth.user);
   const [submissionLoader, setSubmissionLoader] = useState(false);
   const patientId = searchParams.get("patientId");
+  const [visitID, setvisitID] = useState(uniqid.time())
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [receiptInfo, setReceiptInfo] = useState({
     particulars: [
@@ -63,7 +64,7 @@ const Page = () => {
       ...formData,
       uid: user.uid,
       id: patientId,
-      visitId: uniqid.time(),
+      visitId: visitID,
     });
     console.log("status", data);
     if (data?.status === 200) {

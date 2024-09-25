@@ -74,13 +74,13 @@ const PersonalInfo = ({ userInfo }: any) => {
             <p className="text-xs sm:text-sm font-medium leading-3 text-gray-500">
               Name
             </p>
-            <p className="form-input py-[6px] mt-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold leading-4 text-gray-700">
+            <p className="form-input py-[6px] mt-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold text-gray-700">
               {userInfo?.displayName}
             </p>
             <p className="mt-2 text-xs sm:text-sm font-medium leading-3 text-gray-500">
               Email
             </p>
-            <p className="form-input py-[6px] mt-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold leading-4 text-gray-700">
+            <p className="form-input py-[6px] mt-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold text-gray-700">
               {userInfo?.email}
             </p>
           </div>

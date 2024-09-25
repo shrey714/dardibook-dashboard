@@ -73,7 +73,7 @@ const DiseaseRow: React.FC<DisplayDiseaseProps> = ({
             type="text"
             id={disease.diseaseId}
             name="diseaseDetail"
-            className="col-span-6 h-8 md:h-auto w-full disabled:text-gray-500 form-input py-[4px] md:py-1 rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold leading-4 text-gray-700 flex-1 mx-1 text-center"
+            className="col-span-6 h-8 md:h-auto w-full disabled:text-gray-500 form-input py-[4px] md:py-1 rounded-md border-gray-200 bg-white text-sm md:text-base font-normal leading-4 text-gray-700 flex-1 mx-1"
             value={
               editable ? editdiseaseeData.diseaseDetail : disease.diseaseDetail
             }

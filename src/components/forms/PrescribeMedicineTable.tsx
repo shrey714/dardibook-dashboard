@@ -204,13 +204,14 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
                       onChange={(e) => {
                         handleInputChange(row.id, e);
                       }}
+                      defaultValue={""}
                       className="form-select border-0 rounded-[6px] flex flex-1 py-1 text-gray-900 placeholder:text-gray-400 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                     >
                       {medicineTypes.map((type, index) => (
                         <option
                           key={index}
                           value={type.value}
-                          selected={type.isDefault || false}
+                          // selected={type.isDefault || false}
                         >
                           {type.label}
                         </option>
@@ -256,13 +257,14 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
                     onChange={(e) => {
                       handleInputChange(row.id, e);
                     }}
+                    defaultValue={"day"}
                     className="form-select flex flex-1 border-0 rounded-[6px]  py-1 text-gray-900 placeholder:text-gray-400 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                   >
                     {durationTypes.map((type, index) => (
                       <option
                         key={index}
                         value={type.value}
-                        selected={type.isDefault || false}
+                        // selected={type.isDefault || false}
                       >
                         {type.label}
                       </option>

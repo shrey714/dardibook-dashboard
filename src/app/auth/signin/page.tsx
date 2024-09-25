@@ -51,7 +51,7 @@ const SignIn = () => {
             </div>
           </div>
 
-          <div className="z-50 max-h-52 py-8 px-[12.5%] bg-gray-900 w-full flex flex-1 flex-col items-center justify-between rounded-t-3xl overflow-hidden hover:max-h-56 hover:pt-12 hover:px-[calc(12.5%+8px)] hover:w-[calc(100%+16px)] hover:shadow-[0_20px_50px_rgba(8,_112,_184,_0.7)] transition-all">
+          <div className="z-50 max-h-52 py-8 px-[12.5%] bg-gray-900 w-full flex flex-1 flex-col items-center justify-between rounded-t-3xl overflow-hidden pt-12 shadow-[0_0_20px_2px_rgba(8,_112,_184,_0.7)] transition-all">
             <button
               onClick={handleSignIn}
               disabled={loading}

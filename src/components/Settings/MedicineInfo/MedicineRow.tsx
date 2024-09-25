@@ -27,8 +27,8 @@ interface DisplayMedicineProps {
   saveHandler: any;
   index: number;
   deleteHandler: any;
-  globalClickable:boolean;
-  setGlobalClickable:any;
+  globalClickable: boolean;
+  setGlobalClickable: any;
 }
 
 const medicineTypes = [
@@ -62,7 +62,7 @@ const MedicineRow: React.FC<DisplayMedicineProps> = ({
   index,
   deleteHandler,
   globalClickable,
-  setGlobalClickable
+  setGlobalClickable,
 }) => {
   const [editable, setEditable] = useState(false);
   const [editLoader, seteditLoader] = useState(false);
@@ -93,7 +93,7 @@ const MedicineRow: React.FC<DisplayMedicineProps> = ({
             type="text"
             id={medicine.id}
             name="medicineName"
-            className="col-span-2 disabled:text-gray-500 form-input py-[4px] md:py-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold leading-4 text-gray-700 flex-1 mx-1 text-center"
+            className="col-span-2 disabled:text-gray-500 form-input py-[4px] md:py-1 w-full rounded-md border-gray-200 bg-white text-sm leading-6 font-medium text-gray-700 flex-1 mx-1 text-center"
             value={
               editable ? editmedicineData.medicineName : medicine.medicineName
             }
@@ -108,13 +108,14 @@ const MedicineRow: React.FC<DisplayMedicineProps> = ({
               handleChange(e, medicine.id);
             }}
             value={editable ? editmedicineData.type : medicine.type}
-            className="col-span-2 form-select border-0 rounded-[6px] flex flex-1 py-[0px] md:py-[5.5px] text-gray-900 placeholder:text-gray-400 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 mx-1 text-center w-full pr-3"
+            defaultValue={""}
+            className="col-span-2 form-select border-0 rounded-[6px] flex flex-1 py-[0px] sm:py-[5.5px] text-gray-900 placeholder:text-gray-400 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 text-sm leading-6 mx-1 text-center w-full pr-3"
           >
             {medicineTypes.map((type, index) => (
               <option
                 key={index}
                 value={type.value}
-                selected={type.isDefault || false}
+                // selected={type.isDefault || false}
               >
                 {type.label}
               </option>
@@ -125,7 +126,7 @@ const MedicineRow: React.FC<DisplayMedicineProps> = ({
             type="text"
             id={medicine.id}
             name="instruction"
-            className="col-span-2 disabled:text-gray-500 form-input py-[4px] md:py-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold leading-4 text-gray-700 flex-1 mx-1 text-center"
+            className="col-span-2 disabled:text-gray-500 form-input py-[4px] md:py-1 w-full rounded-md border-gray-200 bg-white text-sm font-medium leading-6 text-gray-700 flex-1 mx-1 text-center"
             value={
               editable ? editmedicineData.instruction : medicine.instruction
             }
@@ -153,7 +154,7 @@ const MedicineRow: React.FC<DisplayMedicineProps> = ({
             <button
               tabIndex={0}
               role="button"
-            disabled={!globalClickable && !editable}
+              disabled={!globalClickable && !editable}
               onClick={() => setIsDropdownVisible(true)}
               className="btn btn-sm animate-none btn-square"
             >

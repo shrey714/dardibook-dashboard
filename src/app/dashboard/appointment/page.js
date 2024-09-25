@@ -23,8 +23,8 @@ export default function TShirtsPage() {
           New Case
         </Link>
       </div>
-      <div className="w-full md:w-3/4 p-1 pt-3 pb-6 bg-white rounded-lg flex flex-col gap-6 items-center shadow-[0px_0px_0px_1px_#a0aec0]">
-        <label className="form-control w-full max-w-xs">
+      <div className="overflow-hidden w-full md:w-3/4 p-1 pt-3 pb-6 bg-white flex flex-col gap-6 items-center border-2 rounded-md border-gray-400/70">
+        <label className="z-10 form-control w-full max-w-xs">
           <div className="label">
             <span className="label-text font-bold text-base text-gray-700">
               Patient ID<span className="text-red-500 ml-1">*</span>
@@ -33,7 +33,7 @@ export default function TShirtsPage() {
           <input
             type="text"
             placeholder="ID"
-            value={patientId}
+            value={patientId.trim()}
             onChange={handleInputChange}
             className="input text-lg input-bordered w-full max-w-xs tracking-[0.2rem]"
           />
@@ -45,7 +45,7 @@ export default function TShirtsPage() {
           }}
           className={`btn animate-none ${
             patientId.length > 3 ? "btn-primary" : "btn-disabled"
-          } md:btn-wide md:btn-md md:text-lg`}
+          } md:btn-wide md:btn-md md:text-base z-30`}
         >
           Get Details
         </Link>

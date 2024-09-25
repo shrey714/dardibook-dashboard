@@ -142,7 +142,7 @@ const ClinicInfo = ({ uid, doctorData, mainLoader, setdoctorData }: any) => {
                   type="text"
                   id="clinicName"
                   name="clinicName"
-                  className="disabled:text-gray-500 form-input py-[6px] mt-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold leading-4 text-gray-700"
+                  className="disabled:text-gray-500 form-input py-[6px] mt-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold text-gray-700"
                   value={formdata?.clinicName}
                   onChange={handleChange}
                 />
@@ -160,7 +160,7 @@ const ClinicInfo = ({ uid, doctorData, mainLoader, setdoctorData }: any) => {
                   type="text"
                   id="doctorName"
                   name="doctorName"
-                  className="disabled:text-gray-500 form-input py-[6px] mt-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold leading-4 text-gray-700"
+                  className="disabled:text-gray-500 form-input py-[6px] mt-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold text-gray-700"
                   value={formdata?.doctorName}
                   onChange={handleChange}
                 />
@@ -180,7 +180,7 @@ const ClinicInfo = ({ uid, doctorData, mainLoader, setdoctorData }: any) => {
                   type="text"
                   id="degree"
                   name="degree"
-                  className="disabled:text-gray-500 form-input py-[6px] mt-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold leading-4 text-gray-700"
+                  className="disabled:text-gray-500 form-input py-[6px] mt-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold text-gray-700"
                   value={formdata?.degree}
                   onChange={handleChange}
                 />
@@ -198,7 +198,7 @@ const ClinicInfo = ({ uid, doctorData, mainLoader, setdoctorData }: any) => {
                   type="text"
                   id="registrationNumber"
                   name="registrationNumber"
-                  className="disabled:text-gray-500 form-input py-[6px] mt-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold leading-4 text-gray-700"
+                  className="disabled:text-gray-500 form-input py-[6px] mt-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold text-gray-700"
                   value={formdata?.registrationNumber}
                   onChange={handleChange}
                 />
@@ -217,7 +217,7 @@ const ClinicInfo = ({ uid, doctorData, mainLoader, setdoctorData }: any) => {
                   type="number"
                   id="clinicNumber"
                   name="clinicNumber"
-                  className="disabled:text-gray-500 form-input py-[6px] mt-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold leading-4 text-gray-700"
+                  className="disabled:text-gray-500 form-input py-[6px] mt-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold text-gray-700"
                   value={formdata?.clinicNumber}
                   onChange={handleChange}
                 />
@@ -235,7 +235,7 @@ const ClinicInfo = ({ uid, doctorData, mainLoader, setdoctorData }: any) => {
                   type="number"
                   id="phoneNumber"
                   name="phoneNumber"
-                  className="disabled:text-gray-500 form-input py-[6px] mt-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold leading-4 text-gray-700"
+                  className="disabled:text-gray-500 form-input py-[6px] mt-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold text-gray-700"
                   value={formdata?.phoneNumber}
                   onChange={handleChange}
                 />
@@ -253,7 +253,7 @@ const ClinicInfo = ({ uid, doctorData, mainLoader, setdoctorData }: any) => {
                   type="email"
                   id="emailId"
                   name="emailId"
-                  className="disabled:text-gray-500 form-input py-[6px] mt-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold leading-4 text-gray-700"
+                  className="disabled:text-gray-500 form-input py-[6px] mt-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold text-gray-700"
                   value={formdata?.emailId}
                   onChange={handleChange}
                 />
@@ -271,7 +271,7 @@ const ClinicInfo = ({ uid, doctorData, mainLoader, setdoctorData }: any) => {
                   type="text"
                   id="clinicAddress"
                   name="clinicAddress"
-                  className="disabled:text-gray-500 form-input py-[6px] mt-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold leading-4 text-gray-700"
+                  className="disabled:text-gray-500 form-input py-[6px] mt-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold text-gray-700"
                   value={formdata?.clinicAddress}
                   onChange={handleChange}
                 />
@@ -315,7 +315,7 @@ const ClinicInfo = ({ uid, doctorData, mainLoader, setdoctorData }: any) => {
                           htmlFor="clinicLogo"
                           className="relative text-xs cursor-pointer font-semibold text-indigo-600 hover:text-indigo-500"
                         >
-                          Upload a Clinic Logo
+                          Clinic Logo
                           <input
                             required
                             id="clinicLogo"
@@ -369,7 +369,7 @@ const ClinicInfo = ({ uid, doctorData, mainLoader, setdoctorData }: any) => {
                           htmlFor="signaturePhoto"
                           className="relative text-xs cursor-pointer font-semibold text-indigo-600 hover:text-indigo-500"
                         >
-                          Upload a Signature
+                          Signature
                           <input
                             required
                             id="signaturePhoto"
