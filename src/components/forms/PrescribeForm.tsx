@@ -268,7 +268,7 @@ const PrescribeForm = ({
           {/* <button
             type="button"
             onClick={() => {
-              console.log(formData);
+              console.log(formData.medicines);
             }}
             className="btn md:btn-wide bg-white border-0 text-sm font-semibold leading-6 text-gray-900"
           >

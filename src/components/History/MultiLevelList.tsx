@@ -112,7 +112,7 @@ const ItemList: React.FC<{ items: Item[] }> = ({ items }) => {
     <div className="relative">
       <li className=" pl-[25%] lg:pl-[15%] z-10 top-6  w-full sticky py-1 list-none flex flex-row items-center font-semibold text-sm text-gray-800 gap-1">
         <div className="min-w-6"></div>
-        <div className="w-full">ID</div>
+        <div className="w-full text-center">ID</div>
         <div className="w-full">Name</div>
         <div className="w-full hide-between-768-and-990 hide-before-480">
           Mobile
@@ -121,7 +121,7 @@ const ItemList: React.FC<{ items: Item[] }> = ({ items }) => {
       </li>
       {sortedMonthYears.map((monthYear, key) => (
         <div key={key}>
-          <h2 className="z-[1] h-6 sticky top-0 w-full bg-gray-300 text-gray-800">
+          <h2 className="z-[1] h-6 sticky top-0 w-full bg-gray-300 text-gray-800 text-xs sm:text-sm">
             {monthYear}
           </h2>
           {Object.entries(groupedItems[monthYear])
@@ -129,7 +129,7 @@ const ItemList: React.FC<{ items: Item[] }> = ({ items }) => {
             .map(([date, items]) => (
               <div key={date}>
                 <div className="w-full py-1 bg-gray-300 z-[0] sticky top-6">
-                  <p className="text-gray-800 text-sm">
+                  <p className="text-gray-800 text-xs sm:text-sm">
                     {`${date}th ${monthYear.split(" ")[0]}`} ({items.length})
                   </p>
                 </div>

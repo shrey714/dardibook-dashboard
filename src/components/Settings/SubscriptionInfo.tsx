@@ -99,7 +99,7 @@ const SubscriptionInfo = ({ subId, mainLoader }: any) => {
                   <p className="text-xs sm:text-sm font-medium leading-3 text-gray-500">
                     Status:
                   </p>
-                  <p className="form-input min-h-[2.5rem] py-2 mt-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold leading-4 text-gray-700">
+                  <p className="form-input min-h-[2.25rem] md:min-h-[2.5rem] py-2 mt-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold leading-4 text-gray-700">
                     {subscriptionData?.status}
                   </p>
                 </div>
@@ -108,7 +108,7 @@ const SubscriptionInfo = ({ subId, mainLoader }: any) => {
                   <p className="text-xs sm:text-sm font-medium leading-3 text-gray-500">
                     Subscription Started On:
                   </p>
-                  <p className="form-input min-h-[2.5rem] py-2 mt-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold leading-4 text-gray-700">
+                  <p className="form-input min-h-[2.25rem] md:min-h-[2.5rem] py-2 mt-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold leading-4 text-gray-700">
                     {convertTimestampToDate(subscriptionData?.created_at)}
                   </p>
                 </div>
@@ -117,7 +117,7 @@ const SubscriptionInfo = ({ subId, mainLoader }: any) => {
                   <p className="text-xs sm:text-sm font-medium leading-3 text-gray-500">
                     Next Due Date:
                   </p>
-                  <p className="form-input min-h-[2.5rem] py-2 mt-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold leading-4 text-gray-700">
+                  <p className="form-input min-h-[2.25rem] md:min-h-[2.5rem] py-2 mt-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold leading-4 text-gray-700">
                     {convertTimestampToDate(subscriptionData?.charge_at)}
                   </p>
                 </div>
@@ -127,7 +127,7 @@ const SubscriptionInfo = ({ subId, mainLoader }: any) => {
                   <p className="text-xs sm:text-sm font-medium leading-3 text-gray-500">
                     Final Date:
                   </p>
-                  <p className="form-input min-h-[2.5rem] py-2 mt-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold leading-4 text-gray-700">
+                  <p className="form-input min-h-[2.25rem] md:min-h-[2.5rem] py-2 mt-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold leading-4 text-gray-700">
                     {convertTimestampToDate(subscriptionData?.end_at)}
                   </p>
                 </div>
@@ -137,7 +137,7 @@ const SubscriptionInfo = ({ subId, mainLoader }: any) => {
                   <p className="text-xs sm:text-sm font-medium leading-3 text-gray-500">
                     Total Cycles:
                   </p>
-                  <p className="form-input min-h-[2.5rem] py-2 mt-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold leading-4 text-gray-700">
+                  <p className="form-input min-h-[2.25rem] md:min-h-[2.5rem] py-2 mt-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold leading-4 text-gray-700">
                     {subscriptionData?.total_count}
                   </p>
                 </div>
@@ -147,7 +147,7 @@ const SubscriptionInfo = ({ subId, mainLoader }: any) => {
                   <p className="text-xs sm:text-sm font-medium leading-3 text-gray-500">
                     Cycles Completed:
                   </p>
-                  <p className="form-input min-h-[2.5rem] py-2 mt-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold leading-4 text-gray-700">
+                  <p className="form-input min-h-[2.25rem] md:min-h-[2.5rem] py-2 mt-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold leading-4 text-gray-700">
                     {subscriptionData?.paid_count}
                   </p>
                 </div>
@@ -162,7 +162,7 @@ const SubscriptionInfo = ({ subId, mainLoader }: any) => {
                   <p className="text-xs sm:text-sm font-medium leading-3 text-gray-500">
                     Plan name:
                   </p>
-                  <p className="form-input min-h-[2.5rem] py-2 mt-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold leading-4 text-gray-700">
+                  <p className="form-input min-h-[2.25rem] md:min-h-[2.5rem] py-2 mt-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold leading-4 text-gray-700">
                     {planData?.name}
                   </p>
                 </div>
@@ -171,7 +171,7 @@ const SubscriptionInfo = ({ subId, mainLoader }: any) => {
                   <p className="text-xs sm:text-sm font-medium leading-3 text-gray-500">
                     Description:
                   </p>
-                  <p className="form-input min-h-[2.5rem] py-2 mt-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold leading-4 text-gray-700">
+                  <p className="form-input min-h-[2.25rem] md:min-h-[2.5rem] py-2 mt-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold leading-4 text-gray-700">
                     {planData?.description}
                   </p>
                 </div>
@@ -180,7 +180,7 @@ const SubscriptionInfo = ({ subId, mainLoader }: any) => {
                   <p className="text-xs sm:text-sm font-medium leading-3 text-gray-500">
                     Price:
                   </p>
-                  <p className="form-input min-h-[2.5rem] py-2 mt-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold leading-4 text-gray-700">
+                  <p className="form-input min-h-[2.25rem] md:min-h-[2.5rem] py-2 mt-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold leading-4 text-gray-700">
                     <span className="text-gray-500 text-base dark:text-gray-400 mr-1">
                       ₹
                     </span>
@@ -197,7 +197,7 @@ const SubscriptionInfo = ({ subId, mainLoader }: any) => {
                   <p className="text-xs sm:text-sm font-medium leading-3 text-gray-500">
                     Plan name:
                   </p>
-                  <p className="form-input min-h-[2.5rem] py-2 mt-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold leading-4 text-gray-700">
+                  <p className="form-input min-h-[2.25rem] md:min-h-[2.5rem] py-2 mt-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold leading-4 text-gray-700">
                     {planData?.name}
                   </p>
                 </div> */}

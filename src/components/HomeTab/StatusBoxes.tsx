@@ -26,51 +26,53 @@ const StatusBoxes: React.FC<StatusBoxesProps> = ({
     const todayDate = today.toISOString().split("T")[0]; // Use ISO format YYYY-MM-DD
     const month = today.getMonth() + 1; // Months are 0-based, so add 1
     const year = today.getFullYear();
-  
+
     let registeredTodayCount = 0;
     let attendedTodayCount = 0;
     let newPatientsThisMonthCount = 0;
     let patientsAttendedThisMonthCount = 0;
-  
+
     patientsCollection?.forEach((patient) => {
-      const lastVisitedDate = new Date(patient?.last_visited).toISOString().split("T")[0];
-      const visitedDates = patient?.visitedDates?.map((date: number) =>
-        new Date(date).toISOString().split("T")[0]
-      ) || [];
-  
+      const lastVisitedDate = new Date(patient?.last_visited)
+        .toISOString()
+        .split("T")[0];
+      const visitedDates =
+        patient?.visitedDates?.map(
+          (date: number) => new Date(date).toISOString().split("T")[0]
+        ) || [];
+
       if (lastVisitedDate === todayDate) {
         registeredTodayCount++;
       }
-  
+
       if (visitedDates.includes(todayDate)) {
         attendedTodayCount++;
       }
-  
+
       const visitMonthsAndYears = visitedDates.map((date: string) => {
         const visitDate = new Date(date);
         return `${visitDate.getFullYear()}-${visitDate.getMonth() + 1}`;
       });
-  
+
       const currentMonthYear = `${year}-${month}`;
-  
+
       if (
         visitedDates.length === 1 &&
         visitMonthsAndYears[0] === currentMonthYear
       ) {
         newPatientsThisMonthCount++;
       }
-  
+
       patientsAttendedThisMonthCount += visitMonthsAndYears.filter(
         (date: string) => date === currentMonthYear
       ).length;
     });
-  
+
     setPatientsRegisteredToday(registeredTodayCount);
     setPatientsAttendedToday(attendedTodayCount);
     setNewPatientsThisMonth(newPatientsThisMonthCount);
     setPatientsAttendedThisMonth(patientsAttendedThisMonthCount);
   };
-  
 
   useEffect(() => {
     if (!loader) {
@@ -82,12 +84,11 @@ const StatusBoxes: React.FC<StatusBoxesProps> = ({
   const LoaderBox: React.FC = () => (
     <>
       <div className="bg-custom-gradient bg-gray-300/70 skeleton flex h-11 w-11 items-center justify-center rounded-full"></div>
-      <div className="mt-4 flex items-end justify-between gap-10">
+      <div className="mt-4 flex flex-col justify-between gap-[6px]">
+        <div className="bg-custom-gradient bg-gray-300/70 skeleton h-[33px] w-[20%] rounded-sm"></div>
         <div className="w-full">
-          <div className="bg-custom-gradient bg-gray-300/70 skeleton h-14 w-full rounded-sm"></div>
+          <div className="bg-custom-gradient bg-gray-300/70 skeleton h-[37px] w-full rounded-sm"></div>
         </div>
-
-        <div className="bg-custom-gradient bg-gray-300/70 skeleton h-5 w-[20%] rounded-sm"></div>
       </div>
     </>
   );
@@ -103,7 +104,7 @@ const StatusBoxes: React.FC<StatusBoxesProps> = ({
       <div className="mt-4 flex items-end justify-between">
         <div>
           <h4 className="text-3xl font-bold text-black">{count}</h4>
-          <span className="text-sm font-medium">{title}</span>
+          <p className="text-sm font-medium leading-tight">{title}</p>
         </div>
       </div>
     </>
