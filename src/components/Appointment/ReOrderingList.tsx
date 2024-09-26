@@ -4,6 +4,8 @@ import { useAppSelector } from "@/redux/store";
 import useToken from "@/firebase/useToken";
 import Link from "next/link";
 import Loader from "../common/Loader";
+import { motion } from "framer-motion";
+
 const ReOrderingList: React.FC = () => {
   const user = useAppSelector<any>((state) => state.auth.user);
   const [queueItems, setqueueItems] = useState<any>([]);
@@ -32,7 +34,7 @@ const ReOrderingList: React.FC = () => {
     <>
       <div className="max-h-[80vh] overflow-y-auto overflow-x-hidden flex flex-row">
         {queueLoader ? (
-           <div className="w-full h-52 overflow-hidden flex items-center justify-center">
+           <div className="w-full h-48 overflow-hidden flex items-center justify-center">
            <Loader size="medium" color="text-primary" secondaryColor="text-white" />
          </div>
         ) : queueItems.length === 0 ? (
@@ -150,9 +152,3 @@ const ReOrderingList: React.FC = () => {
 };
 
 export default ReOrderingList;
-
-// ${
-//   select
-//     ? "bg-green-600 text-white"
-//     : "bg-white text-[#333]"
-// }

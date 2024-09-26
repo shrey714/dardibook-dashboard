@@ -8,6 +8,7 @@ import {
   getMedicines,
 } from "@/app/services/crudMedicine";
 import Loader from "@/components/common/Loader";
+import toast from "react-hot-toast";
 
 interface Medicine {
   medicineName: string;
@@ -42,7 +43,6 @@ const MedicineInfo = ({ uid }: any) => {
   const [addLoader, setAddLoader] = useState(false);
   const [searchLoader, setsearchLoader] = useState(true);
   const [searchEnable, setSearchEnable] = useState(true);
-  const [duplicate, setduplicate] = useState(false);
   const [globalClickable, setGlobalClickable] = useState(true);
   const [medicineData, setmedicineData] = useState<Medicine>({
     medicineName: "",
@@ -100,10 +100,10 @@ const MedicineInfo = ({ uid }: any) => {
         med.medicineName + med.type ===
         medicineData.medicineName.trim() + medicineData.type
       ) {
-        setduplicate(true);
-        setTimeout(() => {
-          setduplicate(false);
-        }, 2000);
+        toast.error("Medicine already exists!", {
+          duration: 2000,
+          position: "top-right",
+        });
         return;
       }
     }
@@ -239,35 +239,24 @@ const MedicineInfo = ({ uid }: any) => {
                   placeholder="Instruction.."
                   value={medicineData.instruction}
                 />
-                <div className="dropdown dropdown-end dropdown-open w-fit m-auto">
-                  <button
-                    tabIndex={0}
-                    role="button"
-                    className="btn-square animate-none m-auto bg-primary border-0 btn btn-primary btn-sm text-sm"
-                    type="submit"
-                    disabled={addLoader}
-                  >
-                    {addLoader ? (
-                      <Loader
-                        size="small"
-                        color="text-primary"
-                        secondaryColor="text-gray-300"
-                      />
-                    ) : (
-                      <PlusIcon width={20} height={20} color="white" />
-                    )}
-                  </button>
-                  <div
-                    tabIndex={0}
-                    className={`dropdown-content rounded-md mt-1 flex flex-col items-center justify-center bg-red-400 text-white font-medium z-[1] w-max py-[6px] px-1 shadow ${
-                      duplicate ? "block" : "hidden"
-                    }`}
-                  >
-                    <p className="text-center">Medicine already exists</p>
-                  </div>
-                </div>
+                <button
+                  tabIndex={0}
+                  role="button"
+                  className="btn-square animate-none m-auto bg-primary border-0 btn btn-primary btn-sm text-sm"
+                  type="submit"
+                  disabled={addLoader}
+                >
+                  {addLoader ? (
+                    <Loader
+                      size="small"
+                      color="text-primary"
+                      secondaryColor="text-gray-300"
+                    />
+                  ) : (
+                    <PlusIcon width={20} height={20} color="white" />
+                  )}
+                </button>
               </form>
-
               <div className="relative w-full">
                 <div className="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
                   <svg

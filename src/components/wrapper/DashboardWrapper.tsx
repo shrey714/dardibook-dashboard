@@ -8,7 +8,7 @@ import DefaultComponent from "@/components/DefaultDashboard";
 import "@/styles/globals.css";
 import BlockedModal from "@/components/BlockedModal";
 import Loader from "../common/Loader";
-import ConnectionStatus from "../InternetDialog";
+import ConnectionStatus from "../common/InternetDialog";
 
 const DashboardWrapper = ({ children }: { children: ReactNode }) => {
   const user = useAppSelector((state) => state.auth.user);
