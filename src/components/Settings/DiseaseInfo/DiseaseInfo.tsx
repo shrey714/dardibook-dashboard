@@ -8,6 +8,7 @@ import {
   getDiseases,
 } from "@/app/services/crudDisease";
 import Loader from "@/components/common/Loader";
+import toast from "react-hot-toast";
 
 interface Disease {
   diseaseDetail: string;
@@ -22,7 +23,6 @@ const DiseaseInfo = ({ uid }: any) => {
   const [addLoader, setAddLoader] = useState(false);
   const [searchLoader, setsearchLoader] = useState(true);
   const [searchEnable, setSearchEnable] = useState(true);
-  const [duplicate, setduplicate] = useState(false);
   const [globalClickable, setGlobalClickable] = useState(true);
   const [diseaseData, setdiseaseData] = useState<Disease>({
     diseaseDetail: "",
@@ -71,10 +71,10 @@ const DiseaseInfo = ({ uid }: any) => {
     // add patient api
     for (let dis of diseases) {
       if (dis.diseaseDetail === diseaseData.diseaseDetail.trim()) {
-        setduplicate(true);
-        setTimeout(() => {
-          setduplicate(false);
-        }, 2000);
+        toast.error("Disease already exists!", {
+          duration: 2000,
+          position: "top-right",
+        });
         return;
       }
     }
@@ -180,8 +180,6 @@ const DiseaseInfo = ({ uid }: any) => {
                   required
                   value={diseaseData.diseaseDetail}
                 />
-
-                <div className="dropdown dropdown-end dropdown-open w-fit m-auto">
                   <button
                     tabIndex={0}
                     role="button"
@@ -199,15 +197,6 @@ const DiseaseInfo = ({ uid }: any) => {
                       <PlusIcon width={20} height={20} color="white" />
                     )}
                   </button>
-                  <div
-                    tabIndex={0}
-                    className={`dropdown-content rounded-md mt-1 flex flex-col items-center justify-center bg-red-400 text-white font-medium z-[1] w-max py-[6px] px-1 shadow ${
-                      duplicate ? "block" : "hidden"
-                    }`}
-                  >
-                    <p className="text-center">Disease already exists</p>
-                  </div>
-                </div>
               </form>
 
               <div className="relative w-full">
