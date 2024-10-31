@@ -1,20 +1,14 @@
+import { auth } from "@/firebase/firebaseConfig";
+
 export const createPrescription = async (req: any) => {
-
-    // const payload = {
-    //     id, uid,
-    //     last_visited: "1234",
-    //     deseaseDetail: "fdgsg",
-    //     medicines: [{ medicineName: "med", instruction: "dvkjns", dosages: ["sfsv", "Sf"], duration: "sfdfb" }],
-    //     advice: "sfv",
-    //     nextVisit: "sdvkjsdn",
-    //     refer: { hospitalName: "ksjvn", doctorName: "vdfgv", msg: "sdfvdk" }
-    // }
-
     try {
+        const user = auth.currentUser;
+        const token = user ? await user.getIdToken() : null;
         const res = await fetch(`/api/create-prescription`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
             },
             body: JSON.stringify(req)
         });
