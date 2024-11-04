@@ -9,6 +9,7 @@ import "@/styles/globals.css";
 import BlockedModal from "@/components/BlockedModal";
 import Loader from "../common/Loader";
 import ConnectionStatus from "../common/InternetDialog";
+import Link from "next/link";
 
 const DashboardWrapper = ({ children }: { children: ReactNode }) => {
   const user = useAppSelector((state) => state.auth.user);

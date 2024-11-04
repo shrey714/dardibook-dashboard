@@ -9,12 +9,13 @@ import {
 import { NoSymbolIcon, PauseIcon } from "@heroicons/react/24/solid";
 const BoxContainer = ({ CurrentToken, loading, isPaused }: any) => {
   const [isExpanded, setisExpanded] = useState(false);
+
   return (
     <>
       <AnimatePresence>
         {isExpanded && (
           <motion.div
-            key={714}
+            key={`dardibook-${CurrentToken}`}
             animate={isExpanded ? "expanded" : "collapsed"}
             variants={{
               collapsed: {
@@ -41,7 +42,7 @@ const BoxContainer = ({ CurrentToken, loading, isPaused }: any) => {
               top: "0px",
               left: "0px",
               right: "0px",
-              height: "100vh",
+              height: "100svh",
               zIndex: 999,
             }}
             className="fixed md:absolute"

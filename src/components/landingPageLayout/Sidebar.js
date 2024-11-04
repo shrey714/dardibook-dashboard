@@ -1,14 +1,18 @@
 /* eslint-disable @next/next/no-img-element */
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import TokenBox from "../tokenFramer/TokenBox";
+import { useAppSelector } from "@/redux/store";
+import { getDocotr } from "@/app/services/getDoctor";
 import {
   Cog6ToothIcon,
   HomeIcon,
   CalendarIcon,
   ClipboardDocumentCheckIcon,
   ClockIcon,
+  NewspaperIcon,
+  UserGroupIcon,
 } from "@heroicons/react/24/solid";
 import {
   Cog6ToothIcon as Cog6ToothIconOutline,
@@ -16,12 +20,14 @@ import {
   CalendarIcon as CalendarIconOutline,
   ClipboardDocumentCheckIcon as ClipboardDocumentCheckIconOutline,
   ClockIcon as ClockIconOutline,
+  NewspaperIcon as NewspaperIconOutline,
+  UserGroupIcon as UserGroupIconOutline,
+  PlusCircleIcon,
+  UserCircleIcon,
 } from "@heroicons/react/24/outline";
-// import { HomeIcon as HomeIconoutline } from "@heroicons/react/24/outline";
-// import { SlHome } from "react-icons/sl";
-// import { BsInfoSquare, BsEnvelopeAt } from "react-icons/bs";
-// import { FaTshirt, FaRedhat } from "react-icons/fa";
-// import logo from "@/img/logo.svg";
+import CustomModal from "@/components/BlockedModal";
+import RolesModal from "./RolesModal";
+import Image from "next/image";
 
 const isSubPath = (pathname, route) => {
   // Ensure both pathname and route end with a slash
@@ -33,10 +39,31 @@ const isSubPath = (pathname, route) => {
 };
 
 export default function Sidebar({ show, setter }) {
+  const userInfo = useAppSelector((state) => state.auth.user);
   const pathname = usePathname();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [doctorLoader, setdoctorLoader] = useState(true);
+  const [doctorData, setdoctorData] = useState();
+  useEffect(() => {
+    const setDocotrData = async () => {
+      if (userInfo?.uid) {
+        setdoctorLoader(true);
+        const doctorData = await getDocotr(userInfo?.uid);
+        if (doctorData.data) {
+          setdoctorData(doctorData.data);
+        } else {
+          console.log("No data available for the provided DoctorID.");
+        }
+        setdoctorLoader(false);
+      } else {
+        setdoctorLoader(false);
+      }
+    };
+    setDocotrData();
+  }, [userInfo?.uid]);
   // Define our base class
   const className =
-    "flex flex-col bg-white w-[250px] transition-[margin-left] ease-in-out duration-500 fixed md:static h-screen top-0  z-50";
+    "flex flex-col bg-white w-[250px] transition-[margin-left] ease-in-out duration-500 fixed md:static h-screen top-0  z-50 overflow-y-auto overflow-x-hidden";
   // Append class based on state of sidebar visiblity
   const appendClass = show ? " ml-0" : " ml-[-250px] md:ml-0";
 
@@ -125,6 +152,25 @@ export default function Sidebar({ show, setter }) {
               />
             </>
           );
+        case "medical":
+          return (
+            <>
+              <NewspaperIconOutline
+                className={`h-5 w-5 transition-transform duration-300 ${
+                  isSubPath(pathname, route)
+                    ? "hidden"
+                    : "block group-hover:hidden"
+                }`}
+              />
+              <NewspaperIcon
+                className={`h-5 w-5 transition-transform duration-300 ${
+                  isSubPath(pathname, route)
+                    ? "block"
+                    : "hidden group-hover:block"
+                }`}
+              />
+            </>
+          );
         default:
           return null; // Fallback for unknown icons
       }
@@ -166,7 +212,7 @@ export default function Sidebar({ show, setter }) {
           setter((oldVal) => !oldVal);
         }}
         href="/dashboard/settings"
-        className={`group flex items-center my-4 px-1 py-1 rounded-full mx-4 self-center transition-all duration-200 border-2 ${colorClassBg}`}
+        className={`group flex items-center px-1 py-1 rounded-full mx-2 transition-all duration-200 border-2 ${colorClassBg}`}
       >
         <Cog6ToothIconOutline
           className={`w-5 h-5 transition-transform duration-300 ${
@@ -182,29 +228,150 @@ export default function Sidebar({ show, setter }) {
     );
   };
 
+  // Roles button
+  const Roles = () => {
+    const colorClassBg = isModalOpen
+      ? "bg-primary border-primary text-white"
+      : "bg-white border-gray-300 hover:border-primary text-gray-600 hover:text-black";
+    return (
+      <div
+        onClick={() => {
+          setIsModalOpen(true);
+        }}
+        className={`group flex items-center px-1 py-1 rounded-full mx-2 transition-all duration-200 border-2 ${colorClassBg}`}
+      >
+        <UserGroupIconOutline
+          className={`w-5 h-5 transition-transform duration-300 ${
+            isModalOpen ? "hidden" : "block group-hover:hidden"
+          }`}
+        />
+        <UserGroupIcon
+          className={`w-5 h-5 transition-transform duration-300 ${
+            isModalOpen ? "block" : "hidden group-hover:block"
+          }`}
+        />
+      </div>
+    );
+  };
+
+  const BreakLine = () => (
+    <hr className="w-[calc(100%-40px)] rounded mx-auto my-1 border-gray-300 border-t-2" />
+  );
   return (
     <>
+      <CustomModal isOpen={isModalOpen} mainScreenModal={false}>
+        <RolesModal userInfo={userInfo} isOpen={isModalOpen} />
+        <div className="flex flex-col items-center justify-center gap-y-7">
+          <button
+            type="button"
+            onClick={() => setIsModalOpen(false)}
+            className="btn animate-none border-2 btn-outline rounded-full min-h-min h-min py-2 px-7 text-xs leading-none"
+          >
+            Close
+          </button>
+        </div>
+      </CustomModal>
       <div className={`${className}${appendClass}`}>
-        <div className="p-2 flex">
-          <TokenBox />
-        </div>
+        <Link
+          href={"/"}
+          className="cursor-pointer flex flex-row items-center justify-center gap-1 mt-2 w-fit self-center"
+        >
+          <span className="self-center text-gray-800 text-xl font-semibold whitespace-nowrap">
+            DardiBook
+          </span>
+          <span className="text-[7px] text-gray-800 font-semibold border-[1.5px] border-gray-800 px-2 rounded-full">
+            {userInfo?.role === "admin"
+              ? "Doctor"
+              : userInfo?.role === "subDoctor"
+              ? "subDoctor"
+              : userInfo?.role === "medical"
+              ? "Medical"
+              : ""}
+          </span>
+        </Link>
+        {(userInfo?.role === "admin" || userInfo?.role === "subDoctor") && (
+          <div className="px-2 flex">
+            <TokenBox />
+          </div>
+        )}
         <div className="flex flex-col">
-          <MenuItem name="Home" route="/dashboard/home" icon="home" />
-          <MenuItem
-            name="Register"
-            route="/dashboard/appointment"
-            icon="new-registration"
-          />
-          <MenuItem
-            name="Prescribe"
-            route="/dashboard/prescribe"
-            icon="prescribe"
-          />
-          <MenuItem name="History" route="/dashboard/history" icon="history" />
+          {(userInfo?.role === "admin" || userInfo?.role === "subDoctor") && (
+            <MenuItem name="Home" route="/dashboard/home" icon="home" />
+          )}
+          {(userInfo?.role === "admin" || userInfo?.role === "subDoctor") && (
+            <MenuItem
+              name="Register"
+              route="/dashboard/appointment"
+              icon="new-registration"
+            />
+          )}
+          {userInfo?.role === "admin" && (
+            <MenuItem
+              name="Prescribe"
+              route="/dashboard/prescribe"
+              icon="prescribe"
+            />
+          )}
+
+          {(userInfo?.role === "admin" || userInfo?.role === "subDoctor") && (
+            <MenuItem
+              name="History"
+              route="/dashboard/history"
+              icon="history"
+            />
+          )}
+          {(userInfo?.role === "admin" || userInfo?.role === "medical") && (
+            <MenuItem
+              name="Medical"
+              route="/dashboard/medical"
+              icon="medical"
+            />
+          )}
         </div>
-        <div className="flex flex-1 flex-col justify-end pb-[calc(100vh-100svh)]">
-          {/* <MenuItem name="Settings" route="/dashboard/home" icon={"icon"} /> */}
+
+        <div className="flex flex-row flex-1 items-end justify-center mt-1">
+          {(userInfo?.role === "subDoctor" || userInfo?.role === "medical") && (
+            <Roles />
+          )}
           <Settings />
+        </div>
+        <BreakLine />
+
+        <div className="flex flex-row items-center gap-3 justify-center px-5 mb-1 pb-[calc(100vh-100svh)]">
+          <div
+            className="flex items-center gap-2 p-1 bg-gray-300 rounded-full shadow-md tooltip before:bg-gray-800 before:text-white"
+            data-tip={`${userInfo?.displayName}`}
+          >
+            <UserCircleIcon
+              className={`size-6 text-gray-600 rounded-full bg-white`}
+            />
+            <Image
+              width={24}
+              height={24}
+              className="size-6 rounded-full bg-gray-300 shadow-lg"
+              src={userInfo?.photoURL || ""}
+              alt="profile photo"
+            />
+          </div>
+          <div
+            className="flex items-center gap-2 p-1 bg-gray-300 rounded-full shadow-md tooltip before:bg-gray-800 before:text-white"
+            data-tip={`${doctorData?.clinicName}`}
+          >
+            <PlusCircleIcon
+              className={`size-6 text-gray-600 rounded-full bg-white`}
+            />
+            {doctorLoader ? (
+              <div className="skeleton size-6 s rounded-full"></div>
+            ) : (
+              <Image
+                width={24}
+                height={24}
+                className="size-6 rounded-full bg-gray-300 shadow-lg"
+                src={doctorData?.clinicLogo || ""}
+                alt="clinic photo"
+              />
+            )}
+          </div>
         </div>
       </div>
       {show ? <ModalOverlay /> : <></>}

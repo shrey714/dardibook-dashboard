@@ -3,6 +3,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { setUser, useAppDispatch, useAppSelector } from "@/redux/store";
+import Link from "next/link";
 import RegistrationForm from "@/components/forms/RegistrationForm";
 import { createDoctor } from "@/app/services/createDoctor";
 import FlickeringGrid from "@/components/AuthPage/FlickeringGrid";
@@ -67,7 +68,7 @@ const SignIn = () => {
   };
 
   return (
-    <section className="relative bg-gray-300 w-full flex justify-center">
+    <section className="relative bg-gray-300 w-full flex justify-center no-scrollbar">
       <FlickeringGrid
         className="z-0 fixed inset-0 size-full"
         squareSize={4}
@@ -83,6 +84,39 @@ const SignIn = () => {
               {header.title}
             </h1>
           </div>
+        </div>
+
+        <div className="z-50 gap-4 py-4 w-full flex flex-col px-8 sm:px-0 sm:flex-row items-center justify-between">
+          <Link
+            href={"register/subDoctorAccessibility"}
+            className="bg-gray-900 w-full sm:w-auto border-0 px-5 py-1 text-gray-300 outline-none flex flex-1 items-center justify-center text-base sm:text-base font-bold tracking-wide rounded-full hover:bg-primary transition-all"
+          >
+            SubDoctor
+            <svg
+              className="size-10"
+              focusable="false"
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              fill="white"
+            >
+              <path d="m11.71 15.29 2.59-2.59c.39-.39.39-1.02 0-1.41L11.71 8.7c-.63-.62-1.71-.18-1.71.71v5.17c0 .9 1.08 1.34 1.71.71"></path>
+            </svg>
+          </Link>
+          <Link
+            href={"register/medicalAccessibility"}
+            className="bg-gray-900 w-full sm:w-auto border-0 px-5 py-1 text-gray-300 outline-none flex flex-1 items-center justify-center text-base sm:text-base font-bold tracking-wide rounded-full hover:bg-primary transition-all"
+          >
+            Medical
+            <svg
+              className="size-10"
+              focusable="false"
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              fill="white"
+            >
+              <path d="m11.71 15.29 2.59-2.59c.39-.39.39-1.02 0-1.41L11.71 8.7c-.63-.62-1.71-.18-1.71.71v5.17c0 .9 1.08 1.34 1.71.71"></path>
+            </svg>
+          </Link>
         </div>
 
         <div className="z-50 py-8 sm:py-12 px-8 md:px-12 lg:px-36 bg-gray-900 w-full flex flex-1 flex-col items-center justify-between rounded-t-3xl overflow-hidden shadow-[0_0_20px_2px_rgba(8,_112,_184,_0.7)]">

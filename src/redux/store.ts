@@ -10,6 +10,7 @@ interface AuthState {
         displayName: string | null;
         photoURL: string | null;
         verified: boolean;
+        role: "admin"
     } | null;
 }
 

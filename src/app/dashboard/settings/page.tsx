@@ -7,14 +7,20 @@ import SubscriptionInfo from "@/components/Settings/SubscriptionInfo";
 import Links from "@/components/Settings/Links";
 import FooterLine from "@/components/Settings/FooterLine";
 import { getDocotr } from "@/app/services/getDoctor";
+import StaffRolesInfo from "@/components/Settings/StaffRoles/StaffRolesInfo";
 import MedicineInfo from "@/components/Settings/MedicineInfo/MedicineInfo";
 import DiseaseInfo from "@/components/Settings/DiseaseInfo/DiseaseInfo";
+
+interface Staff {
+  email: string;
+  role: string;
+}
 
 interface DoctorInfo {
   clinicName: string;
   doctorName: string;
-  degree:string;
-  registrationNumber:string;
+  degree: string;
+  registrationNumber: string;
   clinicNumber: string;
   phoneNumber: string;
   emailId: string;
@@ -22,6 +28,7 @@ interface DoctorInfo {
   clinicLogo: any;
   signaturePhoto: any;
   subscriptionId: string;
+  staff: Staff[];
 }
 
 const Page = () => {
@@ -30,8 +37,8 @@ const Page = () => {
   const [doctorData, setdoctorData] = useState<DoctorInfo>({
     clinicName: "",
     doctorName: "",
-    degree:"",
-    registrationNumber:"",
+    degree: "",
+    registrationNumber: "",
     clinicNumber: "",
     phoneNumber: "",
     emailId: userInfo?.email,
@@ -39,14 +46,15 @@ const Page = () => {
     clinicLogo: "",
     signaturePhoto: "",
     subscriptionId: "",
+    staff: [],
   });
   useEffect(() => {
     const setDocotrData = async () => {
       if (userInfo) {
         setmainLoader(true);
-        const patientData = await getDocotr(userInfo?.uid);
-        if (patientData.data) {
-          setdoctorData(patientData.data);
+        const doctorData = await getDocotr(userInfo?.uid);
+        if (doctorData.data) {
+          setdoctorData(doctorData.data);
         } else {
           console.log("No data available for the provided DoctorID.");
         }
@@ -62,17 +70,27 @@ const Page = () => {
     <div className="w-full self-center py-12 px-4 sm:px-6 lg:px-8">
       <PersonalInfo userInfo={userInfo} />
       <ClinicInfo
-        uid={userInfo?.uid}
+        uid={userInfo.uid}
+        role={userInfo?.role}
         doctorData={doctorData}
         mainLoader={mainLoader}
         setdoctorData={setdoctorData}
       />
-      <SubscriptionInfo
-        subId={doctorData?.subscriptionId}
-        mainLoader={mainLoader}
-      />
-      <MedicineInfo uid={userInfo?.uid}/>
-      <DiseaseInfo uid={userInfo?.uid}/>
+      {userInfo?.role === "admin" && (
+        <>
+          <SubscriptionInfo
+            subId={doctorData?.subscriptionId}
+            mainLoader={mainLoader}
+          />
+          <StaffRolesInfo staff={doctorData.staff} uid={userInfo.uid} />
+        </>
+      )}
+      {(userInfo?.role === "admin" || userInfo?.role === "subDoctor") && (
+        <>
+          <DiseaseInfo uid={userInfo.uid} />
+          <MedicineInfo uid={userInfo.uid} />
+        </>
+      )}
       <Links />
       <FooterLine />
     </div>

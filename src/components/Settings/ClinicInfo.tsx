@@ -29,7 +29,13 @@ const getUpdatedFields = (
     return acc;
   }, {} as Partial<DoctorInfo>);
 
-const ClinicInfo = ({ uid, doctorData, mainLoader, setdoctorData }: any) => {
+const ClinicInfo = ({
+  uid,
+  role,
+  doctorData,
+  mainLoader,
+  setdoctorData,
+}: any) => {
   const [editableForm, seteditableForm] = useState(false);
   const [formdata, setformdata] = useState<any>(doctorData);
   const [loader, setloader] = useState(false);
@@ -420,7 +426,9 @@ const ClinicInfo = ({ uid, doctorData, mainLoader, setdoctorData }: any) => {
             </>
           ) : (
             <span
-              className="btn btn-sm cursor-pointer animate-none btn-primary"
+              className={`btn btn-sm cursor-pointer animate-none btn-primary ${
+                role === "admin" ? "" : "btn-disabled"
+              }`}
               onClick={() => seteditableForm(true)}
             >
               <h3 className="text-base font-semibold leading-4 text-white tracking-wide">

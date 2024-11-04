@@ -21,7 +21,7 @@ const SignIn = () => {
   useEffect(() => {
     setloading(true);
     if (user) {
-      router.replace("/");
+      router.push("/");
     } else {
       setloading(false);
     }
@@ -72,8 +72,8 @@ const SignIn = () => {
                     height={20}
                     priority
                   />
-                  <p className="hidden sm:contents" >Continue with Google</p>
-                  <p className="sm:hidden" >Google</p>
+                  <p className="hidden sm:contents">Continue with Google</p>
+                  <p className="sm:hidden">Google</p>
                 </>
               )}
             </button>

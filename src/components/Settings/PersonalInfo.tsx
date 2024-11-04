@@ -7,7 +7,6 @@ import CustomModal from "@/components/BlockedModal";
 import Lottie from "react-lottie";
 import * as animationData from "@/lottieFiles/SignOut.json";
 
-
 const PersonalInfo = ({ userInfo }: any) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const dispatch = useAppDispatch();
@@ -22,11 +21,7 @@ const PersonalInfo = ({ userInfo }: any) => {
   return (
     <>
       <CustomModal isOpen={isModalOpen} mainScreenModal={false}>
-      <Lottie
-        options={defaultOptions}
-        height={100}
-        width={100}
-      />
+        <Lottie options={defaultOptions} height={100} width={100} />
         <h3 className="text-base pb-8 md:text-lg font-semibold self-center text-gray-800">
           Are you sure you want to Logout?
         </h3>
@@ -52,6 +47,15 @@ const PersonalInfo = ({ userInfo }: any) => {
         <div className="px-3 w-full py-2 md:px-8 flex flex-row justify-between items-center">
           <h3 className="text-sm sm:text-base font-semibold text-gray-900 tracking-wide">
             Personal Information
+            <span className="ml-2 text-xs sm:text-sm text-green-600 font-semibold border-2 border-green-600 px-2 rounded-full">
+              {userInfo?.role === "admin"
+                ? "Doctor"
+                : userInfo?.role === "subDoctor"
+                ? "subDoctor"
+                : userInfo?.role === "medical"
+                ? "Medical"
+                : ""}
+            </span>
           </h3>
           <button
             className="btn animate-none h-3 btn-sm text-sm btn-error text-white"

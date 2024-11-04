@@ -28,6 +28,7 @@
     "react-select": "^5.8.0",
     "react-to-print": "^2.15.1",
     "react-topbar-progress-indicator": "^4.1.1",
+    "sharp": "^0.33.5",
     "uniqid": "^5.4.0"
   },
   "devDependencies": {

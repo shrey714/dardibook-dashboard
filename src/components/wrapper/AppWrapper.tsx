@@ -47,7 +47,11 @@ const AppWrapper = ({ children }: { children: React.ReactNode }) => {
                 if (result.verified) {
                   // every thing is fine...go ahead
                   dispatch(
-                    setUser({ ...extractUserData(user), verified: true })
+                    setUser({
+                      ...extractUserData(user),
+                      verified: true,
+                      role: "admin",
+                    })
                   );
                   console.log("everything is fine...go ahead");
                   // setfirstLoading(false);
@@ -55,7 +59,11 @@ const AppWrapper = ({ children }: { children: React.ReactNode }) => {
                   // account is still not verified..redirect to register page
                   // setfirstLoading(false);
                   dispatch(
-                    setUser({ ...extractUserData(user), verified: false })
+                    setUser({
+                      ...extractUserData(user),
+                      verified: false,
+                      role: "admin",
+                    })
                   );
                   router.push("/auth/register");
                   console.log(
@@ -65,7 +73,11 @@ const AppWrapper = ({ children }: { children: React.ReactNode }) => {
               } else {
                 // redirect to input doctor form
                 dispatch(
-                  setUser({ ...extractUserData(user), verified: false })
+                  setUser({
+                    ...extractUserData(user),
+                    verified: false,
+                    role: "admin",
+                  })
                 );
                 router.push("/auth/register");
                 console.log("redirect to input doctor form");
