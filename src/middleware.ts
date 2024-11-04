@@ -8,7 +8,7 @@ export async function middleware(req: NextRequest) {
     if (!token) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-    const verifyIdToken = true; //logic to handle the api access
+    const verifyIdToken = true; //logic to handle the api 
 
     if (verifyIdToken) {
         return NextResponse.next();
