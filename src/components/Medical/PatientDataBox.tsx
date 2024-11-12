@@ -5,7 +5,7 @@ const PatientDataBox = ({ patientData }: any) => {
     <div className="mx-auto w-full">
       <div className="px-4 sm:px-0 ">
         <h3 className="text-base font-semibold leading-7 text-gray-900">
-          Applicant Information ( {patientData?.patient_unique_Id} )
+          Patient Information ( {patientData?.patient_unique_Id} )
         </h3>
       </div>
       <div className="mt-2 mb-2 border-t border-b border-gray-100">
@@ -49,11 +49,6 @@ const PatientDataBox = ({ patientData }: any) => {
             </dd>
           </div>
         </dl>
-      </div>
-      <div className="px-4 pb-2 sm:px-0 border-b border-gray-100">
-        <h3 className="text-base font-semibold leading-7 text-gray-900">
-          Previous history information
-        </h3>
       </div>
     </div>
   );

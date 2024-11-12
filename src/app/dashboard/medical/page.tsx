@@ -99,7 +99,7 @@ const Medical = () => {
           </div>
         ) : (
           <>
-            <ul className="w-full mt-4 relative">
+            <ul className="w-full mt-4 pb-3 relative">
               <svg
                 className={`w-4 h-4 absolute -top-6 right-3 transform -rotate-180 ${
                   realUpdateLoader
@@ -180,22 +180,15 @@ const Medical = () => {
                             </p>
                           </td>
                           <td className="transition align-top text-center font-medium text-sm sm:text-base hide-before-480 hide-between-768-and-990">
-                            <Link
-                              href={{
-                                pathname: "history/patientHistory",
-                                query: { patientId: item.patient_unique_Id },
-                              }}
+                            <p
+                              className={`${
+                                select
+                                  ? "bg-primary text-white"
+                                  : "bg-white text-gray-800 rounded-s-full"
+                              } p-1 my-1 px-4`}
                             >
-                              <p
-                                className={`underline ${
-                                  select
-                                    ? "bg-primary text-white"
-                                    : "bg-white text-gray-800 rounded-s-full"
-                                } p-1 my-1 px-4`}
-                              >
-                                {item.patient_unique_Id}
-                              </p>
-                            </Link>
+                              {item.patient_unique_Id}
+                            </p>
                           </td>
                           <td className="transition align-top font-medium text-center text-sm sm:text-base">
                             <p
@@ -226,21 +219,15 @@ const Medical = () => {
                             </p>
                           </td>
                           <td className="transition align-top text-center font-medium text-sm sm:text-base flex flex-row flex-col-below-990">
-                            {item.attended ? (
-                              <span className="mx-1 py-1 px-2 w-full m-1 bg-green-600 text-white rounded-full font-semibold text-sm sm:text-base">
-                                Generated
-                              </span>
-                            ) : (
-                              <Link
-                                href={{
-                                  pathname: "medical/medicalForm",
-                                  query: { patientId: item.patient_unique_Id },
-                                }}
-                                className="mx-1 py-1 px-2 w-full m-1 bg-primary text-white rounded-[4px] shadow-sm font-semibold text-sm sm:text-base"
-                              >
-                                Report
-                              </Link>
-                            )}
+                            <Link
+                              href={{
+                                pathname: "medical/medicalForm",
+                                query: { patientId: item.patient_unique_Id },
+                              }}
+                              className="mx-1 py-1 px-2 w-full m-1 bg-primary text-white rounded-[4px] shadow-sm font-semibold text-sm sm:text-base"
+                            >
+                              Report
+                            </Link>
                           </td>
                         </Reorder.Item>
                       );
