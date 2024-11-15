@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { admin } from "@/server/firebaseAdmin";
 
 export async function POST(request: NextRequest) {
-  const authorizationHeader = request.headers.get("authorization");
+  const authorizationHeader = request.headers.get("Authorization");
 
   if (!authorizationHeader) {
     return NextResponse.json(
@@ -19,8 +19,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const verifiedToken = await admin.auth().verifyIdToken(token);
-    console.log("verifiedToken==", verifiedToken);
-    return NextResponse.json({ verifiedToken }, { status: 200 });
+    return NextResponse.json({ message: "success" }, { status: 200 });
   } catch (error) {
     return NextResponse.json(
       { error: error || "Failed to add staff member" },

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { tokenVerify } from './app/services/tokenVerify';
 
 export async function middleware(req: NextRequest) {
     const token = req.headers.get('Authorization')?.split('Bearer ')[1];
@@ -10,20 +11,13 @@ export async function middleware(req: NextRequest) {
         }, { status: 401 });
     }
     try {
-        const apiResponse = await fetch(`${req.nextUrl.origin}/api/token-verify`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
-            },
-        });
-        console.log("apiResponse==", `${req.nextUrl.origin}/api/token-verify`)
+        const apiResponse = await tokenVerify(token)
+        console.log("apiResponse==", apiResponse)
 
-        if (apiResponse.ok) {
+        if (apiResponse.status === 200) {
             return NextResponse.next();
         } else {
-            const apiResponseBody = await apiResponse.json();
-            return NextResponse.json({ error: 'Invalid token', details: apiResponseBody.error }, { status: 401 });
+            return NextResponse.json({ error: 'Invalid token', details: apiResponse.error }, { status: 401 });
         }
     } catch (error) {
         console.error('Error verifying token in middleware:', error);
