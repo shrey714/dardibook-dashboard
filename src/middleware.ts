@@ -8,7 +8,7 @@ export async function middleware(req: NextRequest) {
 //'Unauthorized' }, { status: 401 });
   //  }
     try {
-        const apiResponse = await fetch(`${req.nextUrl.basePath}/api/token-verify`, {
+        const apiResponse = await fetch(`${req.nextUrl.origin}/api/token-verify`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
