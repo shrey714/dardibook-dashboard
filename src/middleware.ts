@@ -24,7 +24,7 @@ export async function middleware(req: NextRequest) {
         }
     } catch (error) {
         console.error('Error verifying token in middleware:', error);
-        return NextResponse.json({ error: `Internal Server Error : ${error}` }, { status: 500 });
+        return NextResponse.json({ error: `Internal Server Error(${req.nextUrl.basePath}) : ${error}` }, { status: 500 });
     }
 }
 
