@@ -17,11 +17,11 @@ export async function middleware(req: NextRequest) {
             },
         });
 
-        const apiResponseBody = await apiResponse.json();
 
         if (apiResponse.ok) {
             return NextResponse.next();
         } else {
+            const apiResponseBody = await apiResponse.json();
             return NextResponse.json({ error: 'Invalid token', details: apiResponseBody.error }, { status: 401 });
         }
     } catch (error) {
