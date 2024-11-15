@@ -7,7 +7,7 @@ export async function middleware(req: NextRequest) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     try {
-        const apiResponse = await fetch(`https://preview.dashboard.dardibook.in/api/token-verify`, {
+        const apiResponse = await fetch(`${req.nextUrl.basePath}/api/token-verify`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
