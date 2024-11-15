@@ -17,7 +17,7 @@ export async function middleware(req: NextRequest) {
                 'Authorization': `Bearer ${token}`,
             },
         });
-        console.log("apiResponse==", apiResponse)
+        console.log("apiResponse==", `${req.nextUrl.origin}/api/token-verify`)
 
         if (apiResponse.ok) {
             return NextResponse.next();
