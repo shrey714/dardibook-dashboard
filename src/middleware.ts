@@ -1,23 +1,32 @@
 import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server'
+import type { NextRequest } from 'next/server';
 
 export async function middleware(req: NextRequest) {
-
     const token = req.headers.get('Authorization')?.split('Bearer ')[1];
-
     if (!token) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-    const verifyIdToken = true; //logic to handle the api access
+    try {
+        const apiResponse = await fetch(`${req.nextUrl.origin}/api/token-verify`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        });
 
-    if (verifyIdToken) {
-        return NextResponse.next();
-    } else {
-        return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+        const apiResponseBody = await apiResponse.json();
+
+        if (apiResponse.ok) {
+            return NextResponse.next();
+        } else {
+            return NextResponse.json({ error: 'Invalid token', details: apiResponseBody.error }, { status: 401 });
+        }
+    } catch (error) {
+        console.error('Error verifying token in middleware:', error);
+        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
 
-// Apply middleware only to API routes
 export const config = {
     matcher: '/api/:path*',
 };
