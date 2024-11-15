@@ -3,9 +3,10 @@ import type { NextRequest } from 'next/server';
 
 export async function middleware(req: NextRequest) {
     const token = req.headers.get('Authorization')?.split('Bearer ')[1];
-    if (!token) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+  //  if (!token) {
+     //   return NextResponse.json({ error: 
+//'Unauthorized' }, { status: 401 });
+  //  }
     try {
         const apiResponse = await fetch(`${req.nextUrl.basePath}/api/token-verify`, {
             method: 'POST',
