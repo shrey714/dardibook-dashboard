@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const verifiedToken = await admin.auth().verifyIdToken(token);
-
+    console.log("verifiedToken==", verifiedToken);
     return NextResponse.json({ verifiedToken }, { status: 200 });
   } catch (error) {
     return NextResponse.json(
