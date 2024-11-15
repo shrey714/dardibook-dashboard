@@ -13,6 +13,7 @@ export async function middleware(req: NextRequest) {
         const apiResponse = await fetch(`${req.nextUrl.origin}/api/token-verify`, {
             method: 'POST',
             headers: {
+                'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`,
             },
         });
