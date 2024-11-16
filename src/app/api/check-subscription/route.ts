@@ -10,7 +10,7 @@ function isCurrentTimeBetween(start: number, end: number) {
 }
 
 // Define the GET handler for the API route
-export const checkSubscription = async (request: NextRequest) => {
+const checkSubscription = async (request: NextRequest) => {
 
   const { searchParams } = new URL(request.url);
   const userId = searchParams.get("userId");

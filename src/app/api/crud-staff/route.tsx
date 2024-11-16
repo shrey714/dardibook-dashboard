@@ -93,7 +93,7 @@ const postStaff = async(request: NextRequest)=> {
   }
 }
 
-export async function DELETE(request: NextRequest) {
+const deleteStaff = async (request: NextRequest)=> {
   const { searchParams } = new URL(request.url);
   const doctorId = searchParams.get("uid");
   const { staffMailId } = await request.json();
@@ -142,3 +142,4 @@ export async function DELETE(request: NextRequest) {
 
 export const GET = withAuth(getStaff);
 export const POST = withAuth(postStaff);
+export const DELETE = withAuth(deleteStaff);
