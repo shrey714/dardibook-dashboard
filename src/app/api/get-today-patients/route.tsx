@@ -12,8 +12,9 @@ import {
 import { NextResponse, NextRequest } from "next/server";
 import { getDateFromTimeStamp } from "./getDateFromTimeStamp";
 import { getDayStartAndEndTimestampsIST } from "./getDayStartAndEndTimestampsIST";
+import { withAuth } from "@/server/withAuth";
 
-export const GET = async (request: NextRequest) => {
+const getTodayPatients = async (request: NextRequest) => {
   const currentTimestamp = Date.now();
   const timestamps = getDayStartAndEndTimestampsIST(currentTimestamp);
   try {
@@ -68,3 +69,5 @@ export const GET = async (request: NextRequest) => {
     );
   }
 };
+
+export const GET = withAuth(getTodayPatients);

@@ -1,4 +1,5 @@
 import { db } from "@/firebase/firebaseConfig";
+import { withAuth } from "@/server/withAuth";
 import {
   collection,
   doc,
@@ -16,7 +17,7 @@ const getDateFromTimeStamp = (ts: string | number | Date) => {
   return timestamp.getDate();
 };
 
-export const POST = async (request: NextRequest) => {
+const createPrescription = async (request: NextRequest) => {
   try {
     // const { searchParams } = new URL(request.url);
     // const id = searchParams.get("id");
@@ -116,3 +117,5 @@ export const POST = async (request: NextRequest) => {
     );
   }
 };
+
+export const POST = withAuth(createPrescription);

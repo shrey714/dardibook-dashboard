@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import { db } from "@/firebase/firebaseConfig"; // Adjust the path as necessary
 import { doc, getDoc } from 'firebase/firestore';
+import { withAuth } from "@/server/withAuth";
 
 // Utility function to check if the current time is between two timestamps
 function isCurrentTimeBetween(start: number, end: number) {
@@ -9,7 +10,7 @@ function isCurrentTimeBetween(start: number, end: number) {
 }
 
 // Define the GET handler for the API route
-export const GET = async (request: NextRequest) => {
+export const checkSubscription = async (request: NextRequest) => {
 
   const { searchParams } = new URL(request.url);
   const userId = searchParams.get("userId");
@@ -73,3 +74,5 @@ export const GET = async (request: NextRequest) => {
     });
   }
 }
+
+export const GET = withAuth(checkSubscription);

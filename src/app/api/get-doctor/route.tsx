@@ -1,7 +1,7 @@
 import { db } from "@/firebase/firebaseConfig";
-import { withAuth } from "@/server/withAuth";
 import { doc, getDoc } from "firebase/firestore";
 import { NextResponse, NextRequest } from "next/server";
+import { withAuth } from "@/server/withAuth";
 
 const getDoctorData = async (request: NextRequest) => {
   try {

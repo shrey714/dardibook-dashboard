@@ -1,8 +1,9 @@
 import { db } from "@/firebase/firebaseConfig";
+import { withAuth } from "@/server/withAuth";
 import { setDoc, doc } from "firebase/firestore";
 import { NextResponse } from "next/server";
 
-export const POST = async (req: Request) => {
+const registerPatient = async (req: Request) => {
   try {
     const data = await req.json();
     const { uid, id, ...mainData } = data;
@@ -20,3 +21,5 @@ export const POST = async (req: Request) => {
     return NextResponse.json({ error: error }, { status: 500 });
   }
 };
+
+export const POST = withAuth(registerPatient);

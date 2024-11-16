@@ -1,4 +1,5 @@
 import { db } from "@/firebase/firebaseConfig";
+import { withAuth } from "@/server/withAuth";
 import {
   arrayRemove,
   arrayUnion,
@@ -8,7 +9,7 @@ import {
 } from "firebase/firestore";
 import { NextResponse, NextRequest } from "next/server";
 
-export async function GET(request: NextRequest) {
+const getStaff = async(request: NextRequest)=> {
   const { searchParams } = new URL(request.url);
   const doctorId = searchParams.get("uid");
 
@@ -36,7 +37,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function POST(request: NextRequest) {
+const postStaff = async(request: NextRequest)=> {
   const { searchParams } = new URL(request.url);
   const doctorId = searchParams.get("uid");
 
@@ -138,3 +139,6 @@ export async function DELETE(request: NextRequest) {
     );
   }
 }
+
+export const GET = withAuth(getStaff);
+export const POST = withAuth(postStaff);

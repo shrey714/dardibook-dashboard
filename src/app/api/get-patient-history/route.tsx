@@ -1,4 +1,5 @@
 import { db } from "@/firebase/firebaseConfig";
+import { withAuth } from "@/server/withAuth";
 import {
   collection,
   doc,
@@ -38,7 +39,7 @@ const fetchPrescriptionsData = async (
   })) as any[];
 };
 
-export const GET = async (req: NextRequest) => {
+const getPatientHistory = async (req: NextRequest) => {
   const { searchParams } = new URL(req.url);
   const id = searchParams.get("id");
   const uid = searchParams.get("uid");
@@ -70,3 +71,5 @@ export const GET = async (req: NextRequest) => {
     );
   }
 };
+
+export const GET = withAuth(getPatientHistory);
