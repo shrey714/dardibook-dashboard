@@ -1,7 +1,7 @@
 // utils/withAuth.js
 import { NextResponse } from "next/server";
 import admin from "firebase-admin";
-
+import {decryptData,encryptData} from "../utils"
 // Initialize Firebase Admin SDK
 // if (!admin.apps.length) {
 //   admin.initializeApp({
@@ -19,6 +19,15 @@ if (admin.apps.length === 0) {
   });
 }
 
+const setCookies = (response:any,key: string,value: any,days: number)=>{
+  response.cookies.set(key, value, {
+    httpOnly: true,
+    secure: true,
+    maxAge: 60 * 60 * 24 * days, // 7 days
+    path: "/",
+  });
+}
+
 export const withAuth = (handler: (arg0: any, arg1: any) => any) => {
   return async (request:any, context: any) => {
     const authHeader = request.headers.get("authorization");
@@ -30,15 +39,21 @@ export const withAuth = (handler: (arg0: any, arg1: any) => any) => {
     }
 
     const token = authHeader.split(" ")[1];
+    const tokenFromCookie = await decryptData(request.cookies.get("verified token")?.value)
+    if(token===tokenFromCookie){
+      console.log("already verified")
+      return await handler(request, context);
+    }
     try {
       // Verify the Firebase token
-      const decodedToken = await admin.auth().verifyIdToken(token);
+      console.log("verifying token")
+      await admin.auth().verifyIdToken(token);
 
-      // Add user info to the request (mutable context)
-      request.user = decodedToken;
+      const response = await handler(request, context);
+      const encryptedToken = await encryptData(token)
+      setCookies(response,"verified token",encryptedToken,7)
 
-      // Call the actual handler
-      return handler(request, context);
+      return response;
     } catch (error) {
       console.error("Error verifying Firebase token:", error);
       return NextResponse.json(

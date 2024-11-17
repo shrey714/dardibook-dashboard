@@ -15,6 +15,7 @@
     "@tailwindcss/forms": "^0.5.7",
     "axios": "^1.7.2",
     "chart.js": "^4.4.3",
+    "crypto-js": "^4.2.0",
     "daisyui": "^4.12.7",
     "embla-carousel": "^8.3.1",
     "embla-carousel-react": "^8.3.1",
