@@ -1,6 +1,7 @@
+import { withAuth } from "@/server/withAuth";
 import { NextResponse, NextRequest } from "next/server";
 
-export const GET = async (request: NextRequest) => {
+const getSubscription = async (request: NextRequest) => {
   try {
     const { searchParams } = new URL(request.url);
     const subId = searchParams.get("subId");
@@ -35,3 +36,5 @@ export const GET = async (request: NextRequest) => {
     );
   }
 };
+
+export const GET = withAuth(getSubscription);

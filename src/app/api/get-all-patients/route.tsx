@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/firebase/firebaseConfig";
 import { collection, doc, getDocs, query, where } from "firebase/firestore";
+import { withAuth } from "@/server/withAuth";
 
 
 
-export const GET = async (request: NextRequest) => {
+const getAllPatients = async (request: NextRequest) => {
   try {
     const { searchParams } = new URL(request.url);
     const doctorId = searchParams.get("doctorId");
@@ -55,3 +56,5 @@ export const GET = async (request: NextRequest) => {
     );
   }
 };
+
+export const GET = withAuth(getAllPatients);

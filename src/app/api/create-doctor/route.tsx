@@ -1,9 +1,10 @@
 import { db, storage } from "@/firebase/firebaseConfig";
+import { withAuth } from "@/server/withAuth";
 import { doc, setDoc } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { NextResponse, NextRequest } from "next/server";
 
-export const POST = async (request: NextRequest) => {
+const createDoctor = async (request: NextRequest) => {
   try {
     // const { searchParams } = new URL(request.url);
     // const id = searchParams.get("id");
@@ -35,3 +36,5 @@ export const POST = async (request: NextRequest) => {
     );
   }
 };
+
+export const POST = withAuth(createDoctor);

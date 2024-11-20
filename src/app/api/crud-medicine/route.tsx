@@ -1,4 +1,5 @@
 import { db } from "@/firebase/firebaseConfig";
+import { withAuth } from "@/server/withAuth";
 import {
   collection,
   deleteDoc,
@@ -8,7 +9,7 @@ import {
 } from "firebase/firestore";
 import { NextResponse, NextRequest } from "next/server";
 
-export const POST = async (request: NextRequest) => {
+const postMedicine = async (request: NextRequest) => {
   try {
     const { searchParams } = new URL(request.url);
     // const id = searchParams.get("id");
@@ -45,7 +46,7 @@ export const POST = async (request: NextRequest) => {
   }
 };
 
-export const GET = async (request: NextRequest) => {
+const getMedicine = async (request: NextRequest) => {
   try {
     const { searchParams } = new URL(request.url);
     // const id = searchParams.get("id");
@@ -80,7 +81,7 @@ export const GET = async (request: NextRequest) => {
   }
 };
 
-export const DELETE = async (request: NextRequest) => {
+const deleteMedicine = async (request: NextRequest) => {
   try {
     const { searchParams } = new URL(request.url);
     const uid = searchParams.get("uid");
@@ -107,3 +108,7 @@ export const DELETE = async (request: NextRequest) => {
     );
   }
 };
+
+export const GET = withAuth(getMedicine);
+export const POST = withAuth(postMedicine);
+export const DELETE = withAuth(deleteMedicine);
