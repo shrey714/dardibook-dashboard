@@ -23,7 +23,7 @@ const MedicalReport = ({ patientId, selectedPatientId }: any) => {
       }
     };
     getPatientData();
-  }, [selectedPatientId, user.uid]);
+  }, [patientId, selectedPatientId, user.uid]);
 
   return loading ? (
     <Loader size="medium" color="text-primary" secondaryColor="text-gray-300" />
@@ -89,7 +89,9 @@ const MedicalReport = ({ patientId, selectedPatientId }: any) => {
                         }
                       )}
                       <br className="md:hidden" />
-                      <span className="text-primary ml-0 font-medium md:ml-2" >{row?.type || ""}</span>
+                      <span className="text-primary ml-0 font-medium md:ml-2">
+                        {row?.type || ""}
+                      </span>
                     </div>
                   </td>
                   <td className="align-top p-1 flex flex-row items-center gap-2">

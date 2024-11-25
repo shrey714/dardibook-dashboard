@@ -23,7 +23,7 @@ const Page = () => {
   const [loader, setLoader] = useState(false);
   const [patientList, setpatientList] = useState<any>([]);
   const [startIndex, setstartIndex] = useState(0);
-  const [selectedPatientId, setselectedPatientId] = useState();
+  const [selectedPatientId, setselectedPatientId] = useState(patientId);
 
   useEffect(() => {
     let unsubscribe: () => void;
