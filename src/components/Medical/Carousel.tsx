@@ -11,6 +11,7 @@ import { EmblaOptionsType } from "embla-carousel";
 import useEmblaCarousel from "embla-carousel-react";
 import { createContext } from "react";
 import { IdentificationIcon } from "@heroicons/react/24/outline";
+import MedicalReport from "./MedicalReport";
 
 type CarouselContextProps = {
   carouselOptions?: EmblaOptionsType;
@@ -255,31 +256,38 @@ const SliderMainItem = forwardRef<
   HTMLDivElement,
   {
     patient: any;
-    setselectedPatientId: any;
+    selectedPatientId: any;
   } & React.HTMLAttributes<HTMLDivElement>
->(({ className, patient, setselectedPatientId, ...props }, ref) => {
+>(({ className, patient, selectedPatientId, ...props }, ref) => {
   const { orientation } = useCarousel();
   return (
     <div
       {...props}
       ref={ref}
-      className={`min-w-0 shrink-0 grow-0 basis-[calc(100%-8px)] bg-white p-1 relative ${
+      className={`min-w-0 shrink-0 grow-0 basis-[calc(100%-8px)] bg-white pt-10 md:pt-0 relative ${
         orientation === "vertical" ? "pb-1" : "mx-[4px]"
       } ${className}
         `}
     >
-      <div className="drawer-content absolute  top-2 right-2">
+      <div className="drawer-content absolute top-2 right-2">
         {/* Page content here */}
         <label
           htmlFor="my-drawer-shrey"
           className="drawer-button btn bg-gray-300 min-h-0 h-auto p-1 rounded-md border-0 text-xs"
-          onClick={() => {
-            setselectedPatientId(patient.patient_unique_Id);
-          }}
         >
           <IdentificationIcon className="size-5 md:size-7 text-gray-800" />
         </label>
       </div>
+      {patient.attended ? (
+        <MedicalReport
+          patientId={patient.patient_unique_Id}
+          selectedPatientId={selectedPatientId}
+        />
+      ) : (
+        <div className="font-semibold text-gray-800 text-sm md:text-base lg:text-lg p-2">
+          Prescription is not generated yet.
+        </div>
+      )}
     </div>
   );
 });
@@ -291,8 +299,9 @@ const SliderThumbItem = forwardRef<
   {
     index: number;
     patient: any;
+    setselectedPatientId: any;
   } & React.HTMLAttributes<HTMLDivElement>
->(({ className, index, patient, ...props }, ref) => {
+>(({ className, index, patient, setselectedPatientId, ...props }, ref) => {
   const { activeIndex, onThumbClick, orientation } = useCarousel();
   const isSlideActive = activeIndex === index;
   return (
@@ -300,6 +309,7 @@ const SliderThumbItem = forwardRef<
       {...props}
       ref={ref}
       onClick={() => {
+        setselectedPatientId(patient.patient_unique_Id);
         onThumbClick(index);
       }}
       className={`min-w-0 w-1 flex shrink-0 grow-0 basis-[calc((100%-24px)/3)] lg:basis-[calc((100%-48px)/6)] p-0
@@ -313,7 +323,11 @@ const SliderThumbItem = forwardRef<
         } border-green-600 relative h-10 transition-opacity ${
           patient.attended ? "bg-green-600/30" : "bg-white"
         } text-gray-600 w-full flex flex-wrap items-center justify-center rounded-md cursor-pointer text-sm md:text-base font-semibold ${
-          isSlideActive ? "!bg-gray-800 !text-white" : ""
+          isSlideActive
+            ? patient.attended
+              ? "!bg-green-600 !text-white"
+              : "!bg-gray-800 !text-white"
+            : ""
         }`}
       >
         {patient.patient_unique_Id}

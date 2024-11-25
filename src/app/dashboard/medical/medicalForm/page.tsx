@@ -75,7 +75,6 @@ const Page = () => {
           ></label>
           <div className="menu bg-base-200 text-base-content h-svh overflow-hidden flex-col w-full md:w-[70vw] lg:w-[60vw] p-4 pt-2 relative">
             {/* Sidebar content here */}
-            {/*serach bar */}
 
             <div className="w-full mb-2 flex justify-end md:justify-start">
               <label
@@ -134,6 +133,7 @@ const Page = () => {
                   key={index}
                   index={index}
                   patient={patient}
+                  setselectedPatientId={setselectedPatientId}
                   className="rounded-md bg-transparent"
                 />
               ))}
@@ -143,8 +143,8 @@ const Page = () => {
                 {patientList.map((patient: any, index: any) => (
                   <SliderMainItem
                     key={index}
-                    setselectedPatientId={setselectedPatientId}
                     patient={patient}
+                    selectedPatientId={selectedPatientId}
                     className="border-0 flex items-center justify-center h-full rounded-md"
                   />
                 ))}
