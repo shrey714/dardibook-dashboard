@@ -280,7 +280,7 @@ const SliderMainItem = forwardRef<
       </div>
       {patient.attended ? (
         <MedicalReport
-          patientId={patient.patient_unique_Id}
+          patient={patient}
           selectedPatientId={selectedPatientId}
         />
       ) : (
