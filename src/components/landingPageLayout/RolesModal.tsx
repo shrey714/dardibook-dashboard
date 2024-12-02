@@ -34,6 +34,7 @@ const RolesModal = ({
 
       if (snapshot.empty) {
         setloading(false);
+        setroles([]);
         return;
       }
       const docsData = snapshot.docs.map((doc) => ({

@@ -22,7 +22,6 @@ import {
   ClockIcon as ClockIconOutline,
   NewspaperIcon as NewspaperIconOutline,
   UserGroupIcon as UserGroupIconOutline,
-  PlusCircleIcon,
   UserCircleIcon,
 } from "@heroicons/react/24/outline";
 import CustomModal from "@/components/BlockedModal";
@@ -343,7 +342,7 @@ export default function Sidebar({ show, setter }) {
             data-tip={`${userInfo?.displayName}`}
           >
             <UserCircleIcon
-              className={`size-6 text-gray-600 rounded-full bg-white`}
+              className={`size-6 text-gray-300 rounded-full bg-gray-600`}
             />
             <Image
               width={24}
@@ -357,8 +356,12 @@ export default function Sidebar({ show, setter }) {
             className="flex items-center gap-2 p-1 bg-gray-300 rounded-full shadow-md tooltip before:bg-gray-800 before:text-white"
             data-tip={`${doctorData?.clinicName}`}
           >
-            <PlusCircleIcon
-              className={`size-6 text-gray-600 rounded-full bg-white`}
+            <Image
+              width={24}
+              height={24}
+              className="rounded-full bg-gray-600"
+              src={"/Hospital.svg"}
+              alt={"Hospital Image"}
             />
             {doctorLoader ? (
               <div className="skeleton size-6 s rounded-full"></div>
