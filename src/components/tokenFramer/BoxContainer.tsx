@@ -39,9 +39,9 @@ const BoxContainer = ({ CurrentToken, loading, isPaused }: any) => {
               left: "0px",
               right: "0px",
               height: "100svh",
-              zIndex: 999,
+              zIndex: 111999,
             }}
-            className="fixed md:absolute"
+            className="fixed"
           >
             <Image
               src="/Logo.svg"
@@ -90,12 +90,11 @@ const BoxContainer = ({ CurrentToken, loading, isPaused }: any) => {
         }}
         style={{
           userSelect: "none",
-          borderRadius: "0px",
+          borderRadius: "6px",
           cursor: "pointer",
           position: "relative",
           width: "100%",
-          //   height: "100%",
-          aspectRatio: 1,
+            height: "100%",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -105,7 +104,7 @@ const BoxContainer = ({ CurrentToken, loading, isPaused }: any) => {
       >
         {/* Add image here also */}
 
-        <Maximize className="size-4 text-white absolute top-4 right-4" />
+        <Maximize className="size-3 text-white absolute top-2 right-2" />
         <motion.h3
           layoutId={`h3-714`}
           style={{

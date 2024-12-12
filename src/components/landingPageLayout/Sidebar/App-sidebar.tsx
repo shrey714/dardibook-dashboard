@@ -23,6 +23,7 @@ import {
 import { ModeToggle } from "@/components/common/mode-toggle";
 import { usePathname } from "next/navigation";
 import RolesLink from "./RolesLink";
+import TokenBox from "../../tokenFramer/TokenBox";
 
 const pages = [
   {
@@ -71,7 +72,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader>
         <LogoHandeler />
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className="overflow-x-hidden">
+        <TokenBox />
         <NavMain pages={pages} pathname={pathname} />
       </SidebarContent>
       <SidebarFooter>

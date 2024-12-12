@@ -109,15 +109,15 @@ const StaffRolesInfo = ({ staff, uid }: { staff: Staff[]; uid: string }) => {
               onValueChange={(value) => {
                 setselectRole(value);
               }}
-              defaultValue="SubDoctor"
+              defaultValue="subDoctor"
               className="w-full mt-2"
             >
               <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="SubDoctor">SubDoctor</TabsTrigger>
-                <TabsTrigger value="Medical">Medical</TabsTrigger>
+                <TabsTrigger value="subDoctor">SubDoctor</TabsTrigger>
+                <TabsTrigger value="medical">Medical</TabsTrigger>
               </TabsList>
-              <TabsContent value="SubDoctor"></TabsContent>
-              <TabsContent value="Medical"></TabsContent>
+              <TabsContent value="subDoctor"></TabsContent>
+              <TabsContent value="medical"></TabsContent>
             </Tabs>
 
             <form
