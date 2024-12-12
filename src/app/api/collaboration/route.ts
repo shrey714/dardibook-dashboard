@@ -26,6 +26,9 @@ export const POST = async (request: NextRequest) => {
   if (!userinfo) {
     return new Response('Unauthorized', { status: 401 });
   }
+  if (!process.env.LIVEBLOCKS_SECRET) {
+    throw new Error("LIVEBLOCKS_SECRET is not defined in the environment variables.");
+  }
   const liveblocks = new LiveblocksNode({
     secret: process.env.LIVEBLOCKS_SECRET,
   });
