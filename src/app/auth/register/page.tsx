@@ -8,6 +8,7 @@ import RegistrationForm from "@/components/forms/RegistrationForm";
 import { createDoctor } from "@/app/services/createDoctor";
 import FlickeringGrid from "@/components/AuthPage/FlickeringGrid";
 import Image from "next/image";
+import { Typewriter } from "@/components/common/Text-Typing";
 
 const SignIn = () => {
   const user = useAppSelector((state) => state.auth.user);
@@ -79,10 +80,14 @@ const SignIn = () => {
       />
       <div className=" flex flex-col items-center w-full sm:w-4/5">
         <div className="z-50 h-52 flex items-center justify-center">
-          <div className="w-max">
-            <h1 className="h-auto select-none animate-typing overflow-hidden whitespace-nowrap border-r-4 border-r-gray-700 pr-5 sm:pr-8 text-3xl sm:text-5xl text-gray-800 font-bold leading-[normal] sm:leading-[normal]">
-              {header.title}
-            </h1>
+          <div className="w-full flex-col flex items-center justify-center">
+            <Typewriter
+              list={[
+                "Register yourself.",
+                "Join DardiBook to experience a seamless healthcare management platform.",
+                "Register today to start scheduling appointments, managing prescriptions, and more.",
+              ]}
+            />
           </div>
         </div>
 
