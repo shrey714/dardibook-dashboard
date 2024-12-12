@@ -1,8 +1,8 @@
 // PrescribeMedicineTable
 import { ChangeEvent, useState } from "react";
-import { XMarkIcon, PlusIcon } from "@heroicons/react/24/outline";
 import MedicineSuggetion from "../Prescribe/MedicineSuggetion";
 import uniqid from "uniqid";
+import { Plus, X } from "lucide-react";
 interface Dosage {
   morning: string;
   afternoon: string;
@@ -277,7 +277,7 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
                   onClick={() => deleteRow(row.id)}
                   className="btn btn-xs btn-error btn-circle"
                 >
-                  <XMarkIcon className="size-4 text-white" />
+                  <X className="size-4 text-white" />
                 </button>
               </td>
             </tr>
@@ -289,7 +289,7 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
         onClick={addRow}
         className="btn mt-2 animate-none btn-neutral btn-sm btn-wide"
       >
-        <PlusIcon className="size-4 text-white" />
+        <Plus className="size-4 text-white" />
       </button>
     </div>
   );

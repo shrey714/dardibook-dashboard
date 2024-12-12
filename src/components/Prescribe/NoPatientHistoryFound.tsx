@@ -1,16 +1,17 @@
 import React from "react";
 
-const NoPatientHistoryFound: React.FC<{ message: string }> = ({ message }) => {
+const NoPatientHistoryFound: React.FC<{ message: string | null }> = ({
+  message,
+}) => {
   return (
     <div
       style={{
         width: "100%",
-        height: "100svh",
+        height: "100%",
         overflow: "hidden",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        zIndex: 100000,
       }}
     >
       {message}

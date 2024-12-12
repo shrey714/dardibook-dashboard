@@ -1,9 +1,9 @@
 /* eslint-disable @next/next/no-img-element */
 import React, { ChangeEvent, FormEvent, useState } from "react";
-import { PhotoIcon, XCircleIcon } from "@heroicons/react/24/solid";
 import Loader from "../common/Loader";
 import { useAppDispatch } from "@/redux/store";
 import { signOutUser } from "@/firebase/firebaseAuth";
+import { CircleX, FileImage } from "lucide-react";
 
 interface RegistrationFormProps {
   formData: {
@@ -268,12 +268,12 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({
                     className="absolute top-0 right-0 -mt-2 -mr-2"
                     onClick={() => handleRemoveImage("clinicLogo")}
                   >
-                    <XCircleIcon className="h-6 w-6 text-red-500" />
+                    <CircleX className="h-6 w-6 text-red-500" />
                   </button>
                 </div>
               ) : (
                 <>
-                  <PhotoIcon
+                  <FileImage
                     aria-hidden="true"
                     className="mx-auto h-12 w-12 text-gray-600"
                   />
@@ -323,12 +323,12 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({
                     className="absolute top-0 right-0 -mt-2 -mr-2"
                     onClick={() => handleRemoveImage("signaturePhoto")}
                   >
-                    <XCircleIcon className="h-6 w-6 text-red-500" />
+                    <CircleX className="h-6 w-6 text-red-500" />
                   </button>
                 </div>
               ) : (
                 <>
-                  <PhotoIcon
+                  <FileImage
                     aria-hidden="true"
                     className="mx-auto h-12 w-12 text-gray-600"
                   />
@@ -384,8 +384,6 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({
             {submissionLoader ? (
               <Loader
                 size="medium"
-                color="text-primary"
-                secondaryColor="text-white"
               />
             ) : (
               "Register myself"

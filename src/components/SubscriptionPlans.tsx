@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { ExclamationCircleIcon } from "@heroicons/react/24/outline";
 import getplans from "../app/services/razorpay/getplans";
 interface SubscriptionPlansProps {
   message?: string | undefined;
 }
 import { useRouter } from "next/navigation";
-import { signOutUser } from "@/firebase/firebaseAuth";
-import { useAppDispatch } from "@/redux/store";
+import { CircleAlert } from "lucide-react";
+import LogOutBTtn from "./common/LogOutBTtn";
+import SubscriptionDialogBtn from "./common/SubscriptionDialogBtn";
+import { Skeleton } from "./ui/skeleton";
+import { Button } from "./ui/button";
 const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ message }) => {
-  const dispatch = useAppDispatch();
   const router = useRouter();
   const [loading, setloading] = useState(true);
   const [allplans, setallplans] = useState<any[]>([]);
@@ -30,36 +31,31 @@ const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ message }) => {
 
   return (
     <>
-      {message ? (
-        <div className="text-gray font-medium flex-row flex items-center mb-3 justify-between">
-          <span className="flex flex-row gap-1">
-            <ExclamationCircleIcon className="size-5 text-error" /> {message}
-          </span>
-          <button
-            className="btn animate-none h-3 btn-sm text-sm btn-error text-white"
-            onClick={() => {
-              signOutUser(dispatch);
-            }}
-          >
-            sign out
-          </button>
-        </div>
-      ) : (
-        <></>
-      )}
+      <div className="text-gray font-medium flex-row flex items-center justify-between">
+        <span className="flex flex-row gap-1">
+          <CircleAlert className="size-5" /> {message ? message : ""}
+        </span>
+        <LogOutBTtn size={"sm"} variant={"destructive"} />
+      </div>
+      <div className="text-gray font-medium flex-row flex items-center justify-between">
+        <span className="flex flex-row gap-1">
+          <CircleAlert className="size-5" /> Get your subscription information :
+        </span>
+        <SubscriptionDialogBtn size={"sm"} variant={"secondary"} />
+      </div>
       {loading ? (
         <div className="flex flex-1 flex-row p-6 justify-around">
           <div className="flex flex-col w-full items-center">
-            <div className="skeleton h-8 w-1/4 mb-4   bg-gray-400"></div>
-            <div className="skeleton h-6 w-3/4 bg-gray-400"></div>
-            <div className="skeleton my-8 h-9 w-1/3 bg-gray-400"></div>
+            <Skeleton className="h-8 w-1/4 mb-4"></Skeleton>
+            <Skeleton className="h-6 w-3/4"></Skeleton>
+            <Skeleton className="my-8 h-9 w-1/3"></Skeleton>
 
             <div className="mb-8 space-y-4 w-1/2 self-start">
-              <div className="skeleton h-6 bg-gray-400"></div>
-              <div className="skeleton h-6 bg-gray-400"></div>
+              <Skeleton className="h-6"></Skeleton>
+              <Skeleton className="h-6"></Skeleton>
             </div>
 
-            <div className="skeleton h-8 w-full bg-gray-400"></div>
+            <Skeleton className="h-8 w-full"></Skeleton>
           </div>
         </div>
       ) : (
@@ -116,14 +112,14 @@ const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ message }) => {
                   <span>No setup, or hidden fees</span>
                 </li>
               </ul>
-              <button
+              <Button
                 onClick={() => {
                   router.push(`/subscription/subscribe?planId=${plan?.id}`);
                 }}
                 className="btn btn-sm text-sm"
               >
                 Explore
-              </button>
+              </Button>
             </div>
           ))}
         </div>

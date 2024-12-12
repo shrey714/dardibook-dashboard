@@ -113,21 +113,21 @@ const MedicalReport = ({ patient, selectedPatientId }: any) => {
   }
 
   return loading ? (
-    <Loader size="medium" color="text-primary" secondaryColor="text-gray-300" />
+    <Loader size="medium" />
   ) : prescriptionData !== null ? (
-    <div className="w-full h-full overflow-y-auto md:overflow-y-scroll md:mr-[52px] flex flex-col pb-24">
+    <div className="w-full h-full overflow-y-auto md:overflow-y-scroll mr-0 md:mr-[52px] flex flex-col pb-24">
       {/* Disease text area */}
       <div className="col-span-full p-4 md:px-8">
         <label
           htmlFor="diseaseDetail"
-          className="block text-lg font-semibold leading-7 text-gray-900"
+          className="block text-lg font-semibold leading-7"
         >
           Disease and Diagnosis
         </label>
         <div className="mt-2">
           <div
             id="diseaseDetail"
-            className="w-full rounded-md p-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 sm:text-sm sm:leading-6"
+            className="w-full rounded-md p-1.5 shadow-sm ring-1 ring-inset ring-ring sm:text-sm sm:leading-6"
           >
             {prescriptionData?.diseaseDetail}
           </div>
@@ -136,7 +136,7 @@ const MedicalReport = ({ patient, selectedPatientId }: any) => {
 
       {/* Medicine list */}
       <div className="mt-0 col-span-full">
-        <label className="block px-4 md:px-8 text-lg ext-base font-semibold leading-7 text-gray-900">
+        <label className="block px-4 md:px-8 text-lg ext-base font-semibold leading-7">
           Medicines
         </label>
 
@@ -158,15 +158,15 @@ const MedicalReport = ({ patient, selectedPatientId }: any) => {
               {prescriptionData?.medicines?.map((row: any, index: any) => (
                 <tr
                   key={row.id}
-                  className={`${row.id} border-gray-300 border-b-[1px] sm:border-0 flex flex-col sm:table-row`}
+                  className={`${row.id} border-primary border-b-[1px] sm:border-0 flex flex-col sm:table-row`}
                 >
                   <td className="align-top p-1">
-                    <div className="w-full rounded-md p-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 text-xs sm:text-sm sm:leading-6">
+                    <div className="w-full rounded-md p-1.5 shadow-sm ring-1 ring-inset ring-ring text-xs sm:text-sm sm:leading-6 text-start">
                       {row.medicineName}
                       <br />
                       <span
-                        className={`bg-gray-300 rounded-sm ${
-                          row.instruction ? "px-2" : ""
+                        className={`border-ring rounded-sm ${
+                          row.instruction ? "px-2 border" : ""
                         }`}
                       >
                         {row.instruction}
@@ -174,20 +174,20 @@ const MedicalReport = ({ patient, selectedPatientId }: any) => {
                     </div>
                   </td>
                   <td className="align-top p-1">
-                    <div className="w-full rounded-md p-1.5 shadow-sm ring-1 ring-inset ring-gray-300 text-xs sm:text-sm sm:leading-6 flex flex-row gap-2 flex-wrap">
+                    <div className="w-full rounded-md p-1.5 shadow-sm ring-1 ring-inset ring-ring text-xs sm:text-sm sm:leading-6 flex flex-row gap-2 flex-wrap">
                       <span>
                         {["morning", "afternoon", "evening", "night"].map(
                           (status, index) => {
                             const value = row?.dosages[status] || 0;
                             return (
-                              <span key={index} className="text-gray-800">{`${
+                              <span key={index}>{`${
                                 index !== 0 ? "-" : ""
                               }${value}`}</span>
                             );
                           }
                         )}
                       </span>
-                      <span className="rounded-sm px-2 border-gray-300 border-[1px]">
+                      <span className="rounded-sm px-2 border-primary border-[1px]">
                         {`${row?.duration || ""}${" "}${
                           row.durationType
                             ? `${row.durationType}${
@@ -196,7 +196,7 @@ const MedicalReport = ({ patient, selectedPatientId }: any) => {
                             : ""
                         }`}
                       </span>
-                      <div className="bg-gray-300 rounded-sm px-2 flex flex-row items-center gap-2">
+                      <div className="border border-ring rounded-sm px-2 flex flex-row items-center gap-2">
                         {calculateTotalMedicinesRequired(row)}
                         <span className="text-primary font-medium">
                           {row?.type || ""}
@@ -225,9 +225,7 @@ const MedicalReport = ({ patient, selectedPatientId }: any) => {
           </table>
           {prescriptionData?.medicines?.length !== 0 && !printLoader && (
             <PrintHandeler
-              styleForBtn={
-                "btn animate-none btn-success text-white sm:btn-md lg:btn-wide fixed bottom-3"
-              }
+              styleForBtn={"fixed bottom-3 left-1/2 transform -translate-x-1/2"}
               printOptions={{
                 IsPrescription: false,
                 IsRefer: false,
@@ -245,14 +243,14 @@ const MedicalReport = ({ patient, selectedPatientId }: any) => {
       <div className="col-span-full p-4 md:px-8">
         <label
           htmlFor="diseaseDetail"
-          className="block text-lg font-semibold leading-7 text-gray-900"
+          className="block text-lg font-semibold leading-7"
         >
           Advice or special instructions
         </label>
         <div className="mt-2">
           <div
             id="diseaseDetail"
-            className="w-full rounded-md p-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 sm:text-sm sm:leading-6"
+            className="w-full rounded-md p-1.5 shadow-sm ring-1 ring-inset ring-ring sm:text-sm sm:leading-6"
           >
             {prescriptionData?.advice}
           </div>

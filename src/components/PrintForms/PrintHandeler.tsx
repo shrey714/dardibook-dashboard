@@ -5,6 +5,7 @@ import RefererPrint from "./RefererPrint";
 import PrescriptionPrint from "./PrescriptionPrint";
 import ReceiptPrint from "./ReceiptPrint";
 import MedicalReportPrint from "./MedicalReportPrint";
+import { Button } from "../ui/button";
 
 const PrintHandeler: React.FC<any> = ({
   styleForBtn,
@@ -59,13 +60,12 @@ const PrintHandeler: React.FC<any> = ({
 
   return (
     <div className="w-full join-item flex flex-col">
-      <button
+      <Button
         onClick={handlePrint}
         className={styleForBtn}
-        style={{ left: printOptions?.IsMedical ? "calc(50% - 8rem)" : "" }}
       >
         {printOptions?.IsMedical ? "Print" : "Print Prescription"}
-      </button>
+      </Button>
       <div ref={printRef} className="hide-this-compo">
         {printOptions?.IsPrescription ? (
           <PrescriptionPrint

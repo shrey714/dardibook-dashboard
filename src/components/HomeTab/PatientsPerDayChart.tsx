@@ -1,5 +1,7 @@
+"use client";
+
 import React, { useEffect, useState } from "react";
-import { Bar } from "react-chartjs-2";
+// import { Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   BarElement,
@@ -18,153 +20,219 @@ ChartJS.register(
   Legend
 );
 
-const PatientsPerDayChart = ({ patientsCollection, loader }: any) => {
-  const [chartData, setChartData] = useState<any>({ labels: [], datasets: [] });
-  const [availableMonths, setAvailableMonths] = useState<string[]>([]);
-  const [selectedMonth, setSelectedMonth] = useState<string>("");
+import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
 
-  const fetchPatientVisitData = async () => {
-    const visitData: { [key: string]: { [key: string]: number } } = {};
-    const monthSet: Set<string> = new Set();
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
+import { cn } from "@/lib/utils";
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "@radix-ui/react-popover";
+import { Calendar } from "@/components/ui/calendar";
+import { Button } from "../ui/button";
+import { startOfMonth, endOfMonth, getTime, format } from "date-fns";
+import { CalendarIcon } from "lucide-react";
+import { DateRange } from "react-day-picker";
+import { useAppSelector } from "@/redux/store";
+import { getAllPatients } from "@/app/services/getAllPatients";
+import Loader from "../common/Loader";
+export const description = "An interactive bar chart";
 
-    patientsCollection.forEach((doc: any) => {
-      const data = doc;
-      const array = data.visitedDates || [data.last_visited];
-      if (array) {
-        array.forEach((timestamp: number) => {
-          const date = new Date(timestamp);
-          const year = date.getFullYear();
-          const month = (date.getMonth() + 1).toString().padStart(2, "0");
-          const day = date.getDate().toString().padStart(2, "0");
-          const monthOnly = `${year}-${month}`;
-          const dayOnly = day;
+const chartConfig = {
+  views: {
+    label: "Patients Prescribed",
+  },
+  desktop: {
+    label: "Desktop",
+    color: "hsl(var(--chart-1))",
+  },
+  mobile: {
+    label: "Mobile",
+    color: "hsl(var(--chart-2))",
+  },
+} satisfies ChartConfig;
 
-          monthSet.add(monthOnly);
-          if (!visitData[monthOnly]) {
-            visitData[monthOnly] = {};
+const PatientsPerDayChart = () => {
+  const user = useAppSelector<any>((state) => state.auth.user);
+  const [chartData, setChartData] = useState<any>();
+  const [loader, setLoader] = useState(true);
+  const [patientsCollection, setpatientsCollection] = useState([]);
+  // ===================
+  const [date, setDate] = React.useState<DateRange | undefined>({
+    from: startOfMonth(new Date()),
+    to: endOfMonth(new Date()),
+  });
+  // ========================
+  useEffect(() => {
+    const fetchPatients = async () => {
+      if (user) {
+        try {
+          setLoader(true);
+          const data = await getAllPatients(
+            user.uid,
+            getTime(date?.from || ""),
+            getTime(date?.to || "")
+          );
+          if (data.data) {
+            setLoader(false);
+            setpatientsCollection(data.data);
+          } else {
+            setpatientsCollection([]);
           }
-          if (!visitData[monthOnly][dayOnly]) {
-            visitData[monthOnly][dayOnly] = 0;
-          }
-          visitData[monthOnly][dayOnly]++;
-        });
+        } catch (error) {
+          setpatientsCollection([]);
+
+          setLoader(false);
+        }
       }
-    });
+    };
 
-    setAvailableMonths(Array.from(monthSet).sort((a, b) => b.localeCompare(a)));
+    fetchPatients();
+  }, [user, date]);
 
-    if (!selectedMonth && monthSet.size > 0) {
-      setSelectedMonth(
-        Array.from(monthSet).sort((a, b) => b.localeCompare(a))[0]
-      );
-    }
+  const fetchPatientVisitData = () => {
+    const fromDate = getTime(date?.from || "");
+    const toDate = getTime(date?.to || "");
+    const visitCounts: any = {};
 
-    if (selectedMonth) {
-      const [year, month] = selectedMonth.split("-");
-      const daysInMonth = new Date(parseInt(year), parseInt(month), 0).getDate();
-      const labels = Array.from({ length: daysInMonth }, (_, i) =>
-        (i + 1).toString().padStart(2, "0")
-      ); // Generate 01 to 30/31
-
-      const data = labels.map(
-        (label) => visitData[selectedMonth]?.[label] || 0
-      );
-
-      setChartData({
-        labels,
-        datasets: [
-          {
-            label: "Number of Patients",
-            data,
-            backgroundColor: "rgba(74, 0, 255,0.5)",
-            borderColor: "rgba(74, 0, 255,1)",
-            borderWidth: 1,
-          },
-        ],
+    patientsCollection.forEach((patient: any) => {
+      const visit_dates = patient.visitedDates || [patient.last_visited];
+      visit_dates.forEach((visitDate: number) => {
+        if (visitDate >= fromDate && visitDate <= toDate) {
+          const formattedDate = format(new Date(visitDate), "yyyy-MM-dd");
+          visitCounts[formattedDate] = (visitCounts[formattedDate] || 0) + 1;
+        }
       });
-    }
+    });
+    const visitData = Object.entries(visitCounts).map(([date, count]) => ({
+      date,
+      count,
+    }));
+    setChartData(visitData);
   };
 
   useEffect(() => {
     fetchPatientVisitData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedMonth, patientsCollection]);
-
-  const handleMonthChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedMonth(event.target.value);
-  };
+  }, [patientsCollection]);
 
   return (
-    <div className="rounded-md w-full border-2 p-2 sm:p-4 lg:p-6 border-gray-400/70 bg-white relative">
-      {loader ? (
-        <div className=" bg-custom-gradient bg-gray-300/70 skeleton h-8 md:h-9 w-full rounded-sm"></div>
-      ) : (
-        <div className="mb-2 flex flex-row justify-between items-center">
-          <h1 className="text-base md:text-xl font-bold text-gray-700">
-            Patients Per Day
-          </h1>
-          <select
-            id="month"
-            name="month"
-            className="form-select block pl-2 py-0 pr-10 text-gray-800/60 text-sm md:text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-            value={selectedMonth}
-            onChange={handleMonthChange}
-          >
-            {availableMonths.map((month) => (
-              <option key={month} value={month}>
-                {month}
-              </option>
-            ))}
-          </select>
+    <Card className="w-full">
+      <CardHeader className="flex flex-col gap-4 items-stretch space-y-0 border-b p-0 sm:flex-row sm:py-6 px-6 py-5">
+        <div className="flex flex-1 flex-col justify-center gap-1">
+          <CardTitle>Patients Per Day</CardTitle>
+          <CardDescription>
+            Showing total patients for the selected month
+          </CardDescription>
         </div>
-      )}
-      {loader ? (
-        <div
-          className="absolute flex flex-1 bottom-2 sm:bottom-4 lg:bottom-6
-       bg-custom-gradient bg-gray-200 skeleton rounded-sm
-      h-[calc(100%-3.5rem)] sm:h-[calc(100%-4.5rem)] md:h-[calc(100%-4.75rem)] lg:h-[calc(100%-5.75rem)]
-      w-[calc(100%-1rem)] sm:w-[calc(100%-2rem)] lg:w-[calc(100%-3rem)]
-      "
-        ></div>
-      ) : (
-        <></>
-      )}
-      <Bar
-        className="max-h-[300px]"
-        data={{
-          ...chartData,
-          datasets: chartData.datasets.map((dataset: any) => ({
-            ...dataset,
-            maxBarThickness: 20, // Adjust this value to make bars slimmer
-            borderRadius: 2, // Adjust this value to round the bars
-          })),
-        }}
-        options={{
-          responsive: true,
-          scales: {
-            y: {
-              beginAtZero: true,
-              ticks: {
-                stepSize: 1, // Ensure y-axis values are integers
-                font: {
-                  size: window.innerWidth < 640 ? 10 : 12, // Adjust font size for mobile view
-                },
-                color: loader ? "#fff" : "#666",
-              },
-            },
-            x: {
-              ticks: {
-                font: {
-                  size: window.innerWidth < 640 ? 8 : 12, // Adjust font size for mobile view
-                },
-                maxRotation: 0, // Prevent tilting in mobile view
-                minRotation: 0, // Prevent tilting in mobile view
-              },
-            },
-          },
-        }}
-      />
-    </div>
+        <div className={"flex flex-1 items-center justify-end z-10"}>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                id="date"
+                variant={"outline"}
+                className={cn(
+                  "w-[300px] justify-start text-left font-normal",
+                  !date && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon />
+                {date?.from ? (
+                  date.to ? (
+                    <>
+                      {format(date.from, "LLL dd, y")} -{" "}
+                      {format(date.to, "LLL dd, y")}
+                    </>
+                  ) : (
+                    format(date.from, "LLL dd, y")
+                  )
+                ) : (
+                  <span>Pick a date</span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="end">
+              <Calendar
+                initialFocus
+                min={2}
+                mode="range"
+                className="bg-background border-[1px] rounded-md mt-1"
+                defaultMonth={date?.from}
+                selected={date}
+                onSelect={setDate}
+                numberOfMonths={2}
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
+      </CardHeader>
+      <CardContent className="px-2 sm:p-6">
+        <ChartContainer
+          config={chartConfig}
+          className="aspect-auto h-[250px] w-full"
+        >
+          {loader ? (
+            <div className="flex h-full flex-1 items-center justify-center">
+              <Loader size="medium" />
+            </div>
+          ) : (
+            <BarChart
+              accessibilityLayer
+              data={chartData}
+              margin={{
+                left: 12,
+                right: 12,
+              }}
+            >
+              <CartesianGrid vertical={false} />
+              <XAxis
+                dataKey="date"
+                tickLine={false}
+                axisLine={false}
+                tickMargin={8}
+                minTickGap={32}
+                tickFormatter={(value) => {
+                  const date = new Date(value);
+                  return date.toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                  });
+                }}
+              />
+              <ChartTooltip
+                content={
+                  <ChartTooltipContent
+                    className="w-[150px]"
+                    nameKey="views"
+                    labelFormatter={(value) => {
+                      return new Date(value).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      });
+                    }}
+                  />
+                }
+              />
+              <Bar dataKey={"count"} fill={`hsl(var(--chart-1))`} />
+            </BarChart>
+          )}
+        </ChartContainer>
+      </CardContent>
+    </Card>
   );
 };
 

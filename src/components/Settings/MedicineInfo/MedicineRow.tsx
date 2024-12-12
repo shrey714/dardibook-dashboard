@@ -1,11 +1,15 @@
 import React, { useState, FormEvent } from "react";
-import {
-  PencilSquareIcon,
-  TrashIcon,
-  XCircleIcon,
-} from "@heroicons/react/24/outline";
-import { CheckIcon } from "@heroicons/react/24/solid";
 import Loader from "@/components/common/Loader";
+import { Trash, Pencil, X, Check } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface DisplayMedicineProps {
   handleChange: (
@@ -67,7 +71,6 @@ const MedicineRow: React.FC<DisplayMedicineProps> = ({
   const [editable, setEditable] = useState(false);
   const [editLoader, seteditLoader] = useState(false);
   const [deleteLoader, setdeleteLoader] = useState(false);
-  const [isDropdownVisible, setIsDropdownVisible] = useState(true);
 
   const submitHandler = (e: FormEvent) => {
     e.preventDefault();
@@ -80,7 +83,7 @@ const MedicineRow: React.FC<DisplayMedicineProps> = ({
       }}
     >
       <div className="grid grid-cols-12 gap-1 w-full mb-1">
-        <div className="col-span-1 flex justify-center items-center bg-white rounded-md">
+        <div className="col-span-1 flex justify-center items-center">
           {index + 1}
         </div>
         <fieldset
@@ -93,7 +96,7 @@ const MedicineRow: React.FC<DisplayMedicineProps> = ({
             type="text"
             id={medicine.id}
             name="medicineName"
-            className="col-span-2 disabled:text-gray-500 form-input py-[4px] md:py-1 w-full rounded-md border-gray-200 bg-white text-sm leading-6 font-medium text-gray-700 flex-1 mx-1 text-center"
+            className="col-span-2 disabled:text-gray-500 form-input py-[4px] md:py-1 w-full rounded-md border-border text-sm leading-6 font-medium bg-background flex-1 mx-1 text-center"
             value={
               editable ? editmedicineData.medicineName : medicine.medicineName
             }
@@ -109,7 +112,7 @@ const MedicineRow: React.FC<DisplayMedicineProps> = ({
             }}
             value={editable ? editmedicineData.type : medicine.type}
             defaultValue={""}
-            className="col-span-2 form-select border-0 rounded-[6px] flex flex-1 py-[0px] sm:py-[5.5px] text-gray-900 placeholder:text-gray-400 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 text-sm leading-6 mx-1 text-center w-full pr-3"
+            className="col-span-2 form-select border rounded-[6px] flex flex-1 py-[0px] sm:py-[5.5px] placeholder:text-gray-400 shadow-sm bg-background border-border focus:ring-2 focus:ring-inset focus:ring-indigo-600 text-sm leading-6 mx-1 text-center w-full pr-3"
           >
             {medicineTypes.map((type, index) => (
               <option
@@ -126,7 +129,7 @@ const MedicineRow: React.FC<DisplayMedicineProps> = ({
             type="text"
             id={medicine.id}
             name="instruction"
-            className="col-span-2 disabled:text-gray-500 form-input py-[4px] md:py-1 w-full rounded-md border-gray-200 bg-white text-sm font-medium leading-6 text-gray-700 flex-1 mx-1 text-center"
+            className="col-span-2 disabled:text-gray-500 form-input py-[4px] md:py-1 w-full rounded-md border-border bg-background text-sm font-medium leading-6 flex-1 mx-1 text-center"
             value={
               editable ? editmedicineData.instruction : medicine.instruction
             }
@@ -136,10 +139,9 @@ const MedicineRow: React.FC<DisplayMedicineProps> = ({
           />
         </fieldset>
         <div className="col-span-2 flex justify-center items-center flex-col sm:flex-row gap-1 sm:gap-2">
-          <button
-            className={`btn btn-square btn-sm animate-none ${
-              editable ? "hidden" : ""
-            }`}
+          <Button
+            variant={"outline"}
+            className={`h-8 w-auto min-w-0 ${editable ? "hidden" : ""}`}
             disabled={!globalClickable && !editable}
             onClick={() => {
               setEditable(true);
@@ -148,9 +150,9 @@ const MedicineRow: React.FC<DisplayMedicineProps> = ({
               seteditmedicineData(medicine);
             }}
           >
-            <PencilSquareIcon height={15} width={15} color="black" />
-          </button>
-          <div className={`dropdown dropdown-end ${editable ? "hidden" : ""}`}>
+            <Pencil height={15} width={15} />
+          </Button>
+          {/* <div className={`dropdown dropdown-end ${editable ? "hidden" : ""}`}>
             <button
               tabIndex={0}
               role="button"
@@ -167,7 +169,7 @@ const MedicineRow: React.FC<DisplayMedicineProps> = ({
                   />
                 </>
               ) : (
-                <TrashIcon height={15} width={15} color="red" />
+                <Trash height={15} width={15} color="red" />
               )}
             </button>
 
@@ -200,12 +202,55 @@ const MedicineRow: React.FC<DisplayMedicineProps> = ({
                 </div>
               </ul>
             )}
-          </div>
+          </div> */}
 
-          <button
-            className={`btn btn-square btn-sm animate-none ${
-              !editable ? "hidden" : ""
-            }`}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                className={`h-8 w-auto min-w-0 ${editable ? "hidden" : ""}`}
+                role="button"
+                disabled={!globalClickable && !editable}
+                variant={"destructive"}
+              >
+                {deleteLoader ? (
+                  <>
+                    <Loader
+                      size="small"
+                    />
+                  </>
+                ) : (
+                  <Trash height={15} width={15} />
+                )}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56">
+              <DropdownMenuLabel>
+                Are you sure you want to delete this medicine?
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                <div className="flex flex-1 gap-2 justify-center items-center mt-1">
+                  <Button
+                    variant={"destructive"}
+                    onClick={async () => {
+                      setdeleteLoader(true);
+                      await deleteHandler(medicine.id);
+                      setdeleteLoader(false);
+                    }}
+                  >
+                    <a>Yes</a>
+                  </Button>
+                  <Button variant={"default"}>
+                    <a>No</a>
+                  </Button>
+                </div>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <Button
+            className={`h-8 w-auto min-w-0 ${!editable ? "hidden" : ""}`}
+            variant={"default"}
             onClick={async () => {
               seteditLoader(true);
               setGlobalClickable(true);
@@ -221,19 +266,16 @@ const MedicineRow: React.FC<DisplayMedicineProps> = ({
               <>
                 <Loader
                   size="small"
-                  color="text-primary"
-                  secondaryColor="text-gray-300"
                 />
               </>
             ) : (
-              <CheckIcon height={15} width={15} color="black" />
+              <Check height={15} width={15} />
             )}
-          </button>
+          </Button>
 
-          <button
-            className={`btn btn-square btn-sm animate-none ${
-              !editable ? "hidden" : ""
-            }`}
+          <Button
+            className={`h-8 w-auto min-w-0 ${!editable ? "hidden" : ""}`}
+            variant={"destructive"}
             onClick={() => {
               cancelHandler(medicine.id);
               setEditable(false);
@@ -241,8 +283,8 @@ const MedicineRow: React.FC<DisplayMedicineProps> = ({
               setGlobalClickable(true);
             }}
           >
-            <XCircleIcon height={15} width={15} color="red" />
-          </button>
+            <X height={15} width={15} />
+          </Button>
         </div>
       </div>
     </form>

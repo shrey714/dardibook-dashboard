@@ -1,5 +1,5 @@
 // components/SpeechToTextProvider.tsx
-import { MicrophoneIcon } from "@heroicons/react/24/solid";
+import { Mic } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
 const SpeechToTextProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -82,7 +82,7 @@ const SpeechToTextProvider: React.FC<{ children: React.ReactNode }> = ({
         }`}
       >
         <div className="mic">
-          <MicrophoneIcon className="mic-icon" />
+          <Mic className="mic-icon" />
           <div className="mic-shadow"></div>
         </div>
       </div>

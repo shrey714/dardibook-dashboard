@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import React from "react";
 const RightBox = ({
   thisPlanDetails,
@@ -55,15 +56,15 @@ const RightBox = ({
             <span>No setup, or hidden fees</span>
           </li>
         </ul>
-        <button
+        <Button
           disabled={!isValid}
           onClick={() => {
             handleSubscription();
           }}
-          className="btn btn-sm text-base disabled:bg-gray-300"
+          className="btn btn-sm text-sm"
         >
           Get started
-        </button>
+        </Button>
       </div>
     </>
   );

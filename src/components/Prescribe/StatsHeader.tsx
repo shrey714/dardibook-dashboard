@@ -2,16 +2,16 @@ import React from "react";
 
 const StatsHeader = ({ registrations, attended }: any) => {
   return (
-    <div className="w-auto relative overflow-hidden sm:w-full sm:max-w-[70%] bg-white flex flex-row border-2 rounded-md border-gray-400/70">
+    <div className="w-auto relative overflow-hidden sm:w-full sm:max-w-[70%] bg-gradient-to-b from-muted/50 to-muted flex flex-row border-2 rounded-md">
       <div className="py-4 px-5 sm:py-4 sm:px-6 flex flex-1 flex-col">
-        <div className=" font-semibold text-sm sm:text-base text-gray-800 whitespace-nowrap">
+        <div className=" font-semibold text-sm sm:text-base whitespace-nowrap">
           Total Registrations
         </div>
         <div className=" font-semibold text-xs whitespace-nowrap">
           done by today
         </div>
         <div className=" font-semibold text-4xl text-primary flex flex-row justify-start">
-          <div className="absolute top-0 left-[calc(50%-144px)] stat-figure size-36 opacity-10">
+          <div className="absolute top-0 left-[calc(50%-144px)] stat-figure size-36 opacity-20">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -35,14 +35,14 @@ const StatsHeader = ({ registrations, attended }: any) => {
       </div>
 
       <div className="py-4 px-5 sm:py-4 sm:px-6 flex flex-1 flex-col">
-        <div className=" font-semibold text-sm sm:text-base text-gray-800 whitespace-nowrap">
+        <div className=" font-semibold text-sm sm:text-base whitespace-nowrap">
           Total Attended
         </div>
         <div className=" font-semibold text-xs whitespace-nowrap">
           patient by today
         </div>
-        <div className=" font-semibold text-4xl text-secondary flex flex-row justify-start">
-          <div className="stat-figure absolute top-0 right-0 size-36 opacity-10">
+        <div className=" font-semibold text-4xl flex flex-row justify-start">
+          <div className="stat-figure absolute top-0 right-0 size-36 opacity-20">
             <svg
               className="inline-block size-full"
               viewBox="-5.7 -5.7 74.69 74.69"

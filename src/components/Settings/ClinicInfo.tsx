@@ -1,8 +1,9 @@
 /* eslint-disable @next/next/no-img-element */
 import { createDoctor } from "@/app/services/createDoctor";
-import { PhotoIcon, XCircleIcon } from "@heroicons/react/24/solid";
 import React, { ChangeEvent, useEffect, useState } from "react";
 import Loader from "../common/Loader";
+import { CircleX, FileImage } from "lucide-react";
+import { Button } from "../ui/button";
 
 interface DoctorInfo {
   clinicName: string;
@@ -117,22 +118,16 @@ const ClinicInfo = ({
     <form onSubmit={handleSubmit} autoFocus={true} autoComplete="off">
       <fieldset
         disabled={!editableForm}
-        className="mt-3 md:mt-6 mx-auto max-w-4xl bg-white rounded-lg"
+        className="mt-3 md:mt-6 mx-auto max-w-4xl bg-muted/30 border-2 rounded-lg"
       >
         <div className="px-3 py-2 md:px-8">
-          <h3 className="text-sm sm:text-base font-semibold leading-7 text-gray-900 tracking-wide flex flex-row justify-between items-center">
+          <h3 className="text-sm sm:text-base font-medium leading-7 tracking-wide flex flex-row justify-between items-center">
             Clinic Information
-            {mainLoader && (
-              <Loader
-                size="medium"
-                color="text-primary"
-                secondaryColor="text-gray-300"
-              />
-            )}
+            {mainLoader && <Loader size="medium" />}
           </h3>
         </div>
-        <div className="border-t-4 md:border-t-[6px] border-gray-300 flex flex-col md:flex-row">
-          <div className="py-2 px-3 md:px-8 flex flex-1 flex-col border-b-4 md:border-b-0 md:border-r-[6px] border-gray-300">
+        <div className="border-t-2 border-border flex flex-col md:flex-row">
+          <div className="py-2 px-3 md:px-8 flex flex-1 flex-col border-b-2 md:border-r-2 md:border-b-0 border-border">
             <div className="grid grid-cols-6 gap-1 md:gap-6">
               {/* Clinic Name */}
               <div className="col-span-6 sm:col-span-3">
@@ -148,7 +143,7 @@ const ClinicInfo = ({
                   type="text"
                   id="clinicName"
                   name="clinicName"
-                  className="disabled:text-gray-500 form-input py-[6px] mt-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold text-gray-700"
+                  className="disabled:text-gray-400 form-input py-[6px] mt-1 w-full rounded-md border-border bg-transparent text-sm md:text-base font-medium"
                   value={formdata?.clinicName}
                   onChange={handleChange}
                 />
@@ -166,7 +161,7 @@ const ClinicInfo = ({
                   type="text"
                   id="doctorName"
                   name="doctorName"
-                  className="disabled:text-gray-500 form-input py-[6px] mt-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold text-gray-700"
+                  className="disabled:text-gray-400 form-input py-[6px] mt-1 w-full rounded-md border-border bg-transparent text-sm md:text-base font-medium"
                   value={formdata?.doctorName}
                   onChange={handleChange}
                 />
@@ -186,7 +181,7 @@ const ClinicInfo = ({
                   type="text"
                   id="degree"
                   name="degree"
-                  className="disabled:text-gray-500 form-input py-[6px] mt-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold text-gray-700"
+                  className="disabled:text-gray-400 form-input py-[6px] mt-1 w-full rounded-md border-border bg-transparent text-sm md:text-base font-medium"
                   value={formdata?.degree}
                   onChange={handleChange}
                 />
@@ -204,7 +199,7 @@ const ClinicInfo = ({
                   type="text"
                   id="registrationNumber"
                   name="registrationNumber"
-                  className="disabled:text-gray-500 form-input py-[6px] mt-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold text-gray-700"
+                  className="disabled:text-gray-400 form-input py-[6px] mt-1 w-full rounded-md border-border bg-transparent text-sm md:text-base font-medium"
                   value={formdata?.registrationNumber}
                   onChange={handleChange}
                 />
@@ -223,7 +218,7 @@ const ClinicInfo = ({
                   type="number"
                   id="clinicNumber"
                   name="clinicNumber"
-                  className="disabled:text-gray-500 form-input py-[6px] mt-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold text-gray-700"
+                  className="disabled:text-gray-400 form-input py-[6px] mt-1 w-full rounded-md border-border bg-transparent text-sm md:text-base font-medium"
                   value={formdata?.clinicNumber}
                   onChange={handleChange}
                 />
@@ -241,7 +236,7 @@ const ClinicInfo = ({
                   type="number"
                   id="phoneNumber"
                   name="phoneNumber"
-                  className="disabled:text-gray-500 form-input py-[6px] mt-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold text-gray-700"
+                  className="disabled:text-gray-400 form-input py-[6px] mt-1 w-full rounded-md border-border bg-transparent text-sm md:text-base font-medium"
                   value={formdata?.phoneNumber}
                   onChange={handleChange}
                 />
@@ -259,7 +254,7 @@ const ClinicInfo = ({
                   type="email"
                   id="emailId"
                   name="emailId"
-                  className="disabled:text-gray-500 form-input py-[6px] mt-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold text-gray-700"
+                  className="disabled:text-gray-400 form-input py-[6px] mt-1 w-full rounded-md border-border bg-transparent text-sm md:text-base font-medium"
                   value={formdata?.emailId}
                   onChange={handleChange}
                 />
@@ -277,7 +272,7 @@ const ClinicInfo = ({
                   type="text"
                   id="clinicAddress"
                   name="clinicAddress"
-                  className="disabled:text-gray-500 form-input py-[6px] mt-1 w-full rounded-md border-gray-200 bg-white text-sm md:text-base font-semibold text-gray-700"
+                  className="disabled:text-gray-400 form-input py-[6px] mt-1 w-full rounded-md border-border bg-transparent text-sm md:text-base font-medium"
                   value={formdata?.clinicAddress}
                   onChange={handleChange}
                 />
@@ -291,7 +286,7 @@ const ClinicInfo = ({
               <p className="block text-xs sm:text-sm font-medium leading-3 text-gray-500">
                 Clinic Logo
               </p>
-              <div className="mt-1 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-8">
+              <div className="mt-1 flex justify-center rounded-lg border border-dashed border-border px-6 py-8">
                 <div className="text-center">
                   {clinicLogoPreview ? (
                     <div className="relative">
@@ -306,13 +301,13 @@ const ClinicInfo = ({
                           className="absolute top-0 right-0 -mt-2 -mr-2"
                           onClick={() => handleRemoveImage("clinicLogo")}
                         >
-                          <XCircleIcon className="h-6 w-6 text-red-600" />
+                          <CircleX className="h-6 w-6 text-red-600" />
                         </button>
                       )}
                     </div>
                   ) : (
                     <>
-                      <PhotoIcon
+                      <FileImage
                         aria-hidden="true"
                         className="mx-auto h-14 w-14 text-gray-600"
                       />
@@ -345,7 +340,7 @@ const ClinicInfo = ({
               <p className="block text-xs sm:text-sm font-medium leading-3 text-gray-500">
                 Signature Photo
               </p>
-              <div className="mt-1 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-8">
+              <div className="mt-1 flex justify-center rounded-lg border border-dashed border-border px-6 py-8">
                 <div className="text-center">
                   {signaturePhotoPreview ? (
                     <div className="relative">
@@ -360,13 +355,13 @@ const ClinicInfo = ({
                           className="absolute top-0 right-0 -mt-2 -mr-2"
                           onClick={() => handleRemoveImage("signaturePhoto")}
                         >
-                          <XCircleIcon className="h-6 w-6 text-red-600" />
+                          <CircleX className="h-6 w-6 text-red-600" />
                         </button>
                       )}
                     </div>
                   ) : (
                     <>
-                      <PhotoIcon
+                      <FileImage
                         aria-hidden="true"
                         className="mx-auto h-14 w-14 text-gray-600"
                       />
@@ -395,11 +390,11 @@ const ClinicInfo = ({
             </div>
           </div>
         </div>
-        <div className="border-t-4 md:border-t-[6px] border-gray-300 px-3 py-2 md:px-8 flex flex-row items-center">
+        <div className="border-t-2 border-border px-3 py-2 md:px-8 flex flex-row items-center">
           {editableForm ? (
             <>
-              <button
-                className="btn animate-none btn-neutral btn-sm "
+              <Button
+                variant={"destructive"}
                 onClick={() => {
                   setformdata(doctorData);
                   setClinicLogoPreview(doctorData?.clinicLogo);
@@ -407,34 +402,33 @@ const ClinicInfo = ({
                   seteditableForm(false);
                 }}
               >
-                <h3 className="text-base font-semibold leading-4 tracking-wide">
+                <h3 className="text-base font-medium leading-4 tracking-wide">
                   Cancel
                 </h3>
-              </button>
-              <button
-                type="submit"
-                className="btn animate-none btn-sm btn-primary ml-3"
-              >
+              </Button>
+              <Button type="submit" variant={"outline"} className="ml-3">
                 {loader ? (
                   <span className="loading loading-spinner loading-xs"></span>
                 ) : (
-                  <h3 className="text-base font-semibold leading-4 tracking-wide">
+                  <h3 className="text-base font-medium leading-4 tracking-wide">
                     Save
                   </h3>
                 )}
-              </button>
+              </Button>
             </>
           ) : (
-            <span
-              className={`btn btn-sm cursor-pointer animate-none btn-primary ${
-                role === "admin" ? "" : "btn-disabled"
-              }`}
-              onClick={() => seteditableForm(true)}
-            >
-              <h3 className="text-base font-semibold leading-4 text-white tracking-wide">
-                Edit
-              </h3>
-            </span>
+            <Button variant={"default"} asChild>
+              <span
+                className={`cursor-pointer ${
+                  role === "admin" ? "" : "btn-disabled"
+                }`}
+                onClick={() => seteditableForm(true)}
+              >
+                <h3 className="text-base font-medium leading-4 tracking-wide">
+                  Edit
+                </h3>
+              </span>
+            </Button>
           )}
         </div>
       </fieldset>

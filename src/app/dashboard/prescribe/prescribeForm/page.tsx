@@ -5,15 +5,21 @@ import PrescribeForm from "@/components/forms/PrescribeForm";
 import { useAppSelector } from "@/redux/store";
 import uniqid from "uniqid";
 import { useSearchParams } from "next/navigation";
-import CustomModal from "@/components/BlockedModal";
 import AttendedModal from "@/components/Prescribe/AttendedModal";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const Page = () => {
   const searchParams = useSearchParams();
   const user = useAppSelector<any>((state) => state.auth.user);
   const [submissionLoader, setSubmissionLoader] = useState(false);
   const patientId = searchParams.get("patientId");
-  const [visitID, setvisitID] = useState(uniqid.time())
+  const [visitID, setvisitID] = useState(uniqid.time());
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [receiptInfo, setReceiptInfo] = useState({
     particulars: [
@@ -74,17 +80,27 @@ const Page = () => {
   };
 
   return (
-    <div className="w-full overflow-y-auto h-svh">
-      <CustomModal isOpen={isModalOpen} mainScreenModal={true}>
-        <AttendedModal
-          isModalOpen={isModalOpen}
-          setCloseModal={setIsModalOpen}
-          patientID={patientId}
-          uID={user.uid}
-          PrescriptionAndReferData={formData}
-          receiptInfo={receiptInfo}
-        />
-      </CustomModal>
+    <>
+      <Dialog
+        open={isModalOpen}
+        onOpenChange={(state) => setIsModalOpen(state)}
+      >
+        <DialogContent className="md:max-w-screen-md">
+          <DialogHeader>
+            <DialogTitle hidden>PRINT</DialogTitle>
+            <DialogDescription hidden>DESC</DialogDescription>
+          </DialogHeader>
+          <AttendedModal
+            isModalOpen={isModalOpen}
+            setCloseModal={setIsModalOpen}
+            patientID={patientId}
+            uID={user.uid}
+            PrescriptionAndReferData={formData}
+            receiptInfo={receiptInfo}
+          />
+        </DialogContent>
+      </Dialog>
+
       <PrescribeForm
         formData={formData}
         setFormData={setFormData}
@@ -93,7 +109,7 @@ const Page = () => {
         receiptInfo={receiptInfo as any}
         setReceiptInfo={setReceiptInfo}
       />
-    </div>
+    </>
   );
 };
 

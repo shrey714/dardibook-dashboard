@@ -8,8 +8,15 @@ import { getPatientHistory } from "@/app/services/getPatientHistory";
 import NoPatientHistoryFound from "@/components/Prescribe/NoPatientHistoryFound";
 import Loader from "@/components/common/Loader";
 import PrintModal from "@/components/History/PrintModal";
-import CustomModal from "@/components/BlockedModal";
 import { getDocotr } from "@/app/services/getDoctor";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const Page = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -53,56 +60,59 @@ const Page = () => {
   }, [patientId, user.uid]);
 
   return (
-    <div className="self-center flex w-full flex-col">
+    <>
       {patientId && historyLoader ? (
-        <div className="w-full h-svh overflow-hidden flex items-center justify-center z-50">
-          <Loader
-            size="medium"
-            color="text-primary"
-            secondaryColor="text-white"
-          />
+        <div className="w-full h-full overflow-hidden flex items-center justify-center">
+          <Loader size="medium" />
         </div>
       ) : error ? (
         <NoPatientHistoryFound message={error} />
       ) : (
-        <>
-          <CustomModal isOpen={isModalOpen} mainScreenModal={false}>
-            <PrintModal
-              setIsModalOpen={setIsModalOpen}
-              patientData={patientData}
-              prescriptionsData={prescriptionsData}
-              doctorData={doctorData}
-            />
-          </CustomModal>
+        <div className="relative">
+          <Dialog
+            open={isModalOpen}
+            onOpenChange={(state) => setIsModalOpen(state)}
+          >
+            <DialogContent className="md:max-w-screen-md">
+              <DialogHeader>
+                <DialogTitle hidden>PRINT</DialogTitle>
+                <DialogDescription hidden>DESC</DialogDescription>
+              </DialogHeader>
+              <PrintModal
+                setIsModalOpen={setIsModalOpen}
+                patientData={patientData}
+                prescriptionsData={prescriptionsData}
+                doctorData={doctorData}
+              />
+            </DialogContent>
+          </Dialog>
 
           <div className="p-2 flex gap-0 sm:gap-8 items-center flex-col-reverse sm:flex-row px-4 ">
             <PatientDataBox patientData={patientData} />
             <div className="p-4 gap-6 flex flex-col">
               {prescriptionsData?.length !== 0 && (
-                <button
+                <Button
+                  size={"lg"}
                   disabled={doctorLoader}
                   onClick={() => {
                     setIsModalOpen(true);
                   }}
-                  className="btn animate-none btn-success text-white sm:btn-md lg:btn-wide"
                 >
                   {doctorLoader ? (
                     <Loader
                       size="medium"
-                      color="text-primary"
-                      secondaryColor="text-gray-300"
                     />
                   ) : (
                     "Print"
                   )}
-                </button>
+                </Button>
               )}
             </div>
           </div>
           <PatientHistoryTabs prescriptionsData={prescriptionsData} />
-        </>
+        </div>
       )}
-    </div>
+    </>
   );
 };
 

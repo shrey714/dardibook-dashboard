@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import Loader from "../common/Loader";
+import { Button } from "../ui/button";
 interface PatientFormData {
   last_visited: number;
   patient_unique_Id: string;
@@ -340,28 +341,19 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
         </div>
         {/* submit-cancel buttons */}
         <div className="mt-6 flex items-center justify-center gap-x-6">
-          <Link
-            href={"./"}
-            scroll={true}
-            type="button"
-            className="btn md:btn-wide bg-white border-0 text-sm font-semibold leading-6 text-gray-900"
-          >
-            Cancel
-          </Link>
-          <button
-            type="submit"
-            className="btn relative md:btn-wide rounded-md bg-indigo-600 border-0 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-          >
-            {submissionLoader ? (
-              <Loader
-                size="medium"
-                color="text-primary"
-                secondaryColor="text-white"
-              />
-            ) : (
-              "Save"
-            )}
-          </button>
+          <Button asChild>
+            <Link
+              href={"./"}
+              scroll={true}
+              type="button"
+              className="btn md:btn-wide bg-white border-0 text-sm font-semibold leading-6 text-gray-900"
+            >
+              Cancel
+            </Link>
+          </Button>
+          <Button type="submit" variant={"secondary"}>
+            {submissionLoader ? <Loader size="medium" /> : "Save"}
+          </Button>
         </div>
       </fieldset>
     </form>

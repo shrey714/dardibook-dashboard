@@ -86,27 +86,12 @@ const SignIn = () => {
           </div>
         </div>
 
-        <div className="z-50 gap-4 py-4 w-full flex flex-col px-8 sm:px-0 sm:flex-row items-center justify-between">
+        <div className="z-50 gap-4 py-4 w-full flex flex-col px-8 sm:px-0 sm:flex-row items-center justify-end">
           <Link
-            href={"register/subDoctorAccessibility"}
-            className="bg-gray-900 w-full sm:w-auto border-0 px-5 py-1 text-gray-300 outline-none flex flex-1 items-center justify-center text-base sm:text-base font-bold tracking-wide rounded-full hover:bg-primary transition-all"
+            href={"register/rolesAccessibility"}
+            className="bg-gray-900 w-auto flex flex-row border-0 px-5 py-1 text-gray-300 outline-none items-center justify-center text-base sm:text-base font-bold tracking-wide rounded-full transition-all"
           >
-            SubDoctor
-            <svg
-              className="size-10"
-              focusable="false"
-              aria-hidden="true"
-              viewBox="0 0 24 24"
-              fill="white"
-            >
-              <path d="m11.71 15.29 2.59-2.59c.39-.39.39-1.02 0-1.41L11.71 8.7c-.63-.62-1.71-.18-1.71.71v5.17c0 .9 1.08 1.34 1.71.71"></path>
-            </svg>
-          </Link>
-          <Link
-            href={"register/medicalAccessibility"}
-            className="bg-gray-900 w-full sm:w-auto border-0 px-5 py-1 text-gray-300 outline-none flex flex-1 items-center justify-center text-base sm:text-base font-bold tracking-wide rounded-full hover:bg-primary transition-all"
-          >
-            Medical
+            Select your role
             <svg
               className="size-10"
               focusable="false"

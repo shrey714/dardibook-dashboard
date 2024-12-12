@@ -60,8 +60,6 @@ const SignIn = () => {
               {loading ? (
                 <Loader
                   size="medium"
-                  color="text-gray-300"
-                  secondaryColor="text-primary"
                 />
               ) : (
                 <>

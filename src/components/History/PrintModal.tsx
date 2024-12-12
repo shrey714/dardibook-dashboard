@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import PrintHandeler from "../PrintForms/PrintHandeler";
+import { Button } from "../ui/button";
 
 const PrintModal = ({
   setIsModalOpen,
@@ -29,23 +30,23 @@ const PrintModal = ({
   return (
     <>
       <div className="flex flex-col">
-        <h3 className="mb-4 font-semibold text-gray-900">
+        <h3 className="mb-4 font-semibold">
           Please select the Prescription date :
         </h3>
-        <ul className="text-sm font-medium text-gray-900 border border-gray-200 rounded-lg bg-gray-300">
+        <ul className="text-sm font-medium border-2 rounded-lg">
           {prescriptionsData?.map((pres: any, key: number) => (
             <li
               key={key}
               className={`w-full ${
                 key === prescriptionsData?.length - 1 ? "" : "border-b"
-              } border-gray-200 rounded-t-lg`}
+              } border-border rounded-t-lg`}
             >
               <div className="flex items-center ps-4">
                 <input
                   type="radio"
                   id={`key-id-${key}`}
                   name="date-picker"
-                  className="radio border-2 radio-[#ADADAD]"
+                  className="border-2"
                   defaultChecked={
                     key === prescriptionsData?.length - 1 ? true : false
                   }
@@ -55,7 +56,7 @@ const PrintModal = ({
                 />
                 <label
                   htmlFor={`key-id-${key}`}
-                  className="w-full py-3 pl-4 text-sm font-medium text-gray-900"
+                  className="w-full py-3 pl-4 text-sm font-medium"
                 >
                   {new Date(pres?.time).toLocaleDateString("en-GB")}
                 </label>
@@ -65,60 +66,57 @@ const PrintModal = ({
         </ul>
       </div>
       <div className="mt-4 flex sm:items-end gap-y-3 gap-x-4 flex-col-reverse sm:flex-row">
-        <button
+        <Button
           type="button"
           onClick={() => setIsModalOpen(false)}
-          className="flex animate-none flex-1 btn btn-outline text-sm font-semibold leading-6 text-gray-900"
+          variant={"outline"}
+          className="flex flex-1 text-sm font-semibold leading-6"
         >
           Cancel
-        </button>
-        <div className="join join-vertical flex flex-1">
-          <div className="join-item bg-gray-300">
-            <div className="join-item flex items-center ps-4 border">
-              <input
-                id="Prescription"
-                type="checkbox"
-                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                checked={printOptions.IsPrescription}
-                onChange={(e) =>
-                  setprintOptions({
-                    IsPrescription: e.target.checked,
-                    IsRefer: printOptions.IsRefer,
-                  })
-                }
-              />
-              <label
-                htmlFor="Prescription"
-                className="w-full py-2 ms-2 text-xs font-medium text-gray-500"
-              >
-                Prescription Report
-              </label>
-            </div>
-            <div className="join-item flex items-center ps-4 border border-t-0">
-              <input
-                id="Refer"
-                type="checkbox"
-                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                checked={printOptions.IsRefer}
-                onChange={(e) =>
-                  setprintOptions({
-                    IsPrescription: printOptions.IsPrescription,
-                    IsRefer: e.target.checked,
-                  })
-                }
-              />
-              <label
-                htmlFor="Refer"
-                className="w-full py-2 ms-2 text-xs font-medium text-gray-500"
-              >
-                Refer Report
-              </label>
-            </div>
+        </Button>
+        <div className="flex flex-1 flex-col border rounded-md w-full">
+          <div className="flex items-center ps-4">
+            <input
+              id="Prescription"
+              type="checkbox"
+              className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+              checked={printOptions.IsPrescription}
+              onChange={(e) =>
+                setprintOptions({
+                  IsPrescription: e.target.checked,
+                  IsRefer: printOptions.IsRefer,
+                })
+              }
+            />
+            <label
+              htmlFor="Prescription"
+              className="w-full py-2 ms-2 text-xs font-medium"
+            >
+              Prescription Report
+            </label>
+          </div>
+          <div className="flex items-center ps-4 border-t">
+            <input
+              id="Refer"
+              type="checkbox"
+              className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+              checked={printOptions.IsRefer}
+              onChange={(e) =>
+                setprintOptions({
+                  IsPrescription: printOptions.IsPrescription,
+                  IsRefer: e.target.checked,
+                })
+              }
+            />
+            <label
+              htmlFor="Refer"
+              className="w-full py-2 ms-2 text-xs font-medium"
+            >
+              Refer Report
+            </label>
           </div>
           <PrintHandeler
-            styleForBtn={
-              "flex flex-1 animate-none border-gray-200 btn border-gray-300 hover:border-gray-300 btn-success join-item text-sm font-semibold leading-6 text-white"
-            }
+            styleForBtn={"bg-primary"}
             printOptions={printOptions}
             PrescriptionAndReferData={currentPrescription}
             patientData={patientData}

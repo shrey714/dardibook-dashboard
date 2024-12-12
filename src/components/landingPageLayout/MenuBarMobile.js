@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import { Bars3Icon } from "@heroicons/react/24/outline";
+import { Menu } from "lucide-react";
 // import { FiMenu as Icon } from 'react-icons/fi'
 // import { FaUser } from 'react-icons/fa'
 
@@ -15,7 +15,7 @@ export default function MenuBarMobile({ setter }) {
           setter((oldVal) => !oldVal);
         }}
       >
-        <Bars3Icon className="size-7 p-[2px] text-gray-800/60 border-2 rounded-md border-gray-800/60" />
+        <Menu className="size-7 p-[2px] text-gray-800/60 border-2 rounded-md border-gray-800/60" />
       </button>
     </nav>
   );

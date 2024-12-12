@@ -3,14 +3,7 @@ import React from "react";
 import BoxContainer from "./BoxContainer";
 import useToken from "@/firebase/useToken"; // Adjust the path accordingly
 import { useAppSelector } from "@/redux/store";
-import {
-  MinusIcon,
-  PauseIcon,
-  PlayIcon,
-  PlusIcon,
-  SpeakerWaveIcon,
-  SpeakerXMarkIcon,
-} from "@heroicons/react/24/solid";
+import { Minus,Pause,Play,Plus,Volume2,VolumeOff  } from "lucide-react";
 
 export default function TokenBox() {
   const user = useAppSelector<any>((state) => state.auth.user);
@@ -35,9 +28,9 @@ export default function TokenBox() {
           } border-[3px] border-r-[1.5px] border-black`}
         >
           {isPaused ? (
-            <PauseIcon className="size-4 text-white animate-pulse" />
+            <Pause className="size-4 text-white animate-pulse" />
           ) : (
-            <PlayIcon className="size-4 text-black" />
+            <Play className="size-4 text-black" />
           )}
         </button>
         {/* sound on off button */}
@@ -48,9 +41,9 @@ export default function TokenBox() {
           } border-[3px] border-l-[1.5px] border-black`}
         >
           {allowNotification ? (
-            <SpeakerWaveIcon className="size-4 text-black" />
+            <Volume2 className="size-4 text-black" />
           ) : (
-            <SpeakerXMarkIcon className="size-4 text-white animate-pulse" />
+            <VolumeOff className="size-4 text-white animate-pulse" />
           )}
         </button>
       </div>
@@ -70,7 +63,7 @@ export default function TokenBox() {
           } border-[3px] border-r-[1.5px] border-black`}
           disabled={isPaused}
         >
-          <MinusIcon className="size-4" />
+          <Minus className="size-4" />
         </button>
         {/* token increase button */}
         <button
@@ -82,7 +75,7 @@ export default function TokenBox() {
           } border-[3px] border-l-[1.5px] border-black`}
           disabled={isPaused}
         >
-          <PlusIcon className="size-4" />
+          <Plus className="size-4" />
         </button>
       </div>
     </div>

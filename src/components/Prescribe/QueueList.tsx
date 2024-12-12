@@ -7,9 +7,10 @@ import Link from "next/link";
 import StatsHeader from "./StatsHeader";
 import useToken from "@/firebase/useToken";
 import Loader from "../common/Loader";
-import { collection, onSnapshot, query, where } from "firebase/firestore";
+import { collection, onSnapshot, query } from "firebase/firestore";
 import { db } from "@/firebase/firebaseConfig";
 import { Reorder } from "framer-motion";
+import { RefreshCw } from "lucide-react";
 const QueueList: React.FC = () => {
   const user = useAppSelector<any>((state) => state.auth.user);
   const [queueItems, setqueueItems] = useState<any>([]);
@@ -84,22 +85,18 @@ const QueueList: React.FC = () => {
         }
       />
       <div className="w-full mt-8 p-0 flex flex-row items-center">
-        <span className="flex flex-1 h-[2px] bg-gradient-to-r from-transparent via-primary to-gray-800"></span>
+        <span className="flex flex-1 h-[2px] bg-gradient-to-r from-transparent to-primary"></span>
         <div className=" flex items-center justify-center">
-          <p className="text-gray-800 w-auto px-3 py-1 font-semibold text-base bg-gray-300 rounded-full border-gray-800 border-[2px]">
+          <p className="w-auto px-3 py-1 font-medium text-base rounded-full border-primary border-[2px]">
             Doctor&apos;s Space
           </p>
         </div>
-        <span className="flex flex-1 h-[2px] bg-gradient-to-l from-transparent via-primary to-gray-800"></span>
+        <span className="flex flex-1 h-[2px] bg-gradient-to-l from-transparent to-primary"></span>
       </div>
       <div className="w-full flex flex-row">
         {queueLoader ? (
           <div className="w-full h-52 overflow-hidden flex items-center justify-center">
-            <Loader
-              size="medium"
-              color="text-primary"
-              secondaryColor="text-white"
-            />
+            <Loader size="medium" />
           </div>
         ) : queueItems.length === 0 ? (
           <div className="w-full h-52 overflow-hidden flex items-end justify-center">
@@ -108,25 +105,11 @@ const QueueList: React.FC = () => {
         ) : (
           <>
             <ul className="w-full mt-4 relative">
-              {/* <ArrowPathIcon
-                className={`w-4 h-4 text-gray-800 absolute -top-6 right-3 ${
+              <RefreshCw
+                className={`w-4 h-4 text-primary absolute -top-6 right-3 ${
                   realUpdateLoader ? "animate-spin" : ""
                 }`}
-              /> */}
-
-              <svg
-                className={`w-4 h-4 absolute -top-6 right-3 transform -rotate-180 ${
-                  realUpdateLoader
-                    ? "animate-spin text-primary"
-                    : "text-gray-800"
-                }`}
-                focusable="false"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path d="M18.65 8.35l-2.79 2.79c-.32.32-.1.86.35.86H18c0 3.31-2.69 6-6 6-.79 0-1.56-.15-2.25-.44-.36-.15-.77-.04-1.04.23-.51.51-.33 1.37.34 1.64.91.37 1.91.57 2.95.57 4.42 0 8-3.58 8-8h1.79c.45 0 .67-.54.35-.85l-2.79-2.79c-.19-.2-.51-.2-.7-.01zM6 12c0-3.31 2.69-6 6-6 .79 0 1.56.15 2.25.44.36.15.77.04 1.04-.23.51-.51.33-1.37-.34-1.64C14.04 4.2 13.04 4 12 4c-4.42 0-8 3.58-8 8H2.21c-.45 0-.67.54-.35.85l2.79 2.79c.2.2.51.2.71 0l2.79-2.79c.31-.31.09-.85-.36-.85H6z"></path>
-              </svg>
+              />
 
               <Reorder.Group
                 values={queueItems}
@@ -136,19 +119,19 @@ const QueueList: React.FC = () => {
                 <table className="w-full">
                   <thead>
                     <tr className="sticky top-1 z-20">
-                      <th className="pb-2 text-sm sm:text-base text-gray-800">
+                      <th className="pb-2 text-sm sm:text-base">
                         Token
                       </th>
-                      <th className="pb-2 text-sm sm:text-base text-gray-800 hide-before-480 hide-between-768-and-990">
+                      <th className="pb-2 text-sm sm:text-base hide-before-480 hide-between-768-and-990">
                         Id
                       </th>
-                      <th className="pb-2 text-sm sm:text-base text-gray-800">
+                      <th className="pb-2 text-sm sm:text-base">
                         Name
                       </th>
-                      <th className="pb-2 text-sm sm:text-base text-gray-800">
+                      <th className="pb-2 text-sm sm:text-base">
                         Status
                       </th>
-                      <th className="pb-2 text-sm sm:text-base text-gray-800">
+                      <th className="pb-2 text-sm sm:text-base">
                         Actions
                       </th>
                     </tr>
@@ -159,7 +142,7 @@ const QueueList: React.FC = () => {
                         CurrentToken === queueItems.length - key ? true : false;
                       return (
                         <Reorder.Item
-                        drag={false}
+                          drag={false}
                           as="tr"
                           key={item.patient_unique_Id}
                           value={item.patient_unique_Id}
@@ -187,7 +170,7 @@ const QueueList: React.FC = () => {
                               className={`${
                                 select
                                   ? "bg-primary text-white"
-                                  : " text-gray-800"
+                                  : ""
                               } p-1 my-1 rounded-s-full`}
                             >
                               {queueItems.length - key}
@@ -257,7 +240,7 @@ const QueueList: React.FC = () => {
                                   pathname: "prescribe/prescribeForm",
                                   query: { patientId: item.patient_unique_Id },
                                 }}
-                                className="mx-1 py-1 px-2 w-full m-1 bg-primary text-white rounded-[4px] font-semibold text-sm sm:text-base"
+                                className="mx-1 py-1 px-2 w-full m-1 bg-primary text-gray-800 rounded-[4px] font-semibold text-sm sm:text-base"
                               >
                                 Attend
                               </Link>

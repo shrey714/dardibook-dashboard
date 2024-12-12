@@ -6,6 +6,8 @@ import AppWrapper from "@/components/wrapper/AppWrapper";
 import ReduxWrapper from "@/components/wrapper/ReduxWrapper";
 import { Toaster } from "react-hot-toast";
 import { Suspense } from "react";
+import type { ThemeProviderProps } from "next-themes";
+import { ThemeProvider as NextThemeProvider } from "next-themes";
 const DM_Sans_Font = DM_Sans({
   subsets: ["latin"],
   display: "swap",
@@ -31,14 +33,22 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
         lang="en"
         className={DM_Sans_Font.className}
         style={{ scrollbarGutter: "auto" }}
+        suppressHydrationWarning
       >
         <body className="min-h-svh" suppressHydrationWarning={true}>
-          <Toaster position="top-right" />
-          <ReduxWrapper>
-            <Suspense>
-              <AppWrapper>{children}</AppWrapper>
-            </Suspense>
-          </ReduxWrapper>
+          <NextThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <Toaster position="top-right" />
+            <ReduxWrapper>
+              <Suspense>
+                <AppWrapper>{children}</AppWrapper>
+              </Suspense>
+            </ReduxWrapper>
+          </NextThemeProvider>
         </body>
       </html>
     </>

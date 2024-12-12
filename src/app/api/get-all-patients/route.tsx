@@ -3,22 +3,25 @@ import { db } from "@/firebase/firebaseConfig";
 import { collection, doc, getDocs, query, where } from "firebase/firestore";
 import { withAuth } from "@/server/withAuth";
 
-
-
 const getAllPatients = async (request: NextRequest) => {
   try {
     const { searchParams } = new URL(request.url);
     const doctorId = searchParams.get("doctorId");
+    const from = searchParams.get("from");
+    const to = searchParams.get("to");
 
-    if (!doctorId) {
+    if (!doctorId || !from || !to) {
       return NextResponse.json(
-        { error: "Doctor ID is required." },
+        { error: "Doctor ID/from/to is missing." },
         { status: 400 }
       );
     }
-
     const patientsCollection = collection(db, "doctor", doctorId, "patients");
-    const patientsQuery = query(patientsCollection);
+    const patientsQuery = query(
+      patientsCollection,
+      where("last_visited", ">=", parseInt(from)),
+      where("last_visited", "<=", parseInt(to))
+    );
 
     const querySnapshot = await getDocs(patientsQuery);
     const patientsData: {
@@ -27,7 +30,7 @@ const getAllPatients = async (request: NextRequest) => {
       last_name: any;
       age: string;
       gender: string;
-      last_visited: string;
+      last_visited: number;
       visitedDates: any;
       appointed: boolean;
       mobile_number: string;

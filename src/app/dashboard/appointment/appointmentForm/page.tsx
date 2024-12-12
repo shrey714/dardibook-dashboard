@@ -7,9 +7,16 @@ import { useAppSelector } from "@/redux/store";
 import { getPatientById } from "@/app/services/getPatientById";
 import NoPatientsFound from "@/components/Appointment/NoPatientsFound";
 import { RegisterPatient } from "@/app/services/registerPatient";
-import CustomModal from "@/components/BlockedModal";
 import RegisteredModal from "@/components/Appointment/RegisteredModal";
 import Loader from "@/components/common/Loader";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+
 interface PatientFormDataTypes {
   last_visited: number;
   patient_unique_Id: string;
@@ -91,25 +98,31 @@ const Page: React.FC = () => {
   };
 
   return (
-    <div className="w-full overflow-y-auto h-svh">
-      <CustomModal isOpen={isModalOpen} mainScreenModal={true}>
-        <RegisteredModal
-          isModalOpen={isModalOpen}
-          setCloseModal={setIsModalOpen}
-        />
-      </CustomModal>
-      {patientId && formLoader ? (
-        <div className="w-full h-svh overflow-hidden flex items-center justify-center z-50">
-          <Loader
-            size="medium"
-            color="text-primary"
-            secondaryColor="text-white"
+    <>
+      <Dialog
+        open={isModalOpen}
+        onOpenChange={(state) => setIsModalOpen(state)}
+      >
+        <DialogContent className="md:max-w-screen-md">
+          <DialogHeader>
+            <DialogTitle hidden>PRINT</DialogTitle>
+            <DialogDescription hidden>DESC</DialogDescription>
+          </DialogHeader>
+          <RegisteredModal
+            isModalOpen={isModalOpen}
+            setCloseModal={setIsModalOpen}
           />
+        </DialogContent>
+      </Dialog>
+
+      {patientId && formLoader ? (
+        <div className="w-full h-full overflow-hidden flex items-center justify-center z-50">
+          <Loader size="medium" />
         </div>
       ) : error ? (
         <NoPatientsFound message={error} />
       ) : (
-        <div className="my-12">
+        <div className="mb-12 mt-6">
           <AppointmentForm
             patientFormData={patientFormData}
             setPatientFormData={setPatientFormData}
@@ -118,7 +131,7 @@ const Page: React.FC = () => {
           />
         </div>
       )}
-    </div>
+    </>
   );
 };
 

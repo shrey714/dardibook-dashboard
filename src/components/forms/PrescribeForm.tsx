@@ -6,6 +6,13 @@ import Loader from "../common/Loader";
 import ReceiptForm from "./ReceiptForm";
 import DiseaseSuggetion from "../Prescribe/DiseaseSuggetion";
 import uniqid from "uniqid";
+import { Button } from "../ui/button";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 const PrescribeForm = ({
   formData,
@@ -49,7 +56,7 @@ const PrescribeForm = ({
 
   return (
     <form
-      className="px-4 sm:px-6 lg:px-8 py-12"
+      className="px-4 sm:px-6 lg:px-8 pb-12 pt-6"
       onSubmit={handleSubmit}
       autoComplete="off"
       autoFocus={true}
@@ -159,7 +166,8 @@ const PrescribeForm = ({
         </div>
         <div className="mt-4 sm:mt-6 mx-auto max-w-5xl rounded-lg bg-white">
           {/* Higher hospital Form */}
-          <div className="mt-4 sm:mt-6 col-span-full px-8 ">
+
+          {/* <div className="mt-4 sm:mt-6 col-span-full px-8 ">
             <div className="collapse collapse-arrow text-black ">
               <input
                 type="checkbox"
@@ -230,8 +238,83 @@ const PrescribeForm = ({
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
+
+          <Accordion
+            type="single"
+            collapsible
+            className="w-full mt-4 sm:mt-6 col-span-full px-8 text-black"
+          >
+            <AccordionItem value="item-1" className="border-0">
+              <AccordionTrigger className="text-lg font-semibold">
+                Refer to higher hospital
+              </AccordionTrigger>
+              <AccordionContent>
+                <div className="px-0">
+                  <div className="py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                    <label
+                      htmlFor="hospitalName"
+                      className="text-sm font-medium leading-6 text-gray-900 flex items-center"
+                    >
+                      Hospital Name<span className="text-red-500 ml-1">*</span>
+                    </label>
+                    <div className="sm:col-span-2 flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+                      <input
+                        type="text"
+                        required={formData.diseaseDetail ? false : true}
+                        name="hospitalName"
+                        id="hospitalName"
+                        autoComplete="new-off"
+                        className="form-input block w-full flex-1 border-0 bg-transparent py-1 pl-2 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
+                        value={formData.refer.hospitalName}
+                        onChange={handleHigherHospitalChange}
+                      />
+                    </div>
+                  </div>
+                  <div className="py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0 border-t border-gray-900/10">
+                    <label
+                      htmlFor="doctorName"
+                      className="text-sm font-medium leading-6 text-gray-900 flex items-center"
+                    >
+                      Appointed Doctor Name
+                    </label>
+                    <div className="sm:col-span-2 flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+                      <input
+                        type="text"
+                        name="doctorName"
+                        id="doctorName"
+                        autoComplete="new-off"
+                        className="form-input block w-full flex-1 border-0 bg-transparent py-1 pl-2 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
+                        value={formData.refer.doctorName}
+                        onChange={handleHigherHospitalChange}
+                      />
+                    </div>
+                  </div>
+                  <div className="py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0 border-t border-gray-900/10">
+                    <label
+                      htmlFor="referMessage"
+                      className="block text-sm font-medium leading-6 text-gray-900"
+                    >
+                      Refer message
+                    </label>
+                    <div className="sm:col-span-2 flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+                      <textarea
+                        id="referMessage"
+                        name="referMessage"
+                        autoComplete="new-off"
+                        rows={1}
+                        className="form-textarea block w-full rounded-md flex-1 border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                        value={formData.refer.referMessage}
+                        onChange={handleHigherHospitalChange}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
         </div>
+
         <div className="mt-4 sm:mt-6 mx-auto max-w-5xl rounded-lg bg-white">
           {/* fees inputs */}
 
@@ -243,28 +326,20 @@ const PrescribeForm = ({
 
         {/* Submit button */}
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-          <Link href="./">
-            <button
+          <Button asChild>
+            <Link
+              href={"./"}
+              scroll={true}
               type="button"
               className="btn md:btn-wide bg-white border-0 text-sm font-semibold leading-6 text-gray-900"
             >
               Cancel
-            </button>
-          </Link>
-          <button
-            type="submit"
-            className="btn md:btn-wide rounded-md bg-indigo-600 border-0 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-          >
-            {submissionLoader ? (
-              <Loader
-                size="medium"
-                color="text-primary"
-                secondaryColor="text-white"
-              />
-            ) : (
-              "Save"
-            )}
-          </button>
+            </Link>
+          </Button>
+
+          <Button type="submit" variant={"secondary"}>
+            {submissionLoader ? <Loader size="medium" /> : "Save"}
+          </Button>
           {/* <button
             type="button"
             onClick={() => {

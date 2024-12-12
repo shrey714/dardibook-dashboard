@@ -11,10 +11,20 @@ import {
 import PatientDataBox from "@/components/Medical/PatientDataBox";
 import { db } from "@/firebase/firebaseConfig";
 import { useAppSelector } from "@/redux/store";
-import { XMarkIcon } from "@heroicons/react/24/solid";
 import { query, collection, onSnapshot } from "firebase/firestore";
+import { X } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 const Page = () => {
   const searchParams = useSearchParams();
@@ -24,6 +34,7 @@ const Page = () => {
   const [patientList, setpatientList] = useState<any>([]);
   const [startIndex, setstartIndex] = useState(0);
   const [selectedPatientId, setselectedPatientId] = useState(patientId);
+  const [drawerState, setdrawerState] = useState(false);
 
   useEffect(() => {
     let unsubscribe: () => void;
@@ -65,57 +76,39 @@ const Page = () => {
 
   return (
     <>
-      <div className="drawer drawer-end w-auto static">
-        <input id="my-drawer-shrey" type="checkbox" className="drawer-toggle" />
-        <div className="drawer-side z-20">
-          <label
-            htmlFor="my-drawer-shrey"
-            aria-label="close sidebar"
-            className="drawer-overlay"
-          ></label>
-          <div className="menu bg-base-200 text-base-content h-svh overflow-hidden flex-col w-full md:w-[70vw] lg:w-[60vw] p-4 pt-2 relative">
-            {/* Sidebar content here */}
-
-            <div className="w-full mb-2 flex justify-end md:justify-start">
-              <label
-                htmlFor="my-drawer-shrey"
-                className="drawer-button btn animate-none btn-circle btn-sm bg-gray-300"
-              >
-                <XMarkIcon height={18} width={18} color="red" />
-              </label>
-            </div>
-
-            {/* diaplay medicine */}
-            <div className="w-full flex flex-col flex-1 bg-gray-300 p-2 md:p-3 rounded-lg overflow-y-auto">
-              <PatientDataBox
-                patientData={patientList.find(
-                  (patient: { patient_unique_Id: any }) =>
-                    patient.patient_unique_Id === selectedPatientId
-                )}
-              />
-            </div>
-          </div>
-        </div>
+      <div className="w-auto static">
+        <Sheet
+          open={drawerState}
+          onOpenChange={(state) => setdrawerState(state)}
+        >
+          <SheetContent className="w-full md:w-[50vw] p-3">
+            <SheetHeader>
+              <SheetTitle hidden>Edit profile</SheetTitle>
+              <SheetDescription hidden>DESC</SheetDescription>
+            </SheetHeader>
+            <PatientDataBox
+              patientData={patientList.find(
+                (patient: { patient_unique_Id: any }) =>
+                  patient.patient_unique_Id === selectedPatientId
+              )}
+            />
+          </SheetContent>
+        </Sheet>
 
         {loader ? (
-          <div className="w-full h-svh overflow-hidden flex items-center justify-center z-40">
-            <Loader
-              size="medium"
-              color="text-primary"
-              secondaryColor="text-white"
-            />
+          <div className="w-full overflow-hidden h-[calc(100svh-53px)] flex flex-1 items-center justify-center z-40">
+            <Loader size="medium" />
           </div>
         ) : patientList.length === 0 ? (
           <div
             style={{
               width: "100%",
-              height: "100vh",
               overflow: "hidden",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              zIndex: 100000,
             }}
+            className="h-[calc(100svh-53px)]"
           >
             empty
           </div>
@@ -139,9 +132,10 @@ const Page = () => {
               ))}
             </CarouselThumbsContainer>
             <div className="relative basis-3/4 overflow-hidden">
-              <CarouselMainContainer className="h-[calc(100svh-48px)] pb-[6px] z-[1] relative">
+              <CarouselMainContainer className="h-[calc(100svh-106px)] z-[1] relative">
                 {patientList.map((patient: any, index: any) => (
                   <SliderMainItem
+                    setdrawerState={setdrawerState}
                     key={index}
                     patient={patient}
                     selectedPatientId={selectedPatientId}

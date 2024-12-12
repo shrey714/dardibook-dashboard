@@ -34,7 +34,7 @@ const ReOrderingList: React.FC = () => {
       <div className="max-h-[80vh] overflow-y-auto overflow-x-hidden flex flex-row">
         {queueLoader ? (
            <div className="w-full h-48 overflow-hidden flex items-center justify-center">
-           <Loader size="medium" color="text-primary" secondaryColor="text-white" />
+           <Loader size="medium"/>
          </div>
         ) : queueItems.length === 0 ? (
           <div className="w-full h-52 overflow-hidden flex items-center justify-center">
@@ -45,20 +45,20 @@ const ReOrderingList: React.FC = () => {
             <ul className="w-full">
               <table className="w-full">
                 <thead>
-                  <tr className="sticky top-0 bg-gray-300">
-                    <th className="pb-2 text-sm sm:text-base text-gray-800">
+                  <tr className="sticky top-0 bg-background">
+                    <th className="pb-2 text-sm sm:text-base">
                       Token
                     </th>
-                    <th className="pb-2 text-sm sm:text-base text-gray-800 hide-before-480 hide-between-768-and-990">
+                    <th className="pb-2 text-sm sm:text-base hide-before-480 hide-between-768-and-990">
                       Id
                     </th>
-                    <th className="pb-2 text-sm sm:text-base text-gray-800">
+                    <th className="pb-2 text-sm sm:text-base">
                       Name
                     </th>
-                    <th className="pb-2 hidden lg:block text-sm sm:text-base text-gray-800">
+                    <th className="pb-2 hidden lg:block text-sm sm:text-base">
                       Contact
                     </th>
-                    <th className="pb-2 text-sm sm:text-base text-gray-800">
+                    <th className="pb-2 text-sm sm:text-base">
                       Status
                     </th>
                   </tr>
@@ -74,7 +74,7 @@ const ReOrderingList: React.FC = () => {
                             className={`${
                               select
                                 ? "bg-primary text-white"
-                                : " text-gray-800"
+                                : ""
                             } p-1 rounded-s-full`}
                           >
                             {queueItems.length - key}

@@ -2,11 +2,7 @@ import React, { useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import {
-  ArrowsPointingInIcon,
-  ArrowsPointingOutIcon,
-} from "@heroicons/react/24/outline";
-import { NoSymbolIcon, PauseIcon } from "@heroicons/react/24/solid";
+import { Maximize, Minimize, Pause } from "lucide-react";
 const BoxContainer = ({ CurrentToken, loading, isPaused }: any) => {
   const [isExpanded, setisExpanded] = useState(false);
 
@@ -54,7 +50,7 @@ const BoxContainer = ({ CurrentToken, loading, isPaused }: any) => {
               alt="logo"
             />
 
-            <ArrowsPointingInIcon className="size-4 text-white absolute top-4 right-4 opacity-20" />
+            <Minimize className="size-4 text-white absolute top-4 right-4 opacity-20" />
 
             <motion.h3
               layoutId={`h3-714`}
@@ -68,7 +64,7 @@ const BoxContainer = ({ CurrentToken, loading, isPaused }: any) => {
               }}
             >
               {loading || isPaused ? (
-                <PauseIcon className="size-48 text-white" />
+                <Pause className="size-48 text-white" />
               ) : (
                 CurrentToken
               )}
@@ -109,7 +105,7 @@ const BoxContainer = ({ CurrentToken, loading, isPaused }: any) => {
       >
         {/* Add image here also */}
 
-        <ArrowsPointingOutIcon className="size-4 text-white absolute top-4 right-4" />
+        <Maximize className="size-4 text-white absolute top-4 right-4" />
         <motion.h3
           layoutId={`h3-714`}
           style={{
@@ -122,7 +118,7 @@ const BoxContainer = ({ CurrentToken, loading, isPaused }: any) => {
           }}
         >
           {loading || isPaused ? (
-            <PauseIcon className="size-10 text-white" />
+            <Pause className="size-10 text-white" />
           ) : (
             CurrentToken
           )}

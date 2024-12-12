@@ -6,6 +6,8 @@ import MultiLevelList from "@/components/History/MultiLevelList";
 import { getAllPatients } from "@/app/services/getAllPatients";
 import NoHistoryFound from "@/components/History/NoHistoryFound";
 import Loader from "@/components/common/Loader";
+import { startOfMonth, endOfMonth } from "date-fns";
+import { Button } from "@/components/ui/button";
 
 interface PatientData {
   first_name: string;
@@ -58,8 +60,8 @@ export default function HistoryPage() {
   const [error, setError] = useState<string | null>(null);
   const [patients, setPatients] = useState<PatientData[]>([]);
   const [filters, setFilters] = useState<Filters>({
-    fromDate: "",
-    toDate: "",
+    fromDate: startOfMonth(new Date()).toISOString(),
+    toDate: endOfMonth(new Date()).toISOString(),
     gender: "All",
     ageFrom: "",
     ageTo: "",
@@ -74,7 +76,11 @@ export default function HistoryPage() {
     const fetchPatients = async () => {
       try {
         setLoader(true);
-        const data = await getAllPatients(user.uid);
+        const data = await getAllPatients(
+          user.uid,
+          new Date(filters.fromDate).getTime(),
+          new Date(filters.toDate).getTime()
+        );
         if (data.data) {
           setPatients(data.data);
         } else {
@@ -88,7 +94,7 @@ export default function HistoryPage() {
     };
 
     fetchPatients();
-  }, [user.uid]);
+  }, [user.uid, filters.fromDate, filters.toDate]);
 
   const handleFilterChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | any>
@@ -105,20 +111,9 @@ export default function HistoryPage() {
   };
 
   const filterPatients = (patients: PatientData[]) => {
-    const { fromDate, toDate, gender, ageFrom, ageTo, notAppointed } = filters;
+    const { gender, ageFrom, ageTo, notAppointed } = filters;
 
     return patients.filter((patient) => {
-      const fromDateTimestamp = fromDate ? new Date(fromDate).getTime() : null;
-      const toDateTimestamp = toDate ? new Date(toDate).getTime() : null;
-
-      const isInDateRange =
-        !fromDateTimestamp ||
-        !toDateTimestamp ||
-        getUniqueDateTimestamps(
-          patient.last_visited,
-          patient.visitedDates
-        ).some((date) => date >= fromDateTimestamp && date <= toDateTimestamp);
-
       const isGenderMatch = gender === "All" || patient.gender === gender;
       const isAgeMatch =
         (ageFrom === "" || parseInt(patient.age) >= parseInt(ageFrom)) &&
@@ -134,21 +129,17 @@ export default function HistoryPage() {
         patient.mobile_number.includes(searchQueryLower);
 
       return (
-        isInDateRange &&
-        isGenderMatch &&
-        isAgeMatch &&
-        isNotAppointedMatch &&
-        isSearchMatch
+        isGenderMatch && isAgeMatch && isNotAppointedMatch && isSearchMatch
       );
     });
   };
 
   return (
-    <div className="h-svh overflow-hidden flex flex-1 flex-row">
+    <div className="h-full overflow-hidden flex flex-1 flex-row">
       {/* Sidebar */}
       <aside
-        className={`z-20 top-0 w-full md:w-72 p-4 pt-[50px] md:pt-4 md:pr-0 h-svh transition-transform ${
-          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+        className={`z-20 top-0 w-full md:w-72 p-4 md:pt-4 md:pr-0 h-full transition-transform ${
+          isSidebarOpen ? "translate-x-0 bg-black/80" : "-translate-x-full"
         } md:translate-x-0 fixed md:static`}
         aria-label="Sidenav"
         id="drawer-navigation"
@@ -158,11 +149,11 @@ export default function HistoryPage() {
           src="/Filter.svg"
           alt="Filters"
         />
-        <div className="flex flex-col justify-between rounded-lg md:rounded-tr-none pt-2 md:pt-14 pb-2 h-full bg-white">
+        <div className="flex flex-col justify-between rounded-lg md:rounded-tr-none pt-2 md:pt-14 pb-2 h-full bg-secondary">
           <ul className="space-y-2 px-2">
             {/* From To Date */}
             <li>
-              <h6 className="text-base font-medium text-black">
+              <h6 className="text-base font-medium">
                 Appointment Dates
               </h6>
               <div className="mt-2 flex items-center flex-row gap-1 max-[900px]:flex-wrap">
@@ -202,7 +193,7 @@ export default function HistoryPage() {
             <li>
               <label
                 htmlFor="gender"
-                className="text-base font-medium text-black"
+                className="text-base font-medium"
               >
                 Gender
               </label>
@@ -219,7 +210,7 @@ export default function HistoryPage() {
             </li>
             {/* Age From To number */}
             <li>
-              <h6 className="text-base font-medium text-black">Age Range</h6>
+              <h6 className="text-base font-medium">Age Range</h6>
               <div className="flex flex-row items-center justify-around gap-1">
                 <div className="mt-2">
                   <label
@@ -259,13 +250,13 @@ export default function HistoryPage() {
                 <input
                   id="notAppointed"
                   type="checkbox"
-                  className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                  className="w-4 h-4 text-blue-600 border-border rounded focus:ring-blue-500"
                   onChange={handleFilterChange}
                   checked={filters.notAppointed}
                 />
                 <label
                   htmlFor="notAppointed"
-                  className="w-full py-2 ms-2 text-xs font-medium text-gray-500"
+                  className="w-full py-2 ms-2 text-xs font-medium"
                 >
                   Patients registered but not appointed
                 </label>
@@ -273,7 +264,7 @@ export default function HistoryPage() {
             </li>
           </ul>
           <div className="w-full flex flex-col">
-            <button
+            <Button
               onClick={() =>
                 setFilters({
                   fromDate: "",
@@ -287,19 +278,20 @@ export default function HistoryPage() {
               className="btn btn-sm mx-2 animate-none btn-neutral btn-outline"
             >
               Clear
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={toggleSidebar}
+              variant={"outline"}
               className="btn btn-sm mt-2 mx-2 animate-none btn-neutral block md:hidden"
             >
               Close
-            </button>
+            </Button>
           </div>
         </div>
       </aside>
 
-      <main className="h-svh mt-[50px] md:mt-4 w-auto flex flex-col flex-1">
-        <nav className="z-10 bg-white px-2 flex mr-4 ml-4 md:ml-0 rounded-lg md:rounded-none md:rounded-tr-lg md:rounded-br-lg py-2">
+      <main className="h-full mt-2 md:mt-4 w-auto flex flex-col flex-1">
+        <nav className="z-10 bg-secondary px-2 flex mr-4 ml-4 md:ml-0 rounded-lg md:rounded-none md:rounded-tr-lg md:rounded-br-lg py-2">
           <button
             onClick={toggleSidebar}
             aria-controls="drawer-navigation"
@@ -358,7 +350,7 @@ export default function HistoryPage() {
                 placeholder="Search by ID, Name, or Mobile"
                 value={searchQuery}
                 onChange={handleFilterChange}
-                className="form-input bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full pl-10 p-2.5"
+                className="form-input bg-background text-sm rounded-lg block w-full pl-10 p-2.5"
               />
             </div>
           </form>
@@ -366,15 +358,13 @@ export default function HistoryPage() {
 
         <div
           // style={{ height: "calc(100vh - 5.5rem)" }}
-          className="w-full bg-white overflow-hidden h-[calc(100svh-4.5rem-50px)] md:h-[calc(100svh-5.5rem)] "
+          className="w-full bg-secondary overflow-hidden h-[calc(100%-68px)] md:h-[calc(100svh-5.5rem-53px)] "
         >
-          <div className="bg-gray-300 md:rounded-tl-lg p-4 pt-0 w-full h-full overflow-y-auto">
+          <div className="bg-background md:rounded-tl-lg p-4 pt-0 w-full h-full overflow-y-auto">
             {user && loader ? (
               <div className="w-full h-full overflow-hidden flex items-center justify-center z-50">
                 <Loader
                   size="medium"
-                  color="text-primary"
-                  secondaryColor="text-white"
                 />
               </div>
             ) : error ? (

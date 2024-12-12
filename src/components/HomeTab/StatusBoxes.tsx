@@ -1,26 +1,49 @@
-import {
-  CheckCircleIcon,
-  PencilSquareIcon,
-  StarIcon,
-} from "@heroicons/react/24/solid";
+"use client";
+import { Check, Pencil, Star } from "lucide-react";
 import React, { useEffect, useState } from "react";
+import { Skeleton } from "../ui/skeleton";
+import { getTime, startOfMonth, endOfMonth } from "date-fns";
+import { useAppSelector } from "@/redux/store";
+import { getAllPatients } from "@/app/services/getAllPatients";
 
-interface StatusBoxesProps {
-  loader: boolean;
-  patientsCollection: any[];
-}
-
-const StatusBoxes: React.FC<StatusBoxesProps> = ({
-  loader,
-  patientsCollection,
-}) => {
+const StatusBoxes = () => {
+  const user = useAppSelector<any>((state) => state.auth.user);
   const [patientsRegisteredToday, setPatientsRegisteredToday] =
     useState<number>(0);
   const [patientsAttendedToday, setPatientsAttendedToday] = useState<number>(0);
   const [newPatientsThisMonth, setNewPatientsThisMonth] = useState<number>(0);
   const [patientsAttendedThisMonth, setPatientsAttendedThisMonth] =
     useState<number>(0);
+  const [loader, setLoader] = useState(true);
+  const [patientsCollection, setpatientsCollection] = useState([]);
+  // ========================
+  useEffect(() => {
+    const fetchPatients = async () => {
+      if (user) {
+        try {
+          setLoader(true);
+          const data = await getAllPatients(
+            user.uid,
+            getTime(startOfMonth(new Date())),
+            getTime(endOfMonth(new Date()))
+          );
+          if (data.data) {
+            setLoader(false);
+            setpatientsCollection(data.data);
+          } else {
+            setpatientsCollection([]);
+          }
+        } catch (error) {
+          setpatientsCollection([]);
 
+          setLoader(false);
+        }
+      }
+    };
+
+    fetchPatients();
+  }, [user]);
+  // ================
   const fetchPatientVisitData = (patientsCollection: any[]) => {
     const today = new Date();
     const todayDate = today.toISOString().split("T")[0]; // Use ISO format YYYY-MM-DD
@@ -82,15 +105,7 @@ const StatusBoxes: React.FC<StatusBoxesProps> = ({
   }, [patientsCollection, loader]);
 
   const LoaderBox: React.FC = () => (
-    <>
-      <div className="bg-custom-gradient bg-gray-300/70 skeleton flex h-11 w-11 items-center justify-center rounded-full"></div>
-      <div className="mt-4 flex flex-col justify-between gap-[6px]">
-        <div className="bg-custom-gradient bg-gray-300/70 skeleton h-[33px] w-[20%] rounded-sm"></div>
-        <div className="w-full">
-          <div className="bg-custom-gradient bg-gray-300/70 skeleton h-[37px] w-full rounded-sm"></div>
-        </div>
-      </div>
-    </>
+    <Skeleton className="bg-custom-gradient bg-gray-300/70 skeleton h-[33px] w-[20%] rounded-sm"></Skeleton>
   );
   const DetailsBox: React.FC<{
     icon: React.ReactNode;
@@ -98,13 +113,13 @@ const StatusBoxes: React.FC<StatusBoxesProps> = ({
     title: string;
   }> = ({ icon, count, title }) => (
     <>
-      <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gray-400/70">
+      <div className="flex h-11 w-11 items-center justify-center rounded-full bg-card border-2">
         {icon}
       </div>
       <div className="mt-4 flex items-end justify-between">
         <div>
-          <h4 className="text-3xl font-bold text-black">{count}</h4>
-          <p className="text-sm font-medium leading-tight">{title}</p>
+          <h4 className="text-2xl font-bold">{count}</h4>
+          <p className="text-sm font-medium leading-tight text-ring">{title}</p>
         </div>
       </div>
     </>
@@ -112,49 +127,33 @@ const StatusBoxes: React.FC<StatusBoxesProps> = ({
   return (
     <div className="w-full mt-2 sm:mt-4 md:mb-6">
       <div className="grid grid-cols-2 gap-2 sm:gap-4 sm:grid-cols-2 md:gap-6 lg:grid-cols-4">
-        <div className="px-7 flex flex-col justify-center border-2 h-[170px] rounded-md overflow-hidden border-gray-400/70 bg-white">
-          {loader ? (
-            <LoaderBox />
-          ) : (
-            <DetailsBox
-              icon={<PencilSquareIcon className="size-5 text-primary" />}
-              count={patientsRegisteredToday}
-              title={"Registered Today"}
-            />
-          )}
+        <div className="px-7 flex flex-col justify-center border-2 h-[170px] rounded-md overflow-hidden bg-gradient-to-b from-muted/50 to-muted">
+          <DetailsBox
+            icon={<Pencil className="size-5 text-primary" />}
+            count={patientsRegisteredToday}
+            title={"Registered Today"}
+          />
         </div>
-        <div className="px-7 flex flex-col justify-center border-2 h-[170px] rounded-md overflow-hidden border-gray-400/70 bg-white">
-          {loader ? (
-            <LoaderBox />
-          ) : (
-            <DetailsBox
-              icon={<CheckCircleIcon className="size-5 text-primary" />}
-              count={patientsAttendedToday}
-              title={"Attended Today"}
-            />
-          )}
+        <div className="px-7 flex flex-col justify-center border-2 h-[170px] rounded-md overflow-hidden bg-gradient-to-b from-muted/50 to-muted">
+          <DetailsBox
+            icon={<Check className="size-5 text-primary" />}
+            count={patientsAttendedToday}
+            title={"Attended Today"}
+          />
         </div>
-        <div className="px-7 flex flex-col justify-center border-2 h-[170px] rounded-md overflow-hidden border-gray-400/70 bg-white">
-          {loader ? (
-            <LoaderBox />
-          ) : (
-            <DetailsBox
-              icon={<StarIcon className="size-5 text-primary" />}
-              count={newPatientsThisMonth}
-              title={"New Patients this Month"}
-            />
-          )}
+        <div className="px-7 flex flex-col justify-center border-2 h-[170px] rounded-md overflow-hidden bg-gradient-to-b from-muted/50 to-muted">
+          <DetailsBox
+            icon={<Star className="size-5 text-primary" />}
+            count={newPatientsThisMonth}
+            title={"New Patients this Month"}
+          />
         </div>
-        <div className="px-7 flex flex-col justify-center border-2 h-[170px] rounded-md overflow-hidden border-gray-400/70 bg-white">
-          {loader ? (
-            <LoaderBox />
-          ) : (
-            <DetailsBox
-              icon={<CheckCircleIcon className="size-5 text-primary" />}
-              count={patientsAttendedThisMonth}
-              title={"Attended this month"}
-            />
-          )}
+        <div className="px-7 flex flex-col justify-center border-2 h-[170px] rounded-md overflow-hidden bg-gradient-to-b from-muted/50 to-muted">
+          <DetailsBox
+            icon={<Check className="size-5 text-primary" />}
+            count={patientsAttendedThisMonth}
+            title={"Attended this month"}
+          />
         </div>
       </div>
     </div>

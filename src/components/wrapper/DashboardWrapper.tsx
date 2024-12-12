@@ -10,7 +10,20 @@ import BlockedModal from "@/components/BlockedModal";
 import Loader from "../common/Loader";
 import ConnectionStatus from "../common/InternetDialog";
 import Link from "next/link";
-
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { AppSidebar } from "@/components/landingPageLayout/Sidebar/App-sidebar";
+import SidebarBreadCrump from "../landingPageLayout/Sidebar/SidebarBreadCrump";
 const DashboardWrapper = ({ children }: { children: ReactNode }) => {
   const user = useAppSelector((state) => state.auth.user);
 
@@ -42,47 +55,57 @@ const DashboardWrapper = ({ children }: { children: ReactNode }) => {
   return (
     <>
       {isModalOpen && (
-        <BlockedModal isOpen={isModalOpen}>
-          <SubscriptionPlans message={message} />
-        </BlockedModal>
+        <Dialog open={true}>
+          <DialogContent className="md:max-w-3xl overflow-y-auto max-h-full" showCloseBtn={false}>
+            <DialogHeader>
+              <DialogTitle>Subscription Info</DialogTitle>
+              <DialogDescription hidden>
+                DESC
+              </DialogDescription>
+            </DialogHeader>
+            <SubscriptionPlans message={message} />
+          </DialogContent>
+        </Dialog>
       )}
       <ConnectionStatus />
-      <div className="h-svh overflow-hidden flex">
-        {/* <div className="md:h-screen md:overflow-hidden flex"> for mobile view */}
-        <Navigation />
-        <div className="flex flex-col flex-grow w-screen md:w-full overflow-y-auto bg-gray-300">
-          {loading ? (
-            <div
-              style={{
-                left: 0,
-                width: "100vw",
-                position: "absolute",
-                height: "100%",
-                overflow: "hidden",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                background: "rgba(0,0,0,0.5)",
-                zIndex: 100000,
-              }}
-            >
-              <Loader
-                size="large"
-                color="text-primary"
-                secondaryColor="text-gray-300"
-              />
-            </div>
-          ) : subscription ? (
-            children ? (
-              children
-            ) : (
-              <DefaultComponent />
-            )
-          ) : (
-            <></>
-          )}
+      {/* <div className="min-h-svh flex"> */}
+      {/* <div className="md:h-screen md:overflow-hidden flex"> for mobile view */}
+      {/* <Navigation /> */}
+      {/* <div className="flex flex-col flex-grow w-screen md:w-full bg-background"> */}
+      {loading ? (
+        <div
+          style={{
+            left: 0,
+            width: "100vw",
+            position: "absolute",
+            height: "100%",
+            overflow: "hidden",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 100000,
+          }}
+          className="bg-background"
+        >
+          <Loader size="large" />
         </div>
-      </div>
+      ) : subscription ? (
+        children ? (
+          <SidebarProvider>
+            <AppSidebar />
+            <SidebarInset className="h-svh overflow-hidden">
+              <SidebarBreadCrump />
+              {children}
+            </SidebarInset>
+          </SidebarProvider>
+        ) : (
+          <DefaultComponent />
+        )
+      ) : (
+        <></>
+      )}
+      {/* </div> */}
+      {/* </div> */}
     </>
   );
 };

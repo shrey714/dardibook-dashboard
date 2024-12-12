@@ -10,8 +10,15 @@ import React, {
 import { EmblaOptionsType } from "embla-carousel";
 import useEmblaCarousel from "embla-carousel-react";
 import { createContext } from "react";
-import { IdentificationIcon } from "@heroicons/react/24/outline";
 import MedicalReport from "./MedicalReport";
+import { BookUser, CalendarIcon } from "lucide-react";
+import { Avatar, AvatarImage, AvatarFallback } from "@radix-ui/react-avatar";
+import {
+  HoverCard,
+  HoverCardTrigger,
+  HoverCardContent,
+} from "@/components/ui/hover-card";
+import { Button } from "../ui/button";
 
 type CarouselContextProps = {
   carouselOptions?: EmblaOptionsType;
@@ -257,40 +264,46 @@ const SliderMainItem = forwardRef<
   {
     patient: any;
     selectedPatientId: any;
+    setdrawerState: any;
   } & React.HTMLAttributes<HTMLDivElement>
->(({ className, patient, selectedPatientId, ...props }, ref) => {
-  const { orientation } = useCarousel();
-  return (
-    <div
-      {...props}
-      ref={ref}
-      className={`min-w-0 shrink-0 grow-0 basis-[calc(100%-8px)] bg-white pt-10 md:pt-0 relative ${
-        orientation === "vertical" ? "pb-1" : "mx-[4px]"
-      } ${className}
+>(
+  (
+    { className, patient, selectedPatientId, setdrawerState, ...props },
+    ref
+  ) => {
+    const { orientation } = useCarousel();
+    return (
+      <div
+        {...props}
+        ref={ref}
+        className={`min-w-0 shrink-0 grow-0 basis-[calc(100%-8px)] bg-secondary relative ${
+          orientation === "vertical" ? "pb-1" : "mx-[4px]"
+        } ${className}
         `}
-    >
-      <div className="drawer-content absolute top-2 right-2">
+      >
         {/* Page content here */}
-        <label
-          htmlFor="my-drawer-shrey"
-          className="drawer-button btn bg-gray-300 min-h-0 h-auto p-1 rounded-md border-0 text-xs"
+        <Button
+          onClick={() => {
+            setdrawerState(true);
+          }}
+          className="absolute top-2 right-2 aspect-square"
         >
-          <IdentificationIcon className="size-5 md:size-7 text-gray-800" />
-        </label>
+          <BookUser />
+        </Button>
+        {patient.attended ? (
+          <MedicalReport
+            patient={patient}
+            selectedPatientId={selectedPatientId}
+          />
+        ) : (
+          <div className="font-semibold text-sm md:text-base lg:text-lg p-2">
+            Prescription is not generated yet.
+          </div>
+        )}
       </div>
-      {patient.attended ? (
-        <MedicalReport
-          patient={patient}
-          selectedPatientId={selectedPatientId}
-        />
-      ) : (
-        <div className="font-semibold text-gray-800 text-sm md:text-base lg:text-lg p-2">
-          Prescription is not generated yet.
-        </div>
-      )}
-    </div>
-  );
-});
+    );
+  }
+);
 
 SliderMainItem.displayName = "SliderMainItem";
 
@@ -317,40 +330,35 @@ const SliderThumbItem = forwardRef<
         ${className}
       `}
     >
-      <div
-        className={`${
-          patient.attended ? "border-2" : "border-0"
-        } border-green-600 relative h-10 transition-opacity ${
-          patient.attended ? "bg-green-600/30" : "bg-white"
-        } text-gray-600 w-full flex flex-wrap items-center justify-center rounded-md cursor-pointer text-sm md:text-base font-semibold ${
-          isSlideActive
-            ? patient.attended
-              ? "!bg-green-600 !text-white"
-              : "!bg-gray-800 !text-white"
-            : ""
-        }`}
-      >
-        {patient.patient_unique_Id}
-        <div
-          className={`dropdown dropdown-hover dropdown-bottom ${
-            index === 0 ? "" : "dropdown-end"
-          }`}
-        >
-          <div tabIndex={patient.patient_unique_Id} role="button" className="">
-            <IdentificationIcon className="size-5 md:size-7 ml-2" />
-          </div>
-          <ul
-            tabIndex={patient.patient_unique_Id}
-            className="dropdown-content mt-3 md:mt-2 menu rounded-box z-10 min-w-40 p-2 shadow bg-gray-800 text-white"
+      <HoverCard openDelay={110} closeDelay={100}>
+        <HoverCardTrigger asChild>
+          <div
+            className={`${
+              patient.attended ? "border-green-600" : ""
+            } border-2 relative h-10 transition-opacity ${
+              patient.attended ? "bg-green-600/30" : ""
+            } w-full flex flex-wrap items-center justify-center rounded-md cursor-pointer text-sm md:text-base font-semibold ${
+              isSlideActive
+                ? patient.attended
+                  ? "!bg-green-600 !text-white"
+                  : "!bg-secondary"
+                : ""
+            }`}
           >
+            {patient.patient_unique_Id}
+            <BookUser className="size-5 ml-2" />
+          </div>
+        </HoverCardTrigger>
+        <HoverCardContent className="bg-background mt-1 w-auto">
+          <ul tabIndex={patient.patient_unique_Id}>
             <li>
               {patient.first_name} {patient.last_name}
             </li>
             <li>{patient.gender}</li>
             <li>{patient.mobile_number}</li>
           </ul>
-        </div>
-      </div>
+        </HoverCardContent>
+      </HoverCard>
     </div>
   );
 });

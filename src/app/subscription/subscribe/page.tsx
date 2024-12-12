@@ -7,7 +7,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import RightBox from "./RightBox";
 import LeftBox from "./LeftBox";
-import Skeleton from "./Skeleton";
+import SkeletonBox from "./SkeletonBox";
 import { checkSubscriptionStatus } from "@/app/services/checkSubscription";
 import { createSubscription } from "@/app/services/create-subscription/create-sub";
 import getPlanById from "@/app/services/razorpay/getPlanById";
@@ -135,9 +135,9 @@ export default function Subscribe() {
         alt="logo"
       />
       <HeaderMain user={user} />
-      <div className=" flex flex-col md:flex-row p-6 mx-auto w-11/12 sm:w-9/12 h-auto text-center rounded-lg borderborder-gray-600 xl:p-8 bg-gray-800 bg-opacity-95 text-white">
+      <div className=" flex flex-col md:flex-row p-6 mx-auto w-11/12 sm:w-9/12 h-auto text-center rounded-lg border-2 border-border xl:p-8 bg-secondary/90 shadow-md">
         {loading ? (
-          <Skeleton />
+          <SkeletonBox />
         ) : (
           <>
             <LeftBox
@@ -148,9 +148,8 @@ export default function Subscribe() {
               isValid={isValid}
               setIsValid={setIsValid}
             />
-            <div className="hidden md:block w-px mx-5 self-stretch bg-gradient-to-tr from-transparent  to-transparent opacity-25 dark:via-neutral-400"></div>
-            <div className="block md:hidden w-full h-px my-5 self-stretch bg-gradient-to-r from-transparent  to-transparent opacity-50 dark:via-neutral-400"></div>
-
+            <div className="hidden md:block w-px mx-5 self-stretch bg-gradient-to-tr from-transparent  to-transparent opacity-25 via-ring"></div>
+            <div className="block md:hidden w-full h-px my-5 self-stretch bg-gradient-to-r from-transparent  to-transparent opacity-50 via-ring"></div>
             <RightBox
               thisPlanDetails={thisPlanDetails}
               handleSubscription={handleSubscription}

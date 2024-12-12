@@ -1,6 +1,6 @@
+import { ExternalLink } from "lucide-react";
 import Link from "next/link";
 import React from "react";
-import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
 // Define the type for the item
 interface Item {
   id: string;
@@ -110,7 +110,7 @@ const ItemList: React.FC<{ items: Item[] }> = ({ items }) => {
 
   return (
     <div className="relative">
-      <li className=" pl-[25%] lg:pl-[15%] z-10 top-6  w-full sticky py-1 list-none flex flex-row items-center font-semibold text-sm text-gray-800 gap-1">
+      <li className=" pl-[25%] lg:pl-[15%] z-10 top-6  w-full sticky py-1 list-none flex flex-row items-center font-semibold text-sm gap-1">
         <div className="min-w-6"></div>
         <div className="w-full text-center">ID</div>
         <div className="w-full">Name</div>
@@ -121,15 +121,15 @@ const ItemList: React.FC<{ items: Item[] }> = ({ items }) => {
       </li>
       {sortedMonthYears.map((monthYear, key) => (
         <div key={key}>
-          <h2 className="z-[1] h-6 sticky top-0 w-full bg-gray-300 text-gray-800 text-xs sm:text-sm">
+          <h2 className="z-[1] h-6 sticky top-0 w-full text-xs sm:text-sm bg-background">
             {monthYear}
           </h2>
           {Object.entries(groupedItems[monthYear])
             .sort((a, b) => parseInt(b[0]) - parseInt(a[0]))
             .map(([date, items]) => (
               <div key={date}>
-                <div className="w-full py-1 bg-gray-300 z-[0] sticky top-6">
-                  <p className="text-gray-800 text-xs sm:text-sm">
+                <div className="w-full py-1 z-[0] sticky top-6 bg-background">
+                  <p className="text-xs sm:text-sm">
                     {`${date}th ${monthYear.split(" ")[0]}`} ({items.length})
                   </p>
                 </div>
@@ -137,7 +137,7 @@ const ItemList: React.FC<{ items: Item[] }> = ({ items }) => {
                 <ul className="pl-[25%] lg:pl-[15%] p-[2px]">
                   {items.map((item, index) => (
                     <li
-                      className="py-[2px] odd:bg-gray-400 w-full list-none flex flex-row items-center text-sm  text-gray-800 gap-1 "
+                      className="py-[2px] odd:bg-gray-400 w-full list-none flex flex-row items-center text-sm  gap-1 "
                       key={index}
                     >
                       <div className="min-w-6 text-center">{index + 1}</div>
@@ -154,7 +154,7 @@ const ItemList: React.FC<{ items: Item[] }> = ({ items }) => {
                         type="button"
                         className="min-w-6"
                       >
-                        <ArrowTopRightOnSquareIcon className="size-3 text-gray-800" />
+                        <ExternalLink className="size-3" />
                       </Link>
                     </li>
                   ))}

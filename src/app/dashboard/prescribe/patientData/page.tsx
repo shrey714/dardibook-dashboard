@@ -8,6 +8,7 @@ import { useAppSelector } from "@/redux/store";
 import { getPatientHistory } from "@/app/services/getPatientHistory";
 import NoPatientHistoryFound from "@/components/Prescribe/NoPatientHistoryFound";
 import Loader from "@/components/common/Loader";
+import { Button } from "@/components/ui/button";
 
 const Page = () => {
   const searchParams = useSearchParams();
@@ -39,43 +40,42 @@ const Page = () => {
   }, [patientId, user.uid]);
 
   return (
-    <div className="self-center flex w-full flex-col">
+    <>
       {patientId && historyLoader ? (
-        <div className="w-full h-svh overflow-hidden flex items-center justify-center z-50">
-          <Loader
-            size="medium"
-            color="text-primary"
-            secondaryColor="text-white"
-          />
+        <div className="w-full h-full overflow-hidden flex items-center justify-center">
+          <Loader size="medium" />
         </div>
       ) : error ? (
         <NoPatientHistoryFound message={error} />
       ) : (
-        <>
-          <div className="p-2 flex gap-8 items-center flex-col-reverse sm:flex-row px-4 ">
+        <div className="relative">
+          <div className="p-2 flex gap-0 sm:gap-8 items-center flex-col-reverse sm:flex-row px-4 ">
             <PatientDataBox patientData={patientData} />
             <div className="p-4 gap-6 flex flex-col">
-              <Link
-                href={{
-                  pathname: "prescribeForm",
-                  query: { patientId: patientId },
-                }}
-                className="btn animate-none btn-primary md:btn-md lg:btn-wide"
-              >
-                Attend
-              </Link>
-              <Link
-                href={"./"}
-                className="btn animate-none md:btn-md lg:btn-wide"
-              >
-                Back to queue
-              </Link>
+              <Button asChild variant={"default"} size={"lg"}>
+                <Link
+                  href={{
+                    pathname: "prescribeForm",
+                    query: { patientId: patientId },
+                  }}
+                >
+                  Attend
+                </Link>
+              </Button>
+              <Button asChild variant={"destructive"} size={"lg"}>
+                <Link
+                  href={"./"}
+                  className="btn animate-none md:btn-md lg:btn-wide"
+                >
+                  Back to queue
+                </Link>
+              </Button>
             </div>
           </div>
           <PatientHistoryTabs prescriptionsData={prescriptionsData} />
-        </>
+        </div>
       )}
-    </div>
+    </>
   );
 };
 

@@ -67,7 +67,7 @@ const Page = () => {
   }, [userInfo]);
 
   return (
-    <div className="w-full self-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="w-full self-center pb-12 pt-6 px-4 sm:px-6 lg:px-8">
       <PersonalInfo userInfo={userInfo} />
       <ClinicInfo
         uid={userInfo.uid}
