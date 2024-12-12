@@ -67,7 +67,7 @@ const SidebarBreadCrump = () => {
         </Breadcrumb>
       </div>
       <div className="flex items-center pl-4">
-        {user ? (
+        {user  ? (
           <CollaborationProvider orgId={user.uid}>
             <AvatarStack />
           </CollaborationProvider>

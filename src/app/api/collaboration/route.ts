@@ -27,7 +27,7 @@ export const POST = async (request: NextRequest) => {
     return new Response('Unauthorized', { status: 401 });
   }
   const liveblocks = new LiveblocksNode({
-    secret: process.env.LIVEBLOCKS_SECRET || "",
+    secret: process.env.LIVEBLOCKS_SECRET,
   });
 
   // Start an auth session inside your endpoint
