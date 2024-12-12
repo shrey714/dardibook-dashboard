@@ -83,8 +83,8 @@ const PatientsPerDayChart = () => {
           setLoader(true);
           const data = await getAllPatients(
             user.uid,
-            getTime(date?.from || ""),
-            getTime(date?.to || "")
+            getTime(date?.from || 0),
+            getTime(date?.to || 0)
           );
           if (data.data) {
             setLoader(false);
@@ -104,8 +104,8 @@ const PatientsPerDayChart = () => {
   }, [user, date]);
 
   const fetchPatientVisitData = () => {
-    const fromDate = getTime(date?.from || "");
-    const toDate = getTime(date?.to || "");
+    const fromDate = getTime(date?.from || 0);
+    const toDate = getTime(date?.to || 0);
     const visitCounts: any = {};
 
     patientsCollection.forEach((patient: any) => {
