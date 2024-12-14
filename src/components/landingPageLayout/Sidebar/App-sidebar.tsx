@@ -19,11 +19,13 @@ import {
   SidebarFooter,
   SidebarHeader,
   SidebarRail,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { ModeToggle } from "@/components/common/mode-toggle";
 import { usePathname } from "next/navigation";
 import RolesLink from "./RolesLink";
 import TokenBox from "../../tokenFramer/TokenBox";
+import Pip from "@/hooks/pip";
 
 const pages = [
   {
@@ -66,6 +68,7 @@ const pages = [
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
+  const { state, isMobile } = useSidebar();
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -73,7 +76,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <LogoHandeler />
       </SidebarHeader>
       <SidebarContent className="overflow-x-hidden">
-        <TokenBox />
+        {state === "collapsed" && !isMobile ? <Pip /> : <TokenBox />}
         <NavMain pages={pages} pathname={pathname} />
       </SidebarContent>
       <SidebarFooter>

@@ -344,3 +344,20 @@ body{
     transform: translate(-50%, -50%) rotate(360deg);
   }
 }
+
+
+.pip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 341.5px; /* maintain aspect ratio of dimensions of this original img source */
+  height: 255px;
+  z-index: 100000;
+}
+
+.pip img {
+  pointer-events: none;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+}

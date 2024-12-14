@@ -326,18 +326,18 @@ const PrescribeForm = ({
 
         {/* Submit button */}
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-          <Button asChild>
+          <Button variant={"destructive"} asChild>
             <Link
               href={"./"}
               scroll={true}
               type="button"
-              className="btn md:btn-wide bg-white border-0 text-sm font-semibold leading-6 text-gray-900"
+              className="btn md:btn-wide border-0 text-sm font-semibold leading-6"
             >
               Cancel
             </Link>
           </Button>
 
-          <Button type="submit" variant={"secondary"}>
+          <Button type="submit" variant={"default"}>
             {submissionLoader ? <Loader size="medium" /> : "Save"}
           </Button>
           {/* <button

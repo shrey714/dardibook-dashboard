@@ -33,10 +33,10 @@ const Page = () => {
   const [loader, setLoader] = useState(false);
   const [patientList, setpatientList] = useState<any>([]);
   const [startIndex, setstartIndex] = useState(0);
-  const [selectedPatientId, setselectedPatientId] = useState(patientId);
   const [drawerState, setdrawerState] = useState(false);
 
   useEffect(() => {
+    console.log("afafafa====");
     let unsubscribe: () => void;
 
     const getTodayPatientQueue = () => {
@@ -71,7 +71,7 @@ const Page = () => {
         unsubscribe();
       }
     };
-  }, [patientId, user]);
+  }, [user]);
   // =============================================
 
   return (
@@ -89,7 +89,7 @@ const Page = () => {
             <PatientDataBox
               patientData={patientList.find(
                 (patient: { patient_unique_Id: any }) =>
-                  patient.patient_unique_Id === selectedPatientId
+                  patient.patient_unique_Id === patientId
               )}
             />
           </SheetContent>
@@ -126,7 +126,6 @@ const Page = () => {
                   key={index}
                   index={index}
                   patient={patient}
-                  setselectedPatientId={setselectedPatientId}
                   className="rounded-md bg-transparent"
                 />
               ))}
@@ -138,7 +137,7 @@ const Page = () => {
                     setdrawerState={setdrawerState}
                     key={index}
                     patient={patient}
-                    selectedPatientId={selectedPatientId}
+                    selectedPatientId={patientId}
                     className="border-0 flex items-center justify-center h-full rounded-md"
                   />
                 ))}

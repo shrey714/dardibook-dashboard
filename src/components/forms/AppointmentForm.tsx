@@ -341,17 +341,17 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
         </div>
         {/* submit-cancel buttons */}
         <div className="mt-6 flex items-center justify-center gap-x-6">
-          <Button asChild>
+          <Button variant={"destructive"} asChild>
             <Link
               href={"./"}
               scroll={true}
               type="button"
-              className="btn md:btn-wide bg-white border-0 text-sm font-semibold leading-6 text-gray-900"
+              className="btn md:btn-wide border-0 text-sm font-semibold leading-6"
             >
               Cancel
             </Link>
           </Button>
-          <Button type="submit" variant={"secondary"}>
+          <Button type="submit" variant={"default"}>
             {submissionLoader ? <Loader size="medium" /> : "Save"}
           </Button>
         </div>

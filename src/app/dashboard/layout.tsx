@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import DashboardWrapper from "@/components/wrapper/DashboardWrapper";
 import type { Metadata } from "next";
+import { RefProvider } from "@/hooks/RefContext";
 
 export const metadata: Metadata = {
   title: "DardiBook | Dashboard",
@@ -8,8 +9,8 @@ export const metadata: Metadata = {
 };
 export default function RootLayout({ children }: { children?: ReactNode }) {
   return (
-    <DashboardWrapper>
-      {children}
-    </DashboardWrapper>
+    <RefProvider>
+      <DashboardWrapper>{children}</DashboardWrapper>
+    </RefProvider>
   );
 }

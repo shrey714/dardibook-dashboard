@@ -225,7 +225,7 @@ const MedicalReport = ({ patient, selectedPatientId }: any) => {
           </table>
           {prescriptionData?.medicines?.length !== 0 && !printLoader && (
             <PrintHandeler
-              styleForBtn={"fixed bottom-3 left-1/2 transform -translate-x-1/2"}
+              styleForBtn={"absolute bottom-3 left-1/2 transform -translate-x-1/2"}
               printOptions={{
                 IsPrescription: false,
                 IsRefer: false,

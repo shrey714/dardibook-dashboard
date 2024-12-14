@@ -23,7 +23,7 @@ export default function TokenBox() {
     <div
       className={`flex flex-col m-2 rounded-lg bg-background transition-all border border-border shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px] ${
         state === "collapsed" && !isMobile
-          ? "fixed right-2 bottom-2 w-60 opacity-60 hover:opacity-100"
+          ? "w-60 opacity-60 hover:opacity-100"
           : ""
       } ${
         user?.role === "subDoctor" || user?.role === "admin" ? "" : "hidden"

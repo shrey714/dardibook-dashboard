@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/dialog";
 import { AppSidebar } from "@/components/landingPageLayout/Sidebar/App-sidebar";
 import SidebarBreadCrump from "../landingPageLayout/Sidebar/SidebarBreadCrump";
+import { useRefContext } from "@/hooks/RefContext";
 const DashboardWrapper = ({ children }: { children: ReactNode }) => {
   const user = useAppSelector((state) => state.auth.user);
 
@@ -32,6 +33,7 @@ const DashboardWrapper = ({ children }: { children: ReactNode }) => {
   const [message, setmessage] = useState<string | undefined>("");
   const [subscription, setsubscription] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const snapRef = useRefContext();
   // ======================
   useEffect(() => {
     const checkUserSubscription = async () => {
@@ -56,12 +58,13 @@ const DashboardWrapper = ({ children }: { children: ReactNode }) => {
     <>
       {isModalOpen && (
         <Dialog open={true}>
-          <DialogContent className="md:max-w-3xl overflow-y-auto max-h-full" showCloseBtn={false}>
+          <DialogContent
+            className="md:max-w-3xl overflow-y-auto max-h-full"
+            showCloseBtn={false}
+          >
             <DialogHeader>
               <DialogTitle>Subscription Info</DialogTitle>
-              <DialogDescription hidden>
-                DESC
-              </DialogDescription>
+              <DialogDescription hidden>DESC</DialogDescription>
             </DialogHeader>
             <SubscriptionPlans message={message} />
           </DialogContent>
@@ -93,7 +96,7 @@ const DashboardWrapper = ({ children }: { children: ReactNode }) => {
         children ? (
           <SidebarProvider>
             <AppSidebar />
-            <SidebarInset className="h-svh overflow-hidden">
+            <SidebarInset ref={snapRef} className="h-svh overflow-hidden">
               <SidebarBreadCrump />
               {children}
             </SidebarInset>

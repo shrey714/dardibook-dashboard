@@ -19,6 +19,7 @@ import {
   HoverCardContent,
 } from "@/components/ui/hover-card";
 import { Button } from "../ui/button";
+import Link from "next/link";
 
 type CarouselContextProps = {
   carouselOptions?: EmblaOptionsType;
@@ -312,9 +313,8 @@ const SliderThumbItem = forwardRef<
   {
     index: number;
     patient: any;
-    setselectedPatientId: any;
   } & React.HTMLAttributes<HTMLDivElement>
->(({ className, index, patient, setselectedPatientId, ...props }, ref) => {
+>(({ className, index, patient, ...props }, ref) => {
   const { activeIndex, onThumbClick, orientation } = useCarousel();
   const isSlideActive = activeIndex === index;
   return (
@@ -322,7 +322,6 @@ const SliderThumbItem = forwardRef<
       {...props}
       ref={ref}
       onClick={() => {
-        setselectedPatientId(patient.patient_unique_Id);
         onThumbClick(index);
       }}
       className={`min-w-0 w-1 flex shrink-0 grow-0 basis-[calc((100%-24px)/3)] lg:basis-[calc((100%-48px)/6)] p-0
@@ -330,35 +329,43 @@ const SliderThumbItem = forwardRef<
         ${className}
       `}
     >
-      <HoverCard openDelay={110} closeDelay={100}>
-        <HoverCardTrigger asChild>
-          <div
-            className={`${
-              patient.attended ? "border-green-600" : ""
-            } border-2 relative h-10 transition-opacity ${
-              patient.attended ? "bg-green-600/30" : ""
-            } w-full flex flex-wrap items-center justify-center rounded-md cursor-pointer text-sm md:text-base font-semibold ${
-              isSlideActive
-                ? patient.attended
-                  ? "!bg-green-600 !text-white"
-                  : "!bg-secondary"
-                : ""
-            }`}
-          >
-            {patient.patient_unique_Id}
-            <BookUser className="size-5 ml-2" />
-          </div>
-        </HoverCardTrigger>
-        <HoverCardContent className="bg-background mt-1 w-auto">
-          <ul tabIndex={patient.patient_unique_Id}>
-            <li>
-              {patient.first_name} {patient.last_name}
-            </li>
-            <li>{patient.gender}</li>
-            <li>{patient.mobile_number}</li>
-          </ul>
-        </HoverCardContent>
-      </HoverCard>
+      <Link
+        href={{
+          pathname: "medicalForm",
+          query: { patientId: patient.patient_unique_Id },
+        }}
+        className="w-full"
+      >
+        <HoverCard openDelay={110} closeDelay={100}>
+          <HoverCardTrigger asChild>
+            <div
+              className={`${
+                patient.attended ? "border-green-600" : ""
+              } border-2 relative h-10 transition-opacity ${
+                patient.attended ? "bg-green-600/30" : ""
+              } w-full flex flex-wrap items-center justify-center rounded-md cursor-pointer text-sm md:text-base font-semibold ${
+                isSlideActive
+                  ? patient.attended
+                    ? "!bg-green-600 !text-white"
+                    : "!bg-secondary"
+                  : ""
+              }`}
+            >
+              {patient.patient_unique_Id}
+              <BookUser className="size-5 ml-2" />
+            </div>
+          </HoverCardTrigger>
+          <HoverCardContent className="bg-background mt-1 w-auto">
+            <ul tabIndex={patient.patient_unique_Id}>
+              <li>
+                {patient.first_name} {patient.last_name}
+              </li>
+              <li>{patient.gender}</li>
+              <li>{patient.mobile_number}</li>
+            </ul>
+          </HoverCardContent>
+        </HoverCard>
+      </Link>
     </div>
   );
 });
