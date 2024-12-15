@@ -169,7 +169,7 @@ const QueueList: React.FC = () => {
                             <p
                               className={`${
                                 select
-                                  ? "bg-primary text-white"
+                                  ? "bg-blue-700 text-white"
                                   : ""
                               } p-1 my-1 rounded-s-full`}
                             >
@@ -186,8 +186,8 @@ const QueueList: React.FC = () => {
                               <p
                                 className={`underline ${
                                   select
-                                    ? "bg-primary text-white"
-                                    : "bg-white text-gray-800 rounded-s-full"
+                                    ? "bg-blue-700 text-white"
+                                    : "bg-border rounded-s-full"
                                 } p-1 my-1 px-4`}
                               >
                                 {item.patient_unique_Id}
@@ -198,8 +198,8 @@ const QueueList: React.FC = () => {
                             <p
                               className={` ${
                                 select
-                                  ? "bg-primary text-white"
-                                  : "bg-white text-gray-800 full-radius-between-768-and-990 full-radius-before-480"
+                                  ? "bg-blue-700 text-white"
+                                  : "bg-border full-radius-between-768-and-990 full-radius-before-480"
                               } p-1 px-2 my-1 rounded-e-full mr-1`}
                             >
                               {item.first_name} {item.last_name}
@@ -211,8 +211,8 @@ const QueueList: React.FC = () => {
                                 item.attended
                                   ? "bg-green-600 p-1 text-white"
                                   : item.old
-                                  ? "bg-white p-1 text-gray-800"
-                                  : "border-2 p-[2px] border-gray-800 text-gray-800"
+                                  ? "bg-border p-1"
+                                  : "border-2 p-[2px] border-border"
                               }`}
                             >
                               {item.attended
@@ -230,7 +230,7 @@ const QueueList: React.FC = () => {
                                   : "prescribe/patientData",
                                 query: { patientId: item.patient_unique_Id },
                               }}
-                              className="mx-1 py-1 px-2 w-full m-1 text-gray-800 bg-white shadow-[0px_0px_0px_1px_#a0aec0] rounded-[4px] font-semibold text-sm sm:text-base"
+                              className="mx-1 py-1 px-2 w-full m-1 bg-border shadow-[0px_0px_0px_1px_#a0aec0] rounded-[4px] font-semibold text-sm sm:text-base"
                             >
                               History
                             </Link>
@@ -240,7 +240,7 @@ const QueueList: React.FC = () => {
                                   pathname: "prescribe/prescribeForm",
                                   query: { patientId: item.patient_unique_Id },
                                 }}
-                                className="mx-1 py-1 px-2 w-full m-1 bg-primary text-gray-800 rounded-[4px] font-semibold text-sm sm:text-base"
+                                className="mx-1 py-1 px-2 w-full m-1 bg-blue-700 text-white rounded-[4px] font-semibold text-sm sm:text-base"
                               >
                                 Attend
                               </Link>

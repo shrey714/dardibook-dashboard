@@ -65,6 +65,7 @@ export default function TokenBox() {
           CurrentToken={CurrentToken}
           loading={loading}
           isPaused={isPaused}
+          allowTokenSceenExpand={state === "expanded" && !isMobile}
         />
         <button
           onClick={() => updateToken(1)}

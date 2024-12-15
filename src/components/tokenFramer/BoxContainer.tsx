@@ -3,7 +3,12 @@ import { AnimatePresence } from "framer-motion";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { Maximize, Minimize, Pause } from "lucide-react";
-const BoxContainer = ({ CurrentToken, loading, isPaused }: any) => {
+const BoxContainer = ({
+  CurrentToken,
+  loading,
+  isPaused,
+  allowTokenSceenExpand,
+}: any) => {
   const [isExpanded, setisExpanded] = useState(false);
 
   return (
@@ -23,7 +28,7 @@ const BoxContainer = ({ CurrentToken, loading, isPaused }: any) => {
             }}
             layoutId={`card-714`}
             onClick={() => {
-              setisExpanded(!isExpanded);
+              allowTokenSceenExpand && setisExpanded(!isExpanded);
             }}
             style={{
               userSelect: "none",
@@ -86,7 +91,7 @@ const BoxContainer = ({ CurrentToken, loading, isPaused }: any) => {
         }}
         layoutId={`card-714`}
         onClick={() => {
-          setisExpanded(!isExpanded);
+          allowTokenSceenExpand && setisExpanded(!isExpanded);
         }}
         style={{
           userSelect: "none",
@@ -94,7 +99,7 @@ const BoxContainer = ({ CurrentToken, loading, isPaused }: any) => {
           cursor: "pointer",
           position: "relative",
           width: "100%",
-            height: "100%",
+          height: "100%",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",

@@ -163,7 +163,7 @@ const Medical = () => {
                             <p
                               className={`${
                                 select
-                                  ? "bg-primary text-white"
+                                  ? "bg-blue-700 text-white"
                                   : ""
                               } p-1 my-1 rounded-s-full`}
                             >
@@ -174,8 +174,8 @@ const Medical = () => {
                             <p
                               className={`${
                                 select
-                                  ? "bg-primary text-white"
-                                  : "bg-white text-gray-800 rounded-s-full"
+                                  ? "bg-blue-700 text-white"
+                                  : "bg-border rounded-s-full"
                               } p-1 my-1 px-4`}
                             >
                               {item.patient_unique_Id}
@@ -185,8 +185,8 @@ const Medical = () => {
                             <p
                               className={` ${
                                 select
-                                  ? "bg-primary text-white"
-                                  : "bg-white text-gray-800 full-radius-between-768-and-990 full-radius-before-480"
+                                  ? "bg-blue-700 text-white"
+                                  : "bg-border full-radius-between-768-and-990 full-radius-before-480"
                               } p-1 px-2 my-1 rounded-e-full mr-1`}
                             >
                               {item.first_name} {item.last_name}
@@ -198,8 +198,8 @@ const Medical = () => {
                                 item.attended
                                   ? "bg-green-600 p-1 text-white"
                                   : item.old
-                                  ? "bg-white p-1 text-gray-800"
-                                  : "border-2 p-[2px] border-gray-800 text-gray-800"
+                                  ? "bg-border p-1"
+                                  : "border-2 p-[2px] border-border"
                               }`}
                             >
                               {item.attended
@@ -215,7 +215,7 @@ const Medical = () => {
                                 pathname: "medical/medicalForm",
                                 query: { patientId: item.patient_unique_Id },
                               }}
-                              className="mx-1 py-1 px-2 w-full text-black bg-white m-1 bg-primary rounded-[4px] shadow-sm font-semibold text-sm sm:text-base"
+                              className="mx-1 py-1 px-2 w-full text-white bg-blue-700 m-1 bg-primary rounded-[4px] shadow-sm font-semibold text-sm sm:text-base"
                             >
                               Report
                             </Link>

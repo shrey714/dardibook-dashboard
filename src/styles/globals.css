@@ -117,7 +117,7 @@
 }
 
 
-body{
+body {
   max-width: 100vw;
   overflow-x: hidden;
 }
@@ -348,9 +348,10 @@ body{
 
 .pip {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 341.5px; /* maintain aspect ratio of dimensions of this original img source */
+  top: 53px;
+  left: 50px;
+  width: 341.5px;
+  /* maintain aspect ratio of dimensions of this original img source */
   height: 255px;
   z-index: 100000;
 }

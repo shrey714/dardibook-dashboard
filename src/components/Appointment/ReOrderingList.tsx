@@ -33,9 +33,9 @@ const ReOrderingList: React.FC = () => {
     <>
       <div className="max-h-[80vh] overflow-y-auto overflow-x-hidden flex flex-row">
         {queueLoader ? (
-           <div className="w-full h-48 overflow-hidden flex items-center justify-center">
-           <Loader size="medium"/>
-         </div>
+          <div className="w-full h-48 overflow-hidden flex items-center justify-center">
+            <Loader size="medium" />
+          </div>
         ) : queueItems.length === 0 ? (
           <div className="w-full h-52 overflow-hidden flex items-center justify-center">
             <img className="w-full max-w-[16rem]" src="/empty.svg" alt="" />
@@ -46,21 +46,15 @@ const ReOrderingList: React.FC = () => {
               <table className="w-full">
                 <thead>
                   <tr className="sticky top-0 bg-background">
-                    <th className="pb-2 text-sm sm:text-base">
-                      Token
-                    </th>
+                    <th className="pb-2 text-sm sm:text-base">Token</th>
                     <th className="pb-2 text-sm sm:text-base hide-before-480 hide-between-768-and-990">
                       Id
                     </th>
-                    <th className="pb-2 text-sm sm:text-base">
-                      Name
-                    </th>
+                    <th className="pb-2 text-sm sm:text-base">Name</th>
                     <th className="pb-2 hidden lg:block text-sm sm:text-base">
                       Contact
                     </th>
-                    <th className="pb-2 text-sm sm:text-base">
-                      Status
-                    </th>
+                    <th className="pb-2 text-sm sm:text-base">Status</th>
                   </tr>
                 </thead>
                 <tbody className="rounded-lg">
@@ -72,9 +66,7 @@ const ReOrderingList: React.FC = () => {
                         <td className="text-center font-medium text-sm sm:text-base">
                           <p
                             className={`${
-                              select
-                                ? "bg-primary text-white"
-                                : ""
+                              select ? "bg-blue-700 text-white" : ""
                             } p-1 rounded-s-full`}
                           >
                             {queueItems.length - key}
@@ -90,8 +82,8 @@ const ReOrderingList: React.FC = () => {
                             <p
                               className={`underline ${
                                 select
-                                  ? "bg-primary text-white"
-                                  : "bg-white text-gray-800 rounded-s-full"
+                                  ? "bg-blue-700 text-white"
+                                  : "bg-border rounded-s-full"
                               } p-1 px-4`}
                             >
                               {item.patient_unique_Id}
@@ -102,8 +94,8 @@ const ReOrderingList: React.FC = () => {
                           <p
                             className={` ${
                               select
-                                ? "bg-primary text-white"
-                                : "bg-white text-gray-800 full-radius-between-768-and-990 full-radius-before-480"
+                                ? "bg-blue-700 text-white"
+                                : "bg-border full-radius-between-768-and-990 full-radius-before-480"
                             } p-1 px-4 rounded-e-full lg:rounded-none mr-1 lg:mr-0`}
                           >
                             {item.first_name} {item.last_name}
@@ -113,8 +105,8 @@ const ReOrderingList: React.FC = () => {
                           <p
                             className={` ${
                               select
-                                ? "bg-primary text-white"
-                                : "bg-white text-gray-800"
+                                ? "bg-blue-700 text-white"
+                                : "bg-border"
                             } my-1 mr-1 p-1 px-4 rounded-e-full`}
                           >
                             {item?.mobile_number}
@@ -126,8 +118,8 @@ const ReOrderingList: React.FC = () => {
                               item.attended
                                 ? "bg-green-600 p-1 text-white"
                                 : item.old
-                                ? "bg-white p-1 text-gray-800"
-                                : "border-2  p-[2px] border-gray-800 text-gray-800"
+                                ? "bg-border p-1"
+                                : "border-2  p-[2px] border-border"
                             }`}
                           >
                             {item.attended
