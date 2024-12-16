@@ -55,7 +55,9 @@ const BoxContainer = ({
               alt="logo"
             />
 
-            <Minimize className="size-4 text-white absolute top-4 right-4 opacity-20" />
+            {allowTokenSceenExpand && (
+              <Minimize className="size-4 text-white absolute top-4 right-4 opacity-20" />
+            )}
 
             <motion.h3
               layoutId={`h3-714`}
@@ -109,7 +111,9 @@ const BoxContainer = ({
       >
         {/* Add image here also */}
 
-        <Maximize className="size-3 text-white absolute top-2 right-2" />
+        {allowTokenSceenExpand && (
+          <Maximize className="size-3 text-white absolute top-2 right-2" />
+        )}
         <motion.h3
           layoutId={`h3-714`}
           style={{

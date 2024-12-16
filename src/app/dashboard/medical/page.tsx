@@ -215,7 +215,7 @@ const Medical = () => {
                                 pathname: "medical/medicalForm",
                                 query: { patientId: item.patient_unique_Id },
                               }}
-                              className="mx-1 py-1 px-2 w-full text-white bg-blue-700 m-1 bg-primary rounded-[4px] shadow-sm font-semibold text-sm sm:text-base"
+                              className="mx-1 py-1 px-2 w-full text-white bg-blue-700 m-1 rounded-[4px] shadow-sm font-semibold text-sm sm:text-base"
                             >
                               Report
                             </Link>
