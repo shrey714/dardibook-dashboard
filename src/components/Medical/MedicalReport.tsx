@@ -156,7 +156,7 @@ const MedicalReport = ({ patient, selectedPatientId }: any) => {
               </tr>
             </thead>
             <tbody>
-              {prescriptionData?.medicines?.map((row: any, index: any) => (
+              {prescriptionData?.medicines?.map((row: any) => (
                 <tr
                   key={row.id}
                   className={`${row.id} border-primary border-b-[1px] sm:border-0 flex flex-col sm:table-row`}

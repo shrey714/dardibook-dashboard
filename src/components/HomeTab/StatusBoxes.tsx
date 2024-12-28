@@ -1,7 +1,6 @@
 "use client";
 import { Check, Pencil, Star } from "lucide-react";
 import React, { useEffect, useState } from "react";
-import { Skeleton } from "../ui/skeleton";
 import { getTime, startOfMonth, endOfMonth } from "date-fns";
 import { getAllPatients } from "@/app/services/getAllPatients";
 import { useAuth } from "@clerk/nextjs";
@@ -34,8 +33,8 @@ const StatusBoxes = () => {
             setpatientsCollection([]);
           }
         } catch (error) {
+          console.log(error);
           setpatientsCollection([]);
-
           setLoader(false);
         }
       }
@@ -104,9 +103,6 @@ const StatusBoxes = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [patientsCollection, loader]);
 
-  const LoaderBox: React.FC = () => (
-    <Skeleton className="bg-custom-gradient bg-gray-300/70 skeleton h-[33px] w-[20%] rounded-sm"></Skeleton>
-  );
   const DetailsBox: React.FC<{
     icon: React.ReactNode;
     count: number;

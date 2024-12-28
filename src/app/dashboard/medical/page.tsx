@@ -4,14 +4,14 @@ import { getTodayPatients } from "@/app/services/getTodayPatients";
 import Link from "next/link";
 import useToken from "@/firebase/useToken";
 import Loader from "@/components/common/Loader";
-import { collection, onSnapshot, query, where } from "firebase/firestore";
+import { collection, onSnapshot, query } from "firebase/firestore";
 import { db } from "@/firebase/firebaseConfig";
 import { Reorder } from "framer-motion";
 import { RefreshCw } from "lucide-react";
 import { useAuth } from "@clerk/nextjs";
 const Medical = () => {
   const { isLoaded, orgId } = useAuth();
-  const [queueItems, setqueueItems] = useState<any>([]);
+  const [queueItems, setqueueItems] = useState([]);
   const [queueLoader, setqueueLoader] = useState(true);
   const [realUpdateLoader, setrealUpdateLoader] = useState(false);
   const { CurrentToken } = useToken(orgId || "");
@@ -44,7 +44,7 @@ const Medical = () => {
         const q = query(collection(db, "doctor", orgId, "patients"));
 
         setqueueLoader(true); //enable after
-        unsubscribe = onSnapshot(q, async (snapshot) => {
+        unsubscribe = onSnapshot(q, async () => {
           setrealUpdateLoader(true);
           const patientQueueData = await getTodayPatients(orgId);
           if (patientQueueData.data) {
@@ -69,10 +69,10 @@ const Medical = () => {
         unsubscribe();
       }
     };
-  }, [isLoaded]);
+  }, [isLoaded, orgId]);
   // =============================================
-  let base = 4;
-  let t = (d: number) => d * base;
+  const base = 4;
+  const t = (d: number) => d * base;
 
   return (
     <div className=" w-full lg:w-3/4 lg:ml-[12.5%] self-center py-0 flex flex-1 justify-start flex-col items-center px-4 sm:px-6 lg:px-8">

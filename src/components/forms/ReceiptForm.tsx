@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 
 const ReceiptForm: React.FC<any> = ({ receiptInfo, setReceiptInfo }: any) => {
   const handleInputChange = (

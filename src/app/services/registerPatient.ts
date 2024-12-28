@@ -1,9 +1,6 @@
-import { auth } from "@/firebase/firebaseConfig";
 
 export const RegisterPatient = async (req: any) => {
     try {
-        const user = auth.currentUser;
-        const token = user ? await user.getIdToken() : null;
         const res = await fetch(`/api/register-patient`, {
             method: 'POST',
             headers: {

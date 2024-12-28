@@ -11,7 +11,6 @@ import Image from "next/image";
 import { ThemeProvider as NextThemeProvider } from "next-themes";
 import { ClerkLoaded, ClerkLoading, ClerkProvider } from "@clerk/nextjs";
 import TopBarLoader from "@/components/common/TopBarLoader";
-import { auth } from "@clerk/nextjs/server";
 const DM_Sans_Font = DM_Sans({
   subsets: ["latin"],
   display: "swap",

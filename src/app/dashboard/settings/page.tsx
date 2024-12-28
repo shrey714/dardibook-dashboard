@@ -25,8 +25,8 @@ interface DoctorInfo {
   phoneNumber: string;
   emailId: string;
   clinicAddress: string;
-  clinicLogo: any;
-  signaturePhoto: any;
+  clinicLogo: string;
+  signaturePhoto: string;
   subscriptionId: string;
   staff: Staff[];
 }
@@ -66,7 +66,7 @@ const Page = () => {
       }
     };
     setDocotrData();
-  }, [isLoaded]);
+  }, [isLoaded, orgId]);
 
   return (
     <div className="w-full self-center pb-12 pt-6 px-4 sm:px-6 lg:px-8">

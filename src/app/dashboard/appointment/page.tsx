@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 export default function TShirtsPage() {
   const [patientId, setPatientId] = useState("");
 
-  const handleInputChange = (e: any) => {
+  const handleInputChange = (e: { target: { value: any; }; }) => {
     const value = e.target.value;
     setPatientId(value);
   };

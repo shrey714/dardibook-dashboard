@@ -44,7 +44,7 @@ const DashboardWrapper = ({ children }: { children: ReactNode }) => {
       }
     };
     checkUserSubscription();
-  }, [isLoaded]);
+  }, [isLoaded, orgId]);
   // ===================
   return (
     <>

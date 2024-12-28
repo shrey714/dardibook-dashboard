@@ -1,6 +1,7 @@
-"use client"
+"use client";
 /* eslint-disable @next/next/no-img-element */
 import Header from "@/components/HeaderDocument";
+import Link from "next/link";
 
 import React from "react";
 
@@ -29,18 +30,18 @@ const ServerError = () => {
             </p>
 
             <div className="flex items-center justify-center mt-6 gap-x-3">
-              <a
+              <Link
                 href="/"
                 className="link bg-gray-800 text-white animate-none btn-neutral btn no-underline"
               >
                 Take me home
-              </a>
-              <a
+              </Link>
+              <Link
                 href="https://dardibook.in/documents/contact-us"
                 className="link bg-gray-800 text-white animate-none btn-neutral btn no-underline"
               >
                 Report
-              </a>
+              </Link>
             </div>
           </div>
         </div>

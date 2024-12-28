@@ -1,9 +1,6 @@
-import { auth } from "@/firebase/firebaseConfig";
 
 const getDataToPrint = async (uid: string, id: string) => {
     try {
-        const user = auth.currentUser;
-        const token = user ? await user.getIdToken() : null;
         const patientRes = await fetch(`/api/get-patient?id=${id}&uid=${uid}`, {
             method: 'GET',
             headers: {

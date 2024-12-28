@@ -28,7 +28,9 @@ const BoxContainer = ({
             }}
             layoutId={`card-714`}
             onClick={() => {
-              allowTokenSceenExpand && setisExpanded(!isExpanded);
+              if (allowTokenSceenExpand) {
+                setisExpanded(!isExpanded);
+              }
             }}
             style={{
               userSelect: "none",
@@ -93,7 +95,9 @@ const BoxContainer = ({
         }}
         layoutId={`card-714`}
         onClick={() => {
-          allowTokenSceenExpand && setisExpanded(!isExpanded);
+          if (allowTokenSceenExpand) {
+            setisExpanded(!isExpanded);
+          }
         }}
         style={{
           userSelect: "none",

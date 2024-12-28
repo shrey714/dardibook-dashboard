@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
@@ -19,7 +19,7 @@ export const Typewriter = ({ list }: any) => {
     }, SWAP_DELAY_IN_MS);
 
     return () => clearInterval(intervalId);
-  }, []);
+  }, [list.length]);
 
   return (
     <div className="flex items-center justify-center px-8 py-24 text-[28px] sm:text-5xl text-gray-800 dark:text-slate-300 font-bold">

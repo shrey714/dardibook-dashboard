@@ -7,7 +7,7 @@ import { useAuth } from "@clerk/nextjs";
 
 const ReOrderingList: React.FC = () => {
   const { isLoaded, orgId } = useAuth();
-  const [queueItems, setqueueItems] = useState<any>([]);
+  const [queueItems, setqueueItems] = useState([]);
   const [queueLoader, setqueueLoader] = useState(false);
   const { CurrentToken } = useToken(orgId || "");
   useEffect(() => {
@@ -27,7 +27,7 @@ const ReOrderingList: React.FC = () => {
       }
     };
     getTodayPatientQueue();
-  }, [isLoaded]);
+  }, [isLoaded, orgId]);
 
   return (
     <>

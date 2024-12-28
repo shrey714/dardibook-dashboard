@@ -1,10 +1,7 @@
-import { auth } from "@/firebase/firebaseConfig";
 
 // Add a staff member
 export const addStaff = async (staffData: { email: string; role: string }, doctorId: string) => {
     try {
-        const user = auth.currentUser;
-        const token = user ? await user.getIdToken() : null;
 
         const res = await fetch(`/api/crud-staff?uid=${doctorId}`, {
             method: 'POST',
@@ -25,8 +22,6 @@ export const addStaff = async (staffData: { email: string; role: string }, docto
 // Get the staff list
 export const getStaff = async (doctorId: string) => {
     try {
-        const user = auth.currentUser;
-        const token = user ? await user.getIdToken() : null;
 
         const res = await fetch(`/api/crud-staff?uid=${doctorId}`, {
             method: 'GET',
@@ -46,8 +41,6 @@ export const getStaff = async (doctorId: string) => {
 // Delete a specific staff member by UID
 export const deleteStaff = async (staffMailId: string, doctorId: string) => {
     try {
-        const user = auth.currentUser;
-        const token = user ? await user.getIdToken() : null;
 
         const res = await fetch(`/api/crud-staff?uid=${doctorId}`, {
             method: 'DELETE',

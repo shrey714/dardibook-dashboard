@@ -1,9 +1,7 @@
 import { db } from "@/firebase/firebaseConfig";
 import {
   collection,
-  doc,
   DocumentData,
-  getDoc,
   getDocs,
   orderBy,
   query,
@@ -40,8 +38,8 @@ const getTodayPatients = async (request: NextRequest) => {
       const currentTs = new Date();
       let old = true;
       let attended = false;
-      let visitedDtesArray = pData?.visitedDates;
-      let todayDate = getDateFromTimeStamp(currentTs);
+      const visitedDtesArray = pData?.visitedDates;
+      const todayDate = getDateFromTimeStamp(currentTs);
       if (visitedDtesArray === undefined) old = false;
       if (visitedDtesArray !== undefined) {
         visitedDtesArray.forEach((dates: number) => {

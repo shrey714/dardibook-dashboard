@@ -1,5 +1,5 @@
 import React, { ChangeEvent, useEffect, useState } from "react";
-import { Plus, X } from "lucide-react";
+import { Plus } from "lucide-react";
 import MedicineRow from "./MedicineRow";
 import uniqid from "uniqid";
 import {
@@ -78,6 +78,7 @@ const MedicineInfo = ({ uid }: any) => {
     e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>,
     id: any
   ) => {
+    console.log(id);
     const { name, value } = e.target;
     seteditmedicineData({ ...editmedicineData, [name]: value });
   };
@@ -85,14 +86,10 @@ const MedicineInfo = ({ uid }: any) => {
   const saveHandler = async (id: any) => {
     await addMedicine(editmedicineData, uid);
     setmedFromDb((prev: any) =>
-      prev.map((item: any, i: any) =>
-        item.id === id ? editmedicineData : item
-      )
+      prev.map((item: any) => (item.id === id ? editmedicineData : item))
     );
     setmedicines((prev: any) =>
-      prev.map((item: any, i: any) =>
-        item.id === id ? editmedicineData : item
-      )
+      prev.map((item: any) => (item.id === id ? editmedicineData : item))
     );
   };
 
@@ -104,7 +101,7 @@ const MedicineInfo = ({ uid }: any) => {
   const submitHandler = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
     // add patient api
-    for (let med of medicines) {
+    for (const med of medicines) {
       if (
         med.medicineName + med.type ===
         medicineData.medicineName.trim() + medicineData.type
@@ -236,9 +233,7 @@ const MedicineInfo = ({ uid }: any) => {
                 disabled={addLoader}
               >
                 {addLoader ? (
-                  <Loader
-                    size="small"
-                  />
+                  <Loader size="small" />
                 ) : (
                   <Plus width={20} height={20} />
                 )}
@@ -276,9 +271,7 @@ const MedicineInfo = ({ uid }: any) => {
             <div className="w-full flex flex-col flex-1 bg-secondary mt-1 p-2 pb-1 rounded-lg overflow-y-auto">
               {searchLoader ? (
                 <div className="flex flex-1 items-center justify-center">
-                  <Loader
-                    size="medium"
-                  />
+                  <Loader size="medium" />
                 </div>
               ) : filteredMedicine(medicines).length === 0 ? (
                 <>

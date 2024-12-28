@@ -10,10 +10,7 @@ import {
 } from "firebase/firestore";
 import { NextRequest, NextResponse } from "next/server";
 
-const fetchPatientData = async (
-  id: string,
-  uid: string
-): Promise<any | null> => {
+const fetchPatientData = async (id: string, uid: string) => {
   const patientDocRef = doc(db, "doctor", uid, "patients", id);
   const patientDocSnap = await getDoc(patientDocRef);
 
@@ -21,13 +18,10 @@ const fetchPatientData = async (
     return null;
   }
 
-  return patientDocSnap.data() as any;
+  return patientDocSnap.data();
 };
 
-const fetchPrescriptionsData = async (
-  id: string,
-  uid: string
-): Promise<any[]> => {
+const fetchPrescriptionsData = async (id: string, uid: string) => {
   const prescriptionsQuery = query(
     collection(db, "doctor", uid, "patients", id, "visits"),
     orderBy("time", "asc") // or "desc" for descending order
@@ -36,7 +30,7 @@ const fetchPrescriptionsData = async (
 
   return prescriptionsSnapshot.docs.map((doc) => ({
     ...doc.data(),
-  })) as any[];
+  }));
 };
 
 const getPatientHistory = async (req: NextRequest) => {

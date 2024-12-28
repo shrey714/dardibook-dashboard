@@ -1,11 +1,6 @@
 import { Button } from "@/components/ui/button";
 import React from "react";
-const RightBox = ({
-  thisPlanDetails,
-  handleSubscription,
-  subscriptionFields,
-  isValid,
-}: any) => {
+const RightBox = ({ thisPlanDetails, handleSubscription, isValid }: any) => {
   return (
     <>
       <div className="flex flex-col ">

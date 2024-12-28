@@ -67,7 +67,10 @@ const useToken = (doctorID: string) => {
                     clearTimeout(debounceTimeout.current);
                 }
                 debounceTimeout.current = window.setTimeout(() => {
-                    allowNotification && playNotification();
+                    if (allowNotification) {
+                        playNotification();
+                    }
+
                 }, 500); // Adjust the delay as needed (300ms in this example)
             };
 

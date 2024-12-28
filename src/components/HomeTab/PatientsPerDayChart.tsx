@@ -92,9 +92,9 @@ const PatientsPerDayChart = () => {
           } else {
             setpatientsCollection([]);
           }
-        } catch (error) {
+        } catch (error){
+          console.log(error);
           setpatientsCollection([]);
-
           setLoader(false);
         }
       }

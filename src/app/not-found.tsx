@@ -1,5 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import Header from "@/components/HeaderDocument";
+import Link from "next/link";
 
 export default function Custom404() {
   return (
@@ -22,9 +23,12 @@ export default function Custom404() {
             </p>
 
             <div className="flex items-center justify-center mt-6 gap-x-3">
-              <a href="/" className="link bg-gray-800 text-white animate-none btn-neutral btn no-underline">
+              <Link
+                href="/"
+                className="link bg-gray-800 text-white animate-none btn-neutral btn no-underline"
+              >
                 Take me home
-              </a>
+              </Link>
             </div>
           </div>
         </div>

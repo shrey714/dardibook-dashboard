@@ -25,6 +25,7 @@ export const decryptData = async (ciphertext: any) => {
     const bytes = await CryptoJS.AES.decrypt(ciphertext, salt || "hfytft");
     return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
   } catch (err) {
+    console.error("failed:", err);
     return null;
   }
 };

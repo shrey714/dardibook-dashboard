@@ -14,7 +14,7 @@ const LeftBox = ({
   isValid,
   setIsValid,
 }: any) => {
-  const handleMobileNumberChange = (e: { target: { value: any } }) => {
+  const handleMobileNumberChange = (e: { target: { value: string } }) => {
     const value = e.target.value;
     setmobileNumber(value);
   };

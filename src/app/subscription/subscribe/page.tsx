@@ -3,14 +3,14 @@ import Image from "next/image";
 import { currentUser } from "@clerk/nextjs/server";
 import HeaderMain from "@/components/HeaderMain";
 import SubscriptionBox from "./SubscriptionBox";
+type Params = Promise<{ planId: string }>
 export default async function Subscribe({
   searchParams,
 }: {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+  searchParams: Params;
 }) {
   const user = await currentUser();
   const { planId } = await searchParams;
-  console.log("searchParams==", planId);
   return (
     <div className="flex pt-24 overflow-y-auto pb-6 flex-col justify-evenly items-center min-h-screen w-full overflow-hidden">
       <Image

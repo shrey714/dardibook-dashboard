@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/firebase/firebaseConfig";
-import { collection, doc, getDocs, query, where } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { withAuth } from "@/server/withAuth";
 
 const getAllPatients = async (request: NextRequest) => {
@@ -26,12 +26,12 @@ const getAllPatients = async (request: NextRequest) => {
     const querySnapshot = await getDocs(patientsQuery);
     const patientsData: {
       id: string;
-      first_name: any;
-      last_name: any;
+      first_name: string;
+      last_name: string;
       age: string;
       gender: string;
       last_visited: number;
-      visitedDates: any;
+      visitedDates: number[];
       appointed: boolean;
       mobile_number: string;
     }[] = [];

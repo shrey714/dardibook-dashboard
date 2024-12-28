@@ -46,7 +46,7 @@ const QueueList: React.FC = () => {
         const q = query(collection(db, "doctor", orgId, "patients"));
 
         setqueueLoader(true); //enable after
-        unsubscribe = onSnapshot(q, async (snapshot) => {
+        unsubscribe = onSnapshot(q, async () => {
           setrealUpdateLoader(true);
           const patientQueueData = await getTodayPatients(orgId);
           if (patientQueueData.data) {
@@ -71,10 +71,10 @@ const QueueList: React.FC = () => {
         unsubscribe();
       }
     };
-  }, [isLoaded]);
+  }, [isLoaded, orgId]);
   // =============================================
-  let base = 4;
-  let t = (d: number) => d * base;
+  const base = 4;
+  const t = (d: number) => d * base;
 
   return (
     <>

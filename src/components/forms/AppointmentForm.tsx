@@ -98,7 +98,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
                         .split("T")[0]
                     }
                     onChange={(e) => {
-                      let getValue =
+                      const getValue =
                         e.target.value === ""
                           ? new Date().toISOString().split("T")[0]
                           : e.target.value;

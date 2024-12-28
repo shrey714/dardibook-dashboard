@@ -28,10 +28,10 @@ const getSubscription = async (request: NextRequest) => {
     const details = await response.json();
 
     return NextResponse.json({ data: details }, { status: 200 });
-  } catch (error: any) {
+  } catch (error) {
     console.log("Error fetching subscription data:", error);
     return NextResponse.json(
-      { error: error.message || "Internal Server Error" },
+      { error: error || "Internal Server Error" },
       { status: 500 }
     );
   }

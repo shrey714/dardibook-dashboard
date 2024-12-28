@@ -1,14 +1,10 @@
-import { auth } from "@/firebase/firebaseConfig";
-
 export const addDisease = async (diseaseData: any, uid: string) => {
     try {
-        const user = auth.currentUser;
-        const token = user ? await user.getIdToken() : null;
         const res = await fetch(`/api/crud-disease?uid=${uid}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                
+
             },
             body: JSON.stringify(diseaseData)
         });
@@ -21,13 +17,11 @@ export const addDisease = async (diseaseData: any, uid: string) => {
 
 export const getDiseases = async (uid: string) => {
     try {
-        const user = auth.currentUser;
-        const token = user ? await user.getIdToken() : null;
         const res = await fetch(`/api/crud-disease?uid=${uid}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                
+
             },
         });
         const data = await res.json();
@@ -39,13 +33,11 @@ export const getDiseases = async (uid: string) => {
 
 export const delDisease = async (id: string, uid: string) => {
     try {
-        const user = auth.currentUser;
-        const token = user ? await user.getIdToken() : null;
         const res = await fetch(`/api/crud-disease?uid=${uid}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
-                
+
             },
             body: JSON.stringify({ id: id })
         });

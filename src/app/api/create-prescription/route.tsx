@@ -3,12 +3,10 @@ import { withAuth } from "@/server/withAuth";
 import {
   collection,
   doc,
-  DocumentData,
   setDoc,
   getDoc,
   updateDoc,
   arrayUnion,
-  addDoc,
 } from "firebase/firestore";
 import { NextResponse, NextRequest } from "next/server";
 
@@ -73,10 +71,10 @@ const createPrescription = async (request: NextRequest) => {
         searchableString: mainData?.diseaseDetail.toLowerCase().trim(),
         diseaseDetail: mainData?.diseaseDetail,
         medicines: mainData?.medicines
-          ?.filter((medicine: any) =>
+          ?.filter((medicine: { medicineName: string; }) =>
             medicine.medicineName.toLowerCase().trim()
           )
-          .map((medicine: any) => medicine.id),
+          .map((medicine: { id: any; }) => medicine.id),
         diseaseId: mainData?.diseaseId,
       },
       { merge: true }

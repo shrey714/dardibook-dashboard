@@ -11,8 +11,7 @@ import { EmblaOptionsType } from "embla-carousel";
 import useEmblaCarousel from "embla-carousel-react";
 import { createContext } from "react";
 import MedicalReport from "./MedicalReport";
-import { BookUser, CalendarIcon } from "lucide-react";
-import { Avatar, AvatarImage, AvatarFallback } from "@radix-ui/react-avatar";
+import { BookUser } from "lucide-react";
 import {
   HoverCard,
   HoverCardTrigger,
@@ -217,7 +216,7 @@ Carousel.displayName = "Carousel";
 const CarouselMainContainer = forwardRef<
   HTMLDivElement,
   {} & React.HTMLAttributes<HTMLDivElement>
->(({ className, dir, children, ...props }, ref) => {
+>(({ className, children, ...props }, ref) => {
   const { mainRef, orientation, direction } = useCarousel();
 
   return (
@@ -240,7 +239,7 @@ CarouselMainContainer.displayName = "CarouselMainContainer";
 const CarouselThumbsContainer = forwardRef<
   HTMLDivElement,
   {} & React.HTMLAttributes<HTMLDivElement>
->(({ className, dir, children, ...props }, ref) => {
+>(({ className, children, ...props }, ref) => {
   const { thumbsRef, orientation, direction } = useCarousel();
 
   return (

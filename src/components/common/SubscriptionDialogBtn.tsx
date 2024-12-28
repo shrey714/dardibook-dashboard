@@ -15,18 +15,6 @@ import SubscriptionInfo from "../Settings/SubscriptionInfo";
 import { getDocotr } from "@/app/services/getDoctor";
 import { useAuth } from "@clerk/nextjs";
 
-interface Subscription {
-  id: string;
-  plan_id: string;
-  status: string;
-  created_at: number | null;
-  total_count: number | null;
-  paid_count: number | null;
-  charge_at: number | null;
-  end_at: number | null;
-  short_url: string;
-}
-
 const SubscriptionDialogBtn = ({ className, ...props }: any) => {
   const [mainLoader, setmainLoader] = useState(false);
   const [doctorData, setdoctorData] = useState<any>({});
@@ -48,7 +36,7 @@ const SubscriptionDialogBtn = ({ className, ...props }: any) => {
       }
     };
     setDocotrData();
-  }, [orgId]);
+  }, [orgId, isLoaded]);
 
   return (
     <Dialog>

@@ -27,7 +27,7 @@ const Page = () => {
   const searchParams = useSearchParams();
   const patientId = searchParams.get("patientId");
   const [loader, setLoader] = useState(false);
-  const [patientList, setpatientList] = useState<any>([]);
+  const [patientList, setpatientList] = useState([]);
   const [startIndex, setstartIndex] = useState(0);
   const [drawerState, setdrawerState] = useState(false);
 
@@ -40,12 +40,12 @@ const Page = () => {
         const q = query(collection(db, "doctor", orgId, "patients"));
 
         setLoader(true); //enable after
-        unsubscribe = onSnapshot(q, async (snapshot) => {
+        unsubscribe = onSnapshot(q, async () => {
           const patientQueueData = await getTodayPatients(orgId);
           if (patientQueueData.data) {
             setpatientList(patientQueueData.data);
             const index = patientQueueData.data.findIndex(
-              (patient: { patient_unique_Id: any }) =>
+              (patient: { patient_unique_Id: string | null }) =>
                 patient.patient_unique_Id === patientId
             );
             setstartIndex(index);
@@ -67,7 +67,7 @@ const Page = () => {
         unsubscribe();
       }
     };
-  }, [isLoaded]);
+  }, [isLoaded, orgId, patientId]);
   // =============================================
 
   return (
@@ -84,7 +84,7 @@ const Page = () => {
             </SheetHeader>
             <PatientDataBox
               patientData={patientList.find(
-                (patient: { patient_unique_Id: any }) =>
+                (patient: { patient_unique_Id: string | null }) =>
                   patient.patient_unique_Id === patientId
               )}
             />
@@ -117,7 +117,7 @@ const Page = () => {
             className="flex flex-col !gap-0 w-full"
           >
             <CarouselThumbsContainer className="h-12 basis-full py-1 select-none">
-              {patientList.map((patient: any, index: any) => (
+              {patientList.map((patient, index) => (
                 <SliderThumbItem
                   key={index}
                   index={index}
@@ -128,7 +128,7 @@ const Page = () => {
             </CarouselThumbsContainer>
             <div className="relative basis-3/4 overflow-hidden">
               <CarouselMainContainer className="h-[calc(100svh-106px)] z-[1] relative">
-                {patientList.map((patient: any, index: any) => (
+                {patientList.map((patient, index) => (
                   <SliderMainItem
                     setdrawerState={setdrawerState}
                     key={index}

@@ -61,7 +61,7 @@ const RegistrationForm = () => {
     if (isLoaded && orgId) {
       router.replace("/");
     }
-  }, [router, isLoaded]);
+  }, [router, isLoaded, orgId]);
   const [formData, setFormData] = useState({
     clinicName: "",
     doctorName: "",

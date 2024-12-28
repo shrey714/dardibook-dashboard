@@ -15,7 +15,7 @@ import SubscriptionDialogBtn from "@/components/common/SubscriptionDialogBtn";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
-const SubscriptionBox = ({ planId }: any) => {
+const SubscriptionBox = ({ planId }: { planId: string }) => {
   const { orgId, isLoaded } = useAuth();
   const { user } = useUser();
   const router = useRouter();
@@ -50,7 +50,11 @@ const SubscriptionBox = ({ planId }: any) => {
             setloading(false);
           },
         },
-        handler: async (response: any) => {
+        handler: async (response: {
+          razorpay_payment_id: string;
+          razorpay_signature: string;
+          razorpay_subscription_id: string;
+        }) => {
           setloading(true);
           const legitCheck = await fetch(
             "https://backend.dardibook.in/verification",
@@ -97,10 +101,13 @@ const SubscriptionBox = ({ planId }: any) => {
       };
 
       const paymentObject = new window.Razorpay(options);
-      paymentObject.on("payment.failed", function (response: any) {
-        setloading(false);
-        alert(response.error.description);
-      });
+      paymentObject.on(
+        "payment.failed",
+        function (response: { error: { description: string } }) {
+          setloading(false);
+          alert(response.error.description);
+        }
+      );
       paymentObject.open();
     } catch (error) {
       console.log(error);
@@ -134,7 +141,7 @@ const SubscriptionBox = ({ planId }: any) => {
       }
     };
     fetchPlans();
-  }, [planId, router, isLoaded]);
+  }, [planId, router, isLoaded, orgId]);
 
   return (
     <>
@@ -185,7 +192,6 @@ const SubscriptionBox = ({ planId }: any) => {
           <RightBox
             thisPlanDetails={thisPlanDetails}
             handleSubscription={handleSubscription}
-            subscriptionFields={subscriptionFields}
             isValid={isValid}
           />
         </>

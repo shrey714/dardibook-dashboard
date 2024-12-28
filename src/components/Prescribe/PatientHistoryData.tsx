@@ -41,7 +41,7 @@ const PatientHistoryData = ({ history }: any) => {
               </tr>
             </thead>
             <tbody>
-              {history?.medicines?.map((row: any, index: any) => (
+              {history?.medicines?.map((row: any) => (
                 <tr key={row.id} className={`${row.id}`}>
                   <td className="align-top p-1">
                     <input

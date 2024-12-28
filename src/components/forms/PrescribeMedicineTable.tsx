@@ -161,7 +161,7 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
           </tr>
         </thead>
         <tbody>
-          {rows?.map((row, index) => (
+          {rows?.map((row) => (
             <tr
               key={row.id}
               className={

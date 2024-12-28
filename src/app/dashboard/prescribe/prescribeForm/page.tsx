@@ -19,7 +19,7 @@ const Page = () => {
   const searchParams = useSearchParams();
   const [submissionLoader, setSubmissionLoader] = useState(false);
   const patientId = searchParams.get("patientId");
-  const [visitID, setvisitID] = useState(uniqid.time());
+  const [visitID] = useState(uniqid.time());
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [receiptInfo, setReceiptInfo] = useState({
     particulars: [
@@ -106,7 +106,7 @@ const Page = () => {
         setFormData={setFormData}
         submissionLoader={submissionLoader}
         handleSubmit={handleSubmit}
-        receiptInfo={receiptInfo as any}
+        receiptInfo={receiptInfo}
         setReceiptInfo={setReceiptInfo}
       />
     </>

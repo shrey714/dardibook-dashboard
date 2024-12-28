@@ -1,7 +1,6 @@
-import { db, storage } from "@/firebase/firebaseConfig";
+import { db } from "@/firebase/firebaseConfig";
 import { withAuth } from "@/server/withAuth";
 import { doc, setDoc } from "firebase/firestore";
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { NextResponse, NextRequest } from "next/server";
 
 const createDoctor = async (request: NextRequest) => {

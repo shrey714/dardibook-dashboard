@@ -1,5 +1,5 @@
 import React, { ChangeEvent, useEffect, useState } from "react";
-import { Plus, X } from "lucide-react";
+import { Plus } from "lucide-react";
 import DiseaseRow from "./DiseaseRow";
 import uniqid from "uniqid";
 import {
@@ -56,6 +56,7 @@ const DiseaseInfo = ({ uid }: any) => {
     e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>,
     id: any
   ) => {
+    console.log(id);
     const { name, value } = e.target;
     seteditdiseaseData({ ...editdiseaseData, [name]: value });
   };
@@ -63,10 +64,10 @@ const DiseaseInfo = ({ uid }: any) => {
   const saveHandler = async (id: any) => {
     await addDisease(editdiseaseData, uid);
     setdisFromDb((prev: any) =>
-      prev.map((item: any, i: any) => (item.id === id ? editdiseaseData : item))
+      prev.map((item: any) => (item.id === id ? editdiseaseData : item))
     );
     setdiseases((prev: any) =>
-      prev.map((item: any, i: any) => (item.id === id ? editdiseaseData : item))
+      prev.map((item: any) => (item.id === id ? editdiseaseData : item))
     );
   };
 
@@ -78,7 +79,7 @@ const DiseaseInfo = ({ uid }: any) => {
   const submitHandler = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
     // add patient api
-    for (let dis of diseases) {
+    for (const dis of diseases) {
       if (dis.diseaseDetail === diseaseData.diseaseDetail.trim()) {
         toast.error("Disease already exists!", {
           duration: 2000,

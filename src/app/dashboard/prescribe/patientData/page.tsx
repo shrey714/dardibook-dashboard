@@ -14,8 +14,8 @@ const Page = () => {
   const { isLoaded, orgId } = useAuth();
   const searchParams = useSearchParams();
   const patientId = searchParams.get("patientId");
-  const [patientData, setPatientData] = useState<any | null>(null);
-  const [prescriptionsData, setPrescriptionsData] = useState<any[]>([]);
+  const [patientData, setPatientData] = useState(null);
+  const [prescriptionsData, setPrescriptionsData] = useState([]);
   const [historyLoader, sethistoryLoader] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -37,7 +37,7 @@ const Page = () => {
       }
     };
     getPatientData();
-  }, [patientId, isLoaded]);
+  }, [patientId, isLoaded, orgId]);
 
   return (
     <>

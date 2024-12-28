@@ -1,6 +1,5 @@
 import { storage } from "@/firebase/firebaseConfig";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { auth } from "@/firebase/firebaseConfig";
 
 const uploadFile = async (file: File, path: string) => {
     const fileRef = ref(storage, path);
@@ -10,8 +9,6 @@ const uploadFile = async (file: File, path: string) => {
 
 export const createDoctor = async (req: any) => {
     try {
-        const user = auth.currentUser;
-        const token = user ? await user.getIdToken() : null;
         let tempFormData = req.formData
 
         let clinicLogoUrl = ""

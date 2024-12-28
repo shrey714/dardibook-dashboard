@@ -3,7 +3,7 @@ import StaffRolesRow from "./StaffRolesRow";
 import Loader from "@/components/common/Loader";
 import toast from "react-hot-toast";
 import { addStaff, deleteStaff } from "@/app/services/crudStaff";
-import { Plus, X } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -43,12 +43,12 @@ const StaffRolesInfo = ({ staff, uid }: { staff: Staff[]; uid: string }) => {
 
   const submitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    let staffEmailInput = e.currentTarget.elements.namedItem(
+    const staffEmailInput = e.currentTarget.elements.namedItem(
       "staffEmail"
     ) as HTMLInputElement;
     const staffEmail = staffEmailInput.value.trim().toLowerCase();
 
-    for (let staff of allStaffs) {
+    for (const staff of allStaffs) {
       if (staff.email.toLowerCase() === staffEmail) {
         toast.error(`Member already exists with role ${staff.role}!`, {
           duration: 2000,
@@ -141,9 +141,7 @@ const StaffRolesInfo = ({ staff, uid }: { staff: Staff[]; uid: string }) => {
                 disabled={addLoader}
               >
                 {addLoader ? (
-                  <Loader
-                    size="small"
-                  />
+                  <Loader size="small" />
                 ) : (
                   <Plus width={20} height={20} />
                 )}

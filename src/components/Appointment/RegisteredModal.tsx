@@ -4,7 +4,15 @@ import Lottie from "react-lottie";
 import Link from "next/link";
 import { Button } from "../ui/button";
 
-const RegisteredModal = ({ isModalOpen, setCloseModal }: any) => {
+interface RegisteredModalProps {
+  isModalOpen: boolean; // Whether the modal is open
+  setCloseModal: (state: boolean) => void; // Function to change the modal state
+}
+
+const RegisteredModal: React.FC<RegisteredModalProps> = ({
+  isModalOpen,
+  setCloseModal,
+}) => {
   const [startAnimation, setStartAnimation] = useState(false);
   const defaultOptions = {
     loop: false,
