@@ -76,6 +76,7 @@ const PatientsPerDayChart = () => {
     to: endOfMonth(new Date()),
   });
   // ========================
+  
   useEffect(() => {
     const fetchPatients = async () => {
       if (isLoaded && orgId) {
