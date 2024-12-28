@@ -17,7 +17,7 @@ const PrintHandeler: React.FC<any> = ({
 }: any) => {
   const printRef = useRef(null);
   const handlePrint = useReactToPrint({
-    content: () => printRef.current,
+    contentRef: printRef,
     pageStyle: `
         @page { 
           size: A4; 
@@ -60,10 +60,7 @@ const PrintHandeler: React.FC<any> = ({
 
   return (
     <div className="w-full join-item flex flex-col">
-      <Button
-        onClick={handlePrint}
-        className={styleForBtn}
-      >
+      <Button onClick={() => handlePrint} className={styleForBtn}>
         {printOptions?.IsMedical ? "Print" : "Print Prescription"}
       </Button>
       <div ref={printRef} className="hide-this-compo">
