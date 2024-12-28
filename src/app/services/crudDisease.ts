@@ -8,7 +8,7 @@ export const addDisease = async (diseaseData: any, uid: string) => {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
+                
             },
             body: JSON.stringify(diseaseData)
         });
@@ -27,7 +27,7 @@ export const getDiseases = async (uid: string) => {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
+                
             },
         });
         const data = await res.json();
@@ -45,7 +45,7 @@ export const delDisease = async (id: string, uid: string) => {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
+                
             },
             body: JSON.stringify({ id: id })
         });

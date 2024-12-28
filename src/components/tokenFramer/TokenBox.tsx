@@ -2,12 +2,13 @@
 import React from "react";
 import BoxContainer from "./BoxContainer";
 import useToken from "@/firebase/useToken"; // Adjust the path accordingly
-import { useAppSelector } from "@/redux/store";
 import { Minus, Pause, Play, Plus, Volume2, VolumeOff } from "lucide-react";
 import { useSidebar } from "../ui/sidebar";
+import { useAuth } from "@clerk/nextjs";
 
 export default function TokenBox() {
-  const user = useAppSelector<any>((state) => state.auth.user);
+  const { orgRole,orgId } = useAuth();
+
   const { state, isMobile } = useSidebar();
   const {
     CurrentToken,
@@ -17,7 +18,7 @@ export default function TokenBox() {
     toggleNotification,
     isPaused,
     togglePause,
-  } = useToken(user?.uid);
+  } = useToken(orgId || "");
 
   return (
     <div
@@ -26,7 +27,7 @@ export default function TokenBox() {
           ? "w-60 opacity-60 hover:opacity-100"
           : ""
       } ${
-        user?.role === "subDoctor" || user?.role === "admin" ? "" : "hidden"
+        orgRole === "org:clinic_head" || orgRole === "org:doctor" || orgRole === "org:assistant_doctor" ? "" : "hidden"
       }`}
     >
       <div className="flex flex-row p-1 gap-1">

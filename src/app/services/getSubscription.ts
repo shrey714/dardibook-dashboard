@@ -8,7 +8,7 @@ export const getSubscription = async (subId: string) => {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
+                
             },
         });
 

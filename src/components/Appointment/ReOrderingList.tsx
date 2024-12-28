@@ -1,20 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { getTodayPatients } from "@/app/services/getTodayPatients";
-import { useAppSelector } from "@/redux/store";
 import useToken from "@/firebase/useToken";
 import Link from "next/link";
 import Loader from "../common/Loader";
+import { useAuth } from "@clerk/nextjs";
 
 const ReOrderingList: React.FC = () => {
-  const user = useAppSelector<any>((state) => state.auth.user);
+  const { isLoaded, orgId } = useAuth();
   const [queueItems, setqueueItems] = useState<any>([]);
   const [queueLoader, setqueueLoader] = useState(false);
-  const { CurrentToken } = useToken(user?.uid);
+  const { CurrentToken } = useToken(orgId || "");
   useEffect(() => {
     const getTodayPatientQueue = async () => {
-      if (user) {
+      if (isLoaded && orgId) {
         setqueueLoader(true);
-        const patientQueueData = await getTodayPatients(user.uid);
+        const patientQueueData = await getTodayPatients(orgId);
         if (patientQueueData.data) {
           // console.log(patientQueueData.data);
           setqueueItems(patientQueueData.data);
@@ -27,7 +27,7 @@ const ReOrderingList: React.FC = () => {
       }
     };
     getTodayPatientQueue();
-  }, [user]);
+  }, [isLoaded]);
 
   return (
     <>
@@ -104,9 +104,7 @@ const ReOrderingList: React.FC = () => {
                         <td className="font-medium text-center text-sm sm:text-base hidden lg:block">
                           <p
                             className={` ${
-                              select
-                                ? "bg-blue-700 text-white"
-                                : "bg-border"
+                              select ? "bg-blue-700 text-white" : "bg-border"
                             } my-1 mr-1 p-1 px-4 rounded-e-full`}
                           >
                             {item?.mobile_number}

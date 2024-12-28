@@ -1,7 +1,6 @@
 "use client";
 import PersonalInfo from "@/components/Settings/PersonalInfo";
 import React, { useEffect, useState } from "react";
-import { useAppSelector } from "@/redux/store";
 import ClinicInfo from "@/components/Settings/ClinicInfo";
 import SubscriptionInfo from "@/components/Settings/SubscriptionInfo";
 import Links from "@/components/Settings/Links";
@@ -10,6 +9,7 @@ import { getDocotr } from "@/app/services/getDoctor";
 import StaffRolesInfo from "@/components/Settings/StaffRoles/StaffRolesInfo";
 import MedicineInfo from "@/components/Settings/MedicineInfo/MedicineInfo";
 import DiseaseInfo from "@/components/Settings/DiseaseInfo/DiseaseInfo";
+import { useAuth, useUser } from "@clerk/nextjs";
 
 interface Staff {
   email: string;
@@ -32,7 +32,9 @@ interface DoctorInfo {
 }
 
 const Page = () => {
-  const userInfo = useAppSelector<any>((state) => state.auth.user);
+  const { user, isLoaded } = useUser();
+  const { orgId, orgRole } = useAuth();
+
   const [mainLoader, setmainLoader] = useState(false);
   const [doctorData, setdoctorData] = useState<DoctorInfo>({
     clinicName: "",
@@ -41,7 +43,7 @@ const Page = () => {
     registrationNumber: "",
     clinicNumber: "",
     phoneNumber: "",
-    emailId: userInfo?.email,
+    emailId: user?.emailAddresses[0]?.emailAddress || "",
     clinicAddress: "",
     clinicLogo: "",
     signaturePhoto: "",
@@ -50,9 +52,9 @@ const Page = () => {
   });
   useEffect(() => {
     const setDocotrData = async () => {
-      if (userInfo) {
+      if (isLoaded && orgId) {
         setmainLoader(true);
-        const doctorData = await getDocotr(userInfo?.uid);
+        const doctorData = await getDocotr(orgId);
         if (doctorData.data) {
           setdoctorData(doctorData.data);
         } else {
@@ -64,31 +66,33 @@ const Page = () => {
       }
     };
     setDocotrData();
-  }, [userInfo]);
+  }, [isLoaded]);
 
   return (
     <div className="w-full self-center pb-12 pt-6 px-4 sm:px-6 lg:px-8">
-      <PersonalInfo userInfo={userInfo} />
+      <PersonalInfo userInfo={user} role={orgRole} />
       <ClinicInfo
-        uid={userInfo.uid}
-        role={userInfo?.role}
+        uid={orgId}
+        role={orgRole}
         doctorData={doctorData}
         mainLoader={mainLoader}
         setdoctorData={setdoctorData}
       />
-      {userInfo?.role === "admin" && (
+      {orgRole === "org:clinic_head" && (
         <>
           <SubscriptionInfo
             subId={doctorData?.subscriptionId}
             mainLoader={mainLoader}
           />
-          <StaffRolesInfo staff={doctorData.staff} uid={userInfo.uid} />
+          <StaffRolesInfo staff={doctorData.staff} uid={orgId} />
         </>
       )}
-      {(userInfo?.role === "admin" || userInfo?.role === "subDoctor") && (
+      {(orgRole === "org:clinic_head" ||
+        orgRole === "org:doctor" ||
+        orgRole === "org:assistant_doctor") && (
         <>
-          <DiseaseInfo uid={userInfo.uid} />
-          <MedicineInfo uid={userInfo.uid} />
+          <DiseaseInfo uid={orgId} />
+          <MedicineInfo uid={orgId} />
         </>
       )}
       <Links />

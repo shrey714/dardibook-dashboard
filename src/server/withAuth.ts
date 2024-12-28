@@ -30,6 +30,7 @@ const setCookies = (response: any, key: string, value: any, days: number) => {
 
 export const withAuth = (handler: (arg0: any, arg1: any) => any) => {
   return async (request: any, context: any) => {
+    return await handler(request, context);
     const authHeader = request.headers.get("authorization");
     if (!authHeader) {
       return NextResponse.json(

@@ -1,15 +1,9 @@
-/* eslint-disable @next/next/no-img-element */
-"use client";
-import React, { useState } from "react";
-import { usePathname } from "next/navigation";
-import { signOutUser } from "@/firebase/firebaseAuth";
-import { useAppDispatch } from "@/redux/store";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
+  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
@@ -18,17 +12,8 @@ import LogOutBTtn from "./common/LogOutBTtn";
 import { ModeToggle } from "./common/mode-toggle";
 import { Menu } from "lucide-react";
 import { Button } from "./ui/button";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "./ui/accordion";
 
-const HeaderMain = ({ user }: any) => {
-  const dispatch = useAppDispatch();
-  const pathname = usePathname();
-  const [menuOpen, setMenuOpen] = useState(false);
+const HeaderMain = async ({ user }: any) => {
   const allPaths = [
     "about-us",
     "cancellation-policy",
@@ -37,9 +22,6 @@ const HeaderMain = ({ user }: any) => {
     "privacy-policy",
     "terms-conditions",
   ];
-  const handleMenuToggle = () => {
-    setMenuOpen(!menuOpen);
-  };
 
   return (
     <nav className="fixed w-full z-20 top-0 start-0 p-4">
@@ -55,11 +37,11 @@ const HeaderMain = ({ user }: any) => {
             <DropdownMenuTrigger asChild>
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage
-                  src={user?.photoURL || ""}
-                  alt={user?.displayName || ""}
+                  src={user?.imageUrl || ""}
+                  alt={user?.firstName || ""}
                 />
                 <AvatarFallback className="rounded-lg">
-                  {user?.displayName?.slice(0, 2)}
+                  {user?.firstName?.slice(0, 2)}
                 </AvatarFallback>
               </Avatar>
             </DropdownMenuTrigger>
@@ -73,16 +55,18 @@ const HeaderMain = ({ user }: any) => {
                 <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                   <Avatar className="h-8 w-8 rounded-lg">
                     <AvatarImage
-                      src={user?.photoURL || ""}
-                      alt={user?.displayName || ""}
+                      src={user?.imageUrl || ""}
+                      alt={user?.firstName || ""}
                     />
                     <AvatarFallback className="rounded-lg">CN</AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
                     <span className="truncate font-semibold">
-                      {user?.displayName}
+                      {user?.firstName}
                     </span>
-                    <span className="truncate text-xs">{user?.email}</span>
+                    <span className="truncate text-xs">
+                      {user?.emailAddresses[0]?.emailAddress}
+                    </span>
                   </div>
                 </div>
               </DropdownMenuLabel>
@@ -96,86 +80,52 @@ const HeaderMain = ({ user }: any) => {
           </DropdownMenu>
           <ModeToggle />
           {/* ========= */}
-          <Button
-            onClick={handleMenuToggle}
-            type="button"
-            variant={"outline"}
-            size={"sm"}
-            className="size-8"
-            aria-controls="navbar-sticky"
-            aria-expanded={menuOpen}
-          >
-            <span className="sr-only">Open main menu</span>
-            <Menu />
-          </Button>
-        </div>
-        <div
-          className={`items-center justify-between ${
-            menuOpen ? "flex" : "hidden"
-          } w-full`}
-          id="navbar-sticky"
-        >
-          <ul className="flex flex-1 flex-col p-4  mt-4 font-medium border rounded-lg border-border">
-            <li>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
               <Button
-                asChild
+                type="button"
                 variant={"outline"}
-                className="w-full justify-start"
+                size={"sm"}
+                className="size-8"
+                aria-controls="navbar-sticky"
+                // aria-expanded={menuOpen}
               >
+                <span className="sr-only">Open main menu</span>
+                <Menu />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent side="bottom" align="end">
+              <DropdownMenuItem asChild>
                 <Link href={"/"} aria-current="page">
                   Home
                 </Link>
-              </Button>
-            </li>
-            <Accordion
-              defaultValue="links"
-              type="single"
-              collapsible
-              className="w-full col-span-full px-8"
-            >
-              <AccordionItem value="links" className="border-0">
-                <AccordionTrigger className="text-lg font-medium">
-                  Documents
-                </AccordionTrigger>
-                <AccordionContent>
-                  <div className="">
-                    {allPaths.map((path, key) => {
-                      return (
-                        <li key={key}>
-                          <Button
-                            asChild
-                            variant={"outline"}
-                            className="w-full justify-start"
-                          >
-                            <Link
-                              onClick={handleMenuToggle}
-                              href={`https://www.dardibook.in/documents/${path}`}
-                              className={`cursor-pointer block py-2 px-3 rounded`}
-                              target="_blank"
-                              aria-current="page"
-                            >
-                              {path.charAt(0).toUpperCase() + path.slice(1)}
-                            </Link>
-                          </Button>
-                        </li>
-                      );
-                    })}
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
-            <li>
-              <Button
-                asChild
-                variant={"outline"}
-                className="w-full justify-start"
-              >
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuLabel>Documents</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {allPaths.map((path, key) => {
+                return (
+                  <DropdownMenuItem key={key} asChild>
+                    <Link
+                      href={`https://www.dardibook.in/documents/${path}`}
+                      className={`cursor-pointer block py-2 px-3 rounded`}
+                      target="_blank"
+                      aria-current="page"
+                    >
+                      {path.charAt(0).toUpperCase() + path.slice(1)}
+                    </Link>
+                  </DropdownMenuItem>
+                );
+              })}
+              <DropdownMenuSeparator />
+              <DropdownMenuItem asChild>
                 <Link href={"/dashboard/settings"} aria-current="page">
                   Setting
                 </Link>
-              </Button>
-            </li>
-          </ul>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </nav>

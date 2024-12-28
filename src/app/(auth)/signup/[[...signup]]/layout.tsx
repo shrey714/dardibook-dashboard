@@ -5,17 +5,6 @@ export const metadata: Metadata = {
   description:
     "Join DardiBook, the comprehensive healthcare management platform, designed to streamline your medical processes. Register now to access appointment scheduling, prescription management, patient history tracking, and more. Simplify healthcare management with DardiBook.",
 };
-export default function RootLayout({
-  children,
-  accessibility,
-}: {
-  children?: ReactNode;
-  accessibility: ReactNode;
-}) {
-  return (
-    <>
-      {children}
-      {accessibility}
-    </>
-  );
+export default function RootLayout({ children }: { children?: ReactNode }) {
+  return <>{children}</>;
 }

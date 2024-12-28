@@ -10,26 +10,22 @@ import {
 } from "@/components/Medical/Carousel";
 import PatientDataBox from "@/components/Medical/PatientDataBox";
 import { db } from "@/firebase/firebaseConfig";
-import { useAppSelector } from "@/redux/store";
 import { query, collection, onSnapshot } from "firebase/firestore";
-import { X } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
   Sheet,
-  SheetClose,
   SheetContent,
   SheetDescription,
-  SheetFooter,
   SheetHeader,
   SheetTitle,
-  SheetTrigger,
 } from "@/components/ui/sheet";
+import { useAuth } from "@clerk/nextjs";
 
 const Page = () => {
+  const { isLoaded, orgId } = useAuth();
   const searchParams = useSearchParams();
   const patientId = searchParams.get("patientId");
-  const user = useAppSelector<any>((state) => state.auth.user);
   const [loader, setLoader] = useState(false);
   const [patientList, setpatientList] = useState<any>([]);
   const [startIndex, setstartIndex] = useState(0);
@@ -40,12 +36,12 @@ const Page = () => {
     let unsubscribe: () => void;
 
     const getTodayPatientQueue = () => {
-      if (user) {
-        const q = query(collection(db, "doctor", user.uid, "patients"));
+      if (isLoaded && orgId) {
+        const q = query(collection(db, "doctor", orgId, "patients"));
 
         setLoader(true); //enable after
         unsubscribe = onSnapshot(q, async (snapshot) => {
-          const patientQueueData = await getTodayPatients(user.uid);
+          const patientQueueData = await getTodayPatients(orgId);
           if (patientQueueData.data) {
             setpatientList(patientQueueData.data);
             const index = patientQueueData.data.findIndex(
@@ -71,7 +67,7 @@ const Page = () => {
         unsubscribe();
       }
     };
-  }, [user]);
+  }, [isLoaded]);
   // =============================================
 
   return (

@@ -2,7 +2,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { getTodayPatients } from "@/app/services/getTodayPatients";
-import { useAppSelector } from "@/redux/store";
 import Link from "next/link";
 import StatsHeader from "./StatsHeader";
 import useToken from "@/firebase/useToken";
@@ -11,12 +10,13 @@ import { collection, onSnapshot, query } from "firebase/firestore";
 import { db } from "@/firebase/firebaseConfig";
 import { Reorder } from "framer-motion";
 import { RefreshCw } from "lucide-react";
+import { useAuth } from "@clerk/nextjs";
 const QueueList: React.FC = () => {
-  const user = useAppSelector<any>((state) => state.auth.user);
+  const { isLoaded, orgId } = useAuth();
   const [queueItems, setqueueItems] = useState<any>([]);
   const [queueLoader, setqueueLoader] = useState(true);
   const [realUpdateLoader, setrealUpdateLoader] = useState(false);
-  const { CurrentToken } = useToken(user?.uid);
+  const { CurrentToken } = useToken(orgId || "");
 
   // =========================================
   // useEffect(() => {
@@ -42,13 +42,13 @@ const QueueList: React.FC = () => {
     let unsubscribe: () => void;
 
     const getTodayPatientQueue = () => {
-      if (user) {
-        const q = query(collection(db, "doctor", user.uid, "patients"));
+      if (isLoaded && orgId) {
+        const q = query(collection(db, "doctor", orgId, "patients"));
 
         setqueueLoader(true); //enable after
         unsubscribe = onSnapshot(q, async (snapshot) => {
           setrealUpdateLoader(true);
-          const patientQueueData = await getTodayPatients(user.uid);
+          const patientQueueData = await getTodayPatients(orgId);
           if (patientQueueData.data) {
             setqueueItems(patientQueueData.data);
           } else {
@@ -71,7 +71,7 @@ const QueueList: React.FC = () => {
         unsubscribe();
       }
     };
-  }, [user]);
+  }, [isLoaded]);
   // =============================================
   let base = 4;
   let t = (d: number) => d * base;
@@ -119,21 +119,13 @@ const QueueList: React.FC = () => {
                 <table className="w-full">
                   <thead>
                     <tr className="sticky top-1 z-20">
-                      <th className="pb-2 text-sm sm:text-base">
-                        Token
-                      </th>
+                      <th className="pb-2 text-sm sm:text-base">Token</th>
                       <th className="pb-2 text-sm sm:text-base hide-before-480 hide-between-768-and-990">
                         Id
                       </th>
-                      <th className="pb-2 text-sm sm:text-base">
-                        Name
-                      </th>
-                      <th className="pb-2 text-sm sm:text-base">
-                        Status
-                      </th>
-                      <th className="pb-2 text-sm sm:text-base">
-                        Actions
-                      </th>
+                      <th className="pb-2 text-sm sm:text-base">Name</th>
+                      <th className="pb-2 text-sm sm:text-base">Status</th>
+                      <th className="pb-2 text-sm sm:text-base">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="rounded-lg">
@@ -168,9 +160,7 @@ const QueueList: React.FC = () => {
                           <td className="transition align-top text-center font-medium text-sm sm:text-base">
                             <p
                               className={`${
-                                select
-                                  ? "bg-blue-700 text-white"
-                                  : ""
+                                select ? "bg-blue-700 text-white" : ""
                               } p-1 my-1 rounded-s-full`}
                             >
                               {queueItems.length - key}

@@ -3,11 +3,11 @@ import { Check, Pencil, Star } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { Skeleton } from "../ui/skeleton";
 import { getTime, startOfMonth, endOfMonth } from "date-fns";
-import { useAppSelector } from "@/redux/store";
 import { getAllPatients } from "@/app/services/getAllPatients";
-
+import { useAuth } from "@clerk/nextjs";
 const StatusBoxes = () => {
-  const user = useAppSelector<any>((state) => state.auth.user);
+  const { isLoaded, orgId } = useAuth();
+
   const [patientsRegisteredToday, setPatientsRegisteredToday] =
     useState<number>(0);
   const [patientsAttendedToday, setPatientsAttendedToday] = useState<number>(0);
@@ -19,11 +19,11 @@ const StatusBoxes = () => {
   // ========================
   useEffect(() => {
     const fetchPatients = async () => {
-      if (user) {
+      if (isLoaded && orgId) {
         try {
           setLoader(true);
           const data = await getAllPatients(
-            user.uid,
+            orgId,
             getTime(startOfMonth(new Date())),
             getTime(endOfMonth(new Date()))
           );
@@ -42,7 +42,7 @@ const StatusBoxes = () => {
     };
 
     fetchPatients();
-  }, [user]);
+  }, [isLoaded, orgId]);
   // ================
   const fetchPatientVisitData = (patientsCollection: any[]) => {
     const today = new Date();

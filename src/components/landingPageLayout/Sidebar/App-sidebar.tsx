@@ -32,37 +32,52 @@ const pages = [
     title: "Home",
     url: "/dashboard/home",
     icon: Home,
-    roles: ["admin", "subDoctor", "medical"],
+    roles: [
+      "org:clinic_head",
+      "org:doctor",
+      "org:assistant_doctor",
+      "org:medical_staff",
+    ],
   },
   {
     title: "Register",
     url: "/dashboard/appointment",
     icon: CalendarIcon,
-    roles: ["admin", "subDoctor"],
+    roles: ["org:clinic_head", "org:doctor", "org:assistant_doctor"],
   },
   {
     title: "Prescribe",
     url: "/dashboard/prescribe",
     icon: ClipboardPlusIcon,
-    roles: ["admin"],
+    roles: ["org:clinic_head", "org:doctor"],
   },
   {
     title: "History",
     url: "/dashboard/history",
     icon: HistoryIcon,
-    roles: ["admin", "subDoctor", "medical"],
+    roles: [
+      "org:clinic_head",
+      "org:doctor",
+      "org:assistant_doctor",
+      "org:medical_staff",
+    ],
   },
   {
     title: "Medical",
     url: "/dashboard/medical",
     icon: BriefcaseMedicalIcon,
-    roles: ["admin", "medical"],
+    roles: ["org:clinic_head", "org:medical_staff"],
   },
   {
     title: "Settings",
     url: "/dashboard/settings",
     icon: SettingsIcon,
-    roles: ["admin", "subDoctor", "medical"],
+    roles: [
+      "org:clinic_head",
+      "org:doctor",
+      "org:assistant_doctor",
+      "org:medical_staff",
+    ],
   },
 ];
 

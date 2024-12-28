@@ -1,20 +1,12 @@
 "use client";
 import { ReactNode, useEffect, useState } from "react";
-import Navigation from "@/components/landingPageLayout/Navigation";
 import { checkSubscriptionStatus } from "@/app/services/checkSubscription";
-import { useAppSelector } from "@/redux/store";
 import SubscriptionPlans from "@/components/SubscriptionPlans";
 import DefaultComponent from "@/components/DefaultDashboard";
 import "@/styles/globals.css";
-import BlockedModal from "@/components/BlockedModal";
 import Loader from "../common/Loader";
 import ConnectionStatus from "../common/InternetDialog";
-import Link from "next/link";
-import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import {
   Dialog,
   DialogContent,
@@ -25,9 +17,9 @@ import {
 import { AppSidebar } from "@/components/landingPageLayout/Sidebar/App-sidebar";
 import SidebarBreadCrump from "../landingPageLayout/Sidebar/SidebarBreadCrump";
 import { useRefContext } from "@/hooks/RefContext";
+import { useAuth } from "@clerk/nextjs";
 const DashboardWrapper = ({ children }: { children: ReactNode }) => {
-  const user = useAppSelector((state) => state.auth.user);
-
+  const { isLoaded, orgId } = useAuth();
   // ======================
   const [loading, setloading] = useState(false);
   const [message, setmessage] = useState<string | undefined>("");
@@ -38,8 +30,8 @@ const DashboardWrapper = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const checkUserSubscription = async () => {
       setloading(true);
-      if (user) {
-        const subscriptionStatus = await checkSubscriptionStatus(user.uid);
+      if (isLoaded && orgId) {
+        const subscriptionStatus = await checkSubscriptionStatus(orgId);
         if (subscriptionStatus?.status) {
           setloading(false);
           setsubscription(true);
@@ -52,7 +44,7 @@ const DashboardWrapper = ({ children }: { children: ReactNode }) => {
       }
     };
     checkUserSubscription();
-  }, [user]);
+  }, [isLoaded]);
   // ===================
   return (
     <>

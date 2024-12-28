@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -10,41 +10,20 @@ import {
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAppSelector } from "@/redux/store";
-import { getDocotr } from "@/app/services/getDoctor";
 import { Dot } from "lucide-react";
+import { useOrganization } from "@clerk/nextjs";
 
-export function NavHospital() {
-  const userInfo = useAppSelector((state) => state.auth.user);
-  const [skeletonLoader, setSkeletonLoader] = useState<boolean>(true);
-  const [doctorData, setdoctorData] = useState<any>({});
-  useEffect(() => {
-    const setDocotrData = async () => {
-      if (userInfo?.uid) {
-        setSkeletonLoader(true);
-        const doctorData = await getDocotr(userInfo?.uid);
-        if (doctorData.data) {
-          setdoctorData(doctorData.data);
-        } else {
-          console.log("No data available for the provided DoctorID.");
-        }
-        setSkeletonLoader(false);
-      } else {
-        setSkeletonLoader(false);
-      }
-    };
-    setDocotrData();
-  }, [userInfo?.uid]);
-
+export function NavHospital() {  
+  const { isLoaded,organization } = useOrganization()
   return (
     <NavigationMenu>
       <NavigationMenuList>
         <NavigationMenuItem className="flex">
           <NavigationMenuTrigger
             className="border-2 gap-1 px-1"
-            disabled={skeletonLoader}
+            disabled={!isLoaded}
           >
-            {skeletonLoader ? (
+            {!isLoaded ? (
               <div className="flex items-center gap-1">
                 <Skeleton className="h-7 w-7 rounded-sm" />
                 <div className="hidden md:block">
@@ -54,11 +33,11 @@ export function NavHospital() {
             ) : (
               <>
                 <Avatar className="rounded-sm h-7 w-7 bg-secondary ring-1 ring-background">
-                  <AvatarImage src={doctorData?.clinicLogo} alt="H" />
+                  <AvatarImage src={organization?.imageUrl} alt="H" />
                   <AvatarFallback>H</AvatarFallback>
                 </Avatar>
                 <div className="w-[50px] overflow-hidden truncate hidden md:block">
-                  {doctorData?.clinicName}
+                  {organization?.name}
                 </div>
               </>
             )}
@@ -67,7 +46,7 @@ export function NavHospital() {
             <ul className="grid lg:p-4 w-[200px] md:w-[300px] lg:w-[400px] lg:grid-cols-[.75fr_1fr]">
               <li className="row-span-3 m-2">
                 <Avatar className="rounded-sm aspect-square h-full w-full bg-secondary ring-1 ring-background">
-                  <AvatarImage src={doctorData?.clinicLogo} alt="H" />
+                  <AvatarImage src={organization?.imageUrl} alt="H" />
                   <AvatarFallback>H</AvatarFallback>
                 </Avatar>
               </li>
@@ -78,16 +57,7 @@ export function NavHospital() {
                 </div>
                 <p className="line-clamp-2 flex flex-row text-sm leading-snug text-muted-foreground">
                   <Dot />
-                  {doctorData?.clinicName}
-                </p>
-              </li>
-              <li className="block select-none rounded-md p-2 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                <div className="text-sm font-medium leading-none">
-                  Doctor Name
-                </div>
-                <p className="line-clamp-2 flex flex-row text-sm leading-snug text-muted-foreground">
-                  <Dot />
-                  {doctorData?.doctorName}
+                  {organization?.name}
                 </p>
               </li>
             </ul>

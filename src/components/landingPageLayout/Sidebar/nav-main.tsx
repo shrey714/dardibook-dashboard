@@ -2,24 +2,15 @@
 
 import { ChevronRight, type LucideIcon } from "lucide-react";
 // import { ChevronRight, type LucideIcon } from "lucide-react"
-
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
 import {
   SidebarGroup,
   SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
-import { useAppSelector } from "@/redux/store";
+import { useAuth } from "@clerk/nextjs";
 
 const isSubPath = (pathname: string, route: string) => {
   const formattedPathname = pathname.endsWith("/") ? pathname : pathname + "/";
@@ -39,15 +30,16 @@ export function NavMain({
     roles: string[];
   }[];
 }) {
-  const user = useAppSelector((state) => state.auth.user);
+  const { orgRole, isLoaded } = useAuth();
 
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Links</SidebarGroupLabel>
       <SidebarMenu>
-        {user &&
+        {isLoaded &&
+          orgRole &&
           pages
-            .filter((page) => page.roles.includes(user?.role))
+            .filter((page) => page.roles.includes(orgRole))
             .map((item, key) => (
               <SidebarMenuItem key={key}>
                 <Link href={item.url}>

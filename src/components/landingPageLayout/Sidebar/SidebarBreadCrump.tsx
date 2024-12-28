@@ -11,7 +11,6 @@ import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useAppSelector } from "@/redux/store";
 import dynamic from "next/dynamic";
 import { AvatarStack } from "./collaboration/avatar-stack";
 import { NavHospital } from "./nav-hospital";
@@ -22,7 +21,6 @@ const CollaborationProvider = dynamic(() =>
 );
 
 const SidebarBreadCrump = () => {
-  const user = useAppSelector((state) => state.auth.user);
   const paths = usePathname();
 
   // Split and filter the pathname into segments
@@ -67,13 +65,9 @@ const SidebarBreadCrump = () => {
         </Breadcrumb>
       </div>
       <div className="flex items-center pl-4">
-        {user  ? (
-          <CollaborationProvider orgId={user.uid}>
+          <CollaborationProvider>
             <AvatarStack />
           </CollaborationProvider>
-        ) : (
-          <></>
-        )}
         <NavHospital />
       </div>
     </header>

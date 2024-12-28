@@ -1,49 +1,16 @@
+"use client";
 /* eslint-disable @next/next/no-img-element */
-import React, { ChangeEvent, FormEvent, useState } from "react";
+import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import Loader from "../common/Loader";
-import { useAppDispatch } from "@/redux/store";
-import { signOutUser } from "@/firebase/firebaseAuth";
 import { CircleX, FileImage } from "lucide-react";
+import LogOutBTtn from "../common/LogOutBTtn";
+import { useAuth } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
+import { createDoctor } from "@/app/services/createDoctor";
 
-interface RegistrationFormProps {
-  formData: {
-    clinicName: string;
-    doctorName: string;
-    degree: string;
-    registrationNumber: string;
-    clinicNumber: string;
-    phoneNumber: string;
-    emailId: string | null | undefined;
-    clinicAddress: string;
-    clinicLogo: File | null;
-    signaturePhoto: File | null;
-  };
-  handleSubmit: (e: FormEvent) => void;
-  setFormData: React.Dispatch<
-    React.SetStateAction<{
-      clinicName: string;
-      doctorName: string;
-      degree: string;
-      registrationNumber: string;
-      clinicNumber: string;
-      phoneNumber: string;
-      emailId: string | null | undefined;
-      clinicAddress: string;
-      clinicLogo: File | null;
-      signaturePhoto: File | null;
-    }>
-  >;
-  submissionLoader: boolean;
-}
-
-const RegistrationForm: React.FC<RegistrationFormProps> = ({
-  formData,
-  handleSubmit,
-  setFormData,
-  submissionLoader,
-}) => {
-  const dispatch = useAppDispatch();
-
+const RegistrationForm = () => {
+  const { isLoaded, orgId } = useAuth();
+  const router = useRouter();
   const [clinicLogoPreview, setClinicLogoPreview] = useState<string | null>(
     null
   );
@@ -89,15 +56,54 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({
     }
   };
 
+  const [submissionLoader, setSubmissionLoader] = useState(false);
+  useEffect(() => {
+    if (isLoaded && orgId) {
+      router.replace("/");
+    }
+  }, [router, isLoaded]);
+  const [formData, setFormData] = useState({
+    clinicName: "",
+    doctorName: "",
+    degree: "",
+    registrationNumber: "",
+    clinicNumber: "",
+    phoneNumber: "",
+    emailId: "XXX",
+    clinicAddress: "",
+    clinicLogo: null as File | null,
+    signaturePhoto: null as File | null,
+  });
+  // upload form data to docotr's collection============
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    if (orgId) {
+      setSubmissionLoader(true);
+      const data = await createDoctor({
+        uid: orgId,
+        formData,
+      });
+      // open modal on submitting the register patoent form
+      if (data?.status === 200) {
+        // createOrganization({ name: formData.clinicName });
+      } else {
+        setSubmissionLoader(false);
+      }
+    }
+  };
+
   return (
-    <form onSubmit={handleSubmit} autoFocus={true} autoComplete="off" className="w-full">
+    <form
+      onSubmit={handleSubmit}
+      autoFocus={true}
+      autoComplete="off"
+      className="w-full"
+    >
       <fieldset disabled={submissionLoader} className="grid grid-cols-12 gap-6">
         {/* Clinic Name */}
         <div className="col-span-12 sm:col-span-6">
-          <label
-            htmlFor="clinicName"
-            className="block text-sm font-medium text-gray-300"
-          >
+          <label htmlFor="clinicName" className="block text-sm font-medium">
             Clinic Name<span className="text-red-500 ml-1">*</span>
           </label>
           <input
@@ -113,10 +119,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({
         </div>
         {/* Doctor Name */}
         <div className="col-span-12 sm:col-span-6">
-          <label
-            htmlFor="doctorName"
-            className="block text-sm font-medium text-gray-300"
-          >
+          <label htmlFor="doctorName" className="block text-sm font-medium">
             Doctor Name<span className="text-red-500 ml-1">*</span>
           </label>
           <input
@@ -132,10 +135,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({
 
         {/* Degree */}
         <div className="col-span-12 sm:col-span-6">
-          <label
-            htmlFor="degree"
-            className="block text-sm font-medium text-gray-300"
-          >
+          <label htmlFor="degree" className="block text-sm font-medium">
             Degree<span className="text-red-500 ml-1">*</span>
           </label>
           <input
@@ -152,7 +152,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({
         <div className="col-span-12 sm:col-span-6">
           <label
             htmlFor="registrationNumber"
-            className="block text-sm font-medium text-gray-300"
+            className="block text-sm font-medium"
           >
             Registration Number<span className="text-red-500 ml-1">*</span>
           </label>
@@ -169,10 +169,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({
 
         {/* Clinic Number */}
         <div className="col-span-12 sm:col-span-6">
-          <label
-            htmlFor="clinicNumber"
-            className="block text-sm font-medium text-gray-300"
-          >
+          <label htmlFor="clinicNumber" className="block text-sm font-medium">
             Clinic Number<span className="text-red-500 ml-1">*</span>
           </label>
           <input
@@ -189,10 +186,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({
         </div>
         {/* Phone Number */}
         <div className="col-span-12 sm:col-span-6">
-          <label
-            htmlFor="phoneNumber"
-            className="block text-sm font-medium text-gray-300"
-          >
+          <label htmlFor="phoneNumber" className="block text-sm font-medium">
             Phone Number<span className="text-red-500 ml-1">*</span>
           </label>
           <input
@@ -210,10 +204,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({
         </div>
         {/* Email Id */}
         <div className="col-span-12 sm:col-span-6">
-          <label
-            htmlFor="emailId"
-            className="block text-sm font-medium text-gray-300"
-          >
+          <label htmlFor="emailId" className="block text-sm font-medium">
             Email<span className="text-red-500 ml-1">*</span>
           </label>
           <input
@@ -229,10 +220,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({
         </div>
         {/* Clinic Address */}
         <div className="col-span-12">
-          <label
-            htmlFor="clinicAddress"
-            className="block text-sm font-medium text-gray-300"
-          >
+          <label htmlFor="clinicAddress" className="block text-sm font-medium">
             Clinic Address<span className="text-red-500 ml-1">*</span>
           </label>
           <input
@@ -250,11 +238,11 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({
         <div className="col-span-12 sm:col-span-6">
           <label
             htmlFor="clinicLogo"
-            className="block text-sm font-medium leading-6 text-gray-300"
+            className="block text-sm font-medium leading-6"
           >
             Clinic Logo<span className="text-red-500 ml-1">*</span>
           </label>
-          <div className="mt-2 flex justify-center rounded-lg border border-dashed border-gray-300/25 px-6 py-8">
+          <div className="mt-2 flex justify-center rounded-lg border border-dashed border-ring px-6 py-8">
             <div className="text-center">
               {clinicLogoPreview ? (
                 <div className="relative">
@@ -273,11 +261,8 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({
                 </div>
               ) : (
                 <>
-                  <FileImage
-                    aria-hidden="true"
-                    className="mx-auto h-12 w-12 text-gray-600"
-                  />
-                  <div className="mt-4 flex text-sm leading-6 text-gray-600">
+                  <FileImage aria-hidden="true" className="mx-auto h-12 w-12" />
+                  <div className="mt-4 flex text-sm leading-6">
                     <label
                       htmlFor="clinicLogo"
                       className="relative cursor-pointer font-semibold text-indigo-600 hover:text-indigo-500"
@@ -305,11 +290,11 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({
         <div className="col-span-12 sm:col-span-6">
           <label
             htmlFor="signaturePhoto"
-            className="block text-sm font-medium leading-6 text-gray-300"
+            className="block text-sm font-medium leading-6"
           >
             Signature Photo<span className="text-red-500 ml-1">*</span>
           </label>
-          <div className="mt-2 flex justify-center rounded-lg border border-dashed border-gray-300/25 px-6 py-8">
+          <div className="mt-2 flex justify-center rounded-lg border border-dashed border-ring px-6 py-8">
             <div className="text-center">
               {signaturePhotoPreview ? (
                 <div className="relative">
@@ -328,11 +313,8 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({
                 </div>
               ) : (
                 <>
-                  <FileImage
-                    aria-hidden="true"
-                    className="mx-auto h-12 w-12 text-gray-600"
-                  />
-                  <div className="mt-4 flex text-sm leading-6 text-gray-600">
+                  <FileImage aria-hidden="true" className="mx-auto h-12 w-12" />
+                  <div className="mt-4 flex text-sm leading-6">
                     <label
                       htmlFor="signaturePhoto"
                       className="relative cursor-pointer font-semibold text-indigo-600 hover:text-indigo-500"
@@ -349,7 +331,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({
                       />
                     </label>
                   </div>
-                  <p className="text-xs leading-5 text-gray-600">PNG, JPG</p>
+                  <p className="text-xs leading-5">PNG, JPG</p>
                 </>
               )}
             </div>
@@ -357,7 +339,7 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({
         </div>
 
         <div className="col-span-12">
-          <p className="text-xs sm:text-sm text-gray-300">
+          <p className="text-xs sm:text-sm">
             By creating an account, you agree to our{" "}
             <a
               href="https://dardibook.in/documents/terms-conditions"
@@ -380,28 +362,18 @@ const RegistrationForm: React.FC<RegistrationFormProps> = ({
         </div>
 
         <div className="col-span-12 flex justify-center sm:gap-6">
-          <button disabled={submissionLoader} className="bg-gray-300 border-0 animate-none btn px-5 py-[10px] text-gray-800 outline-none min-w-40 transition-all flex items-center justify-center h-10 text-base sm:text-lg font-bold tracking-wide w-full rounded-full select-none">
-            {submissionLoader ? (
-              <Loader
-                size="medium"
-              />
-            ) : (
-              "Register myself"
-            )}
+          <button
+            disabled={submissionLoader}
+            className="bg-gray-300 border-0 animate-none btn px-5 py-[10px] text-gray-800 outline-none min-w-40 transition-all flex items-center justify-center h-10 text-base sm:text-lg font-bold tracking-wide w-full rounded-full select-none"
+          >
+            {submissionLoader ? <Loader size="medium" /> : "Register myself"}
           </button>
         </div>
 
         <div className="col-span-12">
-          <p className="text-xs sm:text-sm text-gray-300">
+          <p className="text-xs font-medium sm:text-sm">
             Want to use another account :{" "}
-            <a
-              className="text-red-500 font-medium underline md:no-underline underline-offset-1 hover:underline cursor-pointer tracking-wider"
-              onClick={() => {
-                signOutUser(dispatch);
-              }}
-            >
-              SignOut
-            </a>
+            <LogOutBTtn size={"sm"} variant={"destructive"} />
           </p>
         </div>
       </fieldset>

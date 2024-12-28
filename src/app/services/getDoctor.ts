@@ -8,7 +8,7 @@ export const getDocotr = async (uid: string) => {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
+                
             },
         });
         const data = await doctorRes.json();

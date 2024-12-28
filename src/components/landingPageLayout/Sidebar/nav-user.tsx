@@ -1,20 +1,12 @@
 "use client";
 
-import {
-  BadgeCheck,
-  Bell,
-  ChevronsUpDown,
-  CreditCard,
-  LogOut,
-  Sparkles,
-} from "lucide-react";
+import { ChevronsUpDown } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
-  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
@@ -25,17 +17,13 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { useAppSelector } from "@/redux/store";
 import LogOutBTtn from "@/components/common/LogOutBTtn";
 import SubscriptionDialogBtn from "@/components/common/SubscriptionDialogBtn";
-const sample = {
-  name: "shadcn",
-  email: "m@example.com",
-  avatar: "/avatars/shadcn.jpg",
-};
+import { useUser } from "@clerk/nextjs";
+
 export function NavUser({}) {
   const { isMobile } = useSidebar();
-  const userInfo = useAppSelector((state) => state.auth.user);
+  const { user } = useUser();
 
   return (
     <SidebarMenu>
@@ -48,18 +36,20 @@ export function NavUser({}) {
             >
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage
-                  src={userInfo?.photoURL || ""}
-                  alt={userInfo?.displayName || ""}
+                  src={user?.imageUrl || ""}
+                  alt={user?.firstName || ""}
                 />
                 <AvatarFallback className="rounded-lg">
-                  {userInfo?.displayName?.slice(0, 2)}
+                  {user?.firstName?.slice(0, 2)}
                 </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold">
-                  {userInfo?.displayName}
+                  {user?.firstName}
                 </span>
-                <span className="truncate text-xs">{userInfo?.email}</span>
+                <span className="truncate text-xs">
+                  {user?.emailAddresses[0].emailAddress}
+                </span>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />
             </SidebarMenuButton>
@@ -74,16 +64,18 @@ export function NavUser({}) {
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarImage
-                    src={userInfo?.photoURL || ""}
-                    alt={userInfo?.displayName || ""}
+                    src={user?.imageUrl || ""}
+                    alt={user?.firstName || ""}
                   />
                   <AvatarFallback className="rounded-lg">CN</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">
-                    {userInfo?.displayName}
+                    {user?.firstName}
                   </span>
-                  <span className="truncate text-xs">{userInfo?.email}</span>
+                  <span className="truncate text-xs">
+                    {user?.emailAddresses[0].emailAddress}
+                  </span>
                 </div>
               </div>
             </DropdownMenuLabel>

@@ -1,10 +1,9 @@
+"use client";
 import React, { useEffect } from "react";
 
 import { toast } from "react-hot-toast";
 
 const ConnectionStatus: React.FC = () => {
-
-
   let offlineToastId: string | undefined;
 
   useEffect(() => {
@@ -34,11 +33,7 @@ const ConnectionStatus: React.FC = () => {
     };
   }, []);
 
-  return (
-    <>
-     
-    </>
-  );
+  return <></>;
 };
 
 export default ConnectionStatus;

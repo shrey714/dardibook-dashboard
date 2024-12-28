@@ -1,7 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { getTodayPatients } from "@/app/services/getTodayPatients";
-import { useAppSelector } from "@/redux/store";
 import Link from "next/link";
 import useToken from "@/firebase/useToken";
 import Loader from "@/components/common/Loader";
@@ -9,12 +8,13 @@ import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { db } from "@/firebase/firebaseConfig";
 import { Reorder } from "framer-motion";
 import { RefreshCw } from "lucide-react";
+import { useAuth } from "@clerk/nextjs";
 const Medical = () => {
-  const user = useAppSelector<any>((state) => state.auth.user);
+  const { isLoaded, orgId } = useAuth();
   const [queueItems, setqueueItems] = useState<any>([]);
   const [queueLoader, setqueueLoader] = useState(true);
   const [realUpdateLoader, setrealUpdateLoader] = useState(false);
-  const { CurrentToken } = useToken(user?.uid);
+  const { CurrentToken } = useToken(orgId || "");
 
   // =========================================
   // useEffect(() => {
@@ -40,13 +40,13 @@ const Medical = () => {
     let unsubscribe: () => void;
 
     const getTodayPatientQueue = () => {
-      if (user) {
-        const q = query(collection(db, "doctor", user.uid, "patients"));
+      if (isLoaded && orgId) {
+        const q = query(collection(db, "doctor", orgId, "patients"));
 
         setqueueLoader(true); //enable after
         unsubscribe = onSnapshot(q, async (snapshot) => {
           setrealUpdateLoader(true);
-          const patientQueueData = await getTodayPatients(user.uid);
+          const patientQueueData = await getTodayPatients(orgId);
           if (patientQueueData.data) {
             setqueueItems(patientQueueData.data);
           } else {
@@ -69,7 +69,7 @@ const Medical = () => {
         unsubscribe();
       }
     };
-  }, [user]);
+  }, [isLoaded]);
   // =============================================
   let base = 4;
   let t = (d: number) => d * base;
@@ -88,9 +88,7 @@ const Medical = () => {
       <div className="w-full flex flex-row">
         {queueLoader ? (
           <div className="w-full h-52 overflow-hidden flex items-center justify-center">
-            <Loader
-              size="medium"
-            />
+            <Loader size="medium" />
           </div>
         ) : queueItems.length === 0 ? (
           <div className="w-full h-52 overflow-hidden flex items-end justify-center">
@@ -99,7 +97,7 @@ const Medical = () => {
         ) : (
           <>
             <ul className="w-full mt-4 pb-3 relative">
-            <RefreshCw
+              <RefreshCw
                 className={`w-4 h-4 text-primary absolute -top-6 right-3 ${
                   realUpdateLoader ? "animate-spin" : ""
                 }`}
@@ -113,21 +111,13 @@ const Medical = () => {
                 <table className="w-full">
                   <thead>
                     <tr className="sticky top-1 z-20">
-                      <th className="pb-2 text-sm sm:text-base">
-                        Token
-                      </th>
+                      <th className="pb-2 text-sm sm:text-base">Token</th>
                       <th className="pb-2 text-sm sm:text-base hide-before-480 hide-between-768-and-990">
                         Id
                       </th>
-                      <th className="pb-2 text-sm sm:text-base">
-                        Name
-                      </th>
-                      <th className="pb-2 text-sm sm:text-base">
-                        Status
-                      </th>
-                      <th className="pb-2 text-sm sm:text-base">
-                        Actions
-                      </th>
+                      <th className="pb-2 text-sm sm:text-base">Name</th>
+                      <th className="pb-2 text-sm sm:text-base">Status</th>
+                      <th className="pb-2 text-sm sm:text-base">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="rounded-lg">
@@ -162,9 +152,7 @@ const Medical = () => {
                           <td className="transition align-top text-center font-medium text-sm sm:text-base">
                             <p
                               className={`${
-                                select
-                                  ? "bg-blue-700 text-white"
-                                  : ""
+                                select ? "bg-blue-700 text-white" : ""
                               } p-1 my-1 rounded-s-full`}
                             >
                               {queueItems.length - key}

@@ -8,7 +8,7 @@ const getDataToPrint = async (uid: string, id: string) => {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
+                
             },
         });
         const patientData = await patientRes.json();
@@ -16,7 +16,7 @@ const getDataToPrint = async (uid: string, id: string) => {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
+                
             },
         });
         const doctorData = await doctorRes.json();

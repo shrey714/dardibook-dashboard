@@ -1,3 +1,4 @@
+"use client"
 import React from "react";
 import { Button } from "../ui/button";
 import { LogOut } from "lucide-react";
@@ -13,8 +14,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import Lottie from "react-lottie";
-import { signOutUser } from "@/firebase/firebaseAuth";
-import { useAppDispatch } from "@/redux/store";
+import { SignOutButton } from "@clerk/nextjs";
 
 const LogOutBTtn = ({ className, ...props }: any) => {
   const defaultOptions = {
@@ -25,7 +25,6 @@ const LogOutBTtn = ({ className, ...props }: any) => {
       preserveAspectRatio: "xMidYMid slice",
     },
   };
-  const dispatch = useAppDispatch();
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -50,14 +49,9 @@ const LogOutBTtn = ({ className, ...props }: any) => {
               Close
             </Button>
           </DialogClose>
-          <Button
-            onClick={() => {
-              signOutUser(dispatch);
-            }}
-            variant={"destructive"}
-          >
-            SignOut
-          </Button>
+          <SignOutButton>
+            <Button variant={"destructive"}>SignOut</Button>
+          </SignOutButton>
         </DialogFooter>
       </DialogContent>
     </Dialog>

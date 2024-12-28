@@ -5,16 +5,13 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  useSidebar,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
-import { useAppSelector } from "@/redux/store";
 import Image from "next/image";
+import { useAuth } from "@clerk/nextjs";
 
 export function LogoHandeler({}) {
-  const userInfo = useAppSelector((state) => state.auth.user);
-  const { isMobile } = useSidebar();
-
+  const { orgRole } = useAuth();
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -42,11 +39,13 @@ export function LogoHandeler({}) {
                 DardiBook
               </span>
               <span className="text-[7px] font-semibold border-[1.5px] border-[--border] px-2 rounded-full">
-                {userInfo?.role === "admin"
+                {orgRole === "org:clinic_head"
+                  ? "Admin"
+                  : orgRole === "org:doctor"
                   ? "Doctor"
-                  : userInfo?.role === "subDoctor"
-                  ? "subDoctor"
-                  : userInfo?.role === "medical"
+                  : orgRole === "org:assistant_doctor"
+                  ? "SubDoctor"
+                  : orgRole === "org:medical_staff"
                   ? "Medical"
                   : ""}
               </span>

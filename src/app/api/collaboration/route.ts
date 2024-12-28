@@ -4,7 +4,7 @@ import { authenticate } from "@/components/landingPageLayout/Sidebar/collaborati
 
 
 export const POST = async (request: NextRequest) => {
-  const { userinfo, room } = await request.json();
+  const { userinfo } = await request.json();
 
 
   if (!userinfo) {

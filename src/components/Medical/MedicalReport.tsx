@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from "react";
 import Loader from "../common/Loader";
-import { useAppSelector } from "@/redux/store";
 import { getPatientHistory } from "@/app/services/getPatientHistory";
 import { getDocotr } from "@/app/services/getDoctor";
 import PrintHandeler from "../PrintForms/PrintHandeler";
+import { useAuth } from "@clerk/nextjs";
 
 const countableTypes = ["TAB", "CAP", "DROP", "INJECTION", "SUPPOSITORY"]; // Add more types as needed
 const MedicalReport = ({ patient, selectedPatientId }: any) => {
+  const { isLoaded, orgId } = useAuth();
+
   const [loading, setloading] = useState(false);
   const [prescriptionData, setprescriptionData] = useState<any>(null);
   const [doctorData, setDoctorData] = useState<any | null>(null);
-  const user = useAppSelector<any>((state) => state.auth.user);
   const [printLoader, setprintLoader] = useState<boolean>(false);
   // Handle input change
   const handleChange = (id: string, value: string) => {
@@ -35,14 +36,14 @@ const MedicalReport = ({ patient, selectedPatientId }: any) => {
   useEffect(() => {
     const getPatientData = async () => {
       if (
-        patient?.patient_unique_Id &&
-        user.uid &&
+        isLoaded && patient?.patient_unique_Id &&
+        orgId &&
         patient?.patient_unique_Id === selectedPatientId
       ) {
         setloading(true);
         const patientData = await getPatientHistory(
           patient?.patient_unique_Id,
-          user.uid
+          orgId
         );
         if (patientData) {
           setprescriptionData(patientData?.prescriptions?.pop());
@@ -54,13 +55,13 @@ const MedicalReport = ({ patient, selectedPatientId }: any) => {
       }
     };
     getPatientData();
-  }, [patient?.patient_unique_Id, selectedPatientId, user.uid]);
+  }, [isLoaded, orgId, patient?.patient_unique_Id, selectedPatientId]);
 
   useEffect(() => {
     const getPatientData = async () => {
-      if (user.uid) {
+      if (isLoaded && orgId) {
         setprintLoader(true);
-        const doctorData = await getDocotr(user.uid);
+        const doctorData = await getDocotr(orgId);
         if (doctorData.data) {
           setDoctorData(doctorData.data);
           setprintLoader(false);
@@ -73,7 +74,7 @@ const MedicalReport = ({ patient, selectedPatientId }: any) => {
       }
     };
     getPatientData();
-  }, [user.uid]);
+  }, [isLoaded, orgId]);
 
   function calculateTotalMedicinesRequired(medicine: any): any {
     let totalMedicines = 0;

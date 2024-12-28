@@ -1,52 +1,61 @@
 "use client";
 
-import { useAppSelector } from "@/redux/store";
+import { useAuth, useUser } from "@clerk/nextjs";
 import {
   ClientSideSuspense,
   LiveblocksProvider,
   RoomProvider,
 } from "@liveblocks/react/suspense";
-import type { ReactNode } from "react";
+import { type ReactNode } from "react";
 
 export const CollaborationProvider = ({
-  orgId,
   children,
 }: {
-  orgId: string;
   children: ReactNode;
 }) => {
-  const userinfo = useAppSelector((state) => state.auth.user);
+  const { isLoaded, user } = useUser();
+  const { orgId } = useAuth();
 
   return (
-    <LiveblocksProvider
-      authEndpoint={async (room) => {
-        const headers = {
-          "Content-Type": "application/json",
-        };
-
-        const body = JSON.stringify({
-          room,
-          userinfo,
-        });
-
-        const response = await fetch("/api/collaboration", {
-          method: "POST",
-          headers,
-          body,
-        });
-
-        return await response.json();
-      }}
-    >
-      <RoomProvider id={`${orgId}:presence`} initialPresence={{ cursor: null }}>
-        <ClientSideSuspense
-          fallback={
-            <div className="px-3 text-muted-foreground text-xs">Loading...</div>
-          }
+    <>
+      {isLoaded && orgId && user ? (
+        <LiveblocksProvider
+          authEndpoint={async () => {
+            const response = await fetch("/api/collaboration", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                userinfo: {
+                  email: user.emailAddresses[0].emailAddress,
+                  name: user.firstName,
+                  photoURL: user.imageUrl,
+                },
+              }),
+            });
+            const result = await response.json();
+            return result;
+          }}
         >
-          {children}
-        </ClientSideSuspense>
-      </RoomProvider>
-    </LiveblocksProvider>
+          <RoomProvider
+            id={`${orgId}:presence`}
+            initialPresence={{ cursor: null }}
+          >
+            <ClientSideSuspense
+              fallback={
+                <div className="px-3 text-muted-foreground text-xs">
+                  Loading...
+                </div>
+              }
+            >
+              {children}
+            </ClientSideSuspense>
+          </RoomProvider>
+        </LiveblocksProvider>
+      ) : (
+        <></>
+      )}
+    </>
   );
 };

@@ -11,11 +11,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useAppSelector } from "@/redux/store";
-import { getSubscription } from "@/app/services/getSubscription";
-import getPlanById from "@/app/services/razorpay/getPlanById";
 import SubscriptionInfo from "../Settings/SubscriptionInfo";
 import { getDocotr } from "@/app/services/getDoctor";
+import { useAuth } from "@clerk/nextjs";
 
 interface Subscription {
   id: string;
@@ -30,15 +28,15 @@ interface Subscription {
 }
 
 const SubscriptionDialogBtn = ({ className, ...props }: any) => {
-  const userInfo = useAppSelector((state) => state.auth.user);
   const [mainLoader, setmainLoader] = useState(false);
   const [doctorData, setdoctorData] = useState<any>({});
+  const { isLoaded, orgId } = useAuth();
 
   useEffect(() => {
     const setDocotrData = async () => {
-      if (userInfo) {
+      if (isLoaded && orgId) {
         setmainLoader(true);
-        const doctorData = await getDocotr(userInfo?.uid);
+        const doctorData = await getDocotr(orgId);
         if (doctorData.data) {
           setdoctorData(doctorData.data);
         } else {
@@ -50,7 +48,7 @@ const SubscriptionDialogBtn = ({ className, ...props }: any) => {
       }
     };
     setDocotrData();
-  }, [userInfo]);
+  }, [orgId]);
 
   return (
     <Dialog>

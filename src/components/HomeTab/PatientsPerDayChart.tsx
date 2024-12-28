@@ -46,9 +46,9 @@ import { Button } from "../ui/button";
 import { startOfMonth, endOfMonth, getTime, format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { DateRange } from "react-day-picker";
-import { useAppSelector } from "@/redux/store";
 import { getAllPatients } from "@/app/services/getAllPatients";
 import Loader from "../common/Loader";
+import { useAuth } from "@clerk/nextjs";
 export const description = "An interactive bar chart";
 
 const chartConfig = {
@@ -66,7 +66,7 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 const PatientsPerDayChart = () => {
-  const user = useAppSelector<any>((state) => state.auth.user);
+  const { isLoaded, orgId } = useAuth();
   const [chartData, setChartData] = useState<any>();
   const [loader, setLoader] = useState(true);
   const [patientsCollection, setpatientsCollection] = useState([]);
@@ -78,11 +78,11 @@ const PatientsPerDayChart = () => {
   // ========================
   useEffect(() => {
     const fetchPatients = async () => {
-      if (user) {
+      if (isLoaded && orgId) {
         try {
           setLoader(true);
           const data = await getAllPatients(
-            user.uid,
+            orgId,
             getTime(date?.from || 0),
             getTime(date?.to || 0)
           );
@@ -101,7 +101,7 @@ const PatientsPerDayChart = () => {
     };
 
     fetchPatients();
-  }, [user, date]);
+  }, [isLoaded, date, orgId]);
 
   const fetchPatientVisitData = () => {
     const fromDate = getTime(date?.from || 0);

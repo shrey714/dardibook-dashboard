@@ -3,7 +3,6 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
-import { useAppSelector } from "@/redux/store";
 import { ChevronRight, Blend } from "lucide-react";
 import React from "react";
 import {
@@ -16,17 +15,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import RolesModal from "../RolesModal";
 import { Button } from "@/components/ui/button";
+import { OrganizationList, useAuth } from "@clerk/nextjs";
 
 const RolesLink = () => {
-  const user = useAppSelector((state) => state.auth.user);
+  const { orgRole, isLoaded } = useAuth();
 
   return (
     <>
-      {user && user.role !== "admin" ? (
-        <Dialog
-        >
+      {isLoaded && orgRole !== "org:clinic_head" ? (
+        <Dialog>
           <DialogTrigger asChild>
             <SidebarMenu>
               <SidebarMenuItem>
@@ -47,7 +45,23 @@ const RolesLink = () => {
                 Make changes to your role profile.
               </DialogDescription>
             </DialogHeader>
-            <RolesModal userInfo={user} />
+            {/* <RolesModal userInfo={user} /> */}
+            <OrganizationList
+              hidePersonal={true}
+              appearance={{
+                elements: {
+                  header: "hidden",
+                  rootBox: "w-full",
+                  cardBox:
+                    "max-w-full shadow-none w-full border-2 border-border rounded-md",
+                  card: "w-full shadow-none bg-muted/50 rounded-none pt-0",
+                  organizationPreviewMainIdentifier: "text-foreground",
+                  footer: {
+                    display: "none",
+                  },
+                },
+              }}
+            />
             <DialogFooter className="sm:justify-center">
               <DialogClose asChild>
                 <Button

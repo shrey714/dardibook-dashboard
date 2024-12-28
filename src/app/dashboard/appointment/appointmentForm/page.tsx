@@ -3,7 +3,6 @@ import AppointmentForm from "@/components/forms/AppointmentForm";
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import uniqid from "uniqid";
-import { useAppSelector } from "@/redux/store";
 import { getPatientById } from "@/app/services/getPatientById";
 import NoPatientsFound from "@/components/Appointment/NoPatientsFound";
 import { RegisterPatient } from "@/app/services/registerPatient";
@@ -16,6 +15,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useAuth } from "@clerk/nextjs";
 
 interface PatientFormDataTypes {
   last_visited: number;
@@ -33,7 +33,7 @@ interface PatientFormDataTypes {
 
 const Page: React.FC = () => {
   const searchParams = useSearchParams();
-  const user = useAppSelector<any>((state) => state.auth.user);
+  const { isLoaded, orgId } = useAuth();
   const patientId = searchParams.get("patientId");
   const [formLoader, setFormLoader] = useState(true);
   const [uniqueId] = useState(patientId ? patientId : uniqid.time());
@@ -55,11 +55,10 @@ const Page: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-    console.log("id", uniqueId);
     const getPatientData = async () => {
-      if (patientId) {
+      if (isLoaded && orgId && patientId) {
         setFormLoader(true);
-        const patientData = await getPatientById(patientId, user.uid);
+        const patientData = await getPatientById(patientId, orgId);
         if (patientData.data) {
           setPatientFormData({
             ...patientData.data,
@@ -75,7 +74,7 @@ const Page: React.FC = () => {
       }
     };
     getPatientData();
-  }, [patientId, uniqueId, user.uid]);
+  }, [patientId, uniqueId, isLoaded, orgId]);
 
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     setSubmissionLoader(true);
@@ -87,7 +86,7 @@ const Page: React.FC = () => {
     // });
     const data = await RegisterPatient({
       ...patientFormData,
-      uid: user.uid,
+      uid: orgId,
       id: uniqueId,
     });
     // open modal on submitting the register patoent form

@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import { createPrescription } from "@/app/services/createPrescription";
 import PrescribeForm from "@/components/forms/PrescribeForm";
-import { useAppSelector } from "@/redux/store";
 import uniqid from "uniqid";
 import { useSearchParams } from "next/navigation";
 import AttendedModal from "@/components/Prescribe/AttendedModal";
@@ -13,10 +12,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useAuth } from "@clerk/nextjs";
 
 const Page = () => {
+  const { orgId } = useAuth();
   const searchParams = useSearchParams();
-  const user = useAppSelector<any>((state) => state.auth.user);
   const [submissionLoader, setSubmissionLoader] = useState(false);
   const patientId = searchParams.get("patientId");
   const [visitID, setvisitID] = useState(uniqid.time());
@@ -68,7 +68,7 @@ const Page = () => {
     // });
     const data = await createPrescription({
       ...formData,
-      uid: user.uid,
+      uid: orgId,
       id: patientId,
       visitId: visitID,
     });
@@ -94,7 +94,7 @@ const Page = () => {
             isModalOpen={isModalOpen}
             setCloseModal={setIsModalOpen}
             patientID={patientId}
-            uID={user.uid}
+            uID={orgId}
             PrescriptionAndReferData={formData}
             receiptInfo={receiptInfo}
           />

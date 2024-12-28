@@ -4,15 +4,15 @@ import PatientHistoryTabs from "@/components/Prescribe/PatientHistoryTabs";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { useAppSelector } from "@/redux/store";
 import { getPatientHistory } from "@/app/services/getPatientHistory";
 import NoPatientHistoryFound from "@/components/Prescribe/NoPatientHistoryFound";
 import Loader from "@/components/common/Loader";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@clerk/nextjs";
 
 const Page = () => {
+  const { isLoaded, orgId } = useAuth();
   const searchParams = useSearchParams();
-  const user = useAppSelector<any>((state) => state.auth.user);
   const patientId = searchParams.get("patientId");
   const [patientData, setPatientData] = useState<any | null>(null);
   const [prescriptionsData, setPrescriptionsData] = useState<any[]>([]);
@@ -21,9 +21,9 @@ const Page = () => {
 
   useEffect(() => {
     const getPatientData = async () => {
-      if (patientId) {
+      if (isLoaded && orgId && patientId) {
         sethistoryLoader(true);
-        const patientData = await getPatientHistory(patientId, user.uid);
+        const patientData = await getPatientHistory(patientId, orgId);
         if (patientData) {
           setPatientData(patientData?.patient);
           setPrescriptionsData(patientData?.prescriptions);
@@ -37,7 +37,7 @@ const Page = () => {
       }
     };
     getPatientData();
-  }, [patientId, user.uid]);
+  }, [patientId, isLoaded]);
 
   return (
     <>

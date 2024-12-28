@@ -10,7 +10,7 @@ export const addStaff = async (staffData: { email: string; role: string }, docto
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
+                
             },
             body: JSON.stringify(staffData),
         });
@@ -32,7 +32,7 @@ export const getStaff = async (doctorId: string) => {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
+                
             },
         });
 
@@ -53,7 +53,7 @@ export const deleteStaff = async (staffMailId: string, doctorId: string) => {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
+                
             },
             body: JSON.stringify({ staffMailId: staffMailId }), // Only `uid` of the staff member is required in the body
         });

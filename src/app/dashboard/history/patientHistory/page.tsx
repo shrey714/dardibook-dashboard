@@ -3,7 +3,6 @@ import PatientDataBox from "@/components/Prescribe/PatientDataBox";
 import PatientHistoryTabs from "@/components/Prescribe/PatientHistoryTabs";
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { useAppSelector } from "@/redux/store";
 import { getPatientHistory } from "@/app/services/getPatientHistory";
 import NoPatientHistoryFound from "@/components/Prescribe/NoPatientHistoryFound";
 import Loader from "@/components/common/Loader";
@@ -17,11 +16,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useAuth } from "@clerk/nextjs";
 
 const Page = () => {
+  const { isLoaded, orgId } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const searchParams = useSearchParams();
-  const user = useAppSelector<any>((state) => state.auth.user);
   const patientId = searchParams.get("patientId");
   const [patientData, setPatientData] = useState<any | null>(null);
   const [doctorData, setDoctorData] = useState<any | null>(null);
@@ -31,10 +31,10 @@ const Page = () => {
   const [doctorLoader, setdoctorLoader] = useState(false);
   useEffect(() => {
     const getPatientData = async () => {
-      if (patientId && user.uid) {
+      if (patientId && isLoaded && orgId) {
         sethistoryLoader(true);
         setdoctorLoader(true);
-        const patientData = await getPatientHistory(patientId, user.uid);
+        const patientData = await getPatientHistory(patientId, orgId);
         if (patientData) {
           setPatientData(patientData?.patient);
           setPrescriptionsData(patientData?.prescriptions);
@@ -43,7 +43,7 @@ const Page = () => {
           setError("No patient data available for the provided PatientID.");
           sethistoryLoader(false);
         }
-        const doctorData = await getDocotr(user.uid);
+        const doctorData = await getDocotr(orgId);
         if (doctorData.data) {
           setDoctorData(doctorData.data);
           setdoctorLoader(false);
@@ -57,7 +57,7 @@ const Page = () => {
       }
     };
     getPatientData();
-  }, [patientId, user.uid]);
+  }, [patientId, isLoaded]);
 
   return (
     <>
@@ -98,13 +98,7 @@ const Page = () => {
                     setIsModalOpen(true);
                   }}
                 >
-                  {doctorLoader ? (
-                    <Loader
-                      size="medium"
-                    />
-                  ) : (
-                    "Print"
-                  )}
+                  {doctorLoader ? <Loader size="medium" /> : "Print"}
                 </Button>
               )}
             </div>
