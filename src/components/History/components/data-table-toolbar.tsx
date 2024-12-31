@@ -73,7 +73,7 @@ export function DataTableToolbar<TData>({
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start">
             <Calendar
-              initialFocus
+              autoFocus
               min={2}
               mode="range"
               className="bg-background border-[1px] rounded-md mt-1"

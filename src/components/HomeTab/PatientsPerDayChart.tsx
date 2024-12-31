@@ -76,7 +76,7 @@ const PatientsPerDayChart = () => {
     to: endOfMonth(new Date()),
   });
   // ========================
-  
+
   useEffect(() => {
     const fetchPatients = async () => {
       if (isLoaded && orgId) {
@@ -93,7 +93,7 @@ const PatientsPerDayChart = () => {
           } else {
             setpatientsCollection([]);
           }
-        } catch (error){
+        } catch (error) {
           console.log(error);
           setpatientsCollection([]);
           setLoader(false);
@@ -167,7 +167,7 @@ const PatientsPerDayChart = () => {
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="end">
               <Calendar
-                initialFocus
+                autoFocus
                 min={2}
                 mode="range"
                 className="bg-background border-[1px] rounded-md mt-1"

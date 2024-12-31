@@ -3,7 +3,7 @@ import Image from "next/image";
 import { currentUser } from "@clerk/nextjs/server";
 import HeaderMain from "@/components/HeaderMain";
 import SubscriptionBox from "./SubscriptionBox";
-type Params = Promise<{ planId: string }>
+type Params = Promise<{ planId: string }>;
 export default async function Subscribe({
   searchParams,
 }: {
@@ -12,7 +12,7 @@ export default async function Subscribe({
   const user = await currentUser();
   const { planId } = await searchParams;
   return (
-    <div className="flex pt-24 overflow-y-auto pb-6 flex-col justify-evenly items-center min-h-screen w-full overflow-hidden">
+    <div className="flex overflow-y-auto pb-6 flex-col items-center min-h-screen w-full overflow-hidden">
       <Image
         src="/Logo.svg"
         fill={true}
@@ -20,8 +20,10 @@ export default async function Subscribe({
         alt="logo"
       />
       <HeaderMain user={user} />
-      <div className=" flex flex-col md:flex-row p-6 mx-auto w-11/12 sm:w-9/12 h-auto text-center rounded-lg border-2 border-border xl:p-8 bg-secondary/90 shadow-md">
-        <SubscriptionBox planId={planId} />
+      <div className="flex flex-1 items-center justify-center w-full max-w-screen-xl p-2">
+        <div className=" flex flex-col md:flex-row p-6 mx-auto max-w-screen-xl h-auto text-center rounded-lg border-2 border-border xl:p-8 bg-secondary/90 shadow-md flex-1">
+          <SubscriptionBox planId={planId} />
+        </div>
       </div>
     </div>
   );

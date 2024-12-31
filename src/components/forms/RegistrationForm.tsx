@@ -364,14 +364,14 @@ const RegistrationForm = () => {
         <div className="col-span-12 flex justify-center sm:gap-6">
           <button
             disabled={submissionLoader}
-            className="bg-gray-300 border-0 animate-none btn px-5 py-[10px] text-gray-800 outline-none min-w-40 transition-all flex items-center justify-center h-10 text-base sm:text-lg font-bold tracking-wide w-full rounded-full select-none"
+            className="bg-gray-300 max-w-screen-md border-0 animate-none btn px-5 py-[10px] text-gray-800 outline-none min-w-40 transition-all flex items-center justify-center h-10 text-base sm:text-lg font-bold tracking-wide w-full rounded-full select-none"
           >
             {submissionLoader ? <Loader size="medium" /> : "Register myself"}
           </button>
         </div>
 
         <div className="col-span-12">
-          <p className="text-xs font-medium sm:text-sm">
+          <p className="text-xs font-medium sm:text-sm flex gap-1 items-center">
             Want to use another account :{" "}
             <LogOutBTtn size={"sm"} variant={"destructive"} />
           </p>

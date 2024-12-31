@@ -110,7 +110,7 @@ const LeftBox = ({
                 placeholder="Enter your mobile number"
               />
             </div>
-            <p className="font-medium text-sm text-left mt-2">
+            <p className="font-medium text-xs sm:text-sm text-left mt-2">
               * Mobile number linked to your google account. pls provide if not
               available. You will receive payment related information here.
             </p>
@@ -128,13 +128,13 @@ const LeftBox = ({
               }}
               className="checkbox border border-gray-200"
             />
-            <span className="label-text text-sm font-medium">
+            <span className="label-text text-xs sm:text-sm font-medium">
               Get notified about payments
             </span>
           </label>
         </div>
       </div>
-      <p className=" ont-medium text-sm text-left mb-2">
+      <p className=" ont-medium text-xs sm:text-sm text-left mb-2">
         * Your subscription will start immediately after you complete your
         payment.
         <br />* According to your inputs, your subscription will end after
@@ -150,7 +150,7 @@ const LeftBox = ({
           className="border-2 border-gray-400 dark:border-gray-400 px-4 rounded-md"
         >
           <AccordionItem value="item-1" className="border-0">
-            <AccordionTrigger className="text-sm font-medium">
+            <AccordionTrigger className="text-xs sm:text-sm font-medium">
               Avail an offer by entering the offerID
             </AccordionTrigger>
             <AccordionContent>
