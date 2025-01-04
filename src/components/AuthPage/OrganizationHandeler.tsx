@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
 import { OrganizationList, useOrganizationList } from "@clerk/nextjs";
-import Image from "next/image";
 import RegistrationForm from "@/components/forms/RegistrationForm";
 import Loader from "../common/Loader";
 const OrganizationHandeler = () => {

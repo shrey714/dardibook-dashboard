@@ -9,6 +9,7 @@ import LogOutBTtn from "./common/LogOutBTtn";
 import SubscriptionDialogBtn from "./common/SubscriptionDialogBtn";
 import { Skeleton } from "./ui/skeleton";
 import { Button } from "./ui/button";
+import { OrganizationList } from "@clerk/nextjs";
 const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ message }) => {
   const router = useRouter();
   const [loading, setloading] = useState(true);
@@ -124,6 +125,22 @@ const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ message }) => {
           ))}
         </div>
       )}
+      <OrganizationList
+        hidePersonal={true}
+        appearance={{
+          elements: {
+            header: "hidden",
+            rootBox: "w-full",
+            cardBox:
+              "max-w-full shadow-none w-full border-2 border-border rounded-md",
+            card: "w-full shadow-none bg-muted/50 rounded-none pt-0",
+            organizationPreviewMainIdentifier: "text-foreground",
+            footer: {
+              display: "none",
+            },
+          },
+        }}
+      />
     </>
   );
 };

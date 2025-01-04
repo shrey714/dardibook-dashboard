@@ -2,8 +2,8 @@ import React, { useCallback } from "react";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import AsyncCreatableSelect from "react-select/async-creatable";
 import { db } from "@/firebase/firebaseConfig";
-import { useAppSelector } from "@/redux/store";
 import uniqid from "uniqid";
+import { useAuth } from "@clerk/nextjs";
 // Custom components to hide the dropdown arrow
 const customComponents = {
   DropdownIndicator: () => null,
@@ -73,7 +73,7 @@ const DiseaseSuggetion = ({
   handleInputChange,
   setmedicinesLoading,
 }: any) => {
-  const user = useAppSelector<any>((state) => state.auth.user);
+  const { orgId } = useAuth();
   // Function to load options based on user input
   const loadOptions = useCallback(
     async (inputValue: string) => {
@@ -83,7 +83,7 @@ const DiseaseSuggetion = ({
 
       try {
         // Firestore query to get medicine suggestions
-        const diseaseRef = collection(db, "doctor", user?.uid, "diseaseData");
+        const diseaseRef = collection(db, "doctor", orgId || "", "diseaseData");
         const q = query(
           diseaseRef,
           where("searchableString", ">=", inputValue.toLowerCase()),
@@ -104,7 +104,7 @@ const DiseaseSuggetion = ({
         return [];
       }
     },
-    [user?.uid]
+    [orgId]
   );
 
   const handleChange = async (selectedOption: any) => {
@@ -129,7 +129,7 @@ const DiseaseSuggetion = ({
         const collectionRef = collection(
           db,
           "doctor",
-          user?.uid,
+          orgId || "",
           "medicinesData"
         );
         const q = query(

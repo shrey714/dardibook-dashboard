@@ -35,6 +35,7 @@ const DashboardWrapper = ({ children }: { children: ReactNode }) => {
         if (subscriptionStatus?.status) {
           setloading(false);
           setsubscription(true);
+          setIsModalOpen(false);
         } else {
           setloading(false);
           setmessage(subscriptionStatus?.message);
