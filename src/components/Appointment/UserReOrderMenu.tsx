@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import { db } from "@/firebase/firebaseConfig";
 import { Button } from "@/components/ui/button";
-import { setDoc, doc, updateDoc } from "firebase/firestore";
+import { doc, updateDoc } from "firebase/firestore";
 import {
   DropdownMenu,
   DropdownMenuContent,

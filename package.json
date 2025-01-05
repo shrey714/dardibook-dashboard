@@ -39,6 +39,7 @@
     "cmdk": "^1.0.4",
     "crypto-js": "^4.2.0",
     "date-fns": "2.28.0",
+    "date-fns-tz": "^2.0.0",
     "embla-carousel": "^8.3.1",
     "embla-carousel-react": "^8.3.1",
     "firebase": "^10.12.2",
