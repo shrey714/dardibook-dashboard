@@ -11,9 +11,15 @@ import { DataTableColumnHeader } from "./data-table-column-header";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import Link from "next/link";
-import { SquareArrowOutUpRight } from "lucide-react";
+import { CalendarIcon, SquareArrowOutUpRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CopyButton } from "@/components/common/CopyToClipboard";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export const columns: ColumnDef<Patient>[] = [
   {
@@ -46,15 +52,13 @@ export const columns: ColumnDef<Patient>[] = [
       <DataTableColumnHeader column={column} title="Id" />
     ),
     cell: ({ row }) => (
-      <>
-        <div
-          className="min-w-[80px] inline-block align-middle"
-          style={{ verticalAlign: "middle" }}
-        >
-          {row.getValue("id")}
-        </div>
+      <div
+        className="min-w-[80px] align-middle flex gap-2 flex-row items-center"
+        style={{ verticalAlign: "middle" }}
+      >
+        {row.getValue("id")}
         <CopyButton className="align-middle z-0" value={row.getValue("id")} />
-      </>
+      </div>
     ),
     enableSorting: false,
     enableHiding: false,
@@ -67,7 +71,7 @@ export const columns: ColumnDef<Patient>[] = [
     cell: ({ row }) => (
       <div className="flex space-x-2">
         <span className="max-w-[500px] truncate font-medium">
-          {row.getValue("first_name")}
+          {row.getValue("first_name")} {row.original.last_name}
         </span>
       </div>
     ),
@@ -124,21 +128,54 @@ export const columns: ColumnDef<Patient>[] = [
   {
     id: "actions",
     cell: ({ row }) => (
-      <Button
-        variant="ghost"
-        className="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
-        asChild
-      >
-        <Link
-          href={{
-            pathname: "history/patientHistory",
-            query: { patientId: row.getValue("id") },
-          }}
-          type="button"
-        >
-          <SquareArrowOutUpRight />
-        </Link>
-      </Button>
+      <div className="min-w-min align-middle flex gap-2 flex-row items-center">
+        <TooltipProvider>
+          <Tooltip delayDuration={100}>
+            <TooltipTrigger asChild>
+              <Button
+                className="flex h-8 w-8 p-0 border-green-500 bg-green-500/10 text-green-600 hover:bg-green-500/20"
+                asChild
+              >
+                <Link
+                  href={{
+                    pathname: "appointment/appointmentForm",
+                    query: { patientId: row.getValue("id") },
+                  }}
+                  type="button"
+                >
+                  <CalendarIcon />
+                </Link>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Register</p>
+            </TooltipContent>
+          </Tooltip>
+
+          <Tooltip delayDuration={100}>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                className="flex h-8 w-8 p-0 data-[state=open]:bg-muted border-border border"
+                asChild
+              >
+                <Link
+                  href={{
+                    pathname: "history/patientHistory",
+                    query: { patientId: row.getValue("id") },
+                  }}
+                  type="button"
+                >
+                  <SquareArrowOutUpRight />
+                </Link>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Profile</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </div>
     ),
   },
 ];

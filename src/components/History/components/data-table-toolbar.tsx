@@ -45,7 +45,7 @@ export function DataTableToolbar<TData>({
 
   return (
     <div className="flex items-center justify-between">
-      <div className="flex flex-1 items-center space-x-2 z-10">
+      <div className="flex flex-1 items-center space-x-2">
         <Popover>
           <PopoverTrigger asChild>
             <Button
@@ -71,7 +71,7 @@ export function DataTableToolbar<TData>({
               )}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
+          <PopoverContent className="w-auto p-0 z-10" align="start">
             <Calendar
               autoFocus
               min={2}
