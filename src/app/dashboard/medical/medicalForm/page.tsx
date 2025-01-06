@@ -32,7 +32,6 @@ const Page = () => {
   const [drawerState, setdrawerState] = useState(false);
 
   useEffect(() => {
-    console.log("afafafa====");
     let unsubscribe: () => void;
 
     const getTodayPatientQueue = () => {
@@ -52,7 +51,6 @@ const Page = () => {
           } else {
             setpatientList([]);
           }
-          setTimeout(() => {}, 1000);
           setLoader(false);
         });
       } else {
@@ -67,7 +65,7 @@ const Page = () => {
         unsubscribe();
       }
     };
-  }, [isLoaded, orgId, patientId]);
+  }, [isLoaded, orgId]);
   // =============================================
 
   return (

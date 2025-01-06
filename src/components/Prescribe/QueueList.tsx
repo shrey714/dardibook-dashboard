@@ -232,9 +232,6 @@ const QueueList: React.FC = () => {
                               </p>
                             </td>
                             <td className="transition align-top text-center font-medium text-sm sm:text-base flex flex-row items-center gap-0 sm:gap-1 justify-center">
-                              {!item.attended && (
-                                <UserReOrderMenu item={item} />
-                              )}
                               <Tooltip delayDuration={100}>
                                 <TooltipTrigger asChild>
                                   <Button
@@ -260,31 +257,34 @@ const QueueList: React.FC = () => {
                                   <p>History</p>
                                 </TooltipContent>
                               </Tooltip>
-                              {!item.attended && (
-                                <Tooltip delayDuration={100}>
-                                  <TooltipTrigger asChild>
-                                    <Button
-                                      variant="outline"
-                                      className="my-1 h-7 border-0 sm:h-8 py-1 flex items-center justify-center bg-blue-700 hover:bg-blue-900 text-white hover:text-white rounded-[4px]"
-                                      asChild
+                              <Tooltip delayDuration={100}>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    variant="outline"
+                                    disabled={item.attended}
+                                    className="my-1 mr-1 h-7 border-0 sm:h-8 py-1 flex items-center justify-center bg-blue-700 hover:bg-blue-900 text-white hover:text-white rounded-[4px]"
+                                    asChild={!item.attended}
+                                  >
+                                    <Link
+                                      href={{
+                                        pathname: "prescribe/prescribeForm",
+                                        query: {
+                                          patientId: item.patient_unique_Id,
+                                        },
+                                      }}
                                     >
-                                      <Link
-                                        href={{
-                                          pathname: "prescribe/prescribeForm",
-                                          query: {
-                                            patientId: item.patient_unique_Id,
-                                          },
-                                        }}
-                                      >
-                                        <ClipboardPlus />
-                                      </Link>
-                                    </Button>
-                                  </TooltipTrigger>
-                                  <TooltipContent side="right">
-                                    <p>Prescribe</p>
-                                  </TooltipContent>
-                                </Tooltip>
-                              )}
+                                      <ClipboardPlus />
+                                    </Link>
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent side="right">
+                                  <p>Prescribe</p>
+                                </TooltipContent>
+                              </Tooltip>
+                              <UserReOrderMenu
+                                item={item}
+                                disabled={item.attended}
+                              />
                             </td>
                           </Reorder.Item>
                         );

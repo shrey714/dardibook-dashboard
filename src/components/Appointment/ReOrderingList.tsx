@@ -196,7 +196,10 @@ const ReOrderingList: React.FC = () => {
                             </p>
                           </td>
                           <td className="text-center font-medium text-sm sm:text-base flex items-center justify-center">
-                            {!item.attended && <UserReOrderMenu item={item} />}
+                            <UserReOrderMenu
+                              item={item}
+                              disabled={item.attended}
+                            />
                           </td>
                         </Reorder.Item>
                       );

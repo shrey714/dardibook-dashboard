@@ -26,7 +26,7 @@ import { useAuth } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 
-export function UserReOrderMenu({ item }: any) {
+export function UserReOrderMenu({ item, disabled }: any) {
   const { orgId } = useAuth();
   const [date, setDate] = useState<Date>(new Date(item.last_visited));
   const [menuLoader, setMenuLoader] = useState(false);
@@ -89,6 +89,7 @@ export function UserReOrderMenu({ item }: any) {
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
+          disabled={disabled}
           className="flex h-8 w-8 p-0 data-[state=open]:bg-muted border rounded-full"
         >
           {menuLoader ? <Loader size="small" /> : <MoreHorizontal />}

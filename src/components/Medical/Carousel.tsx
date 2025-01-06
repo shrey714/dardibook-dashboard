@@ -333,6 +333,7 @@ const SliderThumbItem = forwardRef<
           pathname: "medicalForm",
           query: { patientId: patient.patient_unique_Id },
         }}
+        replace
         className="w-full"
       >
         <HoverCard openDelay={110} closeDelay={100}>
