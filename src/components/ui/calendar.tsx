@@ -20,7 +20,7 @@ function Calendar({
       showOutsideDays={showOutsideDays}
       className={cn("p-3", className)}
       classNames={{
-        months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0 relative",
+        months: "flex flex-col sm:flex-row space-y-4 sm:space-y-0 relative justify-center",
         month: "space-y-4",
         month_caption: "flex justify-center pt-1 relative items-center z-0",
         caption_label: "text-sm font-medium",
@@ -50,7 +50,7 @@ function Calendar({
         range_start: "day-range-start rounded-md",
         range_end: "day-range-end rounded-md",
         selected:
-          "bg-primary text-primary-foreground",
+          "bg-primary text-primary-foreground rounded-md",
         today: "bg-accent text-accent-foreground rounded-md",
         outside:
           "day-outside text-muted-foreground aria-selected:bg-accent/50 aria-selected:text-muted-foreground",

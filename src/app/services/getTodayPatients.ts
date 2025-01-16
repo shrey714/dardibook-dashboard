@@ -1,11 +1,12 @@
 
-export const getTodayPatients = async (uid: string) => {
+export const getTodayPatients = async (uid: string, date?: Date) => {
     try {
-        const res = await fetch(`/api/get-today-patients?uid=${uid}`, {
+        const url = date ? `/api/get-today-patients?uid=${uid}&date=${date}` : `/api/get-today-patients?uid=${uid}`;
+        const res = await fetch(url, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                
+
             },
         });
         const data = await res.json();

@@ -2,6 +2,7 @@ import React from "react";
 import Link from "next/link";
 import Loader from "../common/Loader";
 import { Button } from "../ui/button";
+// import { DateTimePicker } from "../ui/DateTimePicker";
 interface PatientFormData {
   last_visited: number;
   patient_unique_Id: string;
@@ -124,6 +125,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
                     }}
                     className="form-input block flex-1 border-0 bg-transparent py-1 pl-2 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
                   />
+                  {/* <DateTimePicker /> */}
                 </div>
               </div>
             </dl>

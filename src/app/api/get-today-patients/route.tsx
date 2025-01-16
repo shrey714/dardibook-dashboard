@@ -13,11 +13,13 @@ import { getDayStartAndEndTimestampsIST } from "./getDayStartAndEndTimestampsIST
 import { withAuth } from "@/server/withAuth";
 
 const getTodayPatients = async (request: NextRequest) => {
-  const currentTimestamp = Date.now();
-  const timestamps = getDayStartAndEndTimestampsIST(currentTimestamp);
   try {
     const { searchParams } = new URL(request.url);
     const uid = searchParams.get("uid");
+    const date = searchParams.get("date");
+
+    const currentTimestamp = date ? date : Date.now();
+    const timestamps = getDayStartAndEndTimestampsIST(currentTimestamp);
 
     if (!uid) {
       return NextResponse.json({ error: "UID is required." }, { status: 400 });

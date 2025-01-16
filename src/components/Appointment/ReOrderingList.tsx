@@ -180,7 +180,7 @@ const ReOrderingList: React.FC = () => {
                           </td>
                           <td className="text-center font-medium text-sm sm:text-base">
                             <p
-                              className={`m-1 rounded-full ${
+                              className={`m-1 mr-2 rounded-full ${
                                 item.attended
                                   ? "bg-green-600 p-1 text-white"
                                   : item.old
@@ -195,7 +195,7 @@ const ReOrderingList: React.FC = () => {
                                 : "New"}
                             </p>
                           </td>
-                          <td className="text-center font-medium text-sm sm:text-base flex items-center justify-center">
+                          <td className="text-center font-medium text-sm sm:text-base">
                             <UserReOrderMenu
                               item={item}
                               disabled={item.attended}
