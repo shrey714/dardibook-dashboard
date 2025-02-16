@@ -362,3 +362,14 @@ body {
   height: 100%;
   object-fit: fill;
 }
+
+/* calendar style */
+
+.fc .fc-toolbar.fc-header-toolbar {
+  margin-bottom: 8px;
+}
+
+.fc .fc-toolbar-title {
+  font-size: 20px;
+  margin: 0px;
+}
