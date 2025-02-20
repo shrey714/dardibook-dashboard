@@ -87,7 +87,7 @@ export function ScheduleSidebar({
       <SidebarHeader2 className="p-0">
         <SidebarGroup2 className="group-data-[collapsible=icon]:hidden p-0">
           <SidebarGroupLabel2 className="justify-center">
-            Schedule
+            Scheduled Patients
           </SidebarGroupLabel2>
           <SidebarGroupContent2>
             <Calendar

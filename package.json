@@ -10,6 +10,13 @@
   },
   "dependencies": {
     "@clerk/nextjs": "^6.9.2",
+    "@fullcalendar/core": "^6.1.15",
+    "@fullcalendar/daygrid": "^6.1.15",
+    "@fullcalendar/interaction": "^6.1.15",
+    "@fullcalendar/react": "^6.1.15",
+    "@fullcalendar/resource": "^6.1.15",
+    "@fullcalendar/resource-timeline": "^6.1.15",
+    "@fullcalendar/timegrid": "^6.1.15",
     "@liveblocks/client": "^2.12.2",
     "@liveblocks/node": "^2.12.2",
     "@liveblocks/react": "^2.12.2",

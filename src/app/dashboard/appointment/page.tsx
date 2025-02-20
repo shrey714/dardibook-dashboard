@@ -19,7 +19,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { SidebarProvider3 } from "@/components/ui/sidebar3";
+import { SidebarProvider3, SidebarTrigger3 } from "@/components/ui/sidebar3";
 import { BedSidebar } from "@/components/Appointment/BedSidebar";
 export default function TShirtsPage() {
   const [patientId, setPatientId] = useState("");
@@ -103,14 +103,14 @@ export default function TShirtsPage() {
                     <p>Calendar</p>
                   </TooltipContent>
                 </Tooltip>
-                {/* <Tooltip delayDuration={100}>
+                <Tooltip delayDuration={100}>
                   <TooltipTrigger asChild>
                     <SidebarTrigger3 className="border" />
                   </TooltipTrigger>
                   <TooltipContent side="left">
                     <p>Bed</p>
                   </TooltipContent>
-                </Tooltip> */}
+                </Tooltip>
               </TooltipProvider>
             </div>
             <ScheduleSidebar />

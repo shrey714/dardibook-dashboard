@@ -8,6 +8,8 @@ import {
   HistoryIcon,
   BriefcaseMedicalIcon,
   SettingsIcon,
+  SquarePenIcon,
+  CalendarDaysIcon,
 } from "lucide-react";
 
 import { NavMain } from "./nav-main";
@@ -26,7 +28,6 @@ import { usePathname } from "next/navigation";
 import RolesLink from "./RolesLink";
 import TokenBox from "../../tokenFramer/TokenBox";
 import Pip from "@/hooks/pip";
-
 const pages = [
   {
     title: "Home",
@@ -40,9 +41,19 @@ const pages = [
     ],
   },
   {
+    title: "Calendar",
+    url: "/dashboard/calendar",
+    icon: CalendarDaysIcon,
+    roles: [
+      "org:clinic_head",
+      "org:doctor",
+      "org:assistant_doctor",
+    ],
+  },
+  {
     title: "Register",
     url: "/dashboard/appointment",
-    icon: CalendarIcon,
+    icon: SquarePenIcon,
     roles: ["org:clinic_head", "org:doctor", "org:assistant_doctor"],
   },
   {
