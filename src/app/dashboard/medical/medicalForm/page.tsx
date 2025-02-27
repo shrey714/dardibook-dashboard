@@ -1,5 +1,4 @@
 "use client";
-import { getTodayPatients } from "@/app/services/getTodayPatients";
 import Loader from "@/components/common/Loader";
 import {
   Carousel,
@@ -9,8 +8,6 @@ import {
   SliderThumbItem,
 } from "@/components/Medical/Carousel";
 import PatientDataBox from "@/components/Medical/PatientDataBox";
-import { db } from "@/firebase/firebaseConfig";
-import { query, collection, onSnapshot } from "firebase/firestore";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
@@ -21,52 +18,34 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { useAuth } from "@clerk/nextjs";
+import { useTodayPatientStore } from "@/lib/providers/todayPatientsProvider";
 
 const Page = () => {
   const { isLoaded, orgId } = useAuth();
   const searchParams = useSearchParams();
   const patientId = searchParams.get("patientId");
-  const [loader, setLoader] = useState(false);
-  const [patientList, setpatientList] = useState([]);
   const [startIndex, setstartIndex] = useState(0);
   const [drawerState, setdrawerState] = useState(false);
+  // =============================================
+
+  const { patientsData, loading, getTodayPatients } = useTodayPatientStore(
+    (state) => state
+  );
 
   useEffect(() => {
-    let unsubscribe: () => void;
+    if (orgId && isLoaded) {
+      getTodayPatients(orgId);
+    }
+  }, [getTodayPatients, isLoaded, orgId]);
 
-    const getTodayPatientQueue = () => {
-      if (isLoaded && orgId) {
-        const q = query(collection(db, "doctor", orgId, "patients"));
-
-        setLoader(true); //enable after
-        unsubscribe = onSnapshot(q, async () => {
-          const patientQueueData = await getTodayPatients(orgId);
-          if (patientQueueData.data) {
-            setpatientList(patientQueueData.data);
-            const index = patientQueueData.data.findIndex(
-              (patient: { patient_unique_Id: string | null }) =>
-                patient.patient_unique_Id === patientId
-            );
-            setstartIndex(index);
-          } else {
-            setpatientList([]);
-          }
-          setLoader(false);
-        });
-      } else {
-        setLoader(false);
-      }
-    };
-
-    getTodayPatientQueue();
-
-    return () => {
-      if (unsubscribe) {
-        unsubscribe();
-      }
-    };
-  }, [isLoaded, orgId]);
-  // =============================================
+  useEffect(() => {
+    const index = patientsData?.findIndex(
+      (patient: { patient_unique_Id: string | null }) =>
+        patient.patient_unique_Id === patientId
+    );
+    setstartIndex(index);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [patientsData]);
 
   return (
     <>
@@ -81,7 +60,7 @@ const Page = () => {
               <SheetDescription hidden>DESC</SheetDescription>
             </SheetHeader>
             <PatientDataBox
-              patientData={patientList.find(
+              patientData={patientsData?.find(
                 (patient: { patient_unique_Id: string | null }) =>
                   patient.patient_unique_Id === patientId
               )}
@@ -89,11 +68,11 @@ const Page = () => {
           </SheetContent>
         </Sheet>
 
-        {loader ? (
+        {loading ? (
           <div className="w-full overflow-hidden h-[calc(100svh-53px)] flex flex-1 items-center justify-center z-40">
             <Loader size="medium" />
           </div>
-        ) : patientList.length === 0 ? (
+        ) : patientsData?.length === 0 || patientsData === null ? (
           <div
             style={{
               width: "100%",
@@ -115,7 +94,7 @@ const Page = () => {
             className="flex flex-col !gap-0 w-full"
           >
             <CarouselThumbsContainer className="h-12 basis-full py-1 select-none">
-              {patientList.map((patient, index) => (
+              {patientsData?.map((patient: any, index: number) => (
                 <SliderThumbItem
                   key={index}
                   index={index}
@@ -126,7 +105,7 @@ const Page = () => {
             </CarouselThumbsContainer>
             <div className="relative basis-3/4 overflow-hidden">
               <CarouselMainContainer className="h-[calc(100svh-106px)] z-[1] relative">
-                {patientList.map((patient, index) => (
+                {patientsData?.map((patient: any, index: number) => (
                   <SliderMainItem
                     setdrawerState={setdrawerState}
                     key={index}

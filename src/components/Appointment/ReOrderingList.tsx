@@ -1,68 +1,38 @@
-import React, { useEffect, useState } from "react";
-import { getTodayPatients } from "@/app/services/getTodayPatients";
+import React, { useEffect } from "react";
+// import { getTodayPatients } from "@/app/services/getTodayPatients";
 import useToken from "@/firebase/useToken";
 import Link from "next/link";
 import Loader from "../common/Loader";
 import { useAuth } from "@clerk/nextjs";
-import { collection, onSnapshot, query } from "firebase/firestore";
-import { db } from "@/firebase/firebaseConfig";
 import { Reorder } from "framer-motion";
 import { format } from "date-fns";
 import { UserReOrderMenu } from "./UserReOrderMenu";
-import { RefreshCw } from "lucide-react";
+import { useTodayPatientStore } from "@/lib/providers/todayPatientsProvider";
 
 const ReOrderingList: React.FC = () => {
   const { isLoaded, orgId } = useAuth();
-  const [queueItems, setqueueItems] = useState([]);
-  const [queueLoader, setqueueLoader] = useState(false);
   const { CurrentToken } = useToken(orgId || "");
-  const [realUpdateLoader, setrealUpdateLoader] = useState(false);
+
+  const { patientsData, loading, getTodayPatients } = useTodayPatientStore(
+    (state) => state
+  );
 
   useEffect(() => {
-    let unsubscribe: () => void;
-
-    const getTodayPatientQueue = () => {
-      if (isLoaded && orgId) {
-        const q = query(collection(db, "doctor", orgId, "patients"));
-
-        setqueueLoader(true); //enable after
-        unsubscribe = onSnapshot(q, async () => {
-          setrealUpdateLoader(true);
-          const patientQueueData = await getTodayPatients(orgId);
-          if (patientQueueData.data) {
-            setqueueItems(patientQueueData.data);
-          } else {
-            setqueueItems([]);
-          }
-          setTimeout(() => {
-            setrealUpdateLoader(false);
-          }, 1000);
-          setqueueLoader(false);
-        });
-      } else {
-        setqueueLoader(false);
-      }
-    };
-
-    getTodayPatientQueue();
-
-    return () => {
-      if (unsubscribe) {
-        unsubscribe();
-      }
-    };
-  }, [isLoaded, orgId]);
+    if (orgId && isLoaded) {
+      getTodayPatients(orgId);
+    }
+  }, [getTodayPatients, isLoaded, orgId]);
 
   const base = 4;
   const t = (d: number) => d * base;
   return (
     <>
       <div className="max-h-[80vh] overflow-y-auto overflow-x-hidden flex flex-row">
-        {queueLoader ? (
+        {loading ? (
           <div className="w-full h-48 overflow-hidden flex items-center justify-center">
             <Loader size="medium" />
           </div>
-        ) : queueItems.length === 0 ? (
+        ) : patientsData?.length === 0 || patientsData === null ? (
           <div className="w-full h-52 overflow-hidden flex items-center justify-center">
             <img className="w-full max-w-[16rem]" src="/empty.svg" alt="" />
           </div>
@@ -70,8 +40,8 @@ const ReOrderingList: React.FC = () => {
           <>
             <ul className="w-full">
               <Reorder.Group
-                values={queueItems}
-                onReorder={setqueueItems}
+                values={patientsData}
+                onReorder={() => {}}
                 draggable={false}
               >
                 <table className="w-full">
@@ -86,19 +56,15 @@ const ReOrderingList: React.FC = () => {
                         Contact
                       </th>
                       <th className="pb-2 text-sm sm:text-base">Status</th>
-                      <th className="pb-2">
-                        <RefreshCw
-                          className={`w-4 h-4 text-primary float-right ${
-                            realUpdateLoader ? "animate-spin" : ""
-                          }`}
-                        />
-                      </th>
+                      <th className="pb-2"></th>
                     </tr>
                   </thead>
                   <tbody className="rounded-lg">
-                    {[...queueItems].map((item: any, key: number) => {
+                    {[...patientsData].map((item: any, key: number) => {
                       const select =
-                        CurrentToken === queueItems.length - key ? true : false;
+                        CurrentToken === patientsData?.length - key
+                          ? true
+                          : false;
                       return (
                         <Reorder.Item
                           drag={false}
@@ -130,7 +96,7 @@ const ReOrderingList: React.FC = () => {
                                 select ? "bg-blue-700 text-white" : ""
                               } p-1 rounded-s-full flex items-center px-3`}
                             >
-                              {queueItems.length - key}
+                              {patientsData?.length - key}
                               <p className="text-xs ml-2">
                                 (
                                 {format(new Date(item.last_visited), "hh:mm a")}

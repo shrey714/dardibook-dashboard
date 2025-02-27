@@ -3,7 +3,6 @@
 import * as React from "react";
 import {
   Home,
-  CalendarIcon,
   ClipboardPlusIcon,
   HistoryIcon,
   BriefcaseMedicalIcon,

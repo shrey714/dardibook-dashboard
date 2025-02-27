@@ -30,7 +30,7 @@ export function BedPatientList({ scheduledPatients }: any) {
   return (
     <table className="w-full">
       <tbody className="rounded-lg">
-        {[...scheduledPatients].map((patient: any, index: number) => {
+        {[...scheduledPatients].map((patient: any) => {
           return (
             <Reorder.Item
               drag={false}
@@ -62,7 +62,7 @@ export function BedPatientList({ scheduledPatients }: any) {
                     <div
                       className={`flex w-full flex-row my-1 rounded-md bg-border h-12 overflow-hidden`}
                     >
-                      <div className="bg-green-500/90 w-1 h-full"></div>
+                      <div className="bg-green-500/90 w-[2.5px] h-full"></div>
 
                       <div className="relative flex flex-1 items-center gap-2 p-2">
                         <span className="text-xl flex flex-row gap-2 items-center justify-center font-bold bg-background rounded-md px-2 py-1">
@@ -85,7 +85,7 @@ export function BedPatientList({ scheduledPatients }: any) {
                         </Link>
                       </div>
 
-                      <div className="bg-red-500/90 w-1 h-full"></div>
+                      <div className="bg-red-500/90 w-[2.5px] h-full"></div>
 
                       {/* <span className="flex flex-row gap-1 items-center ml-1">
                           <UserReOrderMenu

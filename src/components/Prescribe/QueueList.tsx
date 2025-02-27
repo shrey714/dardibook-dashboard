@@ -1,15 +1,12 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
-import React, { useEffect, useState } from "react";
-import { getTodayPatients } from "@/app/services/getTodayPatients";
+import React, { useEffect } from "react";
 import Link from "next/link";
 import StatsHeader from "./StatsHeader";
 import useToken from "@/firebase/useToken";
 import Loader from "../common/Loader";
-import { collection, onSnapshot, query } from "firebase/firestore";
-import { db } from "@/firebase/firebaseConfig";
 import { Reorder } from "framer-motion";
-import { ClipboardPlus, History, RefreshCw } from "lucide-react";
+import { ClipboardPlus, History } from "lucide-react";
 import { useAuth } from "@clerk/nextjs";
 import { format } from "date-fns";
 import {
@@ -20,14 +17,13 @@ import {
 } from "../ui/tooltip";
 import { Button } from "../ui/button";
 import { UserReOrderMenu } from "../Appointment/UserReOrderMenu";
+import { useTodayPatientStore } from "@/lib/providers/todayPatientsProvider";
+
 const QueueList: React.FC = () => {
   const { isLoaded, orgId } = useAuth();
-  const [queueItems, setqueueItems] = useState<any>([]);
-  const [queueLoader, setqueueLoader] = useState(true);
-  const [realUpdateLoader, setrealUpdateLoader] = useState(false);
   const { CurrentToken } = useToken(orgId || "");
 
-  // =========================================
+  // ======================================
   // useEffect(() => {
   //   const getTodayPatientQueue = async () => {
   //     if (user) {
@@ -47,40 +43,15 @@ const QueueList: React.FC = () => {
   //   getTodayPatientQueue();
   // }, [user]);
   // =============================================
+  const { patientsData, loading, getTodayPatients } = useTodayPatientStore(
+    (state) => state
+  );
+
   useEffect(() => {
-    let unsubscribe: () => void;
-
-    const getTodayPatientQueue = () => {
-      if (isLoaded && orgId) {
-        const q = query(collection(db, "doctor", orgId, "patients"));
-
-        setqueueLoader(true); //enable after
-        unsubscribe = onSnapshot(q, async () => {
-          setrealUpdateLoader(true);
-          const patientQueueData = await getTodayPatients(orgId);
-          if (patientQueueData.data) {
-            setqueueItems(patientQueueData.data);
-          } else {
-            setqueueItems([]);
-          }
-          setTimeout(() => {
-            setrealUpdateLoader(false);
-          }, 1000);
-          setqueueLoader(false);
-        });
-      } else {
-        setqueueLoader(false);
-      }
-    };
-
-    getTodayPatientQueue();
-
-    return () => {
-      if (unsubscribe) {
-        unsubscribe();
-      }
-    };
-  }, [isLoaded, orgId]);
+    if (orgId && isLoaded) {
+      getTodayPatients(orgId);
+    }
+  }, [getTodayPatients, isLoaded, orgId]);
   // =============================================
   const base = 4;
   const t = (d: number) => d * base;
@@ -88,9 +59,9 @@ const QueueList: React.FC = () => {
   return (
     <>
       <StatsHeader
-        registrations={queueItems.length}
+        registrations={patientsData?.length}
         attended={
-          queueItems?.filter((item: any) => item.attended === true).length
+          patientsData?.filter((item: any) => item.attended === true).length
         }
       />
       <div className="w-full mt-8 p-0 flex flex-row items-center">
@@ -103,26 +74,21 @@ const QueueList: React.FC = () => {
         <span className="flex flex-1 h-[2px] bg-gradient-to-l from-transparent to-primary"></span>
       </div>
       <div className="w-full flex flex-row">
-        {queueLoader ? (
+        {loading ? (
           <div className="w-full h-52 overflow-hidden flex items-center justify-center">
             <Loader size="medium" />
           </div>
-        ) : queueItems.length === 0 ? (
+        ) : patientsData?.length === 0 || patientsData === null ? (
           <div className="w-full h-52 overflow-hidden flex items-end justify-center">
             <img className="w-full max-w-[16rem]" src="/empty.svg" alt="" />
           </div>
         ) : (
           <>
             <ul className="w-full mt-4 relative">
-              <RefreshCw
-                className={`w-4 h-4 text-primary absolute -top-6 right-3 ${
-                  realUpdateLoader ? "animate-spin" : ""
-                }`}
-              />
               <TooltipProvider>
                 <Reorder.Group
-                  values={queueItems}
-                  onReorder={setqueueItems}
+                  values={patientsData}
+                  onReorder={() => {}}
                   draggable={false}
                 >
                   <table className="w-full">
@@ -138,9 +104,9 @@ const QueueList: React.FC = () => {
                       </tr>
                     </thead>
                     <tbody className="rounded-lg">
-                      {[...queueItems].map((item: any, key: number) => {
+                      {[...patientsData].map((item: any, key: number) => {
                         const select =
-                          CurrentToken === queueItems.length - key
+                          CurrentToken === patientsData?.length - key
                             ? true
                             : false;
                         return (
@@ -174,7 +140,7 @@ const QueueList: React.FC = () => {
                                   select ? "bg-blue-700 text-white" : ""
                                 } p-1 my-1 rounded-s-full flex items-center px-3`}
                               >
-                                {queueItems.length - key}
+                                {patientsData?.length - key}
                                 <p className="text-xs ml-2">
                                   (
                                   {format(

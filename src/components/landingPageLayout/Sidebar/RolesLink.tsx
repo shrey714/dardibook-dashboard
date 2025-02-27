@@ -59,6 +59,9 @@ const RolesLink = () => {
                   footer: {
                     display: "none",
                   },
+                  organizationListCreateOrganizationActionButton: {
+                    display: "none",
+                  },
                 },
               }}
             />

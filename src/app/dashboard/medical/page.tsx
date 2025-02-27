@@ -1,13 +1,10 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import { getTodayPatients } from "@/app/services/getTodayPatients";
+import React, { useEffect } from "react";
 import Link from "next/link";
 import useToken from "@/firebase/useToken";
 import Loader from "@/components/common/Loader";
-import { collection, onSnapshot, query } from "firebase/firestore";
-import { db } from "@/firebase/firebaseConfig";
 import { Reorder } from "framer-motion";
-import { BriefcaseMedical, RefreshCw } from "lucide-react";
+import { BriefcaseMedical } from "lucide-react";
 import { useAuth } from "@clerk/nextjs";
 import {
   Tooltip,
@@ -16,68 +13,21 @@ import {
   TooltipContent,
 } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
+import { useTodayPatientStore } from "@/lib/providers/todayPatientsProvider";
 const Medical = () => {
   const { isLoaded, orgId } = useAuth();
-  const [queueItems, setqueueItems] = useState([]);
-  const [queueLoader, setqueueLoader] = useState(true);
-  const [realUpdateLoader, setrealUpdateLoader] = useState(false);
   const { CurrentToken } = useToken(orgId || "");
 
-  // =========================================
-  // useEffect(() => {
-  //   const getTodayPatientQueue = async () => {
-  //     if (user) {
-  //       setqueueLoader(true);
-  //       const patientQueueData = await getTodayPatients(user.uid);
-  //       if (patientQueueData.data) {
-  //         //   console.log(patientQueueData.data);
-  //         setqueueItems(patientQueueData.data);
-  //       } else {
-  //         setqueueItems([]);
-  //       }
-  //       setqueueLoader(false);
-  //     } else {
-  //       setqueueLoader(false);
-  //     }
-  //   };
-  //   getTodayPatientQueue();
-  // }, [user]);
-  // =============================================
+  const { patientsData, loading, getTodayPatients } = useTodayPatientStore(
+    (state) => state
+  );
+
   useEffect(() => {
-    let unsubscribe: () => void;
+    if (orgId && isLoaded) {
+      getTodayPatients(orgId);
+    }
+  }, [getTodayPatients, isLoaded, orgId]);
 
-    const getTodayPatientQueue = () => {
-      if (isLoaded && orgId) {
-        const q = query(collection(db, "doctor", orgId, "patients"));
-
-        setqueueLoader(true); //enable after
-        unsubscribe = onSnapshot(q, async () => {
-          setrealUpdateLoader(true);
-          const patientQueueData = await getTodayPatients(orgId);
-          if (patientQueueData.data) {
-            setqueueItems(patientQueueData.data);
-          } else {
-            setqueueItems([]);
-          }
-          setTimeout(() => {
-            setrealUpdateLoader(false);
-          }, 1000);
-          setqueueLoader(false);
-        });
-      } else {
-        setqueueLoader(false);
-      }
-    };
-
-    getTodayPatientQueue();
-
-    return () => {
-      if (unsubscribe) {
-        unsubscribe();
-      }
-    };
-  }, [isLoaded, orgId]);
-  // =============================================
   const base = 4;
   const t = (d: number) => d * base;
 
@@ -93,26 +43,21 @@ const Medical = () => {
         <span className="flex flex-1 h-[2px] bg-gradient-to-l from-transparent to-primary"></span>
       </div>
       <div className="w-full flex flex-row">
-        {queueLoader ? (
+        {loading ? (
           <div className="w-full h-52 overflow-hidden flex items-center justify-center">
             <Loader size="medium" />
           </div>
-        ) : queueItems.length === 0 ? (
+        ) : patientsData?.length === 0 || patientsData === null ? (
           <div className="w-full h-52 overflow-hidden flex items-end justify-center">
             <img className="w-full max-w-[16rem]" src="/empty.svg" alt="" />
           </div>
         ) : (
           <>
             <ul className="w-full mt-4 pb-3 relative">
-              <RefreshCw
-                className={`w-4 h-4 text-primary absolute -top-6 right-3 ${
-                  realUpdateLoader ? "animate-spin" : ""
-                }`}
-              />
               <TooltipProvider>
                 <Reorder.Group
-                  values={queueItems}
-                  onReorder={setqueueItems}
+                  values={patientsData}
+                  onReorder={() => {}}
                   draggable={false}
                 >
                   <table className="w-full">
@@ -128,9 +73,9 @@ const Medical = () => {
                       </tr>
                     </thead>
                     <tbody className="rounded-lg">
-                      {[...queueItems].map((item: any, key: number) => {
+                      {[...patientsData].map((item: any, key: number) => {
                         const select =
-                          CurrentToken === queueItems.length - key
+                          CurrentToken === patientsData?.length - key
                             ? true
                             : false;
                         return (
@@ -164,7 +109,7 @@ const Medical = () => {
                                   select ? "bg-blue-700 text-white" : ""
                                 } p-1 my-1 rounded-s-full`}
                               >
-                                {queueItems.length - key}
+                                {patientsData?.length - key}
                               </p>
                             </td>
                             <td className="transition align-top text-center font-medium text-sm sm:text-base hide-before-480 hide-between-768-and-990">
