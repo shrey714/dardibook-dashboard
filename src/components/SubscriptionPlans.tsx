@@ -138,6 +138,9 @@ const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({ message }) => {
             footer: {
               display: "none",
             },
+            organizationListCreateOrganizationActionButton: {
+              display: "none",
+            },
           },
         }}
       />

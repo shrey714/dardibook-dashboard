@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React from "react";
 import { Button } from "../ui/button";
 import { LogOut } from "lucide-react";
@@ -49,7 +49,7 @@ const LogOutBTtn = ({ className, ...props }: any) => {
               Close
             </Button>
           </DialogClose>
-          <SignOutButton>
+          <SignOutButton redirectUrl="/signin">
             <Button variant={"destructive"}>SignOut</Button>
           </SignOutButton>
         </DialogFooter>

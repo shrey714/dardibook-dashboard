@@ -139,7 +139,7 @@ const PatientHistoryGlobalModal = () => {
                       asChild
                       size={"lg"}
                       variant="outline"
-                      className="my-1 mr-1 h-7 border-0 sm:h-8 py-1 flex items-center justify-center bg-blue-700 hover:bg-blue-900 text-white hover:text-white rounded-[4px]"
+                      className="border-0 flex items-center justify-center bg-blue-700 hover:bg-blue-900 text-white hover:text-white"
                     >
                       <Link
                         href={{
