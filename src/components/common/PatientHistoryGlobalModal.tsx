@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@clerk/nextjs";
 import Link from "next/link";
 import { useTodayPatientStore } from "@/lib/providers/todayPatientsProvider";
+import { ClipboardPlus } from "lucide-react";
 
 const PatientHistoryGlobalModal = () => {
   const { isOpen, modalProps, closeModal } = usePatientHistoryModalStore();
@@ -124,7 +125,8 @@ const PatientHistoryGlobalModal = () => {
                 <div className="p-4 gap-6 flex flex-col">
                   {!loading &&
                   patientsData?.some(
-                    (patient: any) => patient?.patient_unique_Id === modalProps.patientId
+                    (patient: any) =>
+                      patient?.patient_unique_Id === modalProps.patientId
                   ) &&
                   patientData &&
                   !patientData?.visitedDates?.some(
@@ -133,13 +135,22 @@ const PatientHistoryGlobalModal = () => {
                   ) &&
                   (orgRole === "org:clinic_head" ||
                     orgRole === "org:doctor") ? (
-                    <Button asChild variant={"default"} size={"lg"}>
+                    <Button
+                      asChild
+                      size={"lg"}
+                      variant="outline"
+                      className="my-1 mr-1 h-7 border-0 sm:h-8 py-1 flex items-center justify-center bg-blue-700 hover:bg-blue-900 text-white hover:text-white rounded-[4px]"
+                    >
                       <Link
                         href={{
-                          pathname: "prescribeForm",
+                          pathname: "prescribe/prescribeForm",
                           query: { patientId: modalProps.patientId },
                         }}
+                        onClick={() => {
+                          closeModal();
+                        }}
                       >
+                        <ClipboardPlus />
                         Attend
                       </Link>
                     </Button>
