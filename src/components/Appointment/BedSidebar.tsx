@@ -14,7 +14,14 @@ import {
   SidebarMenuSkeleton3,
   SidebarSeparator3,
 } from "@/components/ui/sidebar3";
-import { collection, onSnapshot, query } from "firebase/firestore";
+import {
+  query,
+  collection,
+  onSnapshot,
+  DocumentData,
+  where,
+  orderBy,
+} from "firebase/firestore";
 import { Inbox, RotateCcw } from "lucide-react";
 import {
   eachDayOfInterval,
@@ -23,11 +30,13 @@ import {
   isWithinInterval,
   startOfMonth,
   startOfWeek,
+  endOfDay,
+  getTime,
+  startOfDay,
 } from "date-fns";
 import { enUS } from "date-fns/locale";
 import { useAuth } from "@clerk/nextjs";
 import { db } from "@/firebase/firebaseConfig";
-import { getTodayPatients } from "@/app/services/getTodayPatients";
 import { Reorder } from "framer-motion";
 import {
   Week,
@@ -56,7 +65,7 @@ export function BedSidebar({
   ...props
 }: React.ComponentProps<typeof Sidebar3>) {
   const [date, setDate] = useState<Date | undefined>(new Date());
-  const [scheduledPatients, setScheduledPatients] = useState([]);
+  const [scheduledPatients, setScheduledPatients] = useState<any>([]);
   const [loader, setLoader] = useState(false);
   const { isLoaded, orgId } = useAuth();
   // =================================================================
@@ -118,20 +127,34 @@ export function BedSidebar({
   // =================================================================
   useEffect(() => {
     let unsubscribe: () => void;
-
     const getTodayPatientQueue = () => {
-      if (isLoaded && orgId) {
-        const q = query(collection(db, "doctor", orgId, "patients"));
+      if (isLoaded && orgId && date) {
+        const q = query(
+          collection(db, "doctor", orgId, "patients"),
+          where("last_visited", ">=", getTime(startOfDay(date))),
+          where("last_visited", "<=", getTime(endOfDay(date))),
+          orderBy("last_visited", "desc")
+        );
 
-        setLoader(true); //enable after
-        unsubscribe = onSnapshot(q, async () => {
-          const patientQueueData = await getTodayPatients(orgId, date);
-          if (patientQueueData.data) {
-            setScheduledPatients(patientQueueData.data);
-          } else {
-            setScheduledPatients([]);
-          }
-          setTimeout(() => {}, 1000);
+        setLoader(true);
+        unsubscribe = onSnapshot(q, async (snapshot) => {
+          const patientData: DocumentData[] = [];
+
+          snapshot.forEach((doc) => {
+            const pData = doc.data();
+            const visitedDatesArray = pData?.visitedDates || [];
+            const today = new Date().getDate();
+
+            const attended = visitedDatesArray.some(
+              (date: number) => new Date(date).getDate() === today
+            );
+            const old =
+              visitedDatesArray.length > 1 ||
+              (visitedDatesArray.length === 1 && !attended);
+
+            patientData.push({ ...pData, attended, old });
+          });
+          setScheduledPatients(patientData);
           setLoader(false);
         });
       } else {
@@ -168,7 +191,13 @@ export function BedSidebar({
               }}
               mode="single"
               selected={date}
-              onSelect={setDate}
+              onSelect={(d) => {
+                if (d) {
+                  setDate(d);
+                } else {
+                  setDate(date);
+                }
+              }}
               className="py-0"
               disabled={{
                 before: currentWeek[0],

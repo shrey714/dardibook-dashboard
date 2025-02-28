@@ -18,10 +18,12 @@ import {
 import { Button } from "../ui/button";
 import { UserReOrderMenu } from "../Appointment/UserReOrderMenu";
 import { useTodayPatientStore } from "@/lib/providers/todayPatientsProvider";
+import { usePatientHistoryModalStore } from "@/lib/stores/patientHistoryModalStore";
 
 const QueueList: React.FC = () => {
   const { isLoaded, orgId } = useAuth();
   const { CurrentToken } = useToken(orgId || "");
+  const { openModal } = usePatientHistoryModalStore();
 
   // ======================================
   // useEffect(() => {
@@ -153,10 +155,13 @@ const QueueList: React.FC = () => {
                             </td>
                             <td className="transition align-top text-center font-medium text-sm sm:text-base hide-before-480 hide-between-768-and-990">
                               <Link
-                                href={{
-                                  pathname: "history/patientHistory",
-                                  query: { patientId: item.patient_unique_Id },
-                                }}
+                                href={"#"}
+                                role="button"
+                                onClick={() =>
+                                  openModal({
+                                    patientId: item.patient_unique_Id,
+                                  })
+                                }
                               >
                                 <p
                                   className={`underline ${
@@ -206,14 +211,13 @@ const QueueList: React.FC = () => {
                                     asChild
                                   >
                                     <Link
-                                      href={{
-                                        pathname: item.attended
-                                          ? "history/patientHistory"
-                                          : "prescribe/patientData",
-                                        query: {
+                                      href={"#"}
+                                      role="button"
+                                      onClick={() =>
+                                        openModal({
                                           patientId: item.patient_unique_Id,
-                                        },
-                                      }}
+                                        })
+                                      }
                                     >
                                       <History />
                                     </Link>

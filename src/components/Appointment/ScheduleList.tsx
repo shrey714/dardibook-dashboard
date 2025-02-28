@@ -10,6 +10,7 @@ import { format, formatRelative } from "date-fns";
 import Link from "next/link";
 import { enUS } from "date-fns/locale";
 import UserSchedulebtn from "./UserSchedulebtn";
+import { usePatientHistoryModalStore } from "@/lib/stores/patientHistoryModalStore";
 const customLocale = {
   ...enUS,
   formatRelative: (token: string) => {
@@ -26,6 +27,8 @@ const customLocale = {
 };
 
 export function ScheduleList({ scheduledPatients }: any) {
+  const { openModal } = usePatientHistoryModalStore();
+
   const base = 4;
   const t = (d: number) => d * base;
   return (
@@ -60,8 +63,14 @@ export function ScheduleList({ scheduledPatients }: any) {
               <td className="text-center font-medium text-sm sm:text-base relative">
                 <HoverCard openDelay={80} closeDelay={80}>
                   <HoverCardTrigger>
-                    <div className={`flex flex-1 w-full items-center justify-between flex-row my-1 h-8`}>
-                      <div className={`rounded-s-full flex items-center px-3 py-1 rounded-l-full h-full ${patient.attended ? "bg-green-600" : "bg-border"}`}>
+                    <div
+                      className={`flex flex-1 w-full items-center justify-between flex-row my-1 h-8`}
+                    >
+                      <div
+                        className={`rounded-s-full flex items-center px-3 py-1 rounded-l-full h-full ${
+                          patient.attended ? "bg-green-600" : "bg-border"
+                        }`}
+                      >
                         {scheduledPatients.length - index}
                         <p className="text-xs ml-2">
                           ({format(new Date(patient.last_visited), "hh:mm a")})
@@ -69,13 +78,16 @@ export function ScheduleList({ scheduledPatients }: any) {
                       </div>
 
                       <Link
-                        href={{
-                          pathname: "history/patientHistory",
-                          query: {
+                        href={"#"}
+                        role="button"
+                        onClick={() =>
+                          openModal({
                             patientId: patient.patient_unique_Id,
-                          },
-                        }}
-                        className={`py-1 rounded-r-full flex flex-1 text-xs h-full items-center ${patient.attended ? "bg-green-600" : "bg-border"}`}
+                          })
+                        }
+                        className={`py-1 rounded-r-full flex flex-1 text-xs h-full items-center ${
+                          patient.attended ? "bg-green-600" : "bg-border"
+                        }`}
                       >
                         <p className={`underline px-4 text-sm`}>
                           {patient.patient_unique_Id}

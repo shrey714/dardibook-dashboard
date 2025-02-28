@@ -9,6 +9,8 @@ import { formatRelative } from "date-fns";
 import Link from "next/link";
 import { enUS } from "date-fns/locale";
 import { BedSingle } from "lucide-react";
+import { usePatientHistoryModalStore } from "@/lib/stores/patientHistoryModalStore";
+
 const customLocale = {
   ...enUS,
   formatRelative: (token: string) => {
@@ -25,6 +27,7 @@ const customLocale = {
 };
 
 export function BedPatientList({ scheduledPatients }: any) {
+  const { openModal } = usePatientHistoryModalStore();
   const base = 4;
   const t = (d: number) => d * base;
   return (
@@ -71,12 +74,13 @@ export function BedPatientList({ scheduledPatients }: any) {
                         </span>
 
                         <Link
-                          href={{
-                            pathname: "history/patientHistory",
-                            query: {
+                          href={"#"}
+                          role="button"
+                          onClick={() =>
+                            openModal({
                               patientId: patient.patient_unique_Id,
-                            },
-                          }}
+                            })
+                          }
                           className={`py-1 text-sm h-full`}
                         >
                           <p className={`underline px-2 text-sm`}>

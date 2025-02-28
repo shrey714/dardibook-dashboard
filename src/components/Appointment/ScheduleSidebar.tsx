@@ -13,15 +13,27 @@ import {
   SidebarMenuSkeleton2,
   SidebarSeparator2,
 } from "@/components/ui/sidebar2";
-import { collection, onSnapshot, query } from "firebase/firestore";
 import { Inbox, RotateCcw } from "lucide-react";
-import { formatRelative } from "date-fns";
+import {
+  addDays,
+  endOfDay,
+  formatRelative,
+  getTime,
+  startOfDay,
+} from "date-fns";
 import { enUS } from "date-fns/locale";
 import { ScheduleList } from "./ScheduleList";
 import { useAuth } from "@clerk/nextjs";
-import { db } from "@/firebase/firebaseConfig";
-import { getTodayPatients } from "@/app/services/getTodayPatients";
 import { Reorder } from "framer-motion";
+import { db } from "@/firebase/firebaseConfig";
+import {
+  query,
+  collection,
+  onSnapshot,
+  DocumentData,
+  where,
+  orderBy,
+} from "firebase/firestore";
 
 const customLocale = {
   ...enUS,
@@ -41,26 +53,41 @@ const customLocale = {
 export function ScheduleSidebar({
   ...props
 }: React.ComponentProps<typeof Sidebar2>) {
-  const [date, setDate] = useState<Date | undefined>(new Date());
-  const [scheduledPatients, setScheduledPatients] = useState([]);
+  const [date, setDate] = useState<Date | undefined>(addDays(new Date(), 1));
+  const [scheduledPatients, setScheduledPatients] = useState<any>([]);
   const [loader, setLoader] = useState(false);
   const { isLoaded, orgId } = useAuth();
 
   useEffect(() => {
     let unsubscribe: () => void;
-
     const getTodayPatientQueue = () => {
-      if (isLoaded && orgId) {
-        const q = query(collection(db, "doctor", orgId, "patients"));
+      if (isLoaded && orgId && date) {
+        const q = query(
+          collection(db, "doctor", orgId, "patients"),
+          where("last_visited", ">=", getTime(startOfDay(date))),
+          where("last_visited", "<=", getTime(endOfDay(date))),
+          orderBy("last_visited", "desc")
+        );
 
         setLoader(true);
-        unsubscribe = onSnapshot(q, async () => {
-          const patientQueueData = await getTodayPatients(orgId, date);
-          if (patientQueueData.data) {
-            setScheduledPatients(patientQueueData.data);
-          } else {
-            setScheduledPatients([]);
-          }
+        unsubscribe = onSnapshot(q, async (snapshot) => {
+          const patientData: DocumentData[] = [];
+
+          snapshot.forEach((doc) => {
+            const pData = doc.data();
+            const visitedDatesArray = pData?.visitedDates || [];
+            const today = new Date().getDate();
+
+            const attended = visitedDatesArray.some(
+              (date: number) => new Date(date).getDate() === today
+            );
+            const old =
+              visitedDatesArray.length > 1 ||
+              (visitedDatesArray.length === 1 && !attended);
+
+            patientData.push({ ...pData, attended, old });
+          });
+          setScheduledPatients(patientData);
           setLoader(false);
         });
       } else {
@@ -93,9 +120,15 @@ export function ScheduleSidebar({
             <Calendar
               mode="single"
               selected={date}
-              onSelect={setDate}
+              onSelect={(d) => {
+                if (d) {
+                  setDate(d);
+                } else {
+                  setDate(date);
+                }
+              }}
               className="py-0"
-              disabled={{ before: new Date() }}
+              disabled={{ before: addDays(new Date(), 1) }}
             />
           </SidebarGroupContent2>
         </SidebarGroup2>
@@ -108,7 +141,7 @@ export function ScheduleSidebar({
           <SidebarGroupAction2
             title="Reset"
             onClick={() => {
-              setDate(new Date());
+              setDate(addDays(new Date(), 1));
             }}
           >
             <RotateCcw /> <span className="sr-only">Reset</span>

@@ -8,8 +8,10 @@ import { Reorder } from "framer-motion";
 import { format } from "date-fns";
 import { UserReOrderMenu } from "./UserReOrderMenu";
 import { useTodayPatientStore } from "@/lib/providers/todayPatientsProvider";
+import { usePatientHistoryModalStore } from "@/lib/stores/patientHistoryModalStore";
 
 const ReOrderingList: React.FC = () => {
+  const { openModal } = usePatientHistoryModalStore();
   const { isLoaded, orgId } = useAuth();
   const { CurrentToken } = useToken(orgId || "");
 
@@ -106,12 +108,13 @@ const ReOrderingList: React.FC = () => {
                           </td>
                           <td className="text-center font-medium text-sm sm:text-base hide-before-480 hide-between-768-and-990">
                             <Link
-                              href={{
-                                pathname: "history/patientHistory",
-                                query: {
+                              href={"#"}
+                              role="button"
+                              onClick={() =>
+                                openModal({
                                   patientId: item.patient_unique_Id,
-                                },
-                              }}
+                                })
+                              }
                             >
                               <p
                                 className={`underline ${
