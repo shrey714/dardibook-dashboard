@@ -19,9 +19,13 @@ import { getDocotr } from "@/app/services/getDoctor";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@clerk/nextjs";
 import Link from "next/link";
+import { useTodayPatientStore } from "@/lib/providers/todayPatientsProvider";
 
 const PatientHistoryGlobalModal = () => {
   const { isOpen, modalProps, closeModal } = usePatientHistoryModalStore();
+  const { patientsData, loading, getTodayPatients } = useTodayPatientStore(
+    (state) => state
+  );
   const { isLoaded, orgId, orgRole } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [patientData, setPatientData] = useState<any>(null);
@@ -30,6 +34,11 @@ const PatientHistoryGlobalModal = () => {
   const [historyLoader, sethistoryLoader] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [doctorLoader, setdoctorLoader] = useState(false);
+  useEffect(() => {
+    if (orgId && isLoaded) {
+      getTodayPatients(orgId);
+    }
+  }, [getTodayPatients, isLoaded, orgId]);
   useEffect(() => {
     const getPatientData = async () => {
       if (
@@ -45,18 +54,20 @@ const PatientHistoryGlobalModal = () => {
           modalProps.patientId,
           orgId
         );
+        const doctorData = await getDocotr(orgId);
         if (patientData) {
           setPatientData(patientData?.patient);
           setPrescriptionsData(patientData?.prescriptions);
           sethistoryLoader(false);
+          setError(null);
         } else {
           setError("No patient data available for the provided PatientID.");
           sethistoryLoader(false);
         }
-        const doctorData = await getDocotr(orgId);
         if (doctorData.data) {
           setDoctorData(doctorData.data);
           setdoctorLoader(false);
+          setError(null);
         } else {
           setdoctorLoader(false);
         }
@@ -111,8 +122,12 @@ const PatientHistoryGlobalModal = () => {
               <div className="p-2 flex gap-0 sm:gap-8 items-center flex-col-reverse sm:flex-row px-4 ">
                 <PatientDataBox patientData={patientData} />
                 <div className="p-4 gap-6 flex flex-col">
-                  {patientData &&
-                  patientData?.visitedDates?.some(
+                  {!loading &&
+                  patientsData?.some(
+                    (patient: any) => patient?.patient_unique_Id === modalProps.patientId
+                  ) &&
+                  patientData &&
+                  !patientData?.visitedDates?.some(
                     (date: number) =>
                       new Date(date).getDate() === new Date().getDate()
                   ) &&

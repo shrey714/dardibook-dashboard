@@ -13,8 +13,10 @@ export default function RootLayout({ children }: { children?: ReactNode }) {
   return (
     <RefProvider>
       <DashboardWrapper>
-        <PatientHistoryGlobalModal />
-        <TodayPatientsProvider>{children}</TodayPatientsProvider>
+        <TodayPatientsProvider>
+          <PatientHistoryGlobalModal />
+          {children}
+        </TodayPatientsProvider>
       </DashboardWrapper>
     </RefProvider>
   );
