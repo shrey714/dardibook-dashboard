@@ -118,7 +118,7 @@ const ClinicInfo = ({
     <form onSubmit={handleSubmit} autoFocus={true} autoComplete="off">
       <fieldset
         disabled={!editableForm}
-        className="mt-3 md:mt-6 mx-auto max-w-4xl bg-muted/30 border-2 rounded-lg"
+        className="mx-auto max-w-4xl bg-muted/30 border-2 rounded-lg"
       >
         <div className="px-3 py-2 md:px-8">
           <h3 className="text-sm sm:text-base font-medium leading-7 tracking-wide flex flex-row justify-between items-center">
@@ -408,7 +408,7 @@ const ClinicInfo = ({
               </Button>
               <Button type="submit" variant={"outline"} className="ml-3">
                 {loader ? (
-                  <span className="loading loading-spinner loading-xs"></span>
+                  <Loader size="medium" />
                 ) : (
                   <h3 className="text-base font-medium leading-4 tracking-wide">
                     Save

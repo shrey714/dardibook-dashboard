@@ -60,7 +60,7 @@ const SubscriptionInfo = ({ subId, mainLoader }: any) => {
   }, [mainLoader, subId]);
 
   return (
-    <div className="mt-3 md:mt-6 mx-auto max-w-4xl bg-muted/30 border-2 rounded-lg">
+    <div className="mx-auto max-w-4xl bg-muted/30 border-2 rounded-lg">
       <div className="px-3 py-2 md:px-8 flex flex-row justify-between items-center">
         <h3 className="text-sm sm:text-base font-medium leading-7 tracking-wide">
           Subscription Information{" "}

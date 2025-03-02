@@ -164,7 +164,7 @@ const MedicineInfo = ({ uid }: any) => {
   }, [uid]);
 
   return (
-    <div className="mt-3 md:mt-6 mx-auto max-w-4xl bg-gradient-to-b from-muted/50 to-muted border-2 rounded-lg">
+    <div className="mx-auto max-w-4xl bg-gradient-to-b from-muted/50 to-muted border-2 rounded-lg">
       <div className="px-3 py-2 md:px-8 flex justify-between items-center">
         <h3 className="text-sm sm:text-base font-medium leading-7 tracking-wide">
           Manage medicines
