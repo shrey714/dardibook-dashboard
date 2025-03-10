@@ -97,10 +97,7 @@ const ClinicInfo = ({
     // console.log(newdata);
     if (uid) {
       setloader(true);
-      const updateDoctorInfo = await createOrganization({
-        uid: uid,
-        formData: newdata,
-      });
+      const updateDoctorInfo = await createOrganization(formdata);
       if (updateDoctorInfo?.status === 200) {
         setloader(false);
         seteditableForm(false);
