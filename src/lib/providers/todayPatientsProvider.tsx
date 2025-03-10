@@ -1,7 +1,6 @@
 "use client";
 
 import { type ReactNode, createContext, useRef, useContext } from "react";
-
 import { type StoreApi, useStore } from "zustand";
 
 import {
@@ -19,7 +18,9 @@ export interface StoreProviderProps {
 }
 
 export const TodayPatientsProvider = ({ children }: StoreProviderProps) => {
-  const storeRef = useRef<StoreApi<TodayPatientsStore>>(undefined);
+  // 🔹 Use `null` as the initial value instead of `undefined`
+  const storeRef = useRef<StoreApi<TodayPatientsStore> | null>(null);
+
   if (!storeRef.current) {
     storeRef.current = createTodayPatientsStore(initStore());
   }
@@ -35,7 +36,7 @@ export const useTodayPatientStore = <T,>(selector: (store: TodayPatientsStore) =
   const commonStoreContext = useContext(StoreContext);
 
   if (!commonStoreContext) {
-    throw new Error(`useTodayPatientStore must be use within TodayPatientsProvider`);
+    throw new Error(`useTodayPatientStore must be used within TodayPatientsProvider`);
   }
 
   return useStore(commonStoreContext, selector);
