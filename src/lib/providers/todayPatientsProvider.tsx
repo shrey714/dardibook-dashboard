@@ -18,8 +18,7 @@ export interface StoreProviderProps {
 }
 
 export const TodayPatientsProvider = ({ children }: StoreProviderProps) => {
-  // 🔹 Use `null` as the initial value instead of `undefined`
-  const storeRef = useRef<StoreApi<TodayPatientsStore> | null>(null);
+  const storeRef = useRef<StoreApi<TodayPatientsStore>>(undefined);
 
   if (!storeRef.current) {
     storeRef.current = createTodayPatientsStore(initStore());
