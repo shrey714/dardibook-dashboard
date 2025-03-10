@@ -22,7 +22,7 @@ const sidebarNavItems = [
   {
     title: "Clinic",
     href: "/dashboard/settings/clinic",
-    roles: ["org:clinic_head"],
+    roles: ["org:clinic_head", "org:doctor"],
   },
   {
     title: "Subscription",

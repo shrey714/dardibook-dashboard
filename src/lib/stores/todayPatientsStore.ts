@@ -1,6 +1,6 @@
 import { createStore } from "zustand/vanilla";
 import { immer } from "zustand/middleware/immer";
-import { collection, DocumentData, onSnapshot, orderBy, query, where } from "firebase/firestore";
+import { collection, DocumentData, onSnapshot, orderBy, query, Timestamp, where } from "firebase/firestore";
 import { db } from "@/firebase/firebaseConfig";
 import { startOfDay, endOfDay, getTime } from "date-fns";
 
@@ -37,8 +37,8 @@ export const createTodayPatientsStore = (
         const now = new Date();
         const todaysPatientsDoc = query(
           collection(db, "doctor", orgId, "patients"),
-          where("last_visited", ">=", getTime(startOfDay(now))),
-          where("last_visited", "<=", getTime(endOfDay(now))),
+          where("last_visited", ">=", Timestamp.fromMillis(getTime(startOfDay(now)))),
+          where("last_visited", "<=", Timestamp.fromMillis(getTime(endOfDay(now)))),
           orderBy("last_visited", "desc")
         );
 
@@ -49,17 +49,20 @@ export const createTodayPatientsStore = (
             const pData = doc.data();
             const visitedDatesArray = pData?.visitedDates || [];
             const today = new Date().getDate();
-
             const attended = visitedDatesArray.some(
-              (date: number) => new Date(date).getDate() === today
+              (date: Timestamp) => date.toDate().getDate() === today
             );
-
             const old = visitedDatesArray.length > 1 || (visitedDatesArray.length === 1 && !attended);
 
-            patientData.push({ ...pData, attended, old });
+            patientData.push({
+              ...pData, attended, old, last_visited: (pData?.last_visited as Timestamp).toMillis(),
+              visitedDates: pData?.visitedDates?.map((time: Timestamp) =>
+                time.toMillis()
+              ),
+            });
           });
 
-            set({ patientsData: patientData, loading: false });
+          set({ patientsData: patientData, loading: false });
         });
       }
     }))

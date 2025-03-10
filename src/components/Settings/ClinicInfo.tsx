@@ -1,5 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-import { createDoctor } from "@/app/services/createDoctor";
+import { createOrganization } from "@/app/services/createOrganization";
 import React, { ChangeEvent, useEffect, useState } from "react";
 import Loader from "../common/Loader";
 import { CircleX, FileImage } from "lucide-react";
@@ -97,7 +97,7 @@ const ClinicInfo = ({
     // console.log(newdata);
     if (uid) {
       setloader(true);
-      const updateDoctorInfo = await createDoctor({
+      const updateDoctorInfo = await createOrganization({
         uid: uid,
         formData: newdata,
       });

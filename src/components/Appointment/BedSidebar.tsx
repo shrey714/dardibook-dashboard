@@ -21,6 +21,7 @@ import {
   DocumentData,
   where,
   orderBy,
+  Timestamp,
 } from "firebase/firestore";
 import { Inbox, RotateCcw } from "lucide-react";
 import {
@@ -131,8 +132,16 @@ export function BedSidebar({
       if (isLoaded && orgId && date) {
         const q = query(
           collection(db, "doctor", orgId, "patients"),
-          where("last_visited", ">=", getTime(startOfDay(date))),
-          where("last_visited", "<=", getTime(endOfDay(date))),
+          where(
+            "last_visited",
+            ">=",
+            Timestamp.fromMillis(getTime(startOfDay(date)))
+          ),
+          where(
+            "last_visited",
+            "<=",
+            Timestamp.fromMillis(getTime(endOfDay(date)))
+          ),
           orderBy("last_visited", "desc")
         );
 
@@ -152,7 +161,15 @@ export function BedSidebar({
               visitedDatesArray.length > 1 ||
               (visitedDatesArray.length === 1 && !attended);
 
-            patientData.push({ ...pData, attended, old });
+            patientData.push({
+              ...pData,
+              attended,
+              old,
+              last_visited: (pData?.last_visited as Timestamp).toMillis(),
+              visitedDates: pData?.visitedDates?.map((time: Timestamp) =>
+                time.toMillis()
+              ),
+            });
           });
           setScheduledPatients(patientData);
           setLoader(false);

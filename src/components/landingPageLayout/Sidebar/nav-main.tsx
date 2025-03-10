@@ -46,7 +46,15 @@ export function NavMain({
                   <SidebarMenuButton
                     tooltip={item.title}
                     isActive={isSubPath(pathname, item.url)}
+                    className="pl-0 overflow-hidden"
                   >
+                    <span
+                      className={`w-1 bg-foreground rounded-r-full transition-all duration-300 ease-in-out ${
+                        isSubPath(pathname, item.url)
+                          ? "h-full max-h-full opacity-100"
+                          : "h-0 max-h-0 opacity-0"
+                      }`}
+                    ></span>
                     {item.icon && <item.icon />}
                     <span>{item.title}</span>
                     <ChevronRight

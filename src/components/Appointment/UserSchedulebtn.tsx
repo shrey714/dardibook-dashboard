@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { db } from "@/firebase/firebaseConfig";
 import { Button } from "@/components/ui/button";
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, Timestamp, updateDoc } from "firebase/firestore";
 import Loader from "../common/Loader";
 import { ArrowLeftRight } from "lucide-react";
 import { useAuth } from "@clerk/nextjs";
@@ -16,7 +16,7 @@ const UserSchedulebtn = ({ patient }: any) => {
       setLoader(true);
       await updateDoc(
         doc(db, "doctor", orgId, "patients", patient.patient_unique_Id),
-        { last_visited: new Date().getTime() }
+        { last_visited: Timestamp.fromMillis(new Date().getTime()) }
       );
       setLoader(false);
     }

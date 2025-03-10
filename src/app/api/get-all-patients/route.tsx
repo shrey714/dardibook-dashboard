@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/firebase/firebaseConfig";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  query,
+  Timestamp,
+  where,
+} from "firebase/firestore";
 import { withAuth } from "@/server/withAuth";
 
 const getAllPatients = async (request: NextRequest) => {
@@ -19,8 +25,8 @@ const getAllPatients = async (request: NextRequest) => {
     const patientsCollection = collection(db, "doctor", doctorId, "patients");
     const patientsQuery = query(
       patientsCollection,
-      where("last_visited", ">=", parseInt(from)),
-      where("last_visited", "<=", parseInt(to))
+      where("last_visited", ">=", Timestamp.fromMillis(parseInt(from))),
+      where("last_visited", "<=", Timestamp.fromMillis(parseInt(to)))
     );
 
     const querySnapshot = await getDocs(patientsQuery);
@@ -45,8 +51,10 @@ const getAllPatients = async (request: NextRequest) => {
         age: patient.age,
         gender: patient.gender,
         appointed: patient.visitedDates ? true : false,
-        last_visited: patient.last_visited,
-        visitedDates: patient.visitedDates,
+        last_visited: (patient.last_visited as Timestamp).toMillis(),
+        visitedDates: patient.visitedDates?.map((time: Timestamp) =>
+          time.toMillis()
+        ),
         mobile_number: patient.mobile_number,
       });
     });

@@ -7,6 +7,7 @@ import {
   getDocs,
   orderBy,
   query,
+  Timestamp,
 } from "firebase/firestore";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -30,6 +31,7 @@ const fetchPrescriptionsData = async (id: string, uid: string) => {
 
   return prescriptionsSnapshot.docs.map((doc) => ({
     ...doc.data(),
+    time: (doc.data()?.time as Timestamp).toMillis(),
   }));
 };
 

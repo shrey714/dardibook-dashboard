@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import { db } from "@/firebase/firebaseConfig";
 import { Button } from "@/components/ui/button";
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, Timestamp, updateDoc } from "firebase/firestore";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -67,7 +67,7 @@ export function UserReOrderMenu({ item, disabled }: any) {
       setMenuLoader(true);
       await updateDoc(
         doc(db, "doctor", orgId, "patients", item.patient_unique_Id),
-        { last_visited: new Date(date).getTime() }
+        { last_visited: Timestamp.fromMillis(new Date(date).getTime()) }
       );
       setMenuLoader(false);
     }
@@ -78,7 +78,7 @@ export function UserReOrderMenu({ item, disabled }: any) {
       setMenuLoader(true);
       await updateDoc(
         doc(db, "doctor", orgId, "patients", item.patient_unique_Id),
-        { last_visited: 0 }
+        { last_visited: Timestamp.fromMillis(0) }
       );
       setMenuLoader(false);
     }

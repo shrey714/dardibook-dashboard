@@ -6,7 +6,7 @@ import { CircleX, FileImage } from "lucide-react";
 import LogOutBTtn from "../common/LogOutBTtn";
 import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
-import { createDoctor } from "@/app/services/createDoctor";
+import { createOrganization } from "@/app/services/createOrganization";
 
 const RegistrationForm = () => {
   const { isLoaded, orgId } = useAuth();
@@ -69,24 +69,19 @@ const RegistrationForm = () => {
     registrationNumber: "",
     clinicNumber: "",
     phoneNumber: "",
-    emailId: "XXX",
     clinicAddress: "",
     clinicLogo: null as File | null,
     signaturePhoto: null as File | null,
   });
-  // upload form data to docotr's collection============
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (orgId) {
+    if (!orgId) {
       setSubmissionLoader(true);
-      const data = await createDoctor({
-        uid: orgId,
-        formData,
-      });
-      // open modal on submitting the register patoent form
+      const data = await createOrganization(formData);
       if (data?.status === 200) {
-        // createOrganization({ name: formData.clinicName });
+        setSubmissionLoader(false);
+        window.location.reload();
       } else {
         setSubmissionLoader(false);
       }
@@ -202,22 +197,6 @@ const RegistrationForm = () => {
             onChange={handleChange}
           />
         </div>
-        {/* Email Id */}
-        <div className="col-span-12 sm:col-span-6">
-          <label htmlFor="emailId" className="block text-sm font-medium">
-            Email<span className="text-red-500 ml-1">*</span>
-          </label>
-          <input
-            required
-            type="email"
-            id="emailId"
-            name="emailId"
-            className="form-input py-[6px] mt-1 w-full rounded-md border-gray-200 bg-gray-300 text-sm text-gray-700"
-            value={formData.emailId ? formData.emailId : ""}
-            onChange={handleChange}
-            disabled
-          />
-        </div>
         {/* Clinic Address */}
         <div className="col-span-12">
           <label htmlFor="clinicAddress" className="block text-sm font-medium">
@@ -269,7 +248,7 @@ const RegistrationForm = () => {
                     >
                       <span>Upload a Clinic Logo</span>
                       <input
-                        required
+                        // required
                         id="clinicLogo"
                         name="clinicLogo"
                         type="file"
@@ -321,7 +300,7 @@ const RegistrationForm = () => {
                     >
                       <span>Upload a Signature Logo</span>
                       <input
-                        required
+                        // required
                         id="signaturePhoto"
                         name="signaturePhoto"
                         type="file"
