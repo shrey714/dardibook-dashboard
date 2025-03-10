@@ -3,7 +3,7 @@ import React, { useEffect, useRef } from "react";
 import { toast } from "react-hot-toast";
 
 const ConnectionStatus: React.FC = () => {
-  const offlineToastId = useRef<string | undefined>();
+  const offlineToastId = useRef<string | undefined>(undefined);
 
   useEffect(() => {
     console.log("useEffect is running");
