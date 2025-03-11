@@ -1,15 +1,15 @@
 "use server";
 
 // import { useRouter, useSearchParams } from "next/navigation";
-import { AnimatePresence } from "framer-motion";
-import Intro from "@/components/Welcome/intro";
-import Next from "@/components/Welcome/next";
-import Select from "@/components/Welcome/select";
-import Dataroom from "@/components/Welcome/dataroom";
-import {
-  BackButton,
-  OnboardCompletionButton,
-} from "@/components/Welcome/BackButton";
+// import { AnimatePresence } from "framer-motion";
+// import Intro from "@/components/Welcome/intro";
+// import Next from "@/components/Welcome/next";
+// import Select from "@/components/Welcome/select";
+// import Dataroom from "@/components/Welcome/dataroom";
+// import {
+//   BackButton,
+//   OnboardCompletionButton,
+// } from "@/components/Welcome/BackButton";
 
 export default async function Page({
   searchParams,
@@ -20,13 +20,13 @@ export default async function Page({
 
   return (
     <div className="mx-auto flex h-screen max-w-3xl flex-col items-center justify-center overflow-x-hidden">
-      <OnboardCompletionButton />
+      {/* <OnboardCompletionButton />
       <AnimatePresence mode="wait">
         {type ? <BackButton /> : <Intro key="intro" />}
         {type === "next" && <Next key="next" />}
         {type === "select" && <Select key="select" />}
         {type === "dataroom" && <Dataroom key="dataroom" />}
-      </AnimatePresence>
+      </AnimatePresence> */}
     </div>
   );
 }
