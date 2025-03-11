@@ -18,7 +18,7 @@ export interface StoreProviderProps {
 }
 
 export const TodayPatientsProvider = ({ children }: StoreProviderProps) => {
-  const storeRef = useRef<StoreApi<TodayPatientsStore>>(undefined);
+  const storeRef = useRef<StoreApi<TodayPatientsStore> | null>(null);
 
   if (!storeRef.current) {
     storeRef.current = createTodayPatientsStore(initStore());
@@ -31,11 +31,15 @@ export const TodayPatientsProvider = ({ children }: StoreProviderProps) => {
   );
 };
 
-export const useTodayPatientStore = <T,>(selector: (store: TodayPatientsStore) => T): T => {
+export const useTodayPatientStore = <T,>(
+  selector: (store: TodayPatientsStore) => T
+): T => {
   const commonStoreContext = useContext(StoreContext);
 
   if (!commonStoreContext) {
-    throw new Error(`useTodayPatientStore must be used within TodayPatientsProvider`);
+    throw new Error(
+      `useTodayPatientStore must be used within TodayPatientsProvider`
+    );
   }
 
   return useStore(commonStoreContext, selector);
