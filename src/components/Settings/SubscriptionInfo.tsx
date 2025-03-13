@@ -60,7 +60,7 @@ const SubscriptionInfo = ({ subId, mainLoader }: any) => {
   }, [mainLoader, subId]);
 
   return (
-    <div className="mx-auto max-w-4xl bg-muted/30 border-2 rounded-lg">
+    <div className="mx-auto max-w-5xl w-full border rounded-lg">
       <div className="px-3 py-2 md:px-8 flex flex-row justify-between items-center">
         <h3 className="text-sm sm:text-base font-medium leading-7 tracking-wide">
           Subscription Information{" "}
@@ -81,7 +81,7 @@ const SubscriptionInfo = ({ subId, mainLoader }: any) => {
           </a>
         )}
       </div>
-      <div className="border-t-2 border-border flex flex-col-reverse md:flex-row">
+      <div className="border-t border-border flex flex-col-reverse md:flex-row">
         {error ? (
           <p className="flex flex-1 text-center text-sm text-error font-medium py-2 px-3 items-center justify-center">
             Pls get back later {error}
@@ -89,7 +89,7 @@ const SubscriptionInfo = ({ subId, mainLoader }: any) => {
         ) : (
           <>
             {/* subscription details */}
-            <div className="py-3 px-3 md:px-8 flex flex-1 flex-col border-t-2 md:border-t-0 md:border-r-2 border-border">
+            <div className="py-3 px-3 md:px-8 flex flex-1 flex-col border-t md:border-t-0 md:border-r border-border">
               <div className="grid grid-cols-6 gap-1 md:gap-6">
                 {/* Status: */}
                 <div className="col-span-6 sm:col-span-3">
