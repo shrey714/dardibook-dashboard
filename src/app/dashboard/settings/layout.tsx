@@ -55,7 +55,7 @@ export default function SettingsLayout({ children }: SettingsLayoutProps) {
         </p>
       </div>
       <SettingSidebarNav items={sidebarNavItems} />
-      <div className="w-full p-5">{children}</div>
+      <div className="w-full py-2 sm:py-5 px-1 md:px-5">{children}</div>
       <Links />
       <FooterLine />
     </>

@@ -1,150 +1,90 @@
 /* eslint-disable @next/next/no-img-element */
-import { createOrganization } from "@/app/services/createOrganization";
 import React, { ChangeEvent, useEffect, useState } from "react";
 import Loader from "../common/Loader";
-import { CircleX, FileImage } from "lucide-react";
 import { Button } from "../ui/button";
+import { useOrganization } from "@clerk/nextjs";
+import { updateOrgMetadata } from "@/app/dashboard/settings/clinic/_actions";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import toast from "react-hot-toast";
 
 interface DoctorInfo {
-  clinicName: string;
   doctorName: string;
   degree: string;
   registrationNumber: string;
   clinicNumber: string;
   phoneNumber: string;
-  emailId: string;
   clinicAddress: string;
-  clinicLogo: any;
-  signaturePhoto: any;
-  subscriptionId: string;
 }
 
-const getUpdatedFields = (
-  oldObj: DoctorInfo,
-  newObj: DoctorInfo
-): Partial<DoctorInfo> =>
-  Object.keys(newObj).reduce((acc, key) => {
-    if (newObj[key as keyof DoctorInfo] !== oldObj[key as keyof DoctorInfo]) {
-      acc[key as keyof DoctorInfo] = newObj[key as keyof DoctorInfo];
-    }
-    return acc;
-  }, {} as Partial<DoctorInfo>);
-
-const ClinicInfo = ({
-  uid,
-  role,
-  doctorData,
-  mainLoader,
-  setdoctorData,
-}: any) => {
-  const [editableForm, seteditableForm] = useState(false);
-  const [formdata, setformdata] = useState<any>(doctorData);
-  const [loader, setloader] = useState(false);
-  const [clinicLogoPreview, setClinicLogoPreview] = useState<string | null>(
-    null
-  );
-  const [signaturePhotoPreview, setSignaturePhotoPreview] = useState<
-    string | null
-  >(null);
+const ClinicInfo = () => {
+  const { organization, isLoaded } = useOrganization();
+  const [loader, setloader] = useState<boolean>(false);
+  const [formdata, setformdata] = useState<DoctorInfo>({
+    degree: "",
+    doctorName: "",
+    phoneNumber: "",
+    clinicNumber: "",
+    clinicAddress: "",
+    registrationNumber: "",
+  });
 
   useEffect(() => {
-    setformdata(doctorData);
-    setClinicLogoPreview(doctorData?.clinicLogo);
-    setSignaturePhotoPreview(doctorData?.signaturePhoto);
-  }, [doctorData]);
+    if (isLoaded && organization) {
+      setformdata(organization.publicMetadata as unknown as DoctorInfo);
+    }
+  }, [organization, isLoaded]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value, files } = e.target;
-
-    if (files && files[0]) {
-      const file = files[0];
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        if (name === "clinicLogo") {
-          setClinicLogoPreview(reader.result as string);
-        } else if (name === "signaturePhoto") {
-          setSignaturePhotoPreview(reader.result as string);
-        }
-      };
-      reader.readAsDataURL(file);
-
-      setformdata((prevData: any) => ({
-        ...prevData,
-        [name]: file,
-      }));
-    } else {
-      setformdata((prevData: any) => ({
-        ...prevData,
-        [name]: value,
-      }));
-    }
-  };
-  const handleRemoveImage = (name: string) => {
+    const { name, value } = e.target;
     setformdata((prevData: any) => ({
       ...prevData,
-      [name]: null,
+      [name]: value,
     }));
-    if (name === "clinicLogo") {
-      setClinicLogoPreview(null);
-    } else if (name === "signaturePhoto") {
-      setSignaturePhotoPreview(null);
-    }
   };
 
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
-    const newdata = getUpdatedFields(doctorData, formdata);
-    // console.log(newdata);
-    if (uid) {
-      setloader(true);
-      const updateDoctorInfo = await createOrganization(formdata);
-      if (updateDoctorInfo?.status === 200) {
-        setloader(false);
-        seteditableForm(false);
-        setdoctorData({
-          ...formdata,
-          clinicLogo: clinicLogoPreview,
-          signaturePhoto: signaturePhotoPreview,
-        });
-      } else {
-        setloader(false);
+    setloader(true);
+    if (!organization) return;
+    toast.promise(
+      async () => {
+        await updateOrgMetadata(formdata).then(
+          () => {
+            setloader(false);
+          },
+          (error) => {
+            console.error("Error updating metadata:", error);
+            setloader(false);
+          }
+        );
+      },
+      {
+        loading: "Updating...",
+        success: "Updated successfully",
+        error: "Error when updating",
+      },
+      {
+        position: "bottom-right",
       }
-    }
+    );
   };
   return (
-    <form onSubmit={handleSubmit} autoFocus={true} autoComplete="off">
-      <fieldset
-        disabled={!editableForm}
-        className="mx-auto max-w-4xl bg-muted/30 border-2 rounded-lg"
-      >
-        <div className="px-3 py-2 md:px-8">
-          <h3 className="text-sm sm:text-base font-medium leading-7 tracking-wide flex flex-row justify-between items-center">
-            Clinic Information
-            {mainLoader && <Loader size="medium" />}
-          </h3>
-        </div>
-        <div className="border-t-2 border-border flex flex-col md:flex-row">
-          <div className="py-2 px-3 md:px-8 flex flex-1 flex-col border-b-2 md:border-r-2 md:border-b-0 border-border">
-            <div className="grid grid-cols-6 gap-1 md:gap-6">
-              {/* Clinic Name */}
-              <div className="col-span-6 sm:col-span-3">
-                <label
-                  htmlFor="clinicName"
-                  className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-                >
-                  Clinic Name
-                </label>
-                <input
-                  autoFocus={true}
-                  required
-                  type="text"
-                  id="clinicName"
-                  name="clinicName"
-                  className="disabled:text-gray-400 form-input py-[6px] mt-1 w-full rounded-md border-border bg-transparent text-sm md:text-base font-medium"
-                  value={formdata?.clinicName}
-                  onChange={handleChange}
-                />
-              </div>
+    <Card className="mx-auto max-w-4xl shadow-none border">
+      <CardHeader className="border-b p-5">
+        <CardTitle>Clinic Information</CardTitle>
+        <CardDescription>Update your basic clinic information.</CardDescription>
+      </CardHeader>
+      <CardContent className="p-0">
+        <form onSubmit={handleSubmit} autoFocus={false} autoComplete="off">
+          <fieldset disabled={loader}>
+            <div className="py-2 px-3 md:px-8 grid grid-cols-6 gap-1 md:gap-4">
               {/* Doctor Name */}
               <div className="col-span-6 sm:col-span-3">
                 <label
@@ -173,7 +113,6 @@ const ClinicInfo = ({
                   Degree
                 </label>
                 <input
-                  autoFocus={true}
                   required
                   type="text"
                   id="degree"
@@ -238,24 +177,6 @@ const ClinicInfo = ({
                   onChange={handleChange}
                 />
               </div>
-              {/* Email Id */}
-              <div className="col-span-6 sm:col-span-4">
-                <label
-                  htmlFor="emailId"
-                  className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-                >
-                  Email
-                </label>
-                <input
-                  required
-                  type="email"
-                  id="emailId"
-                  name="emailId"
-                  className="disabled:text-gray-400 form-input py-[6px] mt-1 w-full rounded-md border-border bg-transparent text-sm md:text-base font-medium"
-                  value={formdata?.emailId}
-                  onChange={handleChange}
-                />
-              </div>
               {/* Clinic Address */}
               <div className="col-span-6">
                 <label
@@ -275,161 +196,17 @@ const ClinicInfo = ({
                 />
               </div>
             </div>
-          </div>
-
-          <div className="py-2 px-3 md:px-8 flex flex-wrap flex-row md:flex-col">
-            {/* Clinic Logo */}
-            <div className="p-1 min-w-40 flex flex-1 flex-col">
-              <p className="block text-xs sm:text-sm font-medium leading-3 text-gray-500">
-                Clinic Logo
-              </p>
-              <div className="mt-1 flex justify-center rounded-lg border border-dashed border-border px-6 py-8">
-                <div className="text-center">
-                  {clinicLogoPreview ? (
-                    <div className="relative">
-                      <img
-                        src={clinicLogoPreview || "/Favicon.svg"}
-                        alt="Clinic Logo"
-                        className="mx-auto h-24 w-24 object-cover"
-                      />
-                      {editableForm && (
-                        <button
-                          type="button"
-                          className="absolute top-0 right-0 -mt-2 -mr-2"
-                          onClick={() => handleRemoveImage("clinicLogo")}
-                        >
-                          <CircleX className="h-6 w-6 text-red-600" />
-                        </button>
-                      )}
-                    </div>
-                  ) : (
-                    <>
-                      <FileImage
-                        aria-hidden="true"
-                        className="mx-auto h-14 w-14 text-gray-600"
-                      />
-                      <div className="mt-2 flex text-sm leading-6 text-gray-600">
-                        <label
-                          htmlFor="clinicLogo"
-                          className="relative text-xs cursor-pointer font-semibold text-indigo-600 hover:text-indigo-500"
-                        >
-                          Clinic Logo
-                          <input
-                            required
-                            id="clinicLogo"
-                            name="clinicLogo"
-                            type="file"
-                            className="sr-only"
-                            accept="image/*"
-                            onChange={handleChange}
-                          />
-                        </label>
-                      </div>
-                      <p className="text-xs  text-gray-600">PNG, JPG</p>
-                    </>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Signature Photo */}
-            <div className="p-1 min-w-40 flex flex-1 flex-col">
-              <p className="block text-xs sm:text-sm font-medium leading-3 text-gray-500">
-                Signature Photo
-              </p>
-              <div className="mt-1 flex justify-center rounded-lg border border-dashed border-border px-6 py-8">
-                <div className="text-center">
-                  {signaturePhotoPreview ? (
-                    <div className="relative">
-                      <img
-                        src={signaturePhotoPreview || "/Favicon.svg"}
-                        alt="Signature Photo"
-                        className="mx-auto h-24 w-24 object-cover"
-                      />
-                      {editableForm && (
-                        <button
-                          type="button"
-                          className="absolute top-0 right-0 -mt-2 -mr-2"
-                          onClick={() => handleRemoveImage("signaturePhoto")}
-                        >
-                          <CircleX className="h-6 w-6 text-red-600" />
-                        </button>
-                      )}
-                    </div>
-                  ) : (
-                    <>
-                      <FileImage
-                        aria-hidden="true"
-                        className="mx-auto h-14 w-14 text-gray-600"
-                      />
-                      <div className="mt-2 flex text-sm leading-6 text-gray-600">
-                        <label
-                          htmlFor="signaturePhoto"
-                          className="relative text-xs cursor-pointer font-semibold text-indigo-600 hover:text-indigo-500"
-                        >
-                          Signature
-                          <input
-                            required
-                            id="signaturePhoto"
-                            name="signaturePhoto"
-                            accept="image/*"
-                            type="file"
-                            className="sr-only"
-                            onChange={handleChange}
-                          />
-                        </label>
-                      </div>
-                      <p className="text-xs text-gray-600">PNG, JPG</p>
-                    </>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="border-t-2 border-border px-3 py-2 md:px-8 flex flex-row items-center">
-          {editableForm ? (
-            <>
-              <Button
-                variant={"destructive"}
-                onClick={() => {
-                  setformdata(doctorData);
-                  setClinicLogoPreview(doctorData?.clinicLogo);
-                  setSignaturePhotoPreview(doctorData?.signaturePhoto);
-                  seteditableForm(false);
-                }}
-              >
+            <div className="x-3 pt-2 pb-4 px-3 md:px-8 flex flex-row items-center justify-end">
+              <Button disabled={loader} type="submit" className="ml-2">
                 <h3 className="text-base font-medium leading-4 tracking-wide">
-                  Cancel
+                  Save
                 </h3>
               </Button>
-              <Button type="submit" variant={"outline"} className="ml-3">
-                {loader ? (
-                  <Loader size="medium" />
-                ) : (
-                  <h3 className="text-base font-medium leading-4 tracking-wide">
-                    Save
-                  </h3>
-                )}
-              </Button>
-            </>
-          ) : (
-            <Button variant={"default"} asChild>
-              <span
-                className={`cursor-pointer ${
-                  role === "admin" ? "" : "btn-disabled"
-                }`}
-                onClick={() => seteditableForm(true)}
-              >
-                <h3 className="text-base font-medium leading-4 tracking-wide">
-                  Edit
-                </h3>
-              </span>
-            </Button>
-          )}
-        </div>
-      </fieldset>
-    </form>
+            </div>
+          </fieldset>
+        </form>
+      </CardContent>
+    </Card>
   );
 };
 

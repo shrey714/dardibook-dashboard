@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { db, storage } from "@/firebase/firebaseConfig";
 import { useAuth } from "@clerk/nextjs";
+import { startOfDay } from "date-fns";
 import { utcToZonedTime, zonedTimeToUtc } from "date-fns-tz";
 import {
   collection,
@@ -88,15 +89,33 @@ const Temp = () => {
 
   const btnClick2 = async () => {
     if (orgId) {
-      const q = query(
-        collection(db, "doctor", orgId, "patients", "m5jbd7yf", "visits"),
-        where("city", "==", "banglore")
-      );
-      const querySnapshot = await getDocs(q);
+      const date = new Date("2025-03-11T01:37:20Z");
+      console.log(date);
 
-      querySnapshot.forEach((doc) => {
-        console.log(doc.id, "=>", doc.data());
-      });
+      const seconds = Math.floor(date.getTime() / 1000); // Convert milliseconds to seconds
+      const nanoseconds = (date.getTime() % 1000) * 1e6; // Remaining milliseconds to nanoseconds
+
+      console.log("Seconds:", seconds);
+      console.log("Nanoseconds:", nanoseconds);
+      // ====================================
+      const q = query(
+        collection(db, "doctor", orgId, "patients"),
+        where("city", "==", "banglore")
+        // where("times", "array-contains", Timestamp.fromDate(new Date("2025-03-12T12:00:00Z")))
+      );
+
+      try {
+        const querySnapshot = await getDocs(q);
+        const results: any = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        console.log((results[0].times[0] as Timestamp).toDate());
+        console.log(results[0].times[0] as Timestamp);
+        return results;
+      } catch (error) {
+        console.error("Error fetching documents:", error);
+      }
     }
   };
 
@@ -136,19 +155,10 @@ const Temp = () => {
     }
   };
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (!event.target.files) return;
-    const file = event.target.files[0];
-  
-    const imageUrl = await uploadImage(file);
-    console.log("Image URL:", imageUrl);
-  };
-
   return (
     <>
       <Button onClick={() => btnClick1()}>Button1</Button>
       <Button onClick={() => btnClick2()}>Button2</Button>
-      <input type="file" onChange={handleFileUpload} />
     </>
   );
 };
