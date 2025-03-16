@@ -13,7 +13,7 @@ import {
 
 const PersonalInfo = ({ userInfo, role }: any) => {
   return (
-    <Card className="mx-auto max-w-4xl 2xl:mx-0 2xl:max-w-3xl shadow-none border h-min flex flex-1 flex-col bg-sidebar/70">
+    <Card className="mx-auto max-w-2xl 2xl:mx-0 2xl:max-w-3xl shadow-none border h-min flex flex-1 flex-col bg-sidebar/70">
       <CardHeader className="border-b p-5">
         <CardTitle>
           Personal Information
