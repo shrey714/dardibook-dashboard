@@ -34,8 +34,6 @@ import {
   DialogTitle,
   DialogDescription,
   DialogHeader,
-  DialogFooter,
-  DialogClose,
 } from "@/components/ui/dialog";
 
 interface Disease {
