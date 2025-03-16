@@ -72,7 +72,12 @@ const MedicineSuggestion = ({ medicine, rowId, handleComingData }: any) => {
 
       try {
         // Firestore query to get medicine suggestions
-        const medicinesRef = collection(db, "doctor", orgId || "medicinesData");
+        const medicinesRef = collection(
+          db,
+          "doctor",
+          orgId || "",
+          "medicinesData"
+        );
         const q = query(
           medicinesRef,
           where("searchableString", ">=", inputValue.toLowerCase()),

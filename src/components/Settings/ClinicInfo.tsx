@@ -1,6 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
 import React, { ChangeEvent, useEffect, useState } from "react";
-import Loader from "../common/Loader";
 import { Button } from "../ui/button";
 import { useOrganization } from "@clerk/nextjs";
 import { updateOrgMetadata } from "@/app/dashboard/settings/clinic/_actions";
@@ -8,7 +7,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -76,7 +74,7 @@ const ClinicInfo = () => {
     );
   };
   return (
-    <Card className="mx-auto max-w-4xl 2xl:mx-0 shadow-none border h-min">
+    <Card className="mx-auto max-w-4xl 2xl:mx-0 shadow-none border h-min bg-sidebar/70">
       <CardHeader className="border-b p-5">
         <CardTitle>Clinic Information</CardTitle>
         <CardDescription>Update your basic clinic information.</CardDescription>

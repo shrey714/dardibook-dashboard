@@ -1,73 +1,55 @@
-import React, { useState, FormEvent } from "react";
-import { Trash, Pencil, X, Check } from "lucide-react";
-import Loader from "@/components/common/Loader";
+import React from "react";
+import { Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import MultipleSelector from "@/components/Settings/DiseaseInfo/MedicineMultipleSelector";
 
 interface DisplayDiseaseProps {
-  handleChange: (
-    event:
-      | React.ChangeEvent<HTMLInputElement>
-      | React.ChangeEvent<HTMLSelectElement>,
-    id: string
-  ) => void;
   disease: {
     diseaseDetail: string;
     medicines: [];
     diseaseId: string;
   };
-  cancelHandler: any;
-  setSearchEnable: any;
-  seteditdiseaseData: any;
-  editdiseaseeData: any;
-  saveHandler: any;
   index: number;
-  deleteHandler: any;
-  globalClickable: boolean;
-  setGlobalClickable: any;
+  setDiseaseEditModel: React.Dispatch<React.SetStateAction<boolean>>;
+  setEditForDiseaseId: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const DiseaseRow: React.FC<DisplayDiseaseProps> = ({
   index,
-  handleChange,
   disease,
-  cancelHandler,
-  setSearchEnable,
-  seteditdiseaseData,
-  saveHandler,
-  editdiseaseeData,
-  deleteHandler,
-  globalClickable,
-  setGlobalClickable,
+  setDiseaseEditModel,
+  setEditForDiseaseId,
 }) => {
-  const [editable, setEditable] = useState(false);
-  const [editLoader, seteditLoader] = useState(false);
-  const [deleteLoader, setdeleteLoader] = useState(false);
-
-  const submitHandler = (e: FormEvent) => {
-    e.preventDefault();
-  };
-
   return (
-    <form
-      onSubmit={(e) => {
-        submitHandler(e);
-      }}
+    <div
+      className={`grid grid-cols-12 gap-1 w-full p-4 ${
+        index !== 0 ? "border-t" : "border-0"
+      }`}
     >
-      <div className="grid grid-cols-12 gap-1 w-full mb-1">
-        <div className="col-span-1 h-8 md:h-auto flex justify-center items-center">
-          {index + 1}
-        </div>
-        <fieldset
+      <div className="col-span-3 h-8 md:h-auto flex flex-col justify-center items-start">
+        <p className="text-sm font-normal">{disease.diseaseDetail}</p>
+        <p className="text-sm text-muted-foreground">{disease.diseaseId}</p>
+      </div>
+
+      <MultipleSelector
+        commandProps={{
+          className:
+            "col-span-8 w-full rounded-md bg-background text-sm font-normal h-min border-none",
+        }}
+        value={disease?.medicines?.map((disease) => ({
+          label: disease,
+          value: disease,
+        }))}
+        placeholder="No Medicines"
+        disabled
+        hidePlaceholderWhenSelected
+        className={`border-none ${"p-3"}`}
+        badgeClassName="text-sm p-0"
+      />
+
+      {/* <fieldset
           disabled={!editable}
-          className="col-span-9 justify-center items-center"
+          className="col-span-7 justify-center items-center"
         >
           <input
             autoFocus={true}
@@ -83,106 +65,20 @@ const DiseaseRow: React.FC<DisplayDiseaseProps> = ({
               handleChange(e, disease.diseaseId);
             }}
           />
-        </fieldset>
-        <div className="col-span-2 flex justify-center items-center flex-col sm:flex-row gap-1 sm:gap-2">
-          <Button
-            variant={"outline"}
-            className={`h-8 w-auto min-w-0 ${editable ? "hidden" : ""}`}
-            disabled={!globalClickable && !editable}
-            onClick={() => {
-              setEditable(true);
-              setGlobalClickable(false);
-              setSearchEnable(false);
-              seteditdiseaseData(disease);
-            }}
-          >
-            <Pencil height={15} width={15} />
-          </Button>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                className={`h-8 w-auto min-w-0 ${editable ? "hidden" : ""}`}
-                role="button"
-                disabled={!globalClickable && !editable}
-                variant={"destructive"}
-              >
-                {deleteLoader ? (
-                  <>
-                    <Loader
-                      size="small"
-                    />
-                  </>
-                ) : (
-                  <Trash height={15} width={15} />
-                )}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56">
-              <DropdownMenuLabel>
-                Are you sure you want to delete this disease?
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <div className="flex flex-1 gap-2 justify-center items-center mt-1">
-                  <Button
-                    variant={"destructive"}
-                    onClick={async () => {
-                      setdeleteLoader(true);
-                      await deleteHandler(disease.diseaseId);
-                      setdeleteLoader(false);
-                    }}
-                  >
-                    <a>Yes</a>
-                  </Button>
-                  <Button variant={"default"}>
-                    <a>No</a>
-                  </Button>
-                </div>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <Button
-            className={`h-8 w-auto min-w-0 ${!editable ? "hidden" : ""}`}
-            variant={"default"}
-            onClick={async () => {
-              seteditLoader(true);
-              setGlobalClickable(true);
-              await saveHandler(disease.diseaseId);
-              seteditLoader(false);
-              setEditable(false);
-              setSearchEnable(true);
-            }}
-            type="submit"
-            disabled={editLoader}
-          >
-            {editLoader ? (
-              <>
-                <Loader
-                  size="small"
-                />
-              </>
-            ) : (
-              <Check height={15} width={15} />
-            )}
-          </Button>
-
-          <Button
-            className={`h-8 w-auto min-w-0 ${!editable ? "hidden" : ""}`}
-            variant={"destructive"}
-            onClick={() => {
-              cancelHandler(disease.diseaseId);
-              setEditable(false);
-              setSearchEnable(true);
-              setGlobalClickable(true);
-            }}
-          >
-            <X height={15} width={15} />
-          </Button>
-        </div>
+        </fieldset> */}
+      <div className="col-span-1 flex justify-center items-center">
+        <Button
+          variant={"outline"}
+          className={`h-9 w-9 min-w-0`}
+          onClick={() => {
+            setEditForDiseaseId(disease.diseaseId);
+            setDiseaseEditModel(true);
+          }}
+        >
+          <Pencil height={15} width={15} />
+        </Button>
       </div>
-    </form>
+    </div>
   );
 };
 

@@ -55,7 +55,7 @@ export default function SettingsSubscriptionPage() {
   }, [isLoaded, orgId]);
 
   return (
-    <div className="w-full py-2 sm:py-5 px-1 md:px-5 2xl:flex 2xl:flex-row 2xl:gap-5 2xl:justify-center">
+    <div className="w-full py-2 sm:py-5 px-2 md:px-5 2xl:flex 2xl:flex-row 2xl:gap-5 2xl:justify-center">
       <SubscriptionInfo
         subId={doctorData?.subscriptionId}
         mainLoader={mainLoader}
