@@ -26,7 +26,7 @@ const DiseaseRow: React.FC<DisplayDiseaseProps> = ({
         index !== 0 ? "border-t" : "border-0"
       }`}
     >
-      <div className="col-span-3 h-8 md:h-auto flex flex-col justify-center items-start">
+      <div className="col-span-3 h-auto flex flex-col justify-start items-start">
         <p className="text-sm font-normal">{disease.diseaseDetail}</p>
         <p className="text-sm text-muted-foreground">{disease.diseaseId}</p>
       </div>
@@ -47,25 +47,6 @@ const DiseaseRow: React.FC<DisplayDiseaseProps> = ({
         badgeClassName="text-sm p-0"
       />
 
-      {/* <fieldset
-          disabled={!editable}
-          className="col-span-7 justify-center items-center"
-        >
-          <input
-            autoFocus={true}
-            required
-            type="text"
-            id={disease.diseaseId}
-            name="diseaseDetail"
-            className="col-span-6 h-8 md:h-auto w-full disabled:text-gray-500 form-input py-[4px] md:py-1 rounded-md border-border bg-background text-sm md:text-base font-normal leading-4 flex-1 mx-1"
-            value={
-              editable ? editdiseaseeData.diseaseDetail : disease.diseaseDetail
-            }
-            onChange={(e) => {
-              handleChange(e, disease.diseaseId);
-            }}
-          />
-        </fieldset> */}
       <div className="col-span-1 flex justify-center items-center">
         <Button
           variant={"outline"}

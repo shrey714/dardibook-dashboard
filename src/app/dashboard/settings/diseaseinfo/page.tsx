@@ -72,14 +72,17 @@ export default function SettingsDiseaseInfoPage() {
     const form = e.target as HTMLFormElement;
     const newDiseaseDetail = form.diseaseDetail.value.trim() as string;
     const newDisease: Disease = {
-      diseaseDetail: newDiseaseDetail,
+      diseaseDetail: newDiseaseDetail.trim(),
       medicines: addMedicinesData,
       diseaseId: uniqid(),
-      searchableString: newDiseaseDetail.toLowerCase(),
+      searchableString: newDiseaseDetail.toLowerCase().trim(),
     };
 
-    for (const dis of diseases as Disease[]) {
-      if (dis.diseaseDetail.toLowerCase() === newDiseaseDetail.toLowerCase()) {
+    for (const dis of diseases ?? []) {
+      if (
+        dis.diseaseDetail.toLowerCase() ===
+        newDiseaseDetail.toLowerCase().trim()
+      ) {
         toast.error("Disease already exists!", {
           duration: 2000,
           position: "bottom-right",
