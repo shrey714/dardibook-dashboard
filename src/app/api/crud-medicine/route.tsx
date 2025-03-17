@@ -64,12 +64,12 @@ const getMedicine = async (request: NextRequest) => {
     const snapshot = await getDocs(medicineRef);
     const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 
-    if (data.length == 0) {
-      return NextResponse.json(
-        { es: 1, msg: "Please add some medicines" },
-        { status: 200 }
-      );
-    }
+    // if (data.length == 0) {
+    //   return NextResponse.json(
+    //     { es: 1, msg: "Please add some medicines" },
+    //     { status: 200 }
+    //   );
+    // }
 
     return NextResponse.json({ data: data }, { status: 200 });
   } catch (error) {
