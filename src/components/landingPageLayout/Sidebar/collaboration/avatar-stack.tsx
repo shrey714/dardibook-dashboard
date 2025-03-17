@@ -49,7 +49,7 @@ export const AvatarStack = () => {
   const hasMoreUsers = others.length > 3;
 
   return (
-    <div className="-space-x-1 flex items-center px-4">
+    <div className="-space-x-1 flex items-center px-2">
       {others.slice(0, 3).map(({ connectionId, info }) => (
         <PresenceAvatar key={connectionId} info={info} />
       ))}

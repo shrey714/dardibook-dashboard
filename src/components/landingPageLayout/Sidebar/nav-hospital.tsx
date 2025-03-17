@@ -9,17 +9,16 @@ import {
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Dot } from "lucide-react";
 import { useOrganization } from "@clerk/nextjs";
 
-export function NavHospital() {  
-  const { isLoaded,organization } = useOrganization()
+export function NavHospital() {
+  const { isLoaded, organization } = useOrganization();
   return (
     <NavigationMenu>
       <NavigationMenuList>
         <NavigationMenuItem className="flex">
           <NavigationMenuTrigger
-            className="border-2 gap-1 px-1"
+            className="border rounded-full gap-1 px-1 bg-secondary"
             disabled={!isLoaded}
           >
             {!isLoaded ? (
@@ -31,7 +30,7 @@ export function NavHospital() {
               </div>
             ) : (
               <>
-                <Avatar className="rounded-sm h-7 w-7 bg-secondary ring-1 ring-background">
+                <Avatar className="rounded-full h-7 w-7 bg-secondary ring-0">
                   <AvatarImage src={organization?.imageUrl} alt="H" />
                   <AvatarFallback>H</AvatarFallback>
                 </Avatar>
@@ -42,24 +41,16 @@ export function NavHospital() {
             )}
           </NavigationMenuTrigger>
           <NavigationMenuContent>
-            <ul className="grid lg:p-4 w-[200px] md:w-[300px] lg:w-[400px] lg:grid-cols-[.75fr_1fr]">
-              <li className="row-span-3 m-2">
-                <Avatar className="rounded-sm aspect-square h-full w-full bg-secondary ring-1 ring-background">
-                  <AvatarImage src={organization?.imageUrl} alt="H" />
-                  <AvatarFallback>H</AvatarFallback>
-                </Avatar>
-              </li>
+            <div className="p-2 w-32 flex flex-1 flex-col gap-2">
+              <Avatar className="rounded-full border overflow-hidden aspect-square h-full w-full bg-transparent">
+                <AvatarImage src={organization?.imageUrl} alt="H" />
+                <AvatarFallback>H</AvatarFallback>
+              </Avatar>
 
-              <li className="block select-none rounded-md p-2 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground">
-                <div className="text-sm font-medium leading-none">
-                  Clinic Name
-                </div>
-                <p className="line-clamp-2 flex flex-row text-sm leading-snug text-muted-foreground">
-                  <Dot />
-                  {organization?.name}
-                </p>
-              </li>
-            </ul>
+              <div className="border-dotted border rounded-md py-1 px-2 leading-none">
+                {organization?.name}
+              </div>
+            </div>
           </NavigationMenuContent>
         </NavigationMenuItem>
       </NavigationMenuList>

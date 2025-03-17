@@ -33,8 +33,8 @@ const FullscreenToggle = () => {
   return (
     <Button
       onClick={toggleFullscreen}
-      variant={"secondary"}
-      className="p-2 aspect-square h-min w-min ml-4 rounded-full shadow-md transition"
+      variant={"outline"}
+      className="p-2 aspect-square text-muted-foreground h-min w-min ml-2 rounded-full shadow-none transition"
     >
       {isFullscreen ? <Minimize size={20} /> : <Maximize size={20} />}
     </Button>
