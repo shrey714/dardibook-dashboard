@@ -1,7 +1,6 @@
 import React from "react";
 import { Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
 interface DisplayMedicineProps {
   medicine: {
     medicineName: string;
@@ -9,6 +8,7 @@ interface DisplayMedicineProps {
     id: string;
     instruction: string;
     searchableString: string;
+    active: boolean;
   };
   index: number;
   setMedicineEditModel: React.Dispatch<React.SetStateAction<boolean>>;
@@ -28,8 +28,17 @@ const MedicineRow: React.FC<DisplayMedicineProps> = ({
       }`}
     >
       <div className="col-span-3 h-auto flex flex-col justify-start items-start">
-        <p className="text-sm font-normal">{medicine.medicineName}</p>
-        <p className="text-sm text-muted-foreground">{medicine.id}</p>
+        <p className="text-sm font-normal">
+          {medicine.medicineName}
+        </p>
+        <p className="text-sm text-muted-foreground gap-x-2 inline-flex items-center">
+          {medicine.id}{" "}
+          <span
+            className={`w-2 h-2 aspect-square rounded-full ${
+              medicine.active ? "bg-green-500" : "bg-red-500"
+            }`}
+          ></span>
+        </p>
       </div>
 
       <div className="col-span-3 [&:empty]:invisible border rounded-md flex items-center h-min py-[0px] sm:py-[5.5px] px-2 text-muted-foreground shadow-sm bg-background border-border text-sm leading-6 w-full">

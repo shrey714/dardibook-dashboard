@@ -18,6 +18,7 @@ interface Medicine {
   medicineName: string;
   searchableString: string;
   type: string;
+  active: boolean;
 }
 
 const MedicineHoverLink = ({ label }: { label: string }) => {
@@ -51,7 +52,10 @@ const MedicineHoverLink = ({ label }: { label: string }) => {
   return (
     <HoverCard openDelay={300} closeDelay={50} onOpenChange={setIsOpen}>
       <HoverCardTrigger asChild>
-        <Button variant="link" className="text-secondary h-auto px-2 py-0.5 rounded-sm">
+        <Button
+          variant="link"
+          className="text-secondary h-auto px-2 py-0.5 rounded-sm"
+        >
           {label}
         </Button>
       </HoverCardTrigger>
@@ -67,8 +71,13 @@ const MedicineHoverLink = ({ label }: { label: string }) => {
           <Pill size={35} className="text-muted-foreground p-1" />
           {medicine ? (
             <div className="flex flex-1 flex-col">
-              <h4 className="text-sm underline font-semibold text-muted-foreground">
+              <h4 className="text-sm underline font-semibold text-muted-foreground gap-x-2 inline-flex items-center">
                 {medicine.id}
+                <span
+                  className={`w-2 h-2 aspect-square rounded-full ${
+                    medicine.active ? "bg-green-500" : "bg-red-500"
+                  }`}
+                ></span>
               </h4>
               <p className="text-base text-wrap">{medicine.medicineName}</p>
               <p className="text-sm font-medium text-muted-foreground">

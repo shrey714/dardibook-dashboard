@@ -22,7 +22,16 @@ import {
   DialogHeader,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { deleteDoc, doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, updateDoc } from "firebase/firestore";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface Medicine {
   medicineName: string;
@@ -30,6 +39,7 @@ interface Medicine {
   id: string;
   instruction: string;
   searchableString: string;
+  active: boolean;
 }
 const medicineTypes = [
   { label: "Type", value: "", isDefault: true },
@@ -85,6 +95,7 @@ export default function SettingsMedicineInfoPage() {
       id: uniqid(),
       instruction: form.instruction.value,
       searchableString: form.medicineName.value.toLowerCase(),
+      active: true,
     };
 
     for (const med of medicines ?? []) {
@@ -327,6 +338,10 @@ const EditMedicineDataModel: React.FC<EditMedicineDataModel> = ({
       id: editForMedicineId,
       instruction: form.instruction.value,
       searchableString: form.medicineName.value.toLowerCase(),
+      active: medicines?.find((medicine) => medicine.id === editForMedicineId)
+        ?.active
+        ? true
+        : false,
     };
 
     for (const med of medicines ?? []) {
@@ -377,13 +392,14 @@ const EditMedicineDataModel: React.FC<EditMedicineDataModel> = ({
     }
   };
 
-  const deleteMedicine = async () => {
+  const changeMedicineStatus = async (status: boolean) => {
     setUpdateLoader(true);
     if (orgId) {
       toast.promise(
         async () => {
-          await deleteDoc(
-            doc(db, "doctor", orgId, "medicinesData", editForMedicineId)
+          await updateDoc(
+            doc(db, "doctor", orgId, "medicinesData", editForMedicineId),
+            { active: status }
           ).then(
             () => {
               setUpdateLoader(false);
@@ -392,7 +408,13 @@ const EditMedicineDataModel: React.FC<EditMedicineDataModel> = ({
                   (medicine) => medicine.id !== editForMedicineId
                 )
               );
-              setMedicineEditModel(false);
+              setmedicines(
+                (medicines ?? []).map((medicine) =>
+                  medicine.id === editForMedicineId
+                    ? { ...medicine, active: status }
+                    : medicine
+                )
+              );
             },
             () => {
               setUpdateLoader(false);
@@ -400,9 +422,9 @@ const EditMedicineDataModel: React.FC<EditMedicineDataModel> = ({
           );
         },
         {
-          loading: "Deleting...",
-          success: "Medicine deleted",
-          error: "Failed to delete medicine",
+          loading: "Updating...",
+          success: "Medicine status updated",
+          error: "Failed to update medicine status",
         },
         {
           position: "bottom-right",
@@ -495,15 +517,38 @@ const EditMedicineDataModel: React.FC<EditMedicineDataModel> = ({
 
             <Separator className="w-full col-span-6" />
             <div className="flex col-span-6 w-full items-center justify-between">
-              <Button
-                role="button"
-                variant={"destructive"}
-                className="text-sm gap-2 px-6"
-                type="button"
-                onClick={deleteMedicine}
+              <Select
+                onValueChange={(value) => {
+                  changeMedicineStatus(value === "active" ? true : false);
+                }}
+                value={
+                  medicines?.find(
+                    (medicine) => medicine.id === editForMedicineId
+                  )?.active ?? true === true
+                    ? "active"
+                    : "inactive"
+                }
               >
-                Delete
-              </Button>
+                <SelectTrigger
+                  className={`w-min px-4 gap-2 border-0 shadow-sm ${
+                    medicines?.find(
+                      (medicine) => medicine.id === editForMedicineId
+                    )?.active ?? true
+                      ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                      : "bg-destructive text-destructive-foreground hover:bg-destructive/90 "
+                  }`}
+                >
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectLabel>Status</SelectLabel>
+                    <SelectItem value="active">Active</SelectItem>
+                    <SelectItem value="inactive">InActive</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+
               <Button
                 tabIndex={0}
                 role="button"

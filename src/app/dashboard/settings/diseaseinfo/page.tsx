@@ -202,6 +202,7 @@ export default function SettingsDiseaseInfoPage() {
                             orgId || "",
                             "medicinesData"
                           ),
+                          where("active", "!=", false),
                           where("searchableString", ">=", value.toLowerCase()),
                           where(
                             "searchableString",
@@ -498,6 +499,7 @@ const EditDiseaseDataModel: React.FC<DisplayEditDiseaseProps> = ({
                   const querySnapshot = await getDocs(
                     query(
                       collection(db, "doctor", orgId || "", "medicinesData"),
+                      where("active", "!=", false),
                       where("searchableString", ">=", value.toLowerCase()),
                       where(
                         "searchableString",
