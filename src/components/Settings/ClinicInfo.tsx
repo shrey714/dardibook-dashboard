@@ -96,7 +96,7 @@ const ClinicInfo = () => {
                   type="text"
                   id="doctorName"
                   name="doctorName"
-                  className="disabled:text-gray-400 form-input py-[6px] mt-1 w-full rounded-md border-border bg-transparent text-sm md:text-base font-medium"
+                  className="disabled:text-gray-400 form-input shadow-sm py-[6px] mt-1 w-full rounded-md border-border bg-transparent text-sm md:text-base font-medium"
                   value={formdata?.doctorName}
                   onChange={handleChange}
                 />
@@ -115,7 +115,7 @@ const ClinicInfo = () => {
                   type="text"
                   id="degree"
                   name="degree"
-                  className="disabled:text-gray-400 form-input py-[6px] mt-1 w-full rounded-md border-border bg-transparent text-sm md:text-base font-medium"
+                  className="disabled:text-gray-400 form-input shadow-sm py-[6px] mt-1 w-full rounded-md border-border bg-transparent text-sm md:text-base font-medium"
                   value={formdata?.degree}
                   onChange={handleChange}
                 />
@@ -133,7 +133,7 @@ const ClinicInfo = () => {
                   type="text"
                   id="registrationNumber"
                   name="registrationNumber"
-                  className="disabled:text-gray-400 form-input py-[6px] mt-1 w-full rounded-md border-border bg-transparent text-sm md:text-base font-medium"
+                  className="disabled:text-gray-400 form-input shadow-sm py-[6px] mt-1 w-full rounded-md border-border bg-transparent text-sm md:text-base font-medium"
                   value={formdata?.registrationNumber}
                   onChange={handleChange}
                 />
@@ -152,7 +152,7 @@ const ClinicInfo = () => {
                   type="number"
                   id="clinicNumber"
                   name="clinicNumber"
-                  className="disabled:text-gray-400 form-input py-[6px] mt-1 w-full rounded-md border-border bg-transparent text-sm md:text-base font-medium"
+                  className="disabled:text-gray-400 form-input shadow-sm py-[6px] mt-1 w-full rounded-md border-border bg-transparent text-sm md:text-base font-medium"
                   value={formdata?.clinicNumber}
                   onChange={handleChange}
                 />
@@ -170,7 +170,7 @@ const ClinicInfo = () => {
                   type="number"
                   id="phoneNumber"
                   name="phoneNumber"
-                  className="disabled:text-gray-400 form-input py-[6px] mt-1 w-full rounded-md border-border bg-transparent text-sm md:text-base font-medium"
+                  className="disabled:text-gray-400 form-input shadow-sm py-[6px] mt-1 w-full rounded-md border-border bg-transparent text-sm md:text-base font-medium"
                   value={formdata?.phoneNumber}
                   onChange={handleChange}
                 />
@@ -188,7 +188,7 @@ const ClinicInfo = () => {
                   type="text"
                   id="clinicAddress"
                   name="clinicAddress"
-                  className="disabled:text-gray-400 form-input py-[6px] mt-1 w-full rounded-md border-border bg-transparent text-sm md:text-base font-medium"
+                  className="disabled:text-gray-400 form-input shadow-sm py-[6px] mt-1 w-full rounded-md border-border bg-transparent text-sm md:text-base font-medium"
                   value={formdata?.clinicAddress}
                   onChange={handleChange}
                 />

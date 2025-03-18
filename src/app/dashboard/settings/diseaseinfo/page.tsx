@@ -223,7 +223,7 @@ export default function SettingsDiseaseInfoPage() {
                     }}
                     commandProps={{
                       className:
-                        "w-full rounded-md bg-background text-sm font-normal h-min border mt-1",
+                        "w-full rounded-md bg-background text-sm font-normal h-min border mt-1 shadow-sm",
                     }}
                     // defaultOptions={OPTIONS}
                     placeholder="Add Medicines.."
@@ -520,7 +520,7 @@ const EditDiseaseDataModel: React.FC<DisplayEditDiseaseProps> = ({
                 }}
                 commandProps={{
                   className:
-                    "w-full rounded-md bg-background text-sm font-normal h-min border mt-1",
+                    "w-full rounded-md bg-background text-sm font-normal h-min border mt-1 shadow-sm",
                 }}
                 // defaultOptions={OPTIONS}
                 placeholder="Add Medicines.."

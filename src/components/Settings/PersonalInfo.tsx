@@ -10,21 +10,24 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useAuth, useUser } from "@clerk/nextjs";
 
-const PersonalInfo = ({ userInfo, role }: any) => {
+const PersonalInfo = () => {
+  const { user } = useUser();
+  const { orgRole } = useAuth();
   return (
     <Card className="mx-auto max-w-4xl 2xl:mx-0 shadow-none border h-min flex flex-1 flex-col bg-sidebar/70 2xl:max-w-xl">
       <CardHeader className="border-b p-5">
         <CardTitle>
           Personal Information
           <span className="ml-2 text-xs text-green-600 font-semibold border border-green-600 px-2 rounded-full">
-            {role === "org:clinic_head"
+            {orgRole === "org:clinic_head"
               ? "Admin"
-              : role === "org:doctor"
+              : orgRole === "org:doctor"
               ? "Doctor"
-              : role === "org:assistant_doctor"
+              : orgRole === "org:assistant_doctor"
               ? "SubDoctor"
-              : role === "org:medical_staff"
+              : orgRole === "org:medical_staff"
               ? "Medical"
               : ""}
           </span>
@@ -34,9 +37,12 @@ const PersonalInfo = ({ userInfo, role }: any) => {
       <CardContent className="p-0">
         <div className="px-3 py-2 md:px-8 flex flex-col md:items-center md:flex-row 2xl:flex-col gap-2 2xl:gap-2 2xl:px-3 md:gap-8">
           <Avatar className="h-20 w-20 rounded-lg self-center">
-            <AvatarImage src={userInfo?.imageUrl} alt={userInfo?.firstName} />
+            <AvatarImage
+              src={user?.imageUrl}
+              alt={user?.firstName || "user profile"}
+            />
             <AvatarFallback className="rounded-lg">
-              {userInfo?.firstName?.slice(0, 2)}
+              {user?.firstName?.slice(0, 2)}
             </AvatarFallback>
           </Avatar>
 
@@ -45,13 +51,13 @@ const PersonalInfo = ({ userInfo, role }: any) => {
               Name
             </p>
             <p className="form-input py-[6px] mt-1 w-full rounded-md border-border text-sm md:text-base font-medium bg-transparent">
-              {userInfo?.firstName}
+              {user?.fullName}
             </p>
             <p className="mt-2 text-xs sm:text-sm font-medium leading-3 text-gray-500">
               Email
             </p>
             <p className="form-input py-[6px] mt-1 w-full rounded-md border-border text-sm md:text-base font-medium bg-transparent">
-              {userInfo?.emailAddresses[0].emailAddress}
+              {user?.emailAddresses[0].emailAddress}
             </p>
           </div>
         </div>

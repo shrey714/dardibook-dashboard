@@ -41,10 +41,10 @@ const MedicineRow: React.FC<DisplayMedicineProps> = ({
         </p>
       </div>
 
-      <div className="col-span-3 [&:empty]:invisible border rounded-md flex items-center h-min py-[0px] sm:py-[5.5px] px-2 text-muted-foreground shadow-sm bg-background border-border text-sm leading-6 w-full">
+      <div className="col-span-3 [&:empty]:invisible border rounded-md flex items-center h-min py-[0px] sm:py-[5.5px] px-2 text-muted-foreground bg-background border-border text-sm leading-6 w-full">
         {medicine.type}
       </div>
-      <div className="col-span-5 [&:empty]:invisible border rounded-md flex items-center h-min py-[0px] sm:py-[5.5px] px-2 text-muted-foreground shadow-sm bg-background border-border text-sm leading-6 w-full">
+      <div className="col-span-5 [&:empty]:invisible border rounded-md flex items-center h-min py-[0px] sm:py-[5.5px] px-2 text-muted-foreground bg-background border-border text-sm leading-6 w-full">
         {medicine.instruction}
       </div>
 
