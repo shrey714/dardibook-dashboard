@@ -2,17 +2,7 @@ import React from "react";
 
 const NoPatientsFound: React.FC<{ message: string }> = ({ message }) => {
   return (
-    <div
-      style={{
-        width: "100%",
-        height: "100vh",
-        overflow: "hidden",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        zIndex: 100000,
-      }}
-    >
+    <div className="px-2 text-muted-foreground font-medium text-base justify-self-center max-w-4xl h-full flex flex-1 items-center justify-center z-10 overflow-hidden text-center">
       {message}
     </div>
   );

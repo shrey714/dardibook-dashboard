@@ -1,9 +1,9 @@
 "use client";
- 
+
 import * as React from "react";
 import { CalendarIcon } from "@radix-ui/react-icons";
 import { format } from "date-fns";
- 
+
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -13,18 +13,27 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
- 
-export function DateTimePicker() {
-  const [date, setDate] = React.useState<Date>();
+
+interface DateTimePickerProps {
+  registered_date: number[];
+  date: Date;
+  setDate: React.Dispatch<React.SetStateAction<Date>>;
+}
+
+export const DateTimePicker: React.FC<DateTimePickerProps> = ({
+  registered_date,
+  date,
+  setDate,
+}) => {
   const [isOpen, setIsOpen] = React.useState(false);
- 
+
   const hours = Array.from({ length: 12 }, (_, i) => i + 1);
   const handleDateSelect = (selectedDate: Date | undefined) => {
     if (selectedDate) {
       setDate(selectedDate);
     }
   };
- 
+
   const handleTimeChange = (
     type: "hour" | "minute" | "ampm",
     value: string
@@ -46,7 +55,7 @@ export function DateTimePicker() {
       setDate(newDate);
     }
   };
- 
+
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
@@ -54,6 +63,7 @@ export function DateTimePicker() {
           variant="outline"
           className={cn(
             "w-full justify-start text-left font-normal",
+            "col-span-2 w-full md:max-w-md lg:col-span-2 disabled:text-primary shadow-sm rounded-md border-border bg-transparent py-1 pl-2 sm:text-sm sm:leading-6",
             !date && "text-muted-foreground"
           )}
         >
@@ -68,6 +78,10 @@ export function DateTimePicker() {
       <PopoverContent className="w-auto p-0">
         <div className="sm:flex">
           <Calendar
+            disabled={[
+              registered_date.map((date) => new Date(date)),
+              { before: new Date() },
+            ]}
             mode="single"
             selected={date}
             onSelect={handleDateSelect}
@@ -101,9 +115,7 @@ export function DateTimePicker() {
                     key={minute}
                     size="icon"
                     variant={
-                      date && date.getMinutes() === minute
-                        ? "default"
-                        : "ghost"
+                      date && date.getMinutes() === minute ? "default" : "ghost"
                     }
                     className="sm:w-full shrink-0 aspect-square"
                     onClick={() =>
@@ -142,4 +154,4 @@ export function DateTimePicker() {
       </PopoverContent>
     </Popover>
   );
-}
+};

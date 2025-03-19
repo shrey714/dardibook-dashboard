@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
-import * as animationData from "@/lottieFiles/Registered.json";
+import animationData from "@/lottieFiles/Registered.json";
 import Lottie from "react-lottie";
 import Link from "next/link";
 import { Button } from "../ui/button";
 
 interface RegisteredModalProps {
-  isModalOpen: boolean; // Whether the modal is open
-  setCloseModal: (state: boolean) => void; // Function to change the modal state
+  isModalOpen: boolean;
+  setCloseModal: (state: boolean) => void;
 }
 
 const RegisteredModal: React.FC<RegisteredModalProps> = ({
@@ -43,7 +43,7 @@ const RegisteredModal: React.FC<RegisteredModalProps> = ({
         isStopped={!startAnimation}
       />
       <h3 className="text-base md:text-lg font-semibold self-center w-full text-center">
-        Patient added to Queue.
+        Patient Registered.
       </h3>
       <div className="mt-6 flex flex-row flex-wrap items-center gap-x-4">
         <Button

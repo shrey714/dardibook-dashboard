@@ -47,7 +47,7 @@ export default function TShirtsPage() {
             </TabsTrigger>
           </TabsList>
         </Tabs>
-        <Card className="w-full p-1 pt-3 pb-3 bg-gradient-to-b from-muted/50 to-muted">
+        <Card className="max-w-6xl w-full p-1 pt-3 pb-3 bg-gradient-to-b from-muted/50 to-muted">
           <CardHeader>
             <CardTitle>
               Patient ID<span className="text-red-500 ml-1">*</span>
@@ -76,7 +76,7 @@ export default function TShirtsPage() {
             </Button>
           </CardFooter>
         </Card>
-        <div className="w-full p-0 flex flex-row items-center">
+        <div className="max-w-4xl w-full p-0 flex flex-row items-center">
           <span className="flex flex-1 h-[2px] bg-gradient-to-r from-transparent to-primary"></span>
           <div className=" flex items-center justify-center">
             <p className="w-auto px-3 py-1 font-medium text-base rounded-full border-primary border-[2px]">
@@ -85,7 +85,7 @@ export default function TShirtsPage() {
           </div>
           <span className="flex flex-1 h-[2px] bg-gradient-to-l from-transparent to-primary"></span>
         </div>
-        <div className="w-full p-0 -mt-4">
+        <div className="max-w-4xl p-0 -mt-4">
           <ReOrderingList />
         </div>
       </div>

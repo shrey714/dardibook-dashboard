@@ -1,27 +1,38 @@
 import React from "react";
 import Link from "next/link";
-import Loader from "../common/Loader";
 import { Button } from "../ui/button";
-// import { DateTimePicker } from "../ui/DateTimePicker";
-interface PatientFormData {
-  last_visited: number;
-  patient_unique_Id: string;
-  first_name: string;
-  last_name: string;
-  mobile_number: string;
-  gender: string;
-  age: string;
-  street_address: string;
-  city: string;
-  state: string;
-  zip: string;
-}
+import { RegisterPatientFormTypes } from "@/types/FormTypes";
+import { DateTimePicker } from "../Appointment/DateTimePicker";
+import {
+  Timeline,
+  TimelineConnector,
+  TimelineContent,
+  TimelineDescription,
+  TimelineDot,
+  TimelineItem,
+  TimelineSeparator,
+  TimelineTitle,
+} from "@/components/ui/timeline";
+import { format, getTime, isSameDay, startOfDay } from "date-fns";
+import { CircleCheckBig, RotateCcw, UserPlus } from "lucide-react";
+import Loader from "@/components/common/Loader";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface AppointmentFormProps {
-  patientFormData: PatientFormData;
-  setPatientFormData: React.Dispatch<React.SetStateAction<PatientFormData>>;
+  patientFormData: RegisterPatientFormTypes;
+  setPatientFormData: React.Dispatch<
+    React.SetStateAction<RegisterPatientFormTypes>
+  >;
   handleSubmit: any;
   submissionLoader: boolean;
+  registerForDate: Date;
+  setRegisterForDate: React.Dispatch<React.SetStateAction<Date>>;
 }
 
 const AppointmentForm: React.FC<AppointmentFormProps> = ({
@@ -29,6 +40,8 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
   setPatientFormData,
   handleSubmit,
   submissionLoader,
+  registerForDate,
+  setRegisterForDate,
 }) => {
   const handleInputChange = (e: { target: { name: any; value: any } }) => {
     const { name, value } = e.target;
@@ -40,324 +53,341 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
 
   return (
     <form
-      className="px-4 sm:px-6 lg:px-8"
+      className="w-full px-2 sm:px-6 lg:px-8 mb-20 mt-2 sm:mt-6 2xl:flex 2xl:flex-row 2xl:gap-5 2xl:justify-center"
       onSubmit={handleSubmit}
       autoFocus={true}
       autoComplete="off"
     >
-      <fieldset disabled={submissionLoader}>
-        <div className="mx-auto max-w-4xl bg-white rounded-lg pt-3 md:pt-6 pb-3">
-          {/* token selection form */}
-          <div className="px-4 md:px-8">
-            <h3 className="text-base font-semibold leading-7 text-gray-900">
-              Appointment
-            </h3>
-            <p className="mt-1 max-w-2xl text-sm leading-6 text-gray-500">
-              Instant appointment or schedule on date
-            </p>
+      <div className="mx-auto 2xl:mx-0 max-w-4xl 2xl:max-w-2xl border rounded-lg h-min 2xl:sticky top-2 sm:top-6 overflow-x-auto">
+        {patientFormData.registered_date.length > 0 &&
+        patientFormData.prescribed_date_time.length >= 0 ? (
+          <Timeline
+            orientation="horizontal"
+            className="pt-6 px-6 pb-6 2xl:pb-0 2xl:flex-col"
+          >
+            {patientFormData.registered_date
+              .concat([getTime(registerForDate)])
+              .sort((a, b) => b - a)
+              .map((registered_date, index) => {
+                const isSameDate = isSameDay(registered_date, registerForDate);
+                const attendedStatus =
+                  patientFormData.prescribed_date_time.some(
+                    (prescribed_date_time) =>
+                      registered_date ===
+                      getTime(startOfDay(prescribed_date_time))
+                  ) || false;
+                return (
+                  <TimelineItem key={index} className="2xl:flex-row">
+                    <TimelineSeparator className="2xl:flex-col">
+                      <TimelineDot className="2xl:mt-1">
+                        {isSameDate ? (
+                          <Loader size="small" />
+                        ) : attendedStatus ? (
+                          <CircleCheckBig className="text-green-500" />
+                        ) : (
+                          <UserPlus />
+                        )}
+                      </TimelineDot>
+                      <TimelineConnector
+                        className="2xl:my-2 2xl:w-0.5"
+                        hidden={
+                          index + 1 ===
+                          patientFormData.registered_date.length + 1
+                        }
+                      />
+                    </TimelineSeparator>
+                    <TimelineContent className="2xl:pb-7 2xl:first:text-right 2xl:last:text-left">
+                      <TimelineTitle
+                        className={`${
+                          attendedStatus ? "text-green-500" : ""
+                        } whitespace-nowrap`}
+                      >
+                        {isSameDate
+                          ? "Currently viewing"
+                          : attendedStatus
+                          ? "Attended"
+                          : "Registered"}
+                      </TimelineTitle>
+                      <TimelineDescription>
+                        {isSameDate
+                          ? "Registering for"
+                          : attendedStatus
+                          ? "Attended on"
+                          : "Registered for"}{" "}
+                        {format(registered_date, "do MMM yyyy")}
+                      </TimelineDescription>
+                    </TimelineContent>
+                  </TimelineItem>
+                );
+              })}
+          </Timeline>
+        ) : (
+          <></>
+        )}
+      </div>
+      <fieldset
+        disabled={submissionLoader}
+        className="mx-auto mt-2 sm:mt-5 2xl:mt-0 w-full 2xl:mx-0 max-w-4xl bg-sidebar/70 border rounded-lg pt-3 md:pt-6 "
+      >
+        {/* token selection form */}
+        <div className="px-4 md:px-8">
+          <h3 className="text-base font-semibold leading-7 ">Appointment</h3>
+          <p className="max-w-2xl text-sm leading-6 text-gray-500">
+            Instant appointment or schedule on date
+          </p>
+        </div>
+        <div className="pb-2 md:pb-0 mt-3 md:mt-6 border-t border-b">
+          <div className="px-4 py-1 md:py-6 md:grid md:grid-cols-3 md:gap-4 md:px-8">
+            <label
+              htmlFor="patient_id"
+              className="text-sm font-medium leading-6 flex items-center gap-1"
+            >
+              Patient ID<p className="text-red-500">*</p>
+            </label>
+            <input
+              required
+              disabled
+              type="text"
+              name="patient_id"
+              id="patient_id"
+              autoComplete="given-name"
+              value={patientFormData.patient_id}
+              onChange={handleInputChange}
+              className="col-span-2 cursor-not-allowed w-full md:max-w-md lg:col-span-2 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input block py-1 pl-2 sm:text-sm sm:leading-6"
+            />
           </div>
-          <div className="mt-3 md:mt-6 border-t border-b border-gray-900/10">
-            <dl className="divide-y divide-gray-900/10">
-              <div className="px-4 py-2 md:py-6 sm:grid sm:grid-cols-3 sm:gap-4 md:px-8">
-                <label
-                  htmlFor="patient_unique_Id"
-                  className="text-sm font-medium leading-6 text-gray-900 flex items-center gap-1"
-                >
-                  Patient ID<p className="text-red-500">*</p>
-                </label>
-                <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
-                  <input
-                    required
-                    disabled
-                    type="text"
-                    name="patient_unique_Id"
-                    id="patient_unique_Id"
-                    autoComplete="given-name"
-                    value={patientFormData.patient_unique_Id}
-                    onChange={handleInputChange}
-                    className="form-input block flex-1 border-0 bg-transparent py-1 pl-2 text-gray-500 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
-                  />
-                </div>
-              </div>
-              <div className="px-4 py-2 md:py-6 sm:grid sm:grid-cols-3 sm:gap-4 md:px-8">
-                <label
-                  htmlFor="last_visited"
-                  className="text-sm font-medium leading-6 text-gray-900 flex items-center gap-1"
-                >
-                  Appointment date for <p className="text-red-500">*</p>
-                </label>
-                <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
-                  <input
-                    required
-                    type="date"
-                    name="last_visited"
-                    id="last_visited"
-                    // min={new Date().toISOString().split("T")[0]}
-                    value={
-                      new Date(patientFormData.last_visited)
-                        .toISOString()
-                        .split("T")[0]
-                    }
-                    onChange={(e) => {
-                      const getValue =
-                        e.target.value === ""
-                          ? new Date().toISOString().split("T")[0]
-                          : e.target.value;
-
-                      const currentTime = new Date();
-                      const [year, month, day] = getValue
-                        .split("-")
-                        .map(Number);
-                      const dateTime = new Date(
-                        year,
-                        month - 1,
-                        day,
-                        currentTime.getHours(),
-                        currentTime.getMinutes(),
-                        currentTime.getSeconds()
-                      );
-                      handleInputChange({
-                        target: {
-                          name: e.target.name,
-                          value: dateTime.getTime(),
-                        },
-                      });
-                    }}
-                    className="form-input block flex-1 border-0 bg-transparent py-1 pl-2 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
-                  />
-                  {/* <DateTimePicker /> */}
-                </div>
-              </div>
-            </dl>
-          </div>
-          {/* personal information form */}
-          <div className="px-4 mt-3 md:mt-6 md:px-8">
-            <h3 className="text-base font-semibold leading-7 text-gray-900">
-              Personal Information
-            </h3>
-            <p className="mt-1 max-w-2xl text-sm leading-6 text-gray-500">
-              Please use WhatsApp number where you get the reports
-            </p>
-          </div>
-          <div className="mt-3 md:mt-6 border-t border-b border-gray-900/10">
-            <dl className="divide-y divide-gray-900/10">
-              <div className="px-4 py-2 md:py-6 sm:grid sm:grid-cols-3 sm:gap-4 md:px-8">
-                <label
-                  htmlFor="first_name"
-                  className="text-sm font-medium leading-6 text-gray-900 flex items-center gap-1"
-                >
-                  First name<p className="text-red-500">*</p>
-                </label>
-                <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
-                  <input
-                    autoFocus={true}
-                    required
-                    type="text"
-                    name="first_name"
-                    id="first_name"
-                    autoComplete="new-off"
-                    value={patientFormData.first_name}
-                    onChange={handleInputChange}
-                    className="form-input block flex-1 border-0 bg-transparent py-1 pl-2 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
-                  />
-                </div>
-              </div>
-              <div className="px-4 py-2 md:py-6 sm:grid sm:grid-cols-3 sm:gap-4 md:px-8">
-                <label
-                  htmlFor="last_name"
-                  className="text-sm font-medium leading-6 text-gray-900 flex items-center gap-1"
-                >
-                  Last name<p className="text-red-500">*</p>
-                </label>
-                <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
-                  <input
-                    required
-                    type="text"
-                    name="last_name"
-                    id="last_name"
-                    autoComplete="new-off"
-                    value={patientFormData.last_name}
-                    onChange={handleInputChange}
-                    className="form-input block flex-1 border-0 bg-transparent py-1 pl-2 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
-                  />
-                </div>
-              </div>
-              <div className="px-4 py-2 md:py-6 sm:grid sm:grid-cols-3 sm:gap-4 md:px-8">
-                <label
-                  htmlFor="mobile_number"
-                  className="text-sm font-medium leading-6 text-gray-900 flex items-center gap-1"
-                >
-                  Mobile number<p className="text-red-500">*</p>
-                </label>
-                <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
-                  <input
-                    required
-                    type="tel"
-                    name="mobile_number"
-                    id="mobile_number"
-                    autoComplete="new-off"
-                    value={patientFormData.mobile_number}
-                    onChange={handleInputChange}
-                    pattern="^\d{10}$" // Adjust the pattern to match the format you want
-                    title="Please enter a valid 10-digit mobile number."
-                    maxLength={10}
-                    className="form-input block flex-1 border-0 bg-transparent py-1 pl-2 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
-                  />
-                </div>
-              </div>
-              <div className="px-4 py-2 md:py-6 sm:grid sm:grid-cols-3 sm:gap-4 md:px-8">
-                <label
-                  htmlFor="gender"
-                  className="text-sm font-medium leading-6 text-gray-900 flex items-center gap-1"
-                >
-                  Gender<p className="text-red-500">*</p>
-                </label>
-                <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
-                  <select
-                    required
-                    id="gender"
-                    name="gender"
-                    value={patientFormData.gender}
-                    onChange={handleInputChange}
-                    autoComplete="new-off"
-                    className="form-input block w-full rounded-md border-0 py-1 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
-                  >
-                    <option>Male</option>
-                    <option>Female</option>
-                  </select>
-                </div>
-              </div>
-              <div className="px-4 py-2 md:py-6 sm:grid sm:grid-cols-3 sm:gap-4 md:px-8">
-                <label
-                  htmlFor="age"
-                  className="text-sm font-medium leading-6 text-gray-900 flex items-center gap-1"
-                >
-                  Age<p className="text-red-500">*</p>
-                </label>
-                <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
-                  <input
-                    required
-                    type="number"
-                    name="age"
-                    id="age"
-                    autoComplete="new-off"
-                    value={patientFormData.age}
-                    onChange={handleInputChange}
-                    className="form-input block flex-1 border-0 bg-transparent py-1 pl-2 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
-                  />
-                </div>
-              </div>
-            </dl>
-          </div>
-          {/* Address information form */}
-          <div className="px-4 mt-3 md:mt-6 md:px-8">
-            <h3 className="text-base font-semibold leading-7 text-gray-900">
-              Address Information
-            </h3>
-            <p className="mt-1 max-w-2xl text-sm leading-6 text-gray-500">
-              Please Specify full patient address
-            </p>
-          </div>
-          <div className="mt-3 md:mt-6 border-t border-gray-900/10">
-            <dl className="divide-y divide-gray-900/10">
-              <div className="px-4 py-2 md:py-6 sm:grid sm:grid-cols-3 sm:gap-4 md:px-8">
-                <label
-                  htmlFor="street_address"
-                  className="text-sm font-medium leading-6 text-gray-900 flex items-center"
-                >
-                  Street address
-                </label>
-                <div className="sm:col-span-2 flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
-                  <input
-                    type="text"
-                    name="street_address"
-                    id="street_address"
-                    autoComplete="new-off"
-                    value={patientFormData.street_address}
-                    onChange={handleInputChange}
-                    className="form-input block w-full flex-1 border-0 bg-transparent py-1 pl-2 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
-                  />
-                </div>
-              </div>
-              <div className="px-4 py-2 md:py-6 sm:grid sm:grid-cols-3 sm:gap-4 md:px-8">
-                <label
-                  htmlFor="city"
-                  className="text-sm font-medium leading-6 text-gray-900 flex items-center"
-                >
-                  City
-                </label>
-                <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
-                  <input
-                    type="text"
-                    name="city"
-                    id="city"
-                    autoComplete="new-off"
-                    value={patientFormData.city}
-                    onChange={handleInputChange}
-                    className="form-input block w-full flex-1 border-0 bg-transparent py-1 pl-2 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
-                  />
-                </div>
-              </div>
-              <div className="px-4 py-2 md:py-6 sm:grid sm:grid-cols-3 sm:gap-4 md:px-8">
-                <label
-                  htmlFor="state"
-                  className="text-sm font-medium leading-6 text-gray-900 flex items-center"
-                >
-                  State / Province
-                </label>
-                <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
-                  <input
-                    type="text"
-                    name="state"
-                    id="state"
-                    autoComplete="new-off"
-                    value={patientFormData.state}
-                    onChange={handleInputChange}
-                    className="form-input block w-full flex-1 border-0 bg-transparent py-1 pl-2 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
-                  />
-                </div>
-              </div>
-              <div className="px-4 py-2 md:py-6 sm:grid sm:grid-cols-3 sm:gap-4 md:px-8">
-                <label
-                  htmlFor="zip"
-                  className="text-sm font-medium leading-6 text-gray-900 flex items-center"
-                >
-                  Pin code
-                </label>
-                <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
-                  <input
-                    type="text"
-                    name="zip"
-                    id="zip"
-                    value={patientFormData.zip}
-                    onChange={handleInputChange}
-                    pattern="^\d{6}$" // Adjust the pattern to match the format you want
-                    title="Please enter a valid 6-digit PIN code."
-                    maxLength={6}
-                    className="form-input block w-full flex-1 border-0 bg-transparent py-1 pl-2 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
-                  />
-                </div>
-              </div>
-            </dl>
+          <div className="px-4 py-1 md:py-6 md:grid md:grid-cols-3 md:gap-4 md:px-8">
+            <label
+              htmlFor="last_visited"
+              className="text-sm font-medium leading-6  flex items-center justify-between md:justify-start gap-1"
+            >
+              Appointment date
+              {/* <p className="text-red-500">*</p> */}
+              <Button
+                type="button"
+                onClick={() => {
+                  setRegisterForDate(new Date());
+                }}
+                variant={"outline"}
+                className="rounded-full p-1 aspect-square my-1"
+                size={"sm"}
+              >
+                <RotateCcw />
+              </Button>
+            </label>
+            <DateTimePicker
+              registered_date={patientFormData.registered_date}
+              date={registerForDate}
+              setDate={setRegisterForDate}
+            />
           </div>
         </div>
-        {/* submit-cancel buttons */}
-        <div className="mt-6 flex items-center justify-center gap-x-6">
-          <Button variant={"destructive"} asChild>
-            <Link
-              href={"./"}
-              scroll={true}
-              type="button"
-              className="btn md:btn-wide border-0 text-sm font-semibold leading-6"
+        {/* personal information form */}
+        <div className="px-4 mt-3 md:mt-6 md:px-8">
+          <h3 className="text-base font-semibold leading-7 ">
+            Personal Information
+          </h3>
+          <p className="max-w-2xl text-sm leading-6 text-gray-500">
+            Please use WhatsApp number where you get the reports
+          </p>
+        </div>
+        <div className="pb-2 md:pb-0 mt-3 md:mt-6 border-t border-b">
+          <div className="px-4 py-1 md:py-6 md:grid md:grid-cols-3 sm:gap-4 md:px-8">
+            <label
+              htmlFor="name"
+              className="text-sm font-medium leading-6  flex items-center gap-1"
             >
-              Cancel
-            </Link>
-          </Button>
-          <Button type="submit" variant={"default"}>
-            {submissionLoader ? <Loader size="medium" /> : "Save"}
-          </Button>
+              Full name<p className="text-red-500">*</p>
+            </label>
+            <input
+              autoFocus={true}
+              required
+              type="text"
+              name="name"
+              id="name"
+              autoComplete="new-off"
+              placeholder="patient name"
+              value={patientFormData.name}
+              onChange={handleInputChange}
+              className="col-span-2 w-full md:max-w-md lg:col-span-2 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input block py-1 pl-2 sm:text-sm sm:leading-6"
+            />
+          </div>
+          <div className="px-4 py-1 md:py-6 md:grid md:grid-cols-3 sm:gap-4 md:px-8">
+            <label
+              htmlFor="mobile"
+              className="text-sm font-medium leading-6  flex items-center gap-1"
+            >
+              Mobile number<p className="text-red-500">*</p>
+            </label>
+            <input
+              required
+              type="tel"
+              name="mobile"
+              placeholder="contact number"
+              id="mobile"
+              autoComplete="new-off"
+              value={patientFormData.mobile}
+              onChange={handleInputChange}
+              pattern="^\d{10}$" // Adjust the pattern to match the format you want
+              title="Please enter a valid 10-digit mobile number."
+              maxLength={10}
+              className="col-span-2 w-full md:max-w-md lg:col-span-2 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input block py-1 pl-2 sm:text-sm sm:leading-6"
+            />
+          </div>
+          <div className="px-4 py-1 md:py-6 md:grid md:grid-cols-3 sm:gap-4 md:px-8">
+            <label
+              htmlFor="gender"
+              className="text-sm font-medium leading-6  flex items-center gap-1"
+            >
+              Gender<p className="text-red-500">*</p>
+            </label>
+            <Select
+              required
+              name="gender"
+              value={patientFormData.gender}
+              onValueChange={(val) => {
+                handleInputChange({ target: { name: "gender", value: val } });
+              }}
+            >
+              <SelectTrigger
+                id="gender"
+                className="col-span-2 w-full md:max-w-md lg:col-span-2 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input py-1 pl-2 sm:text-sm sm:leading-6"
+              >
+                <SelectValue placeholder="gender" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Male">Male</SelectItem>
+                <SelectItem value="Female">Female</SelectItem>
+                <SelectItem value="Other">Other</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="px-4 py-1 md:py-6 md:grid md:grid-cols-3 sm:gap-4 md:px-8">
+            <label
+              htmlFor="age"
+              className="text-sm font-medium leading-6  flex items-center gap-1"
+            >
+              Age<p className="text-red-500">*</p>
+            </label>
+            <input
+              required
+              type="number"
+              name="age"
+              placeholder="patient age"
+              id="age"
+              autoComplete="new-off"
+              value={patientFormData.age}
+              onChange={handleInputChange}
+              className="col-span-2 w-full md:max-w-md lg:col-span-2 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input block py-1 pl-2 sm:text-sm sm:leading-6"
+            />
+          </div>
+        </div>
+        {/* Address information form */}
+        <div className="px-4 mt-3 md:mt-6 md:px-8">
+          <h3 className="text-base font-semibold leading-7 ">
+            Address Information
+          </h3>
+          <p className="max-w-2xl text-sm leading-6 text-gray-500">
+            Please Specify full patient address
+          </p>
+        </div>
+        <div className="pb-2 md:pb-0 mt-3 md:mt-6 border-t">
+          <div className="px-4 py-1 md:py-6 md:grid md:grid-cols-3 sm:gap-4 md:px-8">
+            <label
+              htmlFor="street_address"
+              className="text-sm font-medium leading-6  flex items-center"
+            >
+              Street address
+            </label>
+            <input
+              type="text"
+              name="street_address"
+              placeholder="street address"
+              id="street_address"
+              autoComplete="new-off"
+              value={patientFormData.street_address}
+              onChange={handleInputChange}
+              className="col-span-2 w-full md:max-w-md lg:col-span-2 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input block py-1 pl-2 sm:text-sm sm:leading-6"
+            />
+          </div>
+          <div className="px-4 py-1 md:py-6 md:grid md:grid-cols-3 sm:gap-4 md:px-8">
+            <label
+              htmlFor="city"
+              className="text-sm font-medium leading-6  flex items-center"
+            >
+              City
+            </label>
+            <input
+              type="text"
+              name="city"
+              placeholder="patient city"
+              id="city"
+              autoComplete="new-off"
+              value={patientFormData.city}
+              onChange={handleInputChange}
+              className="col-span-2 w-full md:max-w-md lg:col-span-2 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input block py-1 pl-2 sm:text-sm sm:leading-6"
+            />
+          </div>
+          <div className="px-4 py-1 md:py-6 md:grid md:grid-cols-3 sm:gap-4 md:px-8">
+            <label
+              htmlFor="state"
+              className="text-sm font-medium leading-6  flex items-center"
+            >
+              State / Province
+            </label>
+            <input
+              type="text"
+              name="state"
+              placeholder="patient state"
+              id="state"
+              autoComplete="new-off"
+              value={patientFormData.state}
+              onChange={handleInputChange}
+              className="col-span-2 w-full md:max-w-md lg:col-span-2 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input block py-1 pl-2 sm:text-sm sm:leading-6"
+            />
+          </div>
+          <div className="px-4 py-1 md:py-6 md:grid md:grid-cols-3 sm:gap-4 md:px-8">
+            <label
+              htmlFor="zip"
+              className="text-sm font-medium leading-6  flex items-center"
+            >
+              Pin code
+            </label>
+            <input
+              type="text"
+              name="zip"
+              placeholder="pincode"
+              id="zip"
+              value={patientFormData.zip}
+              onChange={handleInputChange}
+              pattern="^\d{6}$" // Adjust the pattern to match the format you want
+              title="Please enter a valid 6-digit PIN code."
+              maxLength={6}
+              className="col-span-2 w-full md:max-w-md lg:col-span-2 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input block py-1 pl-2 sm:text-sm sm:leading-6"
+            />
+          </div>
         </div>
       </fieldset>
+      {/* submit-cancel buttons */}
+      <div
+        className="flex items-center justify-center gap-x-4 sm:gap-x-6 absolute 
+      bg-clip-padding backdrop-filter backdrop-blur-sm
+      bottom-0 py-2 border-t sm:py-3 left-0 right-0"
+      >
+        <Button variant={"destructive"} className="w-28 sm:w-32" asChild>
+          <Link
+            href={"./"}
+            scroll={true}
+            type="button"
+            className="border-0 text-sm font-semibold leading-6"
+          >
+            Cancel
+          </Link>
+        </Button>
+        <Button className="w-28 sm:w-32" type="submit" variant={"default"}>
+          {submissionLoader ? <Loader size="medium" /> : "Register"}
+        </Button>
+      </div>
     </form>
   );
 };

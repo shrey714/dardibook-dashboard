@@ -5,9 +5,9 @@ import { useSearchParams } from "next/navigation";
 import uniqid from "uniqid";
 import { getPatientById } from "@/app/services/getPatientById";
 import NoPatientsFound from "@/components/Appointment/NoPatientsFound";
-import { RegisterPatient } from "@/app/services/registerPatient";
 import RegisteredModal from "@/components/Appointment/RegisteredModal";
 import Loader from "@/components/common/Loader";
+import { RegisterPatientFormTypes } from "@/types/FormTypes";
 import {
   Dialog,
   DialogContent,
@@ -16,20 +16,10 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useAuth } from "@clerk/nextjs";
-
-interface PatientFormDataTypes {
-  last_visited: number;
-  patient_unique_Id: string;
-  first_name: string;
-  last_name: string;
-  mobile_number: string;
-  gender: string;
-  age: string;
-  street_address: string;
-  city: string;
-  state: string;
-  zip: string;
-}
+import { doc, setDoc } from "firebase/firestore";
+import { db } from "@/firebase/firebaseConfig";
+import toast from "react-hot-toast";
+import { getTime, startOfDay } from "date-fns";
 
 const Page: React.FC = () => {
   const searchParams = useSearchParams();
@@ -37,20 +27,24 @@ const Page: React.FC = () => {
   const patientId = searchParams.get("patientId");
   const [formLoader, setFormLoader] = useState(true);
   const [uniqueId] = useState(patientId ? patientId : uniqid.time());
-  const [error, setError] = useState<string | null>(null); // State for error
-  const [patientFormData, setPatientFormData] = useState<PatientFormDataTypes>({
-    last_visited: new Date().getTime(),
-    patient_unique_Id: uniqueId,
-    first_name: "",
-    last_name: "",
-    mobile_number: "",
-    gender: "Male",
-    age: "",
-    street_address: "",
-    city: "",
-    state: "",
-    zip: "",
-  });
+  const [error, setError] = useState<string | null>(null);
+  const [patientFormData, setPatientFormData] =
+    useState<RegisterPatientFormTypes>({
+      patient_id: uniqueId,
+      name: "",
+      mobile: "",
+      gender: "Male",
+      age: "",
+      street_address: "",
+      city: "",
+      state: "",
+      zip: "",
+      registered_date: [],
+      registered_date_time: [],
+      prescribed_date_time: [],
+      bed_info: [],
+    });
+  const [registerForDate, setRegisterForDate] = useState<Date>(new Date());
   const [submissionLoader, setSubmissionLoader] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -59,12 +53,19 @@ const Page: React.FC = () => {
       if (isLoaded && orgId && patientId) {
         setFormLoader(true);
         const patientData = await getPatientById(patientId, orgId);
-        if (patientData.data) {
-          setPatientFormData({
-            ...patientData.data,
-            last_visited: new Date().getTime(),
-            patient_unique_Id: uniqueId,
-          } as PatientFormDataTypes);
+        if (patientData.data as RegisterPatientFormTypes) {
+          (patientData.data as RegisterPatientFormTypes).registered_date.map(
+            (registered_date) => {
+              if (registered_date === getTime(startOfDay(new Date()))) {
+                setError(
+                  "Patient is already registed today. You can reschedule to other date."
+                );
+                return;
+              }
+            }
+          );
+
+          setPatientFormData(patientData.data);
         } else {
           setError("No patient data available for the provided PatientID.");
         }
@@ -79,21 +80,43 @@ const Page: React.FC = () => {
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     setSubmissionLoader(true);
     e.preventDefault();
-    // console.log("data form==", {
-    //   ...patientFormData,
-    //   uid: user.uid,
-    //   id: uniqueId,
-    // });
-    const data = await RegisterPatient({
-      ...patientFormData,
-      uid: orgId,
-      id: uniqueId,
-    });
-    // open modal on submitting the register patoent form
-    if (data?.status === 200) {
-      setIsModalOpen(true);
+    if (orgId) {
+      toast.promise(
+        async () => {
+          await setDoc(
+            doc(db, "doctor", orgId, "patients", uniqueId),
+            {
+              ...patientFormData,
+              registered_date: patientFormData.registered_date.concat([
+                getTime(startOfDay(registerForDate)),
+              ]),
+              registered_date_time: patientFormData.registered_date_time.concat(
+                getTime(registerForDate)
+              ),
+            },
+            {
+              merge: true,
+            }
+          ).then(
+            () => {
+              setSubmissionLoader(false);
+              setIsModalOpen(true);
+            },
+            () => {
+              setSubmissionLoader(false);
+            }
+          );
+        },
+        {
+          loading: "Loading...",
+          success: "Registered successfully",
+          error: "Failed to register",
+        },
+        {
+          position: "bottom-right",
+        }
+      );
     }
-    setSubmissionLoader(false);
   };
 
   return (
@@ -121,14 +144,14 @@ const Page: React.FC = () => {
       ) : error ? (
         <NoPatientsFound message={error} />
       ) : (
-        <div className="mb-12 mt-6">
-          <AppointmentForm
-            patientFormData={patientFormData}
-            setPatientFormData={setPatientFormData}
-            handleSubmit={handleSubmit}
-            submissionLoader={submissionLoader}
-          />
-        </div>
+        <AppointmentForm
+          patientFormData={patientFormData}
+          setPatientFormData={setPatientFormData}
+          handleSubmit={handleSubmit}
+          submissionLoader={submissionLoader}
+          registerForDate={registerForDate}
+          setRegisterForDate={setRegisterForDate}
+        />
       )}
     </>
   );
