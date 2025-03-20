@@ -58,9 +58,9 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
       autoFocus={true}
       autoComplete="off"
     >
-      <div className="mx-auto 2xl:mx-0 max-w-4xl 2xl:max-w-2xl border rounded-lg h-min 2xl:sticky top-2 sm:top-6 overflow-x-auto">
-        {patientFormData.registered_date.length > 0 &&
-        patientFormData.prescribed_date_time.length >= 0 ? (
+      {patientFormData.registered_date.length > 0 &&
+      patientFormData.prescribed_date_time.length >= 0 ? (
+        <div className="mx-auto 2xl:mx-0 max-w-4xl 2xl:max-w-2xl border rounded-lg h-min 2xl:sticky top-2 sm:top-6 overflow-x-auto">
           <Timeline
             orientation="horizontal"
             className="pt-6 px-6 pb-6 2xl:pb-0 2xl:flex-col"
@@ -121,10 +121,10 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
                 );
               })}
           </Timeline>
-        ) : (
-          <></>
-        )}
-      </div>
+        </div>
+      ) : (
+        <></>
+      )}
       <fieldset
         disabled={submissionLoader}
         className="mx-auto mt-2 sm:mt-5 2xl:mt-0 w-full 2xl:mx-0 max-w-4xl bg-sidebar/70 border rounded-lg pt-3 md:pt-6 "

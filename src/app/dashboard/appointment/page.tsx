@@ -13,7 +13,6 @@ import { useRouter } from "next/navigation";
 export default function TShirtsPage() {
   const { orgId } = useAuth();
   const router = useRouter();
-
   const loadOptions = useCallback(
     async (inputValue: string) => {
       if (!inputValue || inputValue.length < 2) {
@@ -83,8 +82,8 @@ export default function TShirtsPage() {
               return (
                 <div
                   {...patient.innerProps}
-                  className={`grid cursor-pointer group relative grid-cols-7 gap-1 w-[calc(100%-16px)] rounded-r-full md:w-[calc(100%-24px)] py-1 px-4 md:py-2 ${
-                    patient.isFocused ? "bg-primary-foreground" : ""
+                  className={`grid !text-primary cursor-pointer group relative grid-cols-7 gap-1 w-[calc(100%-16px)] rounded-r-full md:w-[calc(100%-24px)] py-1 px-4 md:py-2 ${
+                    patient.isFocused ? "bg-background" : ""
                   }`}
                 >
                   <span
@@ -119,24 +118,35 @@ export default function TShirtsPage() {
             );
           }}
           isClearable={true}
-          menuIsOpen={true}
-          inputValue="shrey"
           isValidNewOption={() => false}
           allowCreateWhileLoading={false}
           loadOptions={loadOptions}
           cacheOptions
-          defaultOptions
+          loadingMessage={() => "Finding patients..."}
+          noOptionsMessage={() => "Empty"}
+          backspaceRemovesValue={false}
           placeholder="Register patient by id/name/number..."
           className="max-w-2xl w-full mx-auto"
           classNames={{
             control: (state) =>
-              `!rounded-full !shadow-sm !border-2 !bg-muted/50 !py-1.5 ${
+              `!shadow-sm !transition-all !duration-900 !bg-slate-50 dark:!bg-sidebar !py-1.5 ${
                 state.isFocused ? "!border-blue-500" : "!border-border"
-              } `,
+              } 
+              ${
+                state.selectProps.menuIsOpen
+                  ? "!border-2 !rounded-t-2xl !rounded-b-none"
+                  : "!border-2 !rounded-full"
+              }  
+              `,
             placeholder: (state) => "!px-4",
             singleValue: (state) => "!text-primary !px-4",
             input: (state) => "!text-primary !px-4",
-            menu: (state) => "!bg-muted !border-none !rounded-lg !shadow-md",
+            menu: (state) =>
+              `!bg-slate-50 dark:!bg-sidebar !border-border !overflow-hidden !shadow-md !mt-0 ${
+                state.selectProps.menuIsOpen
+                  ? "!border-t-0 !border-b-2 !border-x-2 !rounded-b-2xl !rounded-t-none"
+                  : "!border-2 !rounded-2xl"
+              }`,
             menuList: (state) => "!py-1 md:!py-2",
           }}
         />
