@@ -3,30 +3,27 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
-import { CalendarIcon } from "lucide-react";
+import {
+  BriefcaseMedicalIcon,
+  PencilLineIcon,
+} from "lucide-react";
 import { UserReOrderMenu } from "./UserReOrderMenu";
 import { Reorder } from "framer-motion";
-import { format, formatRelative } from "date-fns";
+import { format } from "date-fns";
 import Link from "next/link";
-import { enUS } from "date-fns/locale";
 import UserSchedulebtn from "./UserSchedulebtn";
 import { usePatientHistoryModalStore } from "@/lib/stores/patientHistoryModalStore";
-const customLocale = {
-  ...enUS,
-  formatRelative: (token: string) => {
-    const formatWithoutTime: Record<string, string> = {
-      lastWeek: "'last' eeee",
-      yesterday: "'yesterday'",
-      today: "'today'",
-      tomorrow: "'tomorrow'",
-      nextWeek: "eeee",
-      other: "MMMM dd, yyyy",
-    };
-    return formatWithoutTime[token];
-  },
-};
+import { ScheduledPatientTypes } from "@/types/FormTypes";
 
-export function ScheduleList({ scheduledPatients }: any) {
+interface ScheduleListProps {
+  scheduledPatients?: ScheduledPatientTypes[];
+  forDate: Date;
+}
+
+export const ScheduleList: React.FC<ScheduleListProps> = ({
+  scheduledPatients,
+  forDate,
+}) => {
   const { openModal } = usePatientHistoryModalStore();
 
   const base = 4;
@@ -34,13 +31,20 @@ export function ScheduleList({ scheduledPatients }: any) {
   return (
     <table className="w-full">
       <tbody className="rounded-lg">
-        {[...scheduledPatients].map((patient: any, index: number) => {
+        {(scheduledPatients ?? []).map((patient, index) => {
+          const matchingTimestamp = patient.registered_date_time.find(
+            (timestamp) => {
+              return (
+                new Date(timestamp).toDateString() === forDate?.toDateString()
+              );
+            }
+          );
           return (
             <Reorder.Item
               drag={false}
               as="tr"
-              key={patient.patient_unique_Id}
-              value={patient.patient_unique_Id}
+              key={patient.patient_id}
+              value={patient.patient_id}
               initial={{ height: 0, opacity: 0 }}
               animate={{
                 height: "auto",
@@ -62,18 +66,19 @@ export function ScheduleList({ scheduledPatients }: any) {
             >
               <td className="text-center font-medium text-sm sm:text-base relative">
                 <HoverCard openDelay={80} closeDelay={80}>
-                  <HoverCardTrigger>
-                    <div
-                      className={`flex flex-1 w-full items-center justify-between flex-row my-1 h-8`}
-                    >
+                  <div className={`flex flex-1 w-full flex-row my-1 h-8`}>
+                    <HoverCardTrigger className="flex flex-1 flex-row items-center justify-center">
                       <div
-                        className={`rounded-s-full flex items-center px-3 py-1 rounded-l-full h-full ${
-                          patient.attended ? "bg-green-600" : "bg-border"
+                        className={`rounded-s-full flex items-center px-3 py-1 rounded-l-full h-full bg-border
                         }`}
                       >
-                        {scheduledPatients.length - index}
+                        {index + 1}
                         <p className="text-xs ml-2">
-                          ({format(new Date(patient.last_visited), "hh:mm a")})
+                          (
+                          {matchingTimestamp
+                            ? format(new Date(matchingTimestamp), "hh:mm a")
+                            : "---"}
+                          )
                         </p>
                       </div>
 
@@ -82,65 +87,59 @@ export function ScheduleList({ scheduledPatients }: any) {
                         role="button"
                         onClick={() =>
                           openModal({
-                            patientId: patient.patient_unique_Id,
+                            patientId: patient.patient_id,
                           })
                         }
                         className={`py-1 rounded-r-full flex flex-1 text-xs h-full items-center ${
-                          patient.attended ? "bg-green-600" : "bg-border"
+                          false ? "bg-green-600" : "bg-border"
                         }`}
                       >
                         <p className={`underline px-4 text-sm`}>
-                          {patient.patient_unique_Id}
+                          {patient.patient_id}
                         </p>
                       </Link>
-
-                      <span className="flex flex-row gap-1 items-center ml-1">
-                        <UserReOrderMenu
-                          item={patient}
-                          disabled={patient.attended}
-                        />
-                        <UserSchedulebtn patient={patient} />
-                      </span>
-                    </div>
-                  </HoverCardTrigger>
+                    </HoverCardTrigger>
+                    <span className="flex flex-row gap-1 items-center ml-1">
+                      <UserReOrderMenu
+                        patient={patient}
+                        matchingDate={forDate}
+                      />
+                      <UserSchedulebtn
+                        patient={patient}
+                        matchingDate={forDate}
+                      />
+                    </span>
+                  </div>
                   <HoverCardContent
                     className="w-auto bg-muted"
                     side="left"
                     sideOffset={20}
                   >
-                    <div className="flex justify-between space-x-4">
-                      <div className="space-y-1">
-                        <h4 className="text-sm font-semibold">
-                          Id : {patient.patient_unique_Id}
-                        </h4>
-                        <h4 className="text-sm font-semibold">
-                          Name : {patient.first_name} {patient.last_name}
-                        </h4>
-                        <h4 className="text-sm font-semibold">
-                          Contact : {patient.mobile_number}
-                        </h4>
-                        <h4
-                          className={`text-sm font-semibold ${
-                            patient.attended ? "text-green-600" : ""
-                          }`}
-                        >
-                          Status :{" "}
-                          {patient.attended
-                            ? "Attended"
-                            : patient.old
-                            ? "Old"
-                            : "New"}
-                        </h4>
-                        <div className="flex items-center pt-2">
-                          <CalendarIcon className="mr-2 h-4 w-4 opacity-70" />{" "}
-                          <span className="text-xs text-muted-foreground">
-                            {patient.last_visited &&
-                              formatRelative(patient.last_visited, new Date(), {
-                                locale: customLocale,
-                              })}
-                          </span>
-                        </div>
-                      </div>
+                    <div className="flex flex-col items-start space-y-1">
+                      <h4 className="text-sm font-semibold">
+                        Id : {patient.patient_id}
+                      </h4>
+                      <h4 className="text-sm font-semibold">
+                        Name : {patient.name}
+                      </h4>
+                      <h4 className="text-sm font-semibold">
+                        Contact : {patient.mobile}
+                      </h4>
+                      <h4 className="text-sm font-semibold">
+                        Gender : {patient.gender}
+                      </h4>
+
+                      <p className="flex text-sm items-center gap-2">
+                        <PencilLineIcon size={16} className="text-blue-500" />{" "}
+                        {patient.registerd_by.name}
+                      </p>
+                      <p className="flex text-sm items-center gap-2">
+                        <BriefcaseMedicalIcon
+                          size={16}
+                          className="text-green-500"
+                        />{" "}
+                        {patient.registerd_for.name}
+                      </p>
                     </div>
                   </HoverCardContent>
                 </HoverCard>
@@ -151,4 +150,4 @@ export function ScheduleList({ scheduledPatients }: any) {
       </tbody>
     </table>
   );
-}
+};

@@ -16,7 +16,6 @@ import {
 import { Inbox, RotateCcw } from "lucide-react";
 import {
   addDays,
-  endOfDay,
   formatRelative,
   getTime,
   startOfDay,
@@ -30,11 +29,9 @@ import {
   query,
   collection,
   onSnapshot,
-  DocumentData,
   where,
-  orderBy,
-  Timestamp,
 } from "firebase/firestore";
+import { ScheduledPatientTypes } from "@/types/FormTypes";
 
 const customLocale = {
   ...enUS,
@@ -54,8 +51,9 @@ const customLocale = {
 export function ScheduleSidebar({
   ...props
 }: React.ComponentProps<typeof Sidebar2>) {
-  const [date, setDate] = useState<Date | undefined>(addDays(new Date(), 1));
-  const [scheduledPatients, setScheduledPatients] = useState<any>([]);
+  const [date, setDate] = useState<Date>(addDays(new Date(), 1));
+  const [scheduledPatients, setScheduledPatients] =
+    useState<ScheduledPatientTypes[]>();
   const [loader, setLoader] = useState(false);
   const { isLoaded, orgId } = useAuth();
 
@@ -65,43 +63,23 @@ export function ScheduleSidebar({
       if (isLoaded && orgId && date) {
         const q = query(
           collection(db, "doctor", orgId, "patients"),
-          where(
-            "last_visited",
-            ">=",
-            Timestamp.fromMillis(getTime(startOfDay(date)))
-          ),
-          where(
-            "last_visited",
-            "<=",
-            Timestamp.fromMillis(getTime(endOfDay(date)))
-          ),
-          orderBy("last_visited", "desc")
+          where("registered_date", "array-contains", getTime(startOfDay(date)))
         );
 
         setLoader(true);
         unsubscribe = onSnapshot(q, async (snapshot) => {
-          const patientData: DocumentData[] = [];
-
+          const patientData: ScheduledPatientTypes[] = [];
           snapshot.forEach((doc) => {
-            const pData = doc.data();
-            const visitedDatesArray = pData?.visitedDates || [];
-            const today = new Date().getDate();
-
-            const attended = visitedDatesArray.some(
-              (date: number) => new Date(date).getDate() === today
-            );
-            const old =
-              visitedDatesArray.length > 1 ||
-              (visitedDatesArray.length === 1 && !attended);
-
+            const pData = doc.data() as ScheduledPatientTypes;
             patientData.push({
-              ...pData,
-              attended,
-              old,
-              last_visited: (pData?.last_visited as Timestamp).toMillis(),
-              visitedDates: pData?.visitedDates?.map((time: Timestamp) =>
-                time.toMillis()
-              ),
+              patient_id: pData.patient_id,
+              name: pData.name,
+              mobile: pData.mobile,
+              gender: pData.gender,
+              registered_date: pData.registered_date,
+              registered_date_time: pData.registered_date_time,
+              registerd_by: pData.registerd_by,
+              registerd_for: pData.registerd_for,
             });
           });
           setScheduledPatients(patientData);
@@ -177,7 +155,7 @@ export function ScheduleSidebar({
                   </SidebarMenuItem2>
                 ))}
               </SidebarMenu2>
-            ) : scheduledPatients.length === 0 ? (
+            ) : scheduledPatients?.length === 0 ? (
               <div className="text-sidebar-foreground/70 flex flex-1 items-center justify-center flex-col gap-1 min-h-28">
                 <Inbox />
                 Empty
@@ -185,11 +163,11 @@ export function ScheduleSidebar({
             ) : (
               <ul className="w-full">
                 <Reorder.Group
-                  values={scheduledPatients}
+                  values={scheduledPatients ?? []}
                   onReorder={setScheduledPatients}
                   draggable={false}
                 >
-                  <ScheduleList scheduledPatients={scheduledPatients} />
+                  <ScheduleList scheduledPatients={scheduledPatients} forDate={date} />
                 </Reorder.Group>
               </ul>
             )}

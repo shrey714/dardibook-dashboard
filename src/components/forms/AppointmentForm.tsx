@@ -24,6 +24,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+import { useOrganization } from "@clerk/nextjs";
+
 interface AppointmentFormProps {
   patientFormData: RegisterPatientFormTypes;
   setPatientFormData: React.Dispatch<
@@ -43,6 +45,14 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
   registerForDate,
   setRegisterForDate,
 }) => {
+  const { memberships } = useOrganization({
+    memberships: {
+      infinite: true,
+      keepPreviousData: true,
+      role: ["org:doctor", "org:clinic_head"],
+    },
+  });
+
   const handleInputChange = (e: { target: { name: any; value: any } }) => {
     const { name, value } = e.target;
     setPatientFormData({
@@ -181,6 +191,67 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
               setDate={setRegisterForDate}
             />
           </div>
+          <div className="px-4 py-1 md:py-6 md:grid md:grid-cols-3 sm:gap-4 md:px-8">
+            <label
+              htmlFor="registerd_for"
+              className="text-sm font-medium leading-6  flex items-center gap-1"
+            >
+              Doctor<p className="text-red-500">*</p>
+            </label>
+            <Select
+              aria-hidden={false}
+              required
+              name="registerd_for"
+              onValueChange={(val) => {
+                const member = memberships?.data?.find(
+                  (mem) => mem.publicUserData.userId === val
+                );
+
+                if (member) {
+                  const {
+                    userId,
+                    firstName = "",
+                    lastName = "",
+                    identifier,
+                  } = member.publicUserData;
+
+                  const selectedMember = {
+                    id: userId,
+                    name: `${firstName} ${lastName}`.trim(),
+                    email: identifier,
+                  };
+
+                  handleInputChange({
+                    target: { name: "registerd_for", value: selectedMember },
+                  });
+                }
+              }}
+            >
+              <SelectTrigger
+                autoFocus={true}
+                id="registerd_for"
+                className="w-full md:max-w-md lg:col-span-2 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input py-1 pl-2 sm:text-sm sm:leading-6"
+              >
+                <SelectValue placeholder="Doctor" />
+              </SelectTrigger>
+              <SelectContent>
+                {memberships &&
+                  memberships.data?.map((member, index) =>
+                    member.publicUserData.userId ? (
+                      <SelectItem
+                        value={member.publicUserData.userId}
+                        key={index}
+                      >
+                        {member.publicUserData.firstName}{" "}
+                        {member.publicUserData.lastName}
+                      </SelectItem>
+                    ) : (
+                      <></>
+                    )
+                  )}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
         {/* personal information form */}
         <div className="px-4 mt-3 md:mt-6 md:px-8">
@@ -200,7 +271,6 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
               Full name<p className="text-red-500">*</p>
             </label>
             <input
-              autoFocus={true}
               required
               type="text"
               name="name"

@@ -2,13 +2,23 @@
 import React, { useCallback } from "react";
 import Link from "next/link";
 import ReOrderingList from "@/components/Appointment/ReOrderingList";
-import { Button } from "@/components/ui/button";
 import { ArrowUpRight, UserPlus } from "lucide-react";
 import AsyncCreatableSelect from "react-select/async-creatable";
 import { and, collection, getDocs, or, query, where } from "firebase/firestore";
 import { db } from "@/firebase/firebaseConfig";
 import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
+import { ScheduleSidebar } from "../../../components/Appointment/ScheduleSidebar";
+import { SidebarProvider2, SidebarTrigger2 } from "@/components/ui/sidebar2";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { SidebarProvider3, SidebarTrigger3 } from "@/components/ui/sidebar3";
+import { BedSidebar } from "@/components/Appointment/BedSidebar";
+import { Button } from "@/components/ui/button";
 
 export default function TShirtsPage() {
   const { orgId } = useAuth();
@@ -73,7 +83,7 @@ export default function TShirtsPage() {
 
   return (
     <div className="flex flex-1 flex-row relative h-full w-full overflow-hidden">
-      <div className="px-4 sm:px-6 lg:px-8 self-center pb-12 pt-5 flex flex-1 flex-col gap-8 items-center relative h-full overflow-y-auto">
+      <div className="px-4 sm:px-6 lg:px-8 self-center pb-12 pt-3 md:pt-5 flex flex-1 flex-col gap-3 md:gap-5 items-center relative h-full overflow-y-auto">
         <AsyncCreatableSelect
           components={{
             DropdownIndicator: () => null,
@@ -88,9 +98,7 @@ export default function TShirtsPage() {
                 >
                   <span
                     className={`w-1 bg-blue-500 h-3/4 self-center rounded-r-full absolute left-0 ${
-                      patient.isSelected || patient.isFocused
-                        ? "visible"
-                        : "invisible"
+                      patient.isFocused ? "visible" : "invisible"
                     }`}
                   ></span>
 
@@ -138,20 +146,20 @@ export default function TShirtsPage() {
                   : "!border-2 !rounded-full"
               }  
               `,
-            placeholder: (state) => "!px-4",
-            singleValue: (state) => "!text-primary !px-4",
-            input: (state) => "!text-primary !px-4",
+            placeholder: () => "!px-4",
+            singleValue: () => "!text-primary !px-4",
+            input: () => "!text-primary !px-4",
             menu: (state) =>
               `!bg-slate-50 dark:!bg-sidebar !border-border !overflow-hidden !shadow-md !mt-0 ${
                 state.selectProps.menuIsOpen
                   ? "!border-t-0 !border-b-2 !border-x-2 !rounded-b-2xl !rounded-t-none"
                   : "!border-2 !rounded-2xl"
               }`,
-            menuList: (state) => "!py-1 md:!py-2",
+            menuList: () => "!py-1 md:!py-2",
           }}
         />
 
-        <div className="max-w-4xl w-full p-0 flex flex-row items-center">
+        <div className="max-w-4xl w-full p-0 flex flex-row items-center mt-1">
           <span className="flex flex-1 h-[2px] bg-gradient-to-r from-transparent to-primary"></span>
           <div className=" flex items-center justify-center">
             <p className="w-auto px-3 py-1 font-medium text-base rounded-full border-primary border-[2px]">
@@ -176,7 +184,7 @@ export default function TShirtsPage() {
         </Button>
       </div>
 
-      {/* <div className="h-full relative">
+      <div className="h-full relative">
         <SidebarProvider2 defaultOpen={true} className="hidden sm:flex">
           <SidebarProvider3 defaultOpen={false} className="hidden sm:flex">
             <div className="h-fit flex flex-col py-2 absolute -left-9 gap-2">
@@ -203,7 +211,7 @@ export default function TShirtsPage() {
             <BedSidebar />
           </SidebarProvider3>
         </SidebarProvider2>
-      </div> */}
+      </div>
     </div>
   );
 }

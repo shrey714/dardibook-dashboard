@@ -251,10 +251,10 @@ const QueueList: React.FC = () => {
                                   <p>Prescribe</p>
                                 </TooltipContent>
                               </Tooltip>
-                              <UserReOrderMenu
+                              {/* <UserReOrderMenu
                                 item={item}
                                 disabled={item.attended}
-                              />
+                              /> */}
                             </td>
                           </Reorder.Item>
                         );

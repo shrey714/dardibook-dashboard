@@ -165,10 +165,10 @@ const ReOrderingList: React.FC = () => {
                             </p>
                           </td>
                           <td className="text-center font-medium text-sm sm:text-base">
-                            <UserReOrderMenu
+                            {/* <UserReOrderMenu
                               item={item}
                               disabled={item.attended}
-                            />
+                            /> */}
                           </td>
                         </Reorder.Item>
                       );

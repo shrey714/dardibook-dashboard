@@ -19,11 +19,13 @@ import { useAuth } from "@clerk/nextjs";
 import { doc, setDoc } from "firebase/firestore";
 import { db } from "@/firebase/firebaseConfig";
 import toast from "react-hot-toast";
-import { getTime, startOfDay } from "date-fns";
+import { format, getTime, startOfDay } from "date-fns";
+import { useUser } from "@clerk/nextjs";
 
 const Page: React.FC = () => {
   const searchParams = useSearchParams();
   const { isLoaded, orgId } = useAuth();
+  const { user } = useUser();
   const patientId = searchParams.get("patientId");
   const [formLoader, setFormLoader] = useState(true);
   const [uniqueId] = useState(patientId ? patientId : uniqid.time());
@@ -43,6 +45,16 @@ const Page: React.FC = () => {
       registered_date_time: [],
       prescribed_date_time: [],
       bed_info: [],
+      registerd_by: {
+        id: "",
+        name: "",
+        email: "",
+      },
+      registerd_for: {
+        id: "",
+        name: "",
+        email: "",
+      },
     });
   const [registerForDate, setRegisterForDate] = useState<Date>(new Date());
   const [submissionLoader, setSubmissionLoader] = useState(false);
@@ -52,13 +64,24 @@ const Page: React.FC = () => {
     const getPatientData = async () => {
       if (isLoaded && orgId && patientId) {
         setFormLoader(true);
-        const patientData = await getPatientById(patientId, orgId);
-        if (patientData.data as RegisterPatientFormTypes) {
-          (patientData.data as RegisterPatientFormTypes).registered_date.map(
+        const patientData = await getPatientById(patientId, orgId).catch(() => {
+          setError("Something wrong with this patient.");
+          setFormLoader(false);
+        });
+        if (patientData.data.registered_date) {
+          (patientData.data as RegisterPatientFormTypes)?.registered_date.map(
             (registered_date) => {
               if (registered_date === getTime(startOfDay(new Date()))) {
                 setError(
                   "Patient is already registed today. You can reschedule to other date."
+                );
+                return;
+              } else if (registered_date > getTime(startOfDay(new Date()))) {
+                setError(
+                  `Patient is already registed for ${format(
+                    new Date(registered_date),
+                    "dd-MM-yyyy"
+                  )}. You can reschedule it to today.`
                 );
                 return;
               }
@@ -78,11 +101,11 @@ const Page: React.FC = () => {
   }, [patientId, uniqueId, isLoaded, orgId]);
 
   const handleSubmit = async (e: { preventDefault: () => void }) => {
-    setSubmissionLoader(true);
     e.preventDefault();
-    if (orgId) {
+    if (orgId && user) {
       toast.promise(
         async () => {
+          setSubmissionLoader(true);
           await setDoc(
             doc(db, "doctor", orgId, "patients", uniqueId),
             {
@@ -93,6 +116,11 @@ const Page: React.FC = () => {
               registered_date_time: patientFormData.registered_date_time.concat(
                 getTime(registerForDate)
               ),
+              registerd_by: {
+                id: user.id,
+                name: user.fullName,
+                email: user.primaryEmailAddress?.emailAddress,
+              },
             },
             {
               merge: true,

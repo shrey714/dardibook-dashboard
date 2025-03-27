@@ -11,5 +11,24 @@ export interface RegisterPatientFormTypes {
     registered_date: number[];
     registered_date_time: number[];
     prescribed_date_time: number[];
-    bed_info: []
+    bed_info: [];
+    registerd_by: orgUserType;
+    registerd_for: orgUserType;
+}
+
+export interface ScheduledPatientTypes {
+    patient_id: string;
+    name: string;
+    mobile: string;
+    gender: "Male" | "Female" | "Other";
+    registered_date: number[];
+    registered_date_time: number[];
+    registerd_by: orgUserType;
+    registerd_for: orgUserType;
+}
+
+export interface orgUserType {
+    id: string;
+    name: string;
+    email: string;
 }

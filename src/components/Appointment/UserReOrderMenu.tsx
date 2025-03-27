@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  BriefcaseMedicalIcon,
   Calendar1Icon,
   CalendarIcon,
   MoreHorizontal,
@@ -8,7 +9,7 @@ import {
 } from "lucide-react";
 import { db } from "@/firebase/firebaseConfig";
 import { Button } from "@/components/ui/button";
-import { doc, Timestamp, updateDoc } from "firebase/firestore";
+import { arrayRemove, doc, updateDoc } from "firebase/firestore";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,13 +23,44 @@ import { Calendar } from "../ui/calendar";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { ResetIcon } from "@radix-ui/react-icons";
 import Loader from "../common/Loader";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth, useOrganization, useUser } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
-import { format } from "date-fns";
+import { format, getTime, startOfDay } from "date-fns";
+import { orgUserType, ScheduledPatientTypes } from "@/types/FormTypes";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
-export function UserReOrderMenu({ item, disabled }: any) {
+interface UserReOrderMenuProps {
+  patient: ScheduledPatientTypes;
+  matchingDate: Date;
+  disabled?: boolean;
+}
+
+export const UserReOrderMenu: React.FC<UserReOrderMenuProps> = ({
+  patient,
+  matchingDate,
+  disabled,
+}) => {
+  const patient_matching_reg_date =
+    patient.registered_date.find(
+      (date) => new Date(date).toDateString() === matchingDate.toDateString()
+    ) ?? 0;
+
+  const patient_matching_reg_date_time =
+    patient.registered_date_time.find(
+      (date_time) =>
+        getTime(startOfDay(date_time)) === getTime(startOfDay(matchingDate))
+    ) ?? 0;
+
   const { orgId } = useAuth();
-  const [date, setDate] = useState<Date>(new Date(item.last_visited));
+  const [date, setDate] = useState<Date>(
+    new Date(patient_matching_reg_date_time)
+  );
   const [menuLoader, setMenuLoader] = useState(false);
   const hours = Array.from({ length: 12 }, (_, i) => i + 1);
   const handleDateSelect = (selectedDate: Date | undefined) => {
@@ -36,9 +68,18 @@ export function UserReOrderMenu({ item, disabled }: any) {
       setDate(selectedDate);
     }
   };
+  const { memberships } = useOrganization({
+    memberships: {
+      infinite: true,
+      keepPreviousData: true,
+      role: ["org:doctor", "org:clinic_head"],
+    },
+  });
+  const { user } = useUser();
+
   useEffect(() => {
-    setDate(new Date(item.last_visited));
-  }, [item.last_visited]);
+    setDate(new Date(patient_matching_reg_date_time));
+  }, [patient_matching_reg_date_time]);
 
   const handleTimeChange = (
     type: "hour" | "minute" | "ampm",
@@ -66,8 +107,20 @@ export function UserReOrderMenu({ item, disabled }: any) {
     if (orgId) {
       setMenuLoader(true);
       await updateDoc(
-        doc(db, "doctor", orgId, "patients", item.patient_unique_Id),
-        { last_visited: Timestamp.fromMillis(new Date(date).getTime()) }
+        doc(db, "doctor", orgId, "patients", patient.patient_id),
+        {
+          registered_date: patient.registered_date.map((registered_date) =>
+            patient_matching_reg_date === registered_date
+              ? getTime(startOfDay(date))
+              : registered_date
+          ),
+          registered_date_time: patient.registered_date_time.map(
+            (registered_date_time) =>
+              patient_matching_reg_date_time === registered_date_time
+                ? getTime(date)
+                : registered_date_time
+          ),
+        }
       );
       setMenuLoader(false);
     }
@@ -77,8 +130,24 @@ export function UserReOrderMenu({ item, disabled }: any) {
     if (orgId) {
       setMenuLoader(true);
       await updateDoc(
-        doc(db, "doctor", orgId, "patients", item.patient_unique_Id),
-        { last_visited: Timestamp.fromMillis(0) }
+        doc(db, "doctor", orgId, "patients", patient.patient_id),
+        {
+          registered_date: arrayRemove(patient_matching_reg_date),
+          registered_date_time: arrayRemove(patient_matching_reg_date_time),
+        }
+      );
+      setMenuLoader(false);
+    }
+  };
+
+  const handleDoctorChange = async (doctor: orgUserType) => {
+    if (orgId) {
+      setMenuLoader(true);
+      await updateDoc(
+        doc(db, "doctor", orgId, "patients", patient.patient_id),
+        {
+          registerd_for: doctor,
+        }
       );
       setMenuLoader(false);
     }
@@ -105,6 +174,7 @@ export function UserReOrderMenu({ item, disabled }: any) {
             mode="single"
             selected={date}
             onSelect={handleDateSelect}
+            disabled={{ before: new Date() }}
             initialFocus
           />
           <div className="flex flex-col sm:flex-row sm:h-[300px] divide-y sm:divide-y-0 sm:divide-x">
@@ -175,7 +245,7 @@ export function UserReOrderMenu({ item, disabled }: any) {
         <Button
           variant="outline"
           className={cn(
-            "w-full justify-start text-left font-normal mb-1",
+            "w-full justify-start text-left font-normal mb-1 cursor-default hover:bg-transparent",
             !date && "text-muted-foreground"
           )}
         >
@@ -188,9 +258,12 @@ export function UserReOrderMenu({ item, disabled }: any) {
         </Button>
 
         <Button
-          disabled={new Date(item.last_visited).toString() === date.toString()}
+          disabled={
+            new Date(patient_matching_reg_date_time).toString() ===
+            date.toString()
+          }
           onClick={() => {
-            setDate(new Date(item.last_visited));
+            setDate(new Date(new Date(patient_matching_reg_date_time)));
           }}
           className="font-medium border-0 bg-red-500/10 text-red-600 hover:!text-red-600 hover:!bg-red-500/20 flex items-center justify-center relative float-right"
         >
@@ -200,12 +273,13 @@ export function UserReOrderMenu({ item, disabled }: any) {
         <DropdownMenuItem asChild>
           <Button
             disabled={
-              new Date(item.last_visited).toString() === date.toString()
+              new Date(patient_matching_reg_date_time).toString() ===
+              date.toString()
             }
             onClick={() => {
               rescheduleFn();
             }}
-            className="font-medium border-0 bg-green-500/10 text-green-600 hover:!text-green-600 hover:!bg-green-500/20 flex items-center justify-center"
+            className="cursor-pointer font-medium border-0 bg-green-500/10 text-green-600 hover:!text-green-600 hover:!bg-green-500/20 flex items-center justify-center"
           >
             <Calendar1Icon />
             Submit
@@ -217,13 +291,70 @@ export function UserReOrderMenu({ item, disabled }: any) {
             onClick={() => {
               cancelAppointment();
             }}
-            className="font-medium w-full border-0 bg-red-500/10 text-red-600 hover:!text-red-600 hover:!bg-red-500/20 flex items-center justify-center"
+            className="cursor-pointer font-medium w-full border-0 bg-red-500/10 text-red-600 hover:!text-red-600 hover:!bg-red-500/20 flex items-center justify-center"
           >
             <XIcon />
             Cancel Appointment
           </Button>
         </DropdownMenuItem>
+        <DropdownMenuSeparator />
+
+        <div className="w-full flex flex-row gap-x-1">
+          <span className="bg-green-500/10 flex h-auto px-2 rounded-md aspect-square items-center justify-center">
+            <BriefcaseMedicalIcon size={20} className="text-green-500" />
+          </span>
+          <Select
+            disabled={patient.registerd_by.id !== user?.id || menuLoader}
+            required
+            defaultValue={patient.registerd_for.id}
+            name="registerd_for"
+            onValueChange={(val) => {
+              const member = memberships?.data?.find(
+                (mem) => mem.publicUserData.userId === val
+              );
+
+              if (member && member.publicUserData.userId) {
+                const {
+                  userId,
+                  firstName = "",
+                  lastName = "",
+                  identifier,
+                } = member.publicUserData;
+
+                const selectedMember = {
+                  id: userId,
+                  name: `${firstName} ${lastName}`.trim(),
+                  email: identifier,
+                };
+                handleDoctorChange(selectedMember);
+              }
+            }}
+          >
+            <SelectTrigger
+              id="registerd_for"
+              className="w-full md:max-w-md lg:col-span-2 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input py-1 pl-2 sm:text-sm sm:leading-6"
+            >
+              <SelectValue placeholder="Doctor" />
+            </SelectTrigger>
+            <SelectContent>
+              {memberships &&
+                memberships.data?.map((member, index) =>
+                  member.publicUserData.userId ? (
+                    <SelectItem
+                      value={member.publicUserData.userId}
+                      key={index}
+                    >
+                      {member.publicUserData.firstName}{" "}
+                      {member.publicUserData.lastName}
+                    </SelectItem>
+                  ) : (
+                    <></>
+                  )
+                )}
+            </SelectContent>
+          </Select>
+        </div>
       </DropdownMenuContent>
     </DropdownMenu>
   );
-}
+};
