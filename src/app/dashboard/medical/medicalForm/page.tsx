@@ -17,26 +17,16 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { useAuth } from "@clerk/nextjs";
 import { useTodayPatientStore } from "@/lib/providers/todayPatientsProvider";
 
 const Page = () => {
-  const { isLoaded, orgId } = useAuth();
   const searchParams = useSearchParams();
   const patientId = searchParams.get("patientId");
   const [startIndex, setstartIndex] = useState(0);
   const [drawerState, setdrawerState] = useState(false);
   // =============================================
 
-  const { patientsData, loading, getTodayPatients } = useTodayPatientStore(
-    (state) => state
-  );
-
-  useEffect(() => {
-    if (orgId && isLoaded) {
-      getTodayPatients(orgId);
-    }
-  }, [getTodayPatients, isLoaded, orgId]);
+  const { patientsData, loading } = useTodayPatientStore((state) => state);
 
   useEffect(() => {
     const index = patientsData?.findIndex(
@@ -44,7 +34,7 @@ const Page = () => {
         patient.patient_unique_Id === patientId
     );
     setstartIndex(index);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [patientsData]);
 
   return (

@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React from "react";
 import Link from "next/link";
 import useToken from "@/firebase/useToken";
 import Loader from "@/components/common/Loader";
@@ -15,18 +15,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { useTodayPatientStore } from "@/lib/providers/todayPatientsProvider";
 const Medical = () => {
-  const { isLoaded, orgId } = useAuth();
+  const { orgId } = useAuth();
   const { CurrentToken } = useToken(orgId || "");
 
-  const { patientsData, loading, getTodayPatients } = useTodayPatientStore(
-    (state) => state
-  );
-
-  useEffect(() => {
-    if (orgId && isLoaded) {
-      getTodayPatients(orgId);
-    }
-  }, [getTodayPatients, isLoaded, orgId]);
+  const { patientsData, loading } = useTodayPatientStore((state) => state);
 
   const base = 4;
   const t = (d: number) => d * base;

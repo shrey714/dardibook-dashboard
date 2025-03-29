@@ -21,39 +21,12 @@ import { useTodayPatientStore } from "@/lib/providers/todayPatientsProvider";
 import { usePatientHistoryModalStore } from "@/lib/stores/patientHistoryModalStore";
 
 const QueueList: React.FC = () => {
-  const { isLoaded, orgId } = useAuth();
+  const { orgId } = useAuth();
   const { CurrentToken } = useToken(orgId || "");
   const { openModal } = usePatientHistoryModalStore();
 
-  // ======================================
-  // useEffect(() => {
-  //   const getTodayPatientQueue = async () => {
-  //     if (user) {
-  //       setqueueLoader(true);
-  //       const patientQueueData = await getTodayPatients(user.uid);
-  //       if (patientQueueData.data) {
-  //         //   console.log(patientQueueData.data);
-  //         setqueueItems(patientQueueData.data);
-  //       } else {
-  //         setqueueItems([]);
-  //       }
-  //       setqueueLoader(false);
-  //     } else {
-  //       setqueueLoader(false);
-  //     }
-  //   };
-  //   getTodayPatientQueue();
-  // }, [user]);
   // =============================================
-  const { patientsData, loading, getTodayPatients } = useTodayPatientStore(
-    (state) => state
-  );
-
-  useEffect(() => {
-    if (orgId && isLoaded) {
-      getTodayPatients(orgId);
-    }
-  }, [getTodayPatients, isLoaded, orgId]);
+  const { patientsData, loading } = useTodayPatientStore((state) => state);
   // =============================================
   const base = 4;
   const t = (d: number) => d * base;

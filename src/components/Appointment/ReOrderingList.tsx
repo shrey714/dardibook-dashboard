@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-// import { getTodayPatients } from "@/app/services/getTodayPatients";
 import useToken from "@/firebase/useToken";
 import Link from "next/link";
 import Loader from "../common/Loader";
@@ -12,18 +11,12 @@ import { usePatientHistoryModalStore } from "@/lib/stores/patientHistoryModalSto
 
 const ReOrderingList: React.FC = () => {
   const { openModal } = usePatientHistoryModalStore();
-  const { isLoaded, orgId } = useAuth();
+  const { orgId } = useAuth();
   const { CurrentToken } = useToken(orgId || "");
 
-  const { patientsData, loading, getTodayPatients } = useTodayPatientStore(
+  const { patientsData, loading } = useTodayPatientStore(
     (state) => state
   );
-
-  useEffect(() => {
-    if (orgId && isLoaded) {
-      getTodayPatients(orgId);
-    }
-  }, [getTodayPatients, isLoaded, orgId]);
 
   const base = 4;
   const t = (d: number) => d * base;

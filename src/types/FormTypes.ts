@@ -1,3 +1,19 @@
+
+export interface orgUserType {
+    id: string;
+    name: string;
+    email: string;
+}
+
+export interface patientBed {
+    bedId: string;
+    admission_at: number;
+    admission_by: orgUserType;
+    admission_for: orgUserType;
+    discharge_at: number;
+    dischargeMarked: boolean;
+    discharged_by: orgUserType;
+}
 export interface RegisterPatientFormTypes {
     patient_id: string;
     name: string;
@@ -11,7 +27,7 @@ export interface RegisterPatientFormTypes {
     registered_date: number[];
     registered_date_time: number[];
     prescribed_date_time: number[];
-    bed_info: [];
+    bed_info: patientBed[];
     registerd_by: orgUserType;
     registerd_for: orgUserType;
 }
@@ -27,8 +43,21 @@ export interface ScheduledPatientTypes {
     registerd_for: orgUserType;
 }
 
-export interface orgUserType {
-    id: string;
+export interface BedPatientTypes {
+    patient_id: string;
     name: string;
-    email: string;
+    mobile: string;
+    gender: "Male" | "Female" | "Other";
+    age: string;
+}
+
+export interface OrgBed {
+    bedId: string;
+    patient_id: string;
+    admission_at: number;
+    admission_by: orgUserType;
+    admission_for: orgUserType;
+    discharge_at: number;
+    dischargeMarked: boolean;
+    discharged_by: orgUserType;
 }

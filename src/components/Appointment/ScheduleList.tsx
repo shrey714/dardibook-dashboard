@@ -3,10 +3,7 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
-import {
-  BriefcaseMedicalIcon,
-  PencilLineIcon,
-} from "lucide-react";
+import { BriefcaseMedicalIcon, PencilLineIcon } from "lucide-react";
 import { UserReOrderMenu } from "./UserReOrderMenu";
 import { Reorder } from "framer-motion";
 import { format } from "date-fns";
@@ -25,7 +22,6 @@ export const ScheduleList: React.FC<ScheduleListProps> = ({
   forDate,
 }) => {
   const { openModal } = usePatientHistoryModalStore();
-
   const base = 4;
   const t = (d: number) => d * base;
   return (

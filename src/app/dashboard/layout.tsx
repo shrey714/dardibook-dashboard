@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { RefProvider } from "@/hooks/RefContext";
 import { TodayPatientsProvider } from "@/lib/providers/todayPatientsProvider";
 import PatientHistoryGlobalModal from "@/components/common/PatientHistoryGlobalModal";
+import InitializeZustandStore from "@/components/InitializeZustandStore";
 
 export const metadata: Metadata = {
   title: "DardiBook | Dashboard",
@@ -14,6 +15,7 @@ export default function RootLayout({ children }: { children?: ReactNode }) {
     <RefProvider>
       <DashboardWrapper>
         <TodayPatientsProvider>
+          <InitializeZustandStore />
           <PatientHistoryGlobalModal />
           {children}
         </TodayPatientsProvider>
