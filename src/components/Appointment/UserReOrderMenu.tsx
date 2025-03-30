@@ -23,7 +23,7 @@ import { Calendar } from "../ui/calendar";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { ResetIcon } from "@radix-ui/react-icons";
 import Loader from "../common/Loader";
-import { useAuth, useOrganization, useUser } from "@clerk/nextjs";
+import { useAuth, useOrganization } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
 import { format, getTime, startOfDay } from "date-fns";
 import { orgUserType, ScheduledPatientTypes } from "@/types/FormTypes";
@@ -75,7 +75,6 @@ export const UserReOrderMenu: React.FC<UserReOrderMenuProps> = ({
       role: ["org:doctor", "org:clinic_head"],
     },
   });
-  const { user } = useUser();
 
   useEffect(() => {
     setDate(new Date(patient_matching_reg_date_time));
@@ -167,7 +166,7 @@ export const UserReOrderMenu: React.FC<UserReOrderMenuProps> = ({
       </DropdownMenuTrigger>
       <DropdownMenuContent side="left" align="center" className="min-w-[160px]">
         <DropdownMenuLabel className="border-b border-green-600 text-green-600">
-          Reschedule
+          Reschedule - {patient.name}
         </DropdownMenuLabel>
         <div className="sm:flex my-1 border rounded-md">
           <Calendar
@@ -304,7 +303,9 @@ export const UserReOrderMenu: React.FC<UserReOrderMenuProps> = ({
             <BriefcaseMedicalIcon size={20} className="text-green-500" />
           </span>
           <Select
-            disabled={patient.registerd_by.id !== user?.id || menuLoader}
+            disabled={menuLoader}
+            // (patient.registerd_by.id !== user?.id &&
+            //   patient.registerd_for.id !== user?.id) ||
             required
             defaultValue={patient.registerd_for.id}
             name="registerd_for"

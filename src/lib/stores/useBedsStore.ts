@@ -12,7 +12,7 @@ interface BedsState {
 }
 
 export const useBedsStore = create<BedsState>()(
-    subscribeWithSelector((set, get) => ({
+    subscribeWithSelector((set) => ({  // get
         beds: [],
         bedPatients: {},
         loading: true,
@@ -32,17 +32,17 @@ export const useBedsStore = create<BedsState>()(
                     patientIds.add(bed.patient_id)
                 });
 
-                set({ beds: bedsData });
 
-                const existingPatients = get().bedPatients;
-                const newPatientIds = Array.from(patientIds).filter(
-                    (id) => !existingPatients[id]
-                );
+                // const existingPatients = get().bedPatients;
+                // const newPatientIds = Array.from(patientIds).filter(
+                //     (id) => !existingPatients[id]
+                // );
 
-                if (newPatientIds.length > 0) {
-                    fetchPatients(orgId, newPatientIds, set);
+                if (Array.from(patientIds).length > 0) {
+                    await fetchPatients(orgId, Array.from(patientIds), set);
                 }
 
+                set({ beds: bedsData });
                 set({ loading: false });
             });
 
@@ -62,8 +62,8 @@ const fetchPatients = async (
             const patientSnap = await getDoc(patientRef);
 
             if (patientSnap.exists()) {
-                const { patient_id, name, mobile, gender, age } = patientSnap.data();
-                patientsData[patientId] = { patient_id, name, mobile, gender, age };
+                const { patient_id, name, mobile, gender, age, bed_info } = patientSnap.data();
+                patientsData[patientId] = { patient_id, name, mobile, gender, age, bed_info };
             }
         })
     );

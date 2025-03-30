@@ -18,10 +18,11 @@ import {
   query,
   collection,
   onSnapshot,
-  DocumentData,
   where,
-  orderBy,
-  Timestamp,
+  doc,
+  getDoc,
+  or,
+  and,
 } from "firebase/firestore";
 import { Inbox, RotateCcw } from "lucide-react";
 import {
@@ -46,6 +47,8 @@ import {
   PreviousMonthButton,
 } from "react-day-picker";
 import { BedPatientList } from "./BedPatientList";
+// import { useBedsStore } from "@/lib/stores/useBedsStore";
+import { BedPatientTypes, OrgBed } from "@/types/FormTypes";
 
 const customLocale = {
   ...enUS,
@@ -65,10 +68,12 @@ const customLocale = {
 export function BedSidebar({
   ...props
 }: React.ComponentProps<typeof Sidebar3>) {
-  const [date, setDate] = useState<Date | undefined>(new Date());
-  const [scheduledPatients, setScheduledPatients] = useState<any>([]);
-  const [loader, setLoader] = useState(false);
-  const { isLoaded, orgId } = useAuth();
+  const [date, setDate] = useState<Date>(new Date());
+  const [bedsForDate, setBedForDate] = useState<OrgBed[]>([]);
+  const [patientsForDate, setPatientsForDate] = useState<
+    Record<string, BedPatientTypes>
+  >({});
+  // const { beds, bedPatients, loading } = useBedsStore((state) => state);
   // =================================================================
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [currentWeek, setCurrentWeek] = useState<Array<Date>>([]);
@@ -126,52 +131,66 @@ export function BedSidebar({
     return <Week {...props} />;
   }
   // =================================================================
+  const [loader, setLoader] = useState(false);
+  const { isLoaded, orgId } = useAuth();
+
   useEffect(() => {
     let unsubscribe: () => void;
     const getTodayPatientQueue = () => {
       if (isLoaded && orgId && date) {
-        const q = query(
-          collection(db, "doctor", orgId, "patients"),
-          where(
-            "last_visited",
-            ">=",
-            Timestamp.fromMillis(getTime(startOfDay(date)))
-          ),
-          where(
-            "last_visited",
-            "<=",
-            Timestamp.fromMillis(getTime(endOfDay(date)))
-          ),
-          orderBy("last_visited", "desc")
+        const bedsQuery = query(
+          collection(db, "doctor", orgId, "beds"),
+          or(
+            and(where("admission_at", "<=", getTime(startOfDay(date))),where("discharge_at", ">=", getTime(endOfDay(date)))),
+            and(where("admission_at", ">=", getTime(startOfDay(date))),where("admission_at", "<=", getTime(endOfDay(date)))),
+            and(where("discharge_at", "<=", getTime(endOfDay(date))),where("discharge_at", ">=", getTime(startOfDay(date))))
+          )
         );
 
         setLoader(true);
-        unsubscribe = onSnapshot(q, async (snapshot) => {
-          const patientData: DocumentData[] = [];
+        unsubscribe = onSnapshot(bedsQuery, async (snapshot) => {
+          const bedsData: OrgBed[] = [];
+          const patientIds = new Set<string>();
 
           snapshot.forEach((doc) => {
-            const pData = doc.data();
-            const visitedDatesArray = pData?.visitedDates || [];
-            const today = new Date().getDate();
-
-            const attended = visitedDatesArray.some(
-              (date: number) => new Date(date).getDate() === today
-            );
-            const old =
-              visitedDatesArray.length > 1 ||
-              (visitedDatesArray.length === 1 && !attended);
-
-            patientData.push({
-              ...pData,
-              attended,
-              old,
-              last_visited: (pData?.last_visited as Timestamp).toMillis(),
-              visitedDates: pData?.visitedDates?.map((time: Timestamp) =>
-                time.toMillis()
-              ),
-            });
+            const bed = doc.data() as OrgBed;
+            bedsData.push(bed);
+            patientIds.add(bed.patient_id);
           });
-          setScheduledPatients(patientData);
+
+          if (Array.from(patientIds).length > 0) {
+            const patientsData: Record<string, BedPatientTypes> = {};
+
+            await Promise.all(
+              Array.from(patientIds).map(async (patientId) => {
+                const patientRef = doc(
+                  db,
+                  "doctor",
+                  orgId,
+                  "patients",
+                  patientId
+                );
+                const patientSnap = await getDoc(patientRef);
+
+                if (patientSnap.exists()) {
+                  const { patient_id, name, mobile, gender, age, bed_info } =
+                    patientSnap.data();
+                  patientsData[patientId] = {
+                    patient_id,
+                    name,
+                    mobile,
+                    gender,
+                    age,
+                    bed_info,
+                  };
+                }
+              })
+            );
+
+            setPatientsForDate(patientsData);
+          }
+
+          setBedForDate(bedsData);
           setLoader(false);
         });
       } else {
@@ -187,7 +206,7 @@ export function BedSidebar({
       }
     };
   }, [isLoaded, orgId, date]);
-
+  // ================================================================
   return (
     <Sidebar3
       side="right"
@@ -268,7 +287,7 @@ export function BedSidebar({
                   </SidebarMenuItem3>
                 ))}
               </SidebarMenu3>
-            ) : scheduledPatients.length === 0 ? (
+            ) : bedsForDate.length === 0 ? (
               <div className="text-sidebar-foreground/70 flex flex-1 items-center justify-center flex-col gap-1 min-h-28">
                 <Inbox />
                 Empty
@@ -276,11 +295,15 @@ export function BedSidebar({
             ) : (
               <ul className="w-full">
                 <Reorder.Group
-                  values={scheduledPatients}
-                  onReorder={setScheduledPatients}
+                  values={bedsForDate}
+                  onReorder={() => {}}
                   draggable={false}
                 >
-                  <BedPatientList scheduledPatients={scheduledPatients} />
+                  <BedPatientList
+                    patientsForDate={patientsForDate}
+                    bedsForDate={bedsForDate}
+                    forDate={date}
+                  />
                 </Reorder.Group>
               </ul>
             )}

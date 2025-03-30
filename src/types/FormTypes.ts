@@ -7,6 +7,7 @@ export interface orgUserType {
 
 export interface patientBed {
     bedId: string;
+    bedBookingId: string;
     admission_at: number;
     admission_by: orgUserType;
     admission_for: orgUserType;
@@ -49,9 +50,11 @@ export interface BedPatientTypes {
     mobile: string;
     gender: "Male" | "Female" | "Other";
     age: string;
+    bed_info: patientBed[];
 }
 
 export interface OrgBed {
+    bedBookingId: string;
     bedId: string;
     patient_id: string;
     admission_at: number;
