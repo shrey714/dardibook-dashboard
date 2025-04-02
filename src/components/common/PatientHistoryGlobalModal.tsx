@@ -24,7 +24,7 @@ import { ClipboardPlus } from "lucide-react";
 
 const PatientHistoryGlobalModal = () => {
   const { isOpen, modalProps, closeModal } = usePatientHistoryModalStore();
-  const { patientsData, loading } = useTodayPatientStore((state) => state);
+  const { todayPatients, loading } = useTodayPatientStore((state) => state);
   const { isLoaded, orgId, orgRole } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [patientData, setPatientData] = useState<any>(null);
@@ -117,7 +117,7 @@ const PatientHistoryGlobalModal = () => {
                 <PatientDataBox patientData={patientData} />
                 <div className="p-4 gap-6 flex flex-col">
                   {!loading &&
-                  patientsData?.some(
+                  todayPatients?.some(
                     (patient: any) =>
                       patient?.patient_unique_Id === modalProps.patientId
                   ) &&

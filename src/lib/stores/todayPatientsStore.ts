@@ -1,6 +1,6 @@
 import { createStore } from "zustand/vanilla";
 import { immer } from "zustand/middleware/immer";
-import { collection, DocumentData, onSnapshot, query, Timestamp, where } from "firebase/firestore";
+import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { db } from "@/firebase/firebaseConfig";
 import { startOfDay, getTime, isSameDay } from "date-fns";
 import { RegisterPatientFormTypes, TodayPatientsType } from "@/types/FormTypes";

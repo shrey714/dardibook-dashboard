@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
-import React, { useEffect } from "react";
+import React from "react";
 import Link from "next/link";
 import StatsHeader from "./StatsHeader";
 import useToken from "@/firebase/useToken";
@@ -16,7 +16,7 @@ import {
   TooltipTrigger,
 } from "../ui/tooltip";
 import { Button } from "../ui/button";
-import { UserReOrderMenu } from "../Appointment/UserReOrderMenu";
+// import { UserReOrderMenu } from "../Appointment/UserReOrderMenu";
 import { useTodayPatientStore } from "@/lib/providers/todayPatientsProvider";
 import { usePatientHistoryModalStore } from "@/lib/stores/patientHistoryModalStore";
 
@@ -26,7 +26,7 @@ const QueueList: React.FC = () => {
   const { openModal } = usePatientHistoryModalStore();
 
   // =============================================
-  const { patientsData, loading } = useTodayPatientStore((state) => state);
+  const { todayPatients, loading } = useTodayPatientStore((state) => state);
   // =============================================
   const base = 4;
   const t = (d: number) => d * base;
@@ -34,9 +34,9 @@ const QueueList: React.FC = () => {
   return (
     <>
       <StatsHeader
-        registrations={patientsData?.length}
+        registrations={todayPatients?.length}
         attended={
-          patientsData?.filter((item: any) => item.attended === true).length
+          todayPatients?.filter((item: any) => item.attended === true).length
         }
       />
       <div className="w-full mt-8 p-0 flex flex-row items-center">
@@ -53,7 +53,7 @@ const QueueList: React.FC = () => {
           <div className="w-full h-52 overflow-hidden flex items-center justify-center">
             <Loader size="medium" />
           </div>
-        ) : patientsData?.length === 0 || patientsData === null ? (
+        ) : todayPatients?.length === 0 || todayPatients === null ? (
           <div className="w-full h-52 overflow-hidden flex items-end justify-center">
             <img className="w-full max-w-[16rem]" src="/empty.svg" alt="" />
           </div>
@@ -62,7 +62,7 @@ const QueueList: React.FC = () => {
             <ul className="w-full mt-4 relative">
               <TooltipProvider>
                 <Reorder.Group
-                  values={patientsData}
+                  values={todayPatients}
                   onReorder={() => {}}
                   draggable={false}
                 >
@@ -79,9 +79,9 @@ const QueueList: React.FC = () => {
                       </tr>
                     </thead>
                     <tbody className="rounded-lg">
-                      {[...patientsData].map((item: any, key: number) => {
+                      {[...todayPatients].map((item: any, key: number) => {
                         const select =
-                          CurrentToken === patientsData?.length - key
+                          CurrentToken === todayPatients?.length - key
                             ? true
                             : false;
                         return (
@@ -115,7 +115,7 @@ const QueueList: React.FC = () => {
                                   select ? "bg-blue-700 text-white" : ""
                                 } p-1 my-1 rounded-s-full flex items-center px-3`}
                               >
-                                {patientsData?.length - key}
+                                {todayPatients?.length - key}
                                 <p className="text-xs ml-2">
                                   (
                                   {format(
