@@ -238,7 +238,7 @@ export const BedManagementMenu: React.FC<BedManagementMenuProps> = ({
         </Alert>
         <DropdownMenuSeparator />
 
-        <div className="flex items-centerw-full relative">
+        <div className="flex items-center w-full relative">
           <motion.button
             disabled={confirming || menuLoader}
             className={`${
