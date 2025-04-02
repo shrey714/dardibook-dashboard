@@ -13,28 +13,12 @@ import {
   PhoneIcon,
 } from "lucide-react";
 import { Reorder } from "framer-motion";
-import { formatRelative, startOfDay } from "date-fns";
+import { format, startOfDay } from "date-fns";
 import Link from "next/link";
-import { enUS } from "date-fns/locale";
 import { BedSingle } from "lucide-react";
 import { usePatientHistoryModalStore } from "@/lib/stores/patientHistoryModalStore";
 import { BedPatientTypes, OrgBed } from "@/types/FormTypes";
 import { BedManagementMenu } from "@/components/Appointment/BedManagementMenu";
-
-const customLocale = {
-  ...enUS,
-  formatRelative: (token: string) => {
-    const formatWithoutTime: Record<string, string> = {
-      lastWeek: "'last' eeee",
-      yesterday: "'yesterday'",
-      today: "'today'",
-      tomorrow: "'tomorrow'",
-      nextWeek: "eeee",
-      other: "MMMM dd, yyyy",
-    };
-    return formatWithoutTime[token];
-  },
-};
 
 interface bedPatientProps {
   patientsForDate: Record<string, BedPatientTypes>;
@@ -172,22 +156,19 @@ export const BedPatientList: React.FC<bedPatientProps> = ({
                         <p className="flex bg-green-500/10 text-green-600 text-sm items-center gap-2 px-2 py-1 w-full rounded-t-sm">
                           <CalendarPlusIcon size={16} />{" "}
                           {bed.admission_at &&
-                            formatRelative(bed.admission_at, forDate, {
-                              locale: customLocale,
-                            })}
+                            format(bed.admission_at, "dd-MM-yyyy hh:mm aa")}
                         </p>
                         <p className="!mt-0 bg-red-500/10 text-red-600 flex text-sm items-center gap-2 px-2 py-1 w-full rounded-b-sm">
                           <CalendarMinusIcon size={16} />{" "}
                           {bed.discharge_at &&
-                            formatRelative(bed.discharge_at, forDate, {
-                              locale: customLocale,
-                            })}
+                            format(bed.discharge_at, "dd-MM-yyyy hh:mm aa")}
                         </p>
                       </div>
                     </div>
                     {bed.dischargeMarked ? (
                       <div className="bg-red-500/10 mt-2 w-full rounded-md text-red-600 flex flex-row gap-4 px-3 py-1 items-center">
-                        <LogOut className="w-5 h-5" /> {bed.discharged_by.name}
+                        <LogOut className="w-5 h-5" /> Discharged by{" "}
+                        {bed.discharged_by.name}
                       </div>
                     ) : (
                       <></>

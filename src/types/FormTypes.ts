@@ -64,3 +64,16 @@ export interface OrgBed {
     dischargeMarked: boolean;
     discharged_by: orgUserType;
 }
+
+export interface TodayPatientsType {
+    patient_id: string;
+    name: string;
+    mobile: string;
+    gender: "Male" | "Female" | "Other";
+    registered_date: number[];
+    registered_date_time: number[];
+    registerd_by: orgUserType;
+    registerd_for: orgUserType;
+    prescribed: boolean;
+    inBed: boolean;
+}
