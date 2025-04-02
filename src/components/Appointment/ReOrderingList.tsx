@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import useToken from "@/firebase/useToken";
 import Link from "next/link";
 import Loader from "../common/Loader";
 import { useAuth, useOrganization } from "@clerk/nextjs";
-import { Reorder } from "framer-motion";
+import { AnimatePresence, Reorder } from "framer-motion";
 import { format, getTime, startOfDay } from "date-fns";
 import { UserReOrderMenu } from "./UserReOrderMenu";
 import { useTodayPatientStore } from "@/lib/providers/todayPatientsProvider";
@@ -29,6 +29,7 @@ import {
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
+import { TodayPatientsType } from "@/types/FormTypes";
 
 interface TodayPatientsFilter {
   registerd_for?: string;
@@ -236,11 +237,12 @@ const ReOrderingList: React.FC = () => {
                 onReorder={() => {}}
                 draggable={false}
               >
+                <AnimatePresence initial={false}>
                 <table className="w-full">
                   <tbody className="rounded-lg">
                     {filteredPatients.map((item, key: number) => {
                       const select =
-                        CurrentToken === todayPatients?.length - key
+                        CurrentToken === filteredPatients?.length - key
                           ? true
                           : false;
                       const patient_matching_reg_date_time =
@@ -253,7 +255,7 @@ const ReOrderingList: React.FC = () => {
                         <Reorder.Item
                           drag={false}
                           as="tr"
-                          key={key}
+                          key={item.patient_id}
                           value={item.patient_id}
                           initial={{ height: 0, opacity: 0 }}
                           animate={{
@@ -280,7 +282,7 @@ const ReOrderingList: React.FC = () => {
                                 select ? "bg-blue-700 text-white" : ""
                               } p-1 rounded-s-full flex items-center px-3`}
                             >
-                              {todayPatients?.length - key}
+                              {filteredPatients?.length - key}
                               <p className="text-xs ml-2">
                                 (
                                 {format(
@@ -363,6 +365,7 @@ const ReOrderingList: React.FC = () => {
                     })}
                   </tbody>
                 </table>
+                </AnimatePresence>
               </Reorder.Group>
             </ul>
           </>
