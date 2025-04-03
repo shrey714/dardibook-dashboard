@@ -126,6 +126,7 @@ export default function Page() {
             );
           }}
           isClearable={true}
+          menuIsOpen
           isValidNewOption={() => false}
           allowCreateWhileLoading={false}
           loadOptions={loadOptions}
@@ -150,7 +151,7 @@ export default function Page() {
             singleValue: () => "!text-primary !px-4",
             input: () => "!text-primary !px-4",
             menu: (state) =>
-              `!bg-slate-50 dark:!bg-sidebar !border-border !overflow-hidden !shadow-md !mt-0 ${
+              `!bg-slate-50 dark:!bg-sidebar !border-border !overflow-hidden !shadow-md !mt-0 !w-[calc(100%-2.25rem)] xl:!w-full ${
                 state.selectProps.menuIsOpen
                   ? "!border-t-0 !border-b-2 !border-x-2 !rounded-b-2xl !rounded-t-none"
                   : "!border-2 !rounded-2xl"

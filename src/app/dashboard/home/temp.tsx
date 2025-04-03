@@ -17,7 +17,7 @@ const Temp = () => {
       ],
       gender: ["Male", "Female"][Math.floor(Math.random() * 2)],
       mobile: Math.floor(9000000000 + Math.random() * 1000000000).toString(),
-      name: `Patient ${Math.floor(Math.random() * 1000)}`,
+      name: `patient ${Math.floor(Math.random() * 1000)}`,
       patient_id: uniqid.time(), // Unique patient ID
       state: [
         "Maharashtra",
