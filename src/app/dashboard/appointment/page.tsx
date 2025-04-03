@@ -83,7 +83,7 @@ export default function Page() {
 
   return (
     <div className="flex flex-1 flex-row relative h-full w-full overflow-hidden">
-      <div className="px-4 sm:px-6 lg:px-8 self-center pt-3 md:pt-5 flex flex-1 flex-col gap-3 md:gap-5 items-center relative h-full overflow-y-hidden">
+      <div className="px-2 sm:px-5 self-center pt-3 md:pt-5 flex flex-1 flex-col space-y-3 md:space-y-4 items-center relative h-full overflow-y-hidden">
         <AsyncCreatableSelect
           components={{
             DropdownIndicator: () => null,
@@ -146,7 +146,7 @@ export default function Page() {
                   : "!border-2 !rounded-full"
               }  
               `,
-            placeholder: () => "!px-4",
+            placeholder: () => "!truncate !text-sm sm:!text-base !px-4",
             singleValue: () => "!text-primary !px-4",
             input: () => "!text-primary !px-4",
             menu: (state) =>
