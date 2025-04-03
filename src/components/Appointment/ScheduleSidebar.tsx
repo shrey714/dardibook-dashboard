@@ -15,7 +15,13 @@ import {
   SidebarSeparator2,
 } from "@/components/ui/sidebar2";
 import { Inbox, RotateCcw } from "lucide-react";
-import { addDays, formatRelative, getTime, startOfDay } from "date-fns";
+import {
+  addDays,
+  formatRelative,
+  getTime,
+  isSameDay,
+  startOfDay,
+} from "date-fns";
 import { enUS } from "date-fns/locale";
 import { ScheduleList } from "./ScheduleList";
 import { useAuth } from "@clerk/nextjs";
@@ -74,7 +80,17 @@ export function ScheduleSidebar({
               registerd_for: pData.registerd_for,
             });
           });
-          setScheduledPatients(patientData);
+          setScheduledPatients(
+            patientData.sort(
+              (a, b) =>
+                a.registered_date_time.filter((date_time) =>
+                  isSameDay(date_time, date)
+                )[0] -
+                b.registered_date_time.filter((date_time) =>
+                  isSameDay(date_time, date)
+                )[0]
+            )
+          );
           setLoader(false);
         });
       } else {
