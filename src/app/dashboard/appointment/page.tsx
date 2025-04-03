@@ -126,7 +126,6 @@ export default function Page() {
             );
           }}
           isClearable={true}
-          menuIsOpen
           isValidNewOption={() => false}
           allowCreateWhileLoading={false}
           loadOptions={loadOptions}
