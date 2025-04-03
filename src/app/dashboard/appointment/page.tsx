@@ -134,7 +134,7 @@ export default function Page() {
           noOptionsMessage={() => "Empty"}
           backspaceRemovesValue={false}
           placeholder="Register patient using ID, name, or phone number..."
-          className="max-w-2xl w-full mx-auto"
+          className="max-w-2xl w-full mx-auto pr-9 xl:pr-0"
           classNames={{
             control: (state) =>
               `!shadow-sm !transition-all !duration-900 !bg-slate-50 dark:!bg-sidebar !py-1.5 ${
@@ -183,8 +183,8 @@ export default function Page() {
       </div>
 
       <div className="h-full relative">
-        <SidebarProvider2 defaultOpen={true} className="hidden sm:flex">
-          <SidebarProvider3 defaultOpen={false} className="hidden sm:flex">
+        <SidebarProvider2 defaultOpen={true} className="flex">
+          <SidebarProvider3 defaultOpen={false} className="flex">
             <div className="h-fit flex flex-col py-2 absolute -left-9 gap-2">
               <TooltipProvider>
                 <Tooltip delayDuration={100}>

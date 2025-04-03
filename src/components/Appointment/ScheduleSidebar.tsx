@@ -3,6 +3,7 @@ import { Calendar } from "@/components/ui/calendar";
 import {
   Sidebar2,
   SidebarContent2,
+  SidebarFooter2,
   SidebarGroup2,
   SidebarGroupAction2,
   SidebarGroupContent2,
@@ -14,24 +15,15 @@ import {
   SidebarSeparator2,
 } from "@/components/ui/sidebar2";
 import { Inbox, RotateCcw } from "lucide-react";
-import {
-  addDays,
-  formatRelative,
-  getTime,
-  startOfDay,
-} from "date-fns";
+import { addDays, formatRelative, getTime, startOfDay } from "date-fns";
 import { enUS } from "date-fns/locale";
 import { ScheduleList } from "./ScheduleList";
 import { useAuth } from "@clerk/nextjs";
 import { Reorder } from "framer-motion";
 import { db } from "@/firebase/firebaseConfig";
-import {
-  query,
-  collection,
-  onSnapshot,
-  where,
-} from "firebase/firestore";
+import { query, collection, onSnapshot, where } from "firebase/firestore";
 import { ScheduledPatientTypes } from "@/types/FormTypes";
+import { Kbd } from "../ui/kbd";
 
 const customLocale = {
   ...enUS,
@@ -167,13 +159,21 @@ export function ScheduleSidebar({
                   onReorder={setScheduledPatients}
                   draggable={false}
                 >
-                  <ScheduleList scheduledPatients={scheduledPatients} forDate={date} />
+                  <ScheduleList
+                    scheduledPatients={scheduledPatients}
+                    forDate={date}
+                  />
                 </Reorder.Group>
               </ul>
             )}
           </SidebarGroupContent2>
         </SidebarGroup2>
       </SidebarContent2>
+      <SidebarFooter2>
+        <Kbd variant="outline" className="self-start">
+          <span className="text-xs">⌘</span>b
+        </Kbd>
+      </SidebarFooter2>
     </Sidebar2>
   );
 }

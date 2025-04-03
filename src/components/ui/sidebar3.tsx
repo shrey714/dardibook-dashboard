@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Tooltip,
@@ -76,6 +76,7 @@ const SidebarProvider3 = React.forwardRef<
     // const [_open, _setOpen] = React.useState(defaultOpen);
     const [_open, _setOpen] = React.useState(defaultOpen);
     const open = openProp ?? _open;
+    const sidebar2 = useSidebar2();
     const setOpen = React.useCallback(
       (value: boolean | ((value: boolean) => boolean)) => {
         const openState = typeof value === "function" ? value(open) : value;
@@ -103,16 +104,17 @@ const SidebarProvider3 = React.forwardRef<
       const handleKeyDown = (event: KeyboardEvent) => {
         if (
           event.key === SIDEBAR_KEYBOARD_SHORTCUT &&
-          (event.metaKey || event.ctrlKey)
+          (event.metaKey || event.ctrlKey) &&
+          !isMobile
         ) {
           event.preventDefault();
-          toggleSidebar();
+          setOpen(sidebar2.open ? true : false);
         }
       };
 
       window.addEventListener("keydown", handleKeyDown);
       return () => window.removeEventListener("keydown", handleKeyDown);
-    }, [toggleSidebar]);
+    }, [toggleSidebar, sidebar2.open]);
 
     // We add a state so that we can do data-state="expanded" or "collapsed".
     // This makes it easier to style the sidebar with Tailwind classes.
@@ -197,9 +199,11 @@ const Sidebar3 = React.forwardRef<
     if (isMobile) {
       return (
         <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
+          <SheetTitle className="hidden"></SheetTitle>
           <SheetContent
             data-sidebar="sidebar"
             data-mobile="true"
+            aria-describedby=""
             className="w-[--sidebar-width] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
             style={
               {
@@ -265,7 +269,7 @@ const SidebarTrigger3 = React.forwardRef<
   React.ElementRef<typeof Button>,
   React.ComponentProps<typeof Button>
 >(({ className, onClick, ...props }, ref) => {
-  const { toggleSidebar, open } = useSidebar3();
+  const { toggleSidebar, open, isMobile } = useSidebar3();
   const sidebar2 = useSidebar2();
   return (
     <Button
@@ -276,12 +280,12 @@ const SidebarTrigger3 = React.forwardRef<
       className={cn(
         "h-7 w-7",
         className,
-        open ? "bg-blue-600 hover:bg-blue-600/50" : ""
+        open && !isMobile ? "bg-blue-600 hover:bg-blue-600/50" : ""
       )}
       onClick={(event) => {
         onClick?.(event);
         toggleSidebar();
-        if (sidebar2.open) sidebar2.toggleSidebar();
+        if (sidebar2.open && !isMobile) sidebar2.toggleSidebar();
       }}
       {...props}
     >
