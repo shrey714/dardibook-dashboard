@@ -162,7 +162,7 @@ export const UserReOrderMenu: React.FC<UserReOrderMenuProps> = ({
         <Button
           variant="ghost"
           disabled={disabled}
-          className="flex h-8 w-8 p-0 data-[state=open]:bg-muted border rounded-full"
+          className="flex h-8 w-8 p-0 data-[state=open]:bg-muted border rounded-full disabled:invisible"
         >
           {menuLoader ? <Loader size="small" /> : <MoreHorizontal />}
           <span className="sr-only">Open menu</span>

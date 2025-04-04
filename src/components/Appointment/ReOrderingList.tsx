@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import useToken from "@/firebase/useToken";
 import Link from "next/link";
 import Loader from "../common/Loader";
