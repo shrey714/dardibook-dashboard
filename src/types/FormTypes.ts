@@ -64,3 +64,7 @@ export interface OrgBed {
     dischargeMarked: boolean;
     discharged_by: orgUserType;
 }
+
+export interface BedInfo {
+    id: string;
+  }

@@ -9,6 +9,7 @@ import {
   SettingsIcon,
   SquarePenIcon,
   CalendarDaysIcon,
+  Bed
 } from "lucide-react";
 
 import { NavMain } from "./nav-main";
@@ -53,6 +54,12 @@ const pages = [
     title: "Register",
     url: "/dashboard/appointment",
     icon: SquarePenIcon,
+    roles: ["org:clinic_head", "org:doctor", "org:assistant_doctor"],
+  },
+  {
+    title: "Admissions",
+    url: "/dashboard/admissions",
+    icon: Bed,
     roles: ["org:clinic_head", "org:doctor", "org:assistant_doctor"],
   },
   {
