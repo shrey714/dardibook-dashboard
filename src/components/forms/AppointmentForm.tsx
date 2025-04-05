@@ -277,7 +277,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
               id="name"
               autoComplete="new-off"
               placeholder="patient name"
-              value={patientFormData.name}
+              value={patientFormData.name.toLowerCase()}
               onChange={handleInputChange}
               className="col-span-2 w-full md:max-w-md lg:col-span-2 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input block py-1 pl-2 sm:text-sm sm:leading-6"
             />

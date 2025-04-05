@@ -6,7 +6,6 @@ import {
   CircleX,
   LogOut,
   MoreHorizontal,
-  Trash2,
 } from "lucide-react";
 import { db } from "@/firebase/firebaseConfig";
 import { Button } from "@/components/ui/button";
@@ -21,7 +20,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useState } from "react";
 import Loader from "../common/Loader";
-import { useAuth, useOrganization } from "@clerk/nextjs";
+import { useAuth, useOrganization, useUser } from "@clerk/nextjs";
 import { BedPatientTypes, OrgBed, orgUserType } from "@/types/FormTypes";
 import {
   Select,
@@ -33,6 +32,7 @@ import {
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
+import { getTime } from "date-fns";
 
 interface BedManagementMenuProps {
   bed: OrgBed;
@@ -55,7 +55,7 @@ export const BedManagementMenu: React.FC<BedManagementMenuProps> = ({
       role: ["org:doctor", "org:clinic_head"],
     },
   });
-
+  const { user } = useUser();
   const handleDoctorChange = async (doctor: orgUserType) => {
     if (!orgId) return;
 
@@ -92,7 +92,7 @@ export const BedManagementMenu: React.FC<BedManagementMenuProps> = ({
   };
 
   const handleDischarge = async () => {
-    if (!orgId) return;
+    if (!orgId || !user) return;
 
     setMenuLoader(true);
 
@@ -100,7 +100,18 @@ export const BedManagementMenu: React.FC<BedManagementMenuProps> = ({
       const batch = writeBatch(db);
 
       const bedRef = doc(db, "doctor", orgId, "beds", bed.bedBookingId);
-      batch.update(bedRef, { dischargeMarked: true });
+      batch.update(bedRef, {
+        dischargeMarked: true,
+        discharge_at:
+          bed.discharge_at < getTime(new Date())
+            ? bed.discharge_at
+            : getTime(new Date()),
+        discharged_by: {
+          id: user.id,
+          name: user.fullName,
+          email: user.primaryEmailAddress?.emailAddress,
+        },
+      });
 
       const patientRef = doc(
         db,
@@ -111,7 +122,19 @@ export const BedManagementMenu: React.FC<BedManagementMenuProps> = ({
       );
       const updatedBedInfo = patient.bed_info.map((patient_bed) =>
         patient_bed.bedBookingId === bed.bedBookingId
-          ? { ...patient_bed, dischargeMarked: true }
+          ? {
+              ...patient_bed,
+              dischargeMarked: true,
+              discharge_at:
+                bed.discharge_at < getTime(new Date())
+                  ? bed.discharge_at
+                  : getTime(new Date()),
+              discharged_by: {
+                id: user.id,
+                name: user.fullName,
+                email: user.primaryEmailAddress?.emailAddress,
+              },
+            }
           : patient_bed
       );
 
@@ -215,7 +238,7 @@ export const BedManagementMenu: React.FC<BedManagementMenuProps> = ({
         </Alert>
         <DropdownMenuSeparator />
 
-        <div className="flex items-centerw-full relative">
+        <div className="flex items-center w-full relative">
           <motion.button
             disabled={confirming || menuLoader}
             className={`${
@@ -228,6 +251,10 @@ export const BedManagementMenu: React.FC<BedManagementMenuProps> = ({
           >
             {confirming ? (
               "Are you Sure?"
+            ) : bed.discharge_at < getTime(new Date()) ? (
+              <>
+                <LogOut size={18} /> Already Discharged ?
+              </>
             ) : (
               <>
                 <LogOut size={18} /> Discharge
@@ -259,7 +286,7 @@ export const BedManagementMenu: React.FC<BedManagementMenuProps> = ({
                 onClick={() => handleDischarge()}
                 disabled={menuLoader}
               >
-                <Trash2 size={18} />
+                <LogOut size={18} />
               </Button>
             </DropdownMenuItem>
             <Button

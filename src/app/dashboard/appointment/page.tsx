@@ -20,7 +20,7 @@ import { SidebarProvider3, SidebarTrigger3 } from "@/components/ui/sidebar3";
 import { BedSidebar } from "@/components/Appointment/BedSidebar";
 import { Button } from "@/components/ui/button";
 
-export default function TShirtsPage() {
+export default function Page() {
   const { orgId } = useAuth();
   const router = useRouter();
   const loadOptions = useCallback(
@@ -83,7 +83,7 @@ export default function TShirtsPage() {
 
   return (
     <div className="flex flex-1 flex-row relative h-full w-full overflow-hidden">
-      <div className="px-4 sm:px-6 lg:px-8 self-center pb-12 pt-3 md:pt-5 flex flex-1 flex-col gap-3 md:gap-5 items-center relative h-full overflow-y-auto">
+      <div className="px-2 sm:px-5 self-center pt-3 md:pt-5 flex flex-1 flex-col space-y-3 md:space-y-4 items-center relative h-full overflow-y-hidden">
         <AsyncCreatableSelect
           components={{
             DropdownIndicator: () => null,
@@ -133,8 +133,8 @@ export default function TShirtsPage() {
           loadingMessage={() => "Finding patients..."}
           noOptionsMessage={() => "Empty"}
           backspaceRemovesValue={false}
-          placeholder="Register patient by id/name/number..."
-          className="max-w-2xl w-full mx-auto"
+          placeholder="Register patient using ID, name, or phone number..."
+          className="max-w-2xl w-full mx-auto pr-9 xl:pr-0"
           classNames={{
             control: (state) =>
               `!shadow-sm !transition-all !duration-900 !bg-slate-50 dark:!bg-sidebar !py-1.5 ${
@@ -146,11 +146,11 @@ export default function TShirtsPage() {
                   : "!border-2 !rounded-full"
               }  
               `,
-            placeholder: () => "!px-4",
+            placeholder: () => "!truncate !text-sm sm:!text-base !px-4",
             singleValue: () => "!text-primary !px-4",
             input: () => "!text-primary !px-4",
             menu: (state) =>
-              `!bg-slate-50 dark:!bg-sidebar !border-border !overflow-hidden !shadow-md !mt-0 ${
+              `!bg-slate-50 dark:!bg-sidebar !border-border !overflow-hidden !shadow-md !mt-0 !w-[calc(100%-2.25rem)] xl:!w-full ${
                 state.selectProps.menuIsOpen
                   ? "!border-t-0 !border-b-2 !border-x-2 !rounded-b-2xl !rounded-t-none"
                   : "!border-2 !rounded-2xl"
@@ -168,13 +168,11 @@ export default function TShirtsPage() {
           </div>
           <span className="flex flex-1 h-[2px] bg-gradient-to-l from-transparent to-primary"></span>
         </div>
-        <div className="max-w-4xl p-0 -mt-4">
-          <ReOrderingList />
-        </div>
+        <ReOrderingList />
 
         <Button
-          className="px-0 w-3/4 lg:w-80 bg-blue-600 border-0 shadow-lg hover:bg-blue-600/80 z-10
-        absolute bottom-6 justify-self-center rounded-full left-0 right-0 text-white font-semibold tracking-wide"
+          className="px-0 w-3/4 lg:w-80 bg-blue-600 border-0 shadow-lg hover:bg-blue-700 z-10
+        absolute bottom-4 justify-self-center rounded-full left-0 right-0 text-white font-semibold tracking-wide"
           variant={"link"}
           asChild
         >
@@ -185,8 +183,8 @@ export default function TShirtsPage() {
       </div>
 
       <div className="h-full relative">
-        <SidebarProvider2 defaultOpen={true} className="hidden sm:flex">
-          <SidebarProvider3 defaultOpen={false} className="hidden sm:flex">
+        <SidebarProvider2 defaultOpen={true} className="flex">
+          <SidebarProvider3 defaultOpen={false} className="flex">
             <div className="h-fit flex flex-col py-2 absolute -left-9 gap-2">
               <TooltipProvider>
                 <Tooltip delayDuration={100}>

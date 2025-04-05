@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Tooltip,
@@ -103,7 +103,8 @@ const SidebarProvider2 = React.forwardRef<
       const handleKeyDown = (event: KeyboardEvent) => {
         if (
           event.key === SIDEBAR_KEYBOARD_SHORTCUT &&
-          (event.metaKey || event.ctrlKey)
+          (event.metaKey || event.ctrlKey) &&
+          !isMobile
         ) {
           event.preventDefault();
           toggleSidebar();
@@ -197,9 +198,11 @@ const Sidebar2 = React.forwardRef<
     if (isMobile) {
       return (
         <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
+          <SheetTitle className="hidden"></SheetTitle>
           <SheetContent
             data-sidebar="sidebar"
             data-mobile="true"
+            aria-describedby=""
             className="w-[--sidebar-width] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
             style={
               {
@@ -265,7 +268,7 @@ const SidebarTrigger2 = React.forwardRef<
   React.ElementRef<typeof Button>,
   React.ComponentProps<typeof Button>
 >(({ className, onClick, ...props }, ref) => {
-  const { toggleSidebar, open } = useSidebar2();
+  const { toggleSidebar, open, isMobile, setOpen } = useSidebar2();
   const sidebar3 = useSidebar3();
   return (
     <Button
@@ -276,12 +279,12 @@ const SidebarTrigger2 = React.forwardRef<
       className={cn(
         "h-7 w-7",
         className,
-        open ? "bg-blue-600 hover:bg-blue-600/50" : ""
+        open && !isMobile ? "bg-blue-600 hover:bg-blue-600/50" : ""
       )}
       onClick={(event) => {
         onClick?.(event);
         toggleSidebar();
-        if (sidebar3.open) sidebar3.toggleSidebar();
+        if (sidebar3.open && !isMobile) sidebar3.toggleSidebar();
       }}
       {...props}
     >

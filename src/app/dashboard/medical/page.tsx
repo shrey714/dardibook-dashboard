@@ -18,7 +18,7 @@ const Medical = () => {
   const { orgId } = useAuth();
   const { CurrentToken } = useToken(orgId || "");
 
-  const { patientsData, loading } = useTodayPatientStore((state) => state);
+  const { todayPatients, loading } = useTodayPatientStore((state) => state);
 
   const base = 4;
   const t = (d: number) => d * base;
@@ -39,7 +39,7 @@ const Medical = () => {
           <div className="w-full h-52 overflow-hidden flex items-center justify-center">
             <Loader size="medium" />
           </div>
-        ) : patientsData?.length === 0 || patientsData === null ? (
+        ) : todayPatients?.length === 0 || todayPatients === null ? (
           <div className="w-full h-52 overflow-hidden flex items-end justify-center">
             <img className="w-full max-w-[16rem]" src="/empty.svg" alt="" />
           </div>
@@ -48,7 +48,7 @@ const Medical = () => {
             <ul className="w-full mt-4 pb-3 relative">
               <TooltipProvider>
                 <Reorder.Group
-                  values={patientsData}
+                  values={todayPatients}
                   onReorder={() => {}}
                   draggable={false}
                 >
@@ -65,9 +65,9 @@ const Medical = () => {
                       </tr>
                     </thead>
                     <tbody className="rounded-lg">
-                      {[...patientsData].map((item: any, key: number) => {
+                      {[...todayPatients].map((item: any, key: number) => {
                         const select =
-                          CurrentToken === patientsData?.length - key
+                          CurrentToken === todayPatients?.length - key
                             ? true
                             : false;
                         return (
@@ -101,7 +101,7 @@ const Medical = () => {
                                   select ? "bg-blue-700 text-white" : ""
                                 } p-1 my-1 rounded-s-full`}
                               >
-                                {patientsData?.length - key}
+                                {todayPatients?.length - key}
                               </p>
                             </td>
                             <td className="transition align-top text-center font-medium text-sm sm:text-base hide-before-480 hide-between-768-and-990">

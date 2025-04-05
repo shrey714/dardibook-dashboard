@@ -1,11 +1,12 @@
 import { createStore } from "zustand/vanilla";
 import { immer } from "zustand/middleware/immer";
-import { collection, DocumentData, onSnapshot, orderBy, query, Timestamp, where } from "firebase/firestore";
+import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { db } from "@/firebase/firebaseConfig";
-import { startOfDay, endOfDay, getTime } from "date-fns";
+import { startOfDay, getTime, isSameDay } from "date-fns";
+import { RegisterPatientFormTypes, TodayPatientsType } from "@/types/FormTypes";
 
 export type TodayPatientsState = {
-  patientsData: any;
+  todayPatients: TodayPatientsType[];
   loading: boolean;
 };
 
@@ -16,7 +17,7 @@ export type TodayPatientsActions = {
 export type TodayPatientsStore = TodayPatientsState & TodayPatientsActions;
 
 export const initStore = (): TodayPatientsState => ({
-  patientsData: null,
+  todayPatients: [],
   loading: false,
 });
 
@@ -34,35 +35,37 @@ export const createTodayPatientsStore = (
 
         set({ loading: true });
 
-        const now = new Date();
+        const today = new Date();
         const todaysPatientsDoc = query(
           collection(db, "doctor", orgId, "patients"),
-          where("last_visited", ">=", Timestamp.fromMillis(getTime(startOfDay(now)))),
-          where("last_visited", "<=", Timestamp.fromMillis(getTime(endOfDay(now)))),
-          orderBy("last_visited", "desc")
+          where("registered_date", "array-contains", getTime(startOfDay(today)))
         );
 
         onSnapshot(todaysPatientsDoc, (snapshot) => {
-          const patientData: DocumentData[] = [];
+          const patientData: TodayPatientsType[] = [];
 
           snapshot.forEach((doc) => {
-            const pData = doc.data();
-            const visitedDatesArray = pData?.visitedDates || [];
-            const today = new Date().getDate();
-            const attended = visitedDatesArray.some(
-              (date: Timestamp) => date.toDate().getDate() === today
-            );
-            const old = visitedDatesArray.length > 1 || (visitedDatesArray.length === 1 && !attended);
-
+            const patientDoc = doc.data() as RegisterPatientFormTypes;
             patientData.push({
-              ...pData, attended, old, last_visited: (pData?.last_visited as Timestamp).toMillis(),
-              visitedDates: pData?.visitedDates?.map((time: Timestamp) =>
-                time.toMillis()
+              patient_id: patientDoc.patient_id,
+              name: patientDoc.name,
+              mobile: patientDoc.mobile,
+              gender: patientDoc.gender,
+              registered_date: patientDoc.registered_date,
+              registered_date_time: patientDoc.registered_date_time,
+              registerd_by: patientDoc.registerd_by,
+              registerd_for: patientDoc.registerd_for,
+              prescribed: patientDoc.prescribed_date_time.some((dateTime) =>
+                isSameDay(dateTime, today)
+              ),
+              inBed: patientDoc.bed_info.some((bed) =>
+                bed.admission_at <= getTime(new Date()) &&
+                bed.discharge_at >= getTime(new Date())
               ),
             });
           });
 
-          set({ patientsData: patientData, loading: false });
+          set({ todayPatients: patientData.sort((a, b) => b.registered_date_time.filter((date_time) => isSameDay(date_time, today))[0] - a.registered_date_time.filter((date_time) => isSameDay(date_time, today))[0]), loading: false });
         });
       }
     }))

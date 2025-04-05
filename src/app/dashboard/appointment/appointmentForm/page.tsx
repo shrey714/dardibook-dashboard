@@ -88,6 +88,20 @@ const Page: React.FC = () => {
             }
           );
 
+          (patientData.data as RegisterPatientFormTypes)?.bed_info.map(
+            (bed) => {
+              if (
+                bed.admission_at <= getTime(new Date()) &&
+                bed.discharge_at >= getTime(new Date())
+              ) {
+                setError(
+                  "Patient is already admitted in bed. No need to reigster patient again."
+                );
+                return;
+              }
+            }
+          );
+
           setPatientFormData(patientData.data);
         } else {
           setError("No patient data available for the provided PatientID.");

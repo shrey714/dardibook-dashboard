@@ -4,6 +4,8 @@ import {
   BriefcaseMedicalIcon,
   Calendar1Icon,
   CalendarIcon,
+  CheckCheck,
+  CircleX,
   MoreHorizontal,
   XIcon,
 } from "lucide-react";
@@ -34,6 +36,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { motion } from "framer-motion";
 
 interface UserReOrderMenuProps {
   patient: ScheduledPatientTypes;
@@ -62,6 +65,7 @@ export const UserReOrderMenu: React.FC<UserReOrderMenuProps> = ({
     new Date(patient_matching_reg_date_time)
   );
   const [menuLoader, setMenuLoader] = useState(false);
+  const [confirming, setConfirming] = useState(false);
   const hours = Array.from({ length: 12 }, (_, i) => i + 1);
   const handleDateSelect = (selectedDate: Date | undefined) => {
     if (selectedDate) {
@@ -158,7 +162,7 @@ export const UserReOrderMenu: React.FC<UserReOrderMenuProps> = ({
         <Button
           variant="ghost"
           disabled={disabled}
-          className="flex h-8 w-8 p-0 data-[state=open]:bg-muted border rounded-full"
+          className="flex h-8 w-8 p-0 data-[state=open]:bg-muted border rounded-full disabled:invisible"
         >
           {menuLoader ? <Loader size="small" /> : <MoreHorizontal />}
           <span className="sr-only">Open menu</span>
@@ -285,17 +289,66 @@ export const UserReOrderMenu: React.FC<UserReOrderMenuProps> = ({
           </Button>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <Button
-            onClick={() => {
-              cancelAppointment();
-            }}
-            className="cursor-pointer font-medium w-full border-0 bg-red-500/10 text-red-600 hover:!text-red-600 hover:!bg-red-500/20 flex items-center justify-center"
+
+        <div className="flex items-center w-full relative">
+          <motion.button
+            disabled={confirming || menuLoader}
+            className={`${
+              confirming ? "" : "hover:!bg-red-500/20"
+            } font-medium flex items-center justify-center gap-2 py-2 bg-red-500/10 text-red-600 rounded-lg overflow-hidden transition-colors`}
+            onClick={() => setConfirming(!confirming)}
+            initial={{ width: "100%" }}
+            animate={{ width: confirming ? "66%" : "100%" }}
+            transition={{ duration: 0.3 }}
           >
-            <XIcon />
-            Cancel Appointment
-          </Button>
-        </DropdownMenuItem>
+            {confirming ? (
+              "Are you Sure?"
+            ) : (
+              <>
+                <XIcon />
+                Cancel Appointment
+              </>
+            )}
+          </motion.button>
+          <motion.div
+            initial={{
+              opacity: 0,
+              display: "none",
+              translateX: "100%",
+            }}
+            animate={{
+              opacity: confirming ? 1 : 0,
+              display: confirming ? "flex" : "none",
+              translateX: confirming ? 0 : "100%",
+            }}
+            exit={{ opacity: 0, display: "none", translateX: "100%" }}
+            transition={{ duration: 0.3 }}
+            className="absolute right-0 w-[34%] flex h-full items-center justify-center flex-row gap-x-1 px-1"
+          >
+            <DropdownMenuItem
+              className="flex-1 cursor-pointer bg-destructive focus:bg-destructive/90"
+              asChild
+            >
+              <Button
+                variant={"destructive"}
+                className="rounded-lg flex flex-1 items-center justify-center h-full"
+                onClick={() => cancelAppointment()}
+                disabled={menuLoader}
+              >
+                <CheckCheck size={18} />
+              </Button>
+            </DropdownMenuItem>
+            <Button
+              variant={"secondary"}
+              className="rounded-lg flex flex-1 items-center justify-center h-full px-2"
+              onClick={() => setConfirming(false)}
+              disabled={menuLoader}
+            >
+              <CircleX size={18} />
+            </Button>
+          </motion.div>
+        </div>
+
         <DropdownMenuSeparator />
 
         <div className="w-full flex flex-row gap-x-1">

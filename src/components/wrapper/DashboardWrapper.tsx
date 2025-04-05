@@ -31,7 +31,10 @@ const DashboardWrapper = ({ children }: { children: ReactNode }) => {
     const checkUserSubscription = async () => {
       setloading(true);
       if (isLoaded && orgId) {
-        const subscriptionStatus = await checkSubscriptionStatus(orgId);
+        const subscriptionStatus =
+          process.env.NEXT_PUBLIC_NODE_ENV === "development"
+            ? { status: true, message: "" }
+            : await checkSubscriptionStatus(orgId);
         if (subscriptionStatus?.status) {
           setloading(false);
           setsubscription(true);

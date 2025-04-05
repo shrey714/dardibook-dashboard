@@ -26,16 +26,16 @@ const Page = () => {
   const [drawerState, setdrawerState] = useState(false);
   // =============================================
 
-  const { patientsData, loading } = useTodayPatientStore((state) => state);
+  const { todayPatients, loading } = useTodayPatientStore((state) => state);
 
   useEffect(() => {
-    const index = patientsData?.findIndex(
-      (patient: { patient_unique_Id: string | null }) =>
-        patient.patient_unique_Id === patientId
-    );
-    setstartIndex(index);
+    // const index = todayPatients?.findIndex(
+    //   (patient: { patient_unique_Id: string | null }) =>
+    //     patient.patient_unique_Id === patientId
+    // );
+    // setstartIndex(index);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [patientsData]);
+  }, [todayPatients]);
 
   return (
     <>
@@ -50,10 +50,11 @@ const Page = () => {
               <SheetDescription hidden>DESC</SheetDescription>
             </SheetHeader>
             <PatientDataBox
-              patientData={patientsData?.find(
-                (patient: { patient_unique_Id: string | null }) =>
-                  patient.patient_unique_Id === patientId
-              )}
+            patientData={[]}
+              // patientData={todayPatients?.find(
+              //   (patient: { patient_unique_Id: string | null }) =>
+              //     patient.patient_unique_Id === patientId
+              // )}
             />
           </SheetContent>
         </Sheet>
@@ -62,7 +63,7 @@ const Page = () => {
           <div className="w-full overflow-hidden h-[calc(100svh-53px)] flex flex-1 items-center justify-center z-40">
             <Loader size="medium" />
           </div>
-        ) : patientsData?.length === 0 || patientsData === null ? (
+        ) : todayPatients?.length === 0 || todayPatients === null ? (
           <div
             style={{
               width: "100%",
@@ -84,7 +85,7 @@ const Page = () => {
             className="flex flex-col !gap-0 w-full"
           >
             <CarouselThumbsContainer className="h-12 basis-full py-1 select-none">
-              {patientsData?.map((patient: any, index: number) => (
+              {todayPatients?.map((patient: any, index: number) => (
                 <SliderThumbItem
                   key={index}
                   index={index}
@@ -95,7 +96,7 @@ const Page = () => {
             </CarouselThumbsContainer>
             <div className="relative basis-3/4 overflow-hidden">
               <CarouselMainContainer className="h-[calc(100svh-106px)] z-[1] relative">
-                {patientsData?.map((patient: any, index: number) => (
+                {todayPatients?.map((patient: any, index: number) => (
                   <SliderMainItem
                     setdrawerState={setdrawerState}
                     key={index}

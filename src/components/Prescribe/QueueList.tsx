@@ -1,246 +1,609 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
-import React, { useEffect } from "react";
-import Link from "next/link";
-import StatsHeader from "./StatsHeader";
+import React, { useState } from "react";
 import useToken from "@/firebase/useToken";
+import Link from "next/link";
 import Loader from "../common/Loader";
-import { Reorder } from "framer-motion";
-import { ClipboardPlus, History } from "lucide-react";
-import { useAuth } from "@clerk/nextjs";
-import { format } from "date-fns";
+import { useAuth, useOrganization } from "@clerk/nextjs";
+import { AnimatePresence, Reorder } from "framer-motion";
+import { format, getTime, startOfDay } from "date-fns";
+import { UserReOrderMenu } from "@/components/Appointment/UserReOrderMenu";
+import { useTodayPatientStore } from "@/lib/providers/todayPatientsProvider";
+import { usePatientHistoryModalStore } from "@/lib/stores/patientHistoryModalStore";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  BedSingle,
+  BedSingleIcon,
+  BriefcaseMedicalIcon,
+  ClipboardCheck,
+  ClipboardCheckIcon,
+  ClipboardPlus,
+  ClipboardPlusIcon,
+  History,
+  HistoryIcon,
+  ListFilter,
+  PencilLineIcon,
+  UserRoundPlus,
+  UserRoundPlusIcon,
+} from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "../ui/tooltip";
-import { Button } from "../ui/button";
-import { UserReOrderMenu } from "../Appointment/UserReOrderMenu";
-import { useTodayPatientStore } from "@/lib/providers/todayPatientsProvider";
-import { usePatientHistoryModalStore } from "@/lib/stores/patientHistoryModalStore";
+} from "@/components/ui/tooltip";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { useMediaQuery } from "@/hooks/use-media-query";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
+
+interface TodayPatientsFilter {
+  registerd_for?: string;
+  registerd_by?: string;
+  selectedFilter?: string;
+}
+
+const filterOptions = [
+  {
+    value: "Registered",
+    icon: <UserRoundPlus className="h-6 w-6" />,
+    classname:
+      "hover:text-blue-600 data-[state=on]:border-blue-600 data-[state=on]:bg-blue-600/10 data-[state=on]:text-blue-600",
+  },
+  {
+    value: "Prescribed",
+    icon: <ClipboardCheck className="h-6 w-6" />,
+    classname:
+      "hover:text-green-600 data-[state=on]:border-green-600 data-[state=on]:bg-green-600/10 data-[state=on]:text-green-600",
+  },
+  {
+    value: "Bed",
+    icon: <BedSingle className="h-6 w-6" />,
+    classname: "hover:text-accent-foreground data-[state=on]:border-primary",
+  },
+];
 
 const QueueList: React.FC = () => {
+  const { openModal } = usePatientHistoryModalStore();
   const { orgId } = useAuth();
   const { CurrentToken } = useToken(orgId || "");
-  const { openModal } = usePatientHistoryModalStore();
+  const { todayPatients, loading } = useTodayPatientStore((state) => state);
+  const [filters, setFilters] = useState<TodayPatientsFilter>();
+  const isDesktop = useMediaQuery("(min-width: 1280px)");
 
-  // =============================================
-  const { patientsData, loading } = useTodayPatientStore((state) => state);
-  // =============================================
+  const { memberships } = useOrganization({
+    memberships: {
+      infinite: true,
+      keepPreviousData: true,
+      role: ["org:doctor", "org:clinic_head", "org:assistant_doctor"],
+    },
+  });
+
+  const filteredPatients = todayPatients.filter((patient) => {
+    if (filters?.selectedFilter) {
+      const filterConditions: Record<string, boolean> = {
+        Registered: !patient.inBed && !patient.prescribed,
+        Prescribed: patient.prescribed,
+        Bed: patient.inBed,
+      };
+
+      if (!filterConditions[filters.selectedFilter]) return false;
+    }
+
+    if (
+      filters?.registerd_by &&
+      patient.registerd_by.id !== filters.registerd_by
+    ) {
+      return false;
+    }
+
+    if (
+      filters?.registerd_for &&
+      patient.registerd_for.id !== filters.registerd_for
+    ) {
+      return false;
+    }
+
+    return true;
+  });
+
   const base = 4;
   const t = (d: number) => d * base;
-
   return (
-    <>
-      <StatsHeader
-        registrations={patientsData?.length}
-        attended={
-          patientsData?.filter((item: any) => item.attended === true).length
-        }
-      />
-      <div className="w-full mt-8 p-0 flex flex-row items-center">
-        <span className="flex flex-1 h-[2px] bg-gradient-to-r from-transparent to-primary"></span>
-        <div className=" flex items-center justify-center">
-          <p className="w-auto px-3 py-1 font-medium text-base rounded-full border-primary border-[2px]">
-            Doctor&apos;s Space
-          </p>
+    <div
+      className={`max-w-6xl ${
+        isDesktop ? "!mt-2" : "!mt-0"
+      } w-full h-full overflow-x-hidden overflow-y-hidden gap-x-4 gap-y-2 flex flex-col 2xl:flex-row flex-wrap`}
+    >
+      {isDesktop ? (
+        <div className="px-2 pb-2 min-w-64 h-min flex flex-wrap gap-2 border-b 2xl:border-b-0 2xl:border-r items-center 2xl:items-stretch flex-row 2xl:flex-col">
+          <div className="flex flex-1 flex-row gap-x-1">
+            <span className="bg-green-500/10 flex h-auto px-2 rounded-md aspect-square items-center justify-center">
+              <BriefcaseMedicalIcon size={20} className="text-green-500" />
+            </span>
+            <Select
+              value={filters?.registerd_for}
+              name="registerd_for"
+              onValueChange={(val) => {
+                setFilters((prev) => ({ ...prev, registerd_for: val }));
+              }}
+            >
+              <SelectTrigger
+                id="registerd_for"
+                className="w-full md:max-w-md lg:col-span-2 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input py-1 pl-2 sm:text-sm sm:leading-6"
+              >
+                <SelectValue placeholder="Registerd for" />
+              </SelectTrigger>
+              <SelectContent>
+                {memberships &&
+                  memberships.data
+                    ?.filter((member) =>
+                      ["org:doctor", "org:clinic_head"].includes(member.role)
+                    )
+                    ?.map((member, index) =>
+                      member.publicUserData.userId ? (
+                        <SelectItem
+                          value={member.publicUserData.userId}
+                          key={index}
+                        >
+                          {member.publicUserData.firstName}{" "}
+                          {member.publicUserData.lastName}
+                        </SelectItem>
+                      ) : (
+                        <></>
+                      )
+                    )}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex flex-1 flex-row gap-x-1">
+            <span className="bg-blue-600/10 flex h-auto px-2 rounded-md aspect-square items-center justify-center">
+              <PencilLineIcon size={20} className="text-blue-600" />
+            </span>
+            <Select
+              value={filters?.registerd_by}
+              name="registerd_by"
+              onValueChange={(val) => {
+                setFilters((prev) => ({ ...prev, registerd_by: val }));
+              }}
+            >
+              <SelectTrigger
+                id="registerd_by"
+                className="w-full md:max-w-md lg:col-span-2 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input py-1 pl-2 sm:text-sm sm:leading-6"
+              >
+                <SelectValue placeholder="Registerd by" />
+              </SelectTrigger>
+              <SelectContent>
+                {memberships &&
+                  memberships.data?.map((member, index) =>
+                    member.publicUserData.userId ? (
+                      <SelectItem
+                        value={member.publicUserData.userId}
+                        key={index}
+                      >
+                        {member.publicUserData.firstName}{" "}
+                        {member.publicUserData.lastName}
+                      </SelectItem>
+                    ) : (
+                      <></>
+                    )
+                  )}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <ToggleGroup
+            className="flex flex-row 2xl:flex-col items-start gap-2"
+            type="single"
+            value={filters?.selectedFilter}
+            onValueChange={(value) =>
+              setFilters((prev) => ({ ...prev, selectedFilter: value }))
+            }
+          >
+            {filterOptions.map(({ value, icon, classname }) => (
+              <ToggleGroupItem
+                key={value}
+                value={value}
+                aria-label={value}
+                className={cn(
+                  "flex h-auto text-muted-foreground flex-row items-center justify-between border border-muted bg-popover px-4 py-2 rounded-full hover:bg-accent",
+                  filters?.selectedFilter === value && classname
+                )}
+              >
+                {icon} {value}
+              </ToggleGroupItem>
+            ))}
+          </ToggleGroup>
+
+          <div className="flex flex-1 flex-row gap-x-1 items-end justify-end">
+            <Button
+              onClick={() => {
+                setFilters({
+                  registerd_for: "",
+                  registerd_by: "",
+                  selectedFilter: "",
+                });
+              }}
+              className="h-auto py-0 pl-0"
+              variant={"link"}
+            >
+              clear
+            </Button>
+          </div>
         </div>
-        <span className="flex flex-1 h-[2px] bg-gradient-to-l from-transparent to-primary"></span>
-      </div>
-      <div className="w-full flex flex-row">
+      ) : (
+        <Drawer autoFocus>
+          <DrawerTrigger asChild>
+            <Button variant="outline" className="self-end py-2 px-3">
+              <ListFilter />
+            </Button>
+          </DrawerTrigger>
+          <DrawerContent>
+            <div className="mx-auto w-full max-w-sm">
+              <DrawerHeader>
+                <DrawerTitle>Filter patients</DrawerTitle>
+                <DrawerDescription>
+                  Filter patients based on their status.
+                </DrawerDescription>
+              </DrawerHeader>
+
+              <div className="px-2 pb-2 min-w-64 h-min flex flex-wrap gap-2 items-stretch flex-col">
+                <div className="flex flex-1 flex-row gap-x-1">
+                  <span className="bg-green-500/10 flex h-auto px-2 rounded-md aspect-square items-center justify-center">
+                    <BriefcaseMedicalIcon
+                      size={20}
+                      className="text-green-500"
+                    />
+                  </span>
+                  <Select
+                    value={filters?.registerd_for}
+                    name="registerd_for"
+                    onValueChange={(val) => {
+                      setFilters((prev) => ({ ...prev, registerd_for: val }));
+                    }}
+                  >
+                    <SelectTrigger
+                      id="registerd_for"
+                      className="w-full md:max-w-md lg:col-span-2 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input py-1 pl-2 sm:text-sm sm:leading-6"
+                    >
+                      <SelectValue placeholder="Registerd for" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {memberships &&
+                        memberships.data
+                          ?.filter((member) =>
+                            ["org:doctor", "org:clinic_head"].includes(
+                              member.role
+                            )
+                          )
+                          ?.map((member, index) =>
+                            member.publicUserData.userId ? (
+                              <SelectItem
+                                value={member.publicUserData.userId}
+                                key={index}
+                              >
+                                {member.publicUserData.firstName}{" "}
+                                {member.publicUserData.lastName}
+                              </SelectItem>
+                            ) : (
+                              <></>
+                            )
+                          )}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="flex flex-1 flex-row gap-x-1">
+                  <span className="bg-blue-600/10 flex h-auto px-2 rounded-md aspect-square items-center justify-center">
+                    <PencilLineIcon size={20} className="text-blue-600" />
+                  </span>
+                  <Select
+                    value={filters?.registerd_by}
+                    name="registerd_by"
+                    onValueChange={(val) => {
+                      setFilters((prev) => ({ ...prev, registerd_by: val }));
+                    }}
+                  >
+                    <SelectTrigger
+                      id="registerd_by"
+                      className="w-full md:max-w-md lg:col-span-2 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input py-1 pl-2 sm:text-sm sm:leading-6"
+                    >
+                      <SelectValue placeholder="Registerd by" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {memberships &&
+                        memberships.data?.map((member, index) =>
+                          member.publicUserData.userId ? (
+                            <SelectItem
+                              value={member.publicUserData.userId}
+                              key={index}
+                            >
+                              {member.publicUserData.firstName}{" "}
+                              {member.publicUserData.lastName}
+                            </SelectItem>
+                          ) : (
+                            <></>
+                          )
+                        )}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <ToggleGroup
+                  className="flex flex-row 2xl:flex-col items-start gap-2"
+                  type="single"
+                  value={filters?.selectedFilter}
+                  onValueChange={(value) =>
+                    setFilters((prev) => ({ ...prev, selectedFilter: value }))
+                  }
+                >
+                  {filterOptions.map(({ value, icon, classname }) => (
+                    <ToggleGroupItem
+                      key={value}
+                      value={value}
+                      aria-label={value}
+                      className={cn(
+                        "flex h-auto text-muted-foreground flex-row items-center justify-between border border-muted bg-popover px-4 py-2 rounded-full hover:bg-accent",
+                        filters?.selectedFilter === value && classname
+                      )}
+                    >
+                      {icon} {value}
+                    </ToggleGroupItem>
+                  ))}
+                </ToggleGroup>
+
+                <div className="flex flex-1 flex-row gap-x-1 items-end justify-end">
+                  <Button
+                    onClick={() => {
+                      setFilters({
+                        registerd_for: "",
+                        registerd_by: "",
+                        selectedFilter: "",
+                      });
+                    }}
+                    className="h-auto py-0 pl-0"
+                    variant={"link"}
+                  >
+                    clear
+                  </Button>
+                </div>
+              </div>
+
+              <DrawerFooter>
+                <DrawerClose asChild>
+                  <Button variant="outline">Cancel</Button>
+                </DrawerClose>
+              </DrawerFooter>
+            </div>
+          </DrawerContent>
+        </Drawer>
+      )}
+
+      <ScrollArea className="h-full flex flex-1">
         {loading ? (
-          <div className="w-full h-52 overflow-hidden flex items-center justify-center">
+          <div className="w-full h-48 overflow-hidden flex items-center justify-center">
             <Loader size="medium" />
           </div>
-        ) : patientsData?.length === 0 || patientsData === null ? (
-          <div className="w-full h-52 overflow-hidden flex items-end justify-center">
+        ) : filteredPatients?.length === 0 || filteredPatients === null ? (
+          <div className="w-full h-52 overflow-hidden flex items-center justify-center">
             <img className="w-full max-w-[16rem]" src="/empty.svg" alt="" />
           </div>
         ) : (
           <>
-            <ul className="w-full mt-4 relative">
+            <ul className="w-full h-full px-2 pb-14">
               <TooltipProvider>
                 <Reorder.Group
-                  values={patientsData}
+                  values={filteredPatients}
                   onReorder={() => {}}
                   draggable={false}
                 >
-                  <table className="w-full">
-                    <thead>
-                      <tr className="sticky top-1 z-20">
-                        <th className="pb-2 text-sm sm:text-base">Token</th>
-                        <th className="pb-2 text-sm sm:text-base hide-before-480 hide-between-768-and-990">
-                          Id
-                        </th>
-                        <th className="pb-2 text-sm sm:text-base">Name</th>
-                        <th className="pb-2 text-sm sm:text-base">Status</th>
-                        <th className="pb-2 text-sm sm:text-base">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="rounded-lg">
-                      {[...patientsData].map((item: any, key: number) => {
-                        const select =
-                          CurrentToken === patientsData?.length - key
-                            ? true
-                            : false;
-                        return (
-                          <Reorder.Item
-                            drag={false}
-                            as="tr"
-                            key={item.patient_unique_Id}
-                            value={item.patient_unique_Id}
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{
-                              height: "auto",
-                              opacity: 1,
-                              transition: {
+                  <AnimatePresence initial={false}>
+                    <table className="w-full">
+                      <tbody className="rounded-lg">
+                        {filteredPatients.map((item, key: number) => {
+                          const select =
+                            CurrentToken === filteredPatients?.length - key
+                              ? true
+                              : false;
+                          const patient_matching_reg_date_time =
+                            item.registered_date_time.find(
+                              (date_time) =>
+                                getTime(startOfDay(date_time)) ===
+                                getTime(startOfDay(new Date()))
+                            ) ?? 0;
+                          return (
+                            <Reorder.Item
+                              drag={false}
+                              as="tr"
+                              key={item.patient_id}
+                              value={item.patient_id}
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{
+                                height: "auto",
+                                opacity: 1,
+                                transition: {
+                                  type: "spring",
+                                  bounce: 0.3,
+                                  opacity: { delay: t(0.025) },
+                                },
+                              }}
+                              exit={{ height: 0, opacity: 0 }}
+                              transition={{
+                                duration: t(0.15),
                                 type: "spring",
-                                bounce: 0.3,
-                                opacity: { delay: t(0.025) },
-                              },
-                            }}
-                            exit={{ height: 0, opacity: 0 }}
-                            transition={{
-                              duration: t(0.15),
-                              type: "spring",
-                              bounce: 0,
-                              opacity: { duration: t(0.03) },
-                            }}
-                            className="relative m-0 overflow-hidden"
-                          >
-                            <td className="transition align-top text-center font-medium text-sm sm:text-base">
-                              <div
-                                className={`${
-                                  select ? "bg-blue-700 text-white" : ""
-                                } p-1 my-1 rounded-s-full flex items-center px-3`}
-                              >
-                                {patientsData?.length - key}
-                                <p className="text-xs ml-2">
-                                  (
-                                  {format(
-                                    new Date(item.last_visited),
-                                    "hh:mm a"
-                                  )}
-                                  )
-                                </p>
-                              </div>
-                            </td>
-                            <td className="transition align-top text-center font-medium text-sm sm:text-base hide-before-480 hide-between-768-and-990">
-                              <Link
-                                href={"#"}
-                                role="button"
-                                onClick={() =>
-                                  openModal({
-                                    patientId: item.patient_unique_Id,
-                                  })
-                                }
-                              >
+                                bounce: 0,
+                                opacity: { duration: t(0.03) },
+                              }}
+                              className="relative m-0 overflow-hidden"
+                            >
+                              <td className="text-center font-medium text-sm sm:text-base relative">
+                                <div
+                                  className={`${
+                                    select ? "bg-blue-700 text-white" : ""
+                                  } p-1 rounded-s-full flex items-center px-3`}
+                                >
+                                  {filteredPatients?.length - key}
+                                  <p className="text-xs ml-2">
+                                    (
+                                    {format(
+                                      new Date(patient_matching_reg_date_time),
+                                      "hh:mm a"
+                                    )}
+                                    )
+                                  </p>
+                                </div>
+                              </td>
+                              <td className="text-center font-medium text-sm sm:text-base hide-before-480 hide-between-768-and-990">
+                                <Link
+                                  href={"#"}
+                                  role="button"
+                                  onClick={() =>
+                                    openModal({
+                                      patientId: item.patient_id,
+                                    })
+                                  }
+                                >
+                                  <p
+                                    className={`underline ${
+                                      select
+                                        ? "bg-blue-700 text-white"
+                                        : "bg-border rounded-s-full"
+                                    } p-1 px-4`}
+                                  >
+                                    {item.patient_id}
+                                  </p>
+                                </Link>
+                              </td>
+                              <td className="font-medium text-center text-sm sm:text-base">
                                 <p
-                                  className={`underline ${
+                                  className={` ${
                                     select
                                       ? "bg-blue-700 text-white"
-                                      : "bg-border rounded-s-full"
-                                  } p-1 my-1 px-4`}
+                                      : "bg-border full-radius-between-768-and-990 full-radius-before-480"
+                                  } p-1 px-4 rounded-e-full lg:rounded-none mr-1 lg:mr-0 line-clamp-1`}
                                 >
-                                  {item.patient_unique_Id}
+                                  {item.name}
                                 </p>
-                              </Link>
-                            </td>
-                            <td className="transition align-top font-medium text-center text-sm sm:text-base">
-                              <p
-                                className={` ${
-                                  select
-                                    ? "bg-blue-700 text-white"
-                                    : "bg-border full-radius-between-768-and-990 full-radius-before-480"
-                                } p-1 px-2 my-1 rounded-e-full mr-1`}
-                              >
-                                {item.first_name} {item.last_name}
-                              </p>
-                            </td>
-                            <td className="transition align-top text-center font-medium text-sm sm:text-base">
-                              <p
-                                className={`m-1 rounded-full ${
-                                  item.attended
-                                    ? "bg-green-600 p-1 text-white"
-                                    : item.old
-                                    ? "bg-border p-1"
-                                    : "border-2 p-[2px] border-border"
-                                }`}
-                              >
-                                {item.attended
-                                  ? "Attended"
-                                  : item.old
-                                  ? "Old"
-                                  : "New"}
-                              </p>
-                            </td>
-                            <td className="transition align-top text-center font-medium text-sm sm:text-base flex flex-row items-center gap-0 sm:gap-1 justify-center">
-                              <Tooltip delayDuration={100}>
-                                <TooltipTrigger asChild>
-                                  <Button
-                                    variant="outline"
-                                    className="m-1 h-7 sm:h-8 py-1 flex items-center justify-center border-2"
-                                    asChild
-                                  >
-                                    <Link
-                                      href={"#"}
-                                      role="button"
-                                      onClick={() =>
-                                        openModal({
-                                          patientId: item.patient_unique_Id,
-                                        })
-                                      }
-                                    >
-                                      <History />
-                                    </Link>
-                                  </Button>
-                                </TooltipTrigger>
-                                <TooltipContent side="left">
-                                  <p>History</p>
-                                </TooltipContent>
-                              </Tooltip>
-                              <Tooltip delayDuration={100}>
-                                <TooltipTrigger asChild>
-                                  <Button
-                                    variant="outline"
-                                    disabled={item.attended}
-                                    className="my-1 mr-1 h-7 border-0 sm:h-8 py-1 flex items-center justify-center bg-blue-700 hover:bg-blue-900 text-white hover:text-white rounded-[4px]"
-                                    asChild={!item.attended}
-                                  >
-                                    <Link
-                                      href={{
-                                        pathname: "prescribe/prescribeForm",
-                                        query: {
-                                          patientId: item.patient_unique_Id,
-                                        },
-                                      }}
-                                    >
-                                      <ClipboardPlus />
-                                    </Link>
-                                  </Button>
-                                </TooltipTrigger>
-                                <TooltipContent side="right">
-                                  <p>Prescribe</p>
-                                </TooltipContent>
-                              </Tooltip>
-                              {/* <UserReOrderMenu
-                                item={item}
-                                disabled={item.attended}
-                              /> */}
-                            </td>
-                          </Reorder.Item>
-                        );
-                      })}
-                    </tbody>
-                  </table>
+                              </td>
+                              <td className="font-medium text-center text-sm sm:text-base hidden lg:block">
+                                <p
+                                  className={` ${
+                                    select
+                                      ? "bg-blue-700 text-white"
+                                      : "bg-border"
+                                  } my-1 mr-1 p-1 px-4 rounded-e-full`}
+                                >
+                                  {item.mobile}
+                                </p>
+                              </td>
+                              <td className="font-medium text-center text-sm sm:text-base">
+                                <p
+                                  className={`my-1 border-2 mr-1 py-1 px-4 rounded-full text-center flex items-center justify-center ${
+                                    item.prescribed
+                                      ? "bg-green-500/10 border-green-500 text-green-500"
+                                      : item.inBed
+                                      ? "border-primary"
+                                      : "bg-blue-500/10 border-blue-500 text-blue-500"
+                                  }`}
+                                >
+                                  {item.prescribed ? (
+                                    <ClipboardCheckIcon className="size-4 sm:size-5" />
+                                  ) : item.inBed ? (
+                                    <BedSingleIcon className="size-4 sm:size-5" />
+                                  ) : (
+                                    <UserRoundPlusIcon className="size-4 sm:size-5" />
+                                  )}
+                                </p>
+                              </td>
+                              <td className="text-center table-cell">
+                                <div className="flex flex-row gap-x-1">
+                                  <UserReOrderMenu
+                                    patient={item}
+                                    matchingDate={new Date()}
+                                    disabled={item.prescribed || item.inBed}
+                                  />
+
+                                  <Tooltip delayDuration={100}>
+                                    <TooltipTrigger asChild>
+                                      <Button
+                                        variant="ghost"
+                                        className="flex h-8 w-8 p-0 data-[state=open]:bg-muted border rounded-full"
+                                        asChild
+                                      >
+                                        <Link
+                                          href={"#"}
+                                          role="button"
+                                          onClick={() =>
+                                            openModal({
+                                              patientId: item.patient_id,
+                                            })
+                                          }
+                                        >
+                                          <History />
+                                        </Link>
+                                      </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent side="left">
+                                      <p>History</p>
+                                    </TooltipContent>
+                                  </Tooltip>
+
+                                  <Tooltip delayDuration={100}>
+                                    <TooltipTrigger asChild>
+                                      <Button
+                                        variant="outline"
+                                        disabled={item.prescribed || item.inBed}
+                                        className="bg-blue-700 hover:bg-blue-900 text-white hover:text-white flex h-8 w-8 p-0 border-0 rounded-full disabled:invisible"
+                                        asChild={!item.prescribed}
+                                      >
+                                        <Link
+                                          href={{
+                                            pathname: "prescribe/prescribeForm",
+                                            query: {
+                                              patientId: item.patient_id,
+                                            },
+                                          }}
+                                        >
+                                          <ClipboardPlusIcon className="size-4 sm:size-5" />
+                                        </Link>
+                                      </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent side="right">
+                                      <p>Prescribe</p>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </div>
+                              </td>
+                            </Reorder.Item>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </AnimatePresence>
                 </Reorder.Group>
               </TooltipProvider>
             </ul>
           </>
         )}
-      </div>
-    </>
+      </ScrollArea>
+    </div>
   );
 };
 
