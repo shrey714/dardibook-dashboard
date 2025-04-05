@@ -68,7 +68,7 @@ function page() {
         </DialogContent>
       </Dialog>
       <div className="w-full">
-      <KanbanBoard />
+      <KanbanBoard setIsModalOpen={setIsModalOpen}/>
       </div>
 
       {/* <div className="grid grid-cols-3 gap-2">

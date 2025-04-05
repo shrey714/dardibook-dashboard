@@ -110,8 +110,8 @@ const initialTasks: Task[] = [
     content: "Launch website and deploy to server",
   },
 ];
-export const KanbanBoard = ()=> {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+
+export const KanbanBoard = ({setIsModalOpen}:any)=> {
   const { isLoaded, user } = useUser();
   const { orgId } = useAuth();
 
@@ -299,6 +299,7 @@ export const KanbanBoard = ()=> {
               key={col.id}
               column={col}
               tasks={tasks.filter((task) => task.columnId === col.id)}
+              setIsModalOpen={setIsModalOpen}
             />
           ))}
         </SortableContext>
@@ -314,6 +315,7 @@ export const KanbanBoard = ()=> {
                 tasks={tasks.filter(
                   (task) => task.columnId === activeColumn.id
                 )}
+              setIsModalOpen={setIsModalOpen}
               />
             )}
             {activeTask && <TaskCard task={activeTask} isOverlay />}

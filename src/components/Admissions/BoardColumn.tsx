@@ -26,9 +26,10 @@ interface BoardColumnProps {
   column: Column;
   tasks: Task[];
   isOverlay?: boolean;
+  setIsModalOpen: any
 }
 
-export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
+export function BoardColumn({ column, tasks, isOverlay,setIsModalOpen }: BoardColumnProps) {
   const tasksIds = useMemo(() => {
     return tasks.map((task) => task.id);
   }, [tasks]);
@@ -95,7 +96,7 @@ export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
             <CardContent className="p-2">
               <p className="flex justify-around items-center">
                 Admit Patient
-                <Button className="" variant="outline" size="sm">
+                <Button className="" variant="outline" size="sm" onClick={()=>{setIsModalOpen(true)}}>
                   <BadgePlusIcon />
                 </Button>
               </p>
