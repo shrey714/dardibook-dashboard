@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
   Sidebar3,
   SidebarContent3,
+  SidebarFooter3,
   SidebarGroup3,
   SidebarGroupAction3,
   SidebarGroupContent3,
@@ -49,6 +50,7 @@ import {
 import { BedPatientList } from "./BedPatientList";
 // import { useBedsStore } from "@/lib/stores/useBedsStore";
 import { BedPatientTypes, OrgBed } from "@/types/FormTypes";
+import { Kbd } from "../ui/kbd";
 
 const customLocale = {
   ...enUS,
@@ -141,9 +143,18 @@ export function BedSidebar({
         const bedsQuery = query(
           collection(db, "doctor", orgId, "beds"),
           or(
-            and(where("admission_at", "<=", getTime(startOfDay(date))),where("discharge_at", ">=", getTime(endOfDay(date)))),
-            and(where("admission_at", ">=", getTime(startOfDay(date))),where("admission_at", "<=", getTime(endOfDay(date)))),
-            and(where("discharge_at", "<=", getTime(endOfDay(date))),where("discharge_at", ">=", getTime(startOfDay(date))))
+            and(
+              where("admission_at", "<=", getTime(startOfDay(date))),
+              where("discharge_at", ">=", getTime(endOfDay(date)))
+            ),
+            and(
+              where("admission_at", ">=", getTime(startOfDay(date))),
+              where("admission_at", "<=", getTime(endOfDay(date)))
+            ),
+            and(
+              where("discharge_at", "<=", getTime(endOfDay(date))),
+              where("discharge_at", ">=", getTime(startOfDay(date)))
+            )
           )
         );
 
@@ -310,6 +321,11 @@ export function BedSidebar({
           </SidebarGroupContent3>
         </SidebarGroup3>
       </SidebarContent3>
+      <SidebarFooter3>
+        <Kbd variant="outline" className="self-start">
+          <span className="text-xs">⌘</span>b
+        </Kbd>
+      </SidebarFooter3>
     </Sidebar3>
   );
 }
