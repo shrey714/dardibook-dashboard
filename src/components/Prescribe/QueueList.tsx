@@ -16,10 +16,8 @@ import {
   BriefcaseMedicalIcon,
   ClipboardCheck,
   ClipboardCheckIcon,
-  ClipboardPlus,
   ClipboardPlusIcon,
   History,
-  HistoryIcon,
   ListFilter,
   PencilLineIcon,
   UserRoundPlus,
@@ -417,6 +415,7 @@ const QueueList: React.FC = () => {
                   <AnimatePresence initial={false}>
                     <table className="w-full">
                       <tbody className="rounded-lg">
+                      {/* [...filteredPatients, ...Array(20).fill(filteredPatients[0])] */}
                         {filteredPatients.map((item, key: number) => {
                           const select =
                             CurrentToken === filteredPatients?.length - key
