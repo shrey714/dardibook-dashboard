@@ -88,7 +88,7 @@ const ReOrderingList: React.FC = () => {
     if (filters?.selectedFilter) {
       const filterConditions: Record<string, boolean> = {
         Registered: !patient.inBed && !patient.prescribed,
-        Prescribed: patient.prescribed,
+        Prescribed: patient.prescribed && !patient.inBed,
         Bed: patient.inBed,
       };
 
@@ -116,7 +116,9 @@ const ReOrderingList: React.FC = () => {
   const t = (d: number) => d * base;
   return (
     <div
-      className={`max-w-6xl ${isDesktop ? "!mt-2" : "!mt-0"} w-full h-full overflow-x-hidden overflow-y-hidden gap-x-4 gap-y-2 flex flex-col 2xl:flex-row flex-wrap`}
+      className={`max-w-6xl ${
+        isDesktop ? "!mt-2" : "!mt-0"
+      } w-full h-full overflow-x-hidden overflow-y-hidden gap-x-4 gap-y-2 flex flex-col 2xl:flex-row flex-wrap`}
     >
       {isDesktop ? (
         <div className="px-2 pb-2 min-w-64 h-min flex flex-wrap gap-2 border-b 2xl:border-b-0 2xl:border-r items-center 2xl:items-stretch flex-row 2xl:flex-col">
@@ -149,12 +151,12 @@ const ReOrderingList: React.FC = () => {
                           value={member.publicUserData.userId}
                           key={index}
                         >
-                         {[
-                        member.publicUserData.firstName,
-                        member.publicUserData.lastName,
-                      ]
-                        .filter(Boolean)
-                        .join(" ")}
+                          {[
+                            member.publicUserData.firstName,
+                            member.publicUserData.lastName,
+                          ]
+                            .filter(Boolean)
+                            .join(" ")}
                         </SelectItem>
                       ) : (
                         <></>
@@ -190,11 +192,11 @@ const ReOrderingList: React.FC = () => {
                         key={index}
                       >
                         {[
-                        member.publicUserData.firstName,
-                        member.publicUserData.lastName,
-                      ]
-                        .filter(Boolean)
-                        .join(" ")}
+                          member.publicUserData.firstName,
+                          member.publicUserData.lastName,
+                        ]
+                          .filter(Boolean)
+                          .join(" ")}
                       </SelectItem>
                     ) : (
                       <></>
@@ -295,11 +297,11 @@ const ReOrderingList: React.FC = () => {
                                 key={index}
                               >
                                 {[
-                        member.publicUserData.firstName,
-                        member.publicUserData.lastName,
-                      ]
-                        .filter(Boolean)
-                        .join(" ")}
+                                  member.publicUserData.firstName,
+                                  member.publicUserData.lastName,
+                                ]
+                                  .filter(Boolean)
+                                  .join(" ")}
                               </SelectItem>
                             ) : (
                               <></>
@@ -335,11 +337,11 @@ const ReOrderingList: React.FC = () => {
                               key={index}
                             >
                               {[
-                        member.publicUserData.firstName,
-                        member.publicUserData.lastName,
-                      ]
-                        .filter(Boolean)
-                        .join(" ")}
+                                member.publicUserData.firstName,
+                                member.publicUserData.lastName,
+                              ]
+                                .filter(Boolean)
+                                .join(" ")}
                             </SelectItem>
                           ) : (
                             <></>
@@ -518,17 +520,17 @@ const ReOrderingList: React.FC = () => {
                             <td className="font-medium text-center text-sm sm:text-base">
                               <p
                                 className={`my-1 border-2 mr-1 py-1 px-4 rounded-full text-center flex items-center justify-center ${
-                                  item.prescribed
-                                    ? "bg-green-500/10 border-green-500 text-green-500"
-                                    : item.inBed
+                                  item.inBed
                                     ? "border-primary"
+                                    : item.prescribed
+                                    ? "bg-green-500/10 border-green-500 text-green-500"
                                     : "bg-blue-500/10 border-blue-500 text-blue-500"
                                 }`}
                               >
-                                {item.prescribed ? (
-                                  <ClipboardCheckIcon className="size-4 sm:size-5" />
-                                ) : item.inBed ? (
+                                {item.inBed ? (
                                   <BedSingleIcon className="size-4 sm:size-5" />
+                                ) : item.prescribed ? (
+                                  <ClipboardCheckIcon className="size-4 sm:size-5" />
                                 ) : (
                                   <UserRoundPlusIcon className="size-4 sm:size-5" />
                                 )}

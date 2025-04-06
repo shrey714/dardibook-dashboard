@@ -97,7 +97,7 @@ const QueueList: React.FC = () => {
     if (filters?.selectedFilter) {
       const filterConditions: Record<string, boolean> = {
         Registered: !patient.inBed && !patient.prescribed,
-        Prescribed: patient.prescribed,
+        Prescribed: patient.prescribed && !patient.inBed,
         Bed: patient.inBed,
       };
 
@@ -531,17 +531,17 @@ const QueueList: React.FC = () => {
                               <td className="font-medium text-center text-sm sm:text-base">
                                 <p
                                   className={`my-1 border-2 mr-1 py-1 px-4 rounded-full text-center flex items-center justify-center ${
-                                    item.prescribed
-                                      ? "bg-green-500/10 border-green-500 text-green-500"
-                                      : item.inBed
+                                    item.inBed
                                       ? "border-primary"
+                                      : item.prescribed
+                                      ? "bg-green-500/10 border-green-500 text-green-500"
                                       : "bg-blue-500/10 border-blue-500 text-blue-500"
                                   }`}
                                 >
-                                  {item.prescribed ? (
-                                    <ClipboardCheckIcon className="size-4 sm:size-5" />
-                                  ) : item.inBed ? (
+                                  {item.inBed ? (
                                     <BedSingleIcon className="size-4 sm:size-5" />
+                                  ) : item.prescribed ? (
+                                    <ClipboardCheckIcon className="size-4 sm:size-5" />
                                   ) : (
                                     <UserRoundPlusIcon className="size-4 sm:size-5" />
                                   )}

@@ -6,9 +6,9 @@ const StatsHeader = () => {
   const { todayPatients, loading } = useTodayPatientStore((state) => state);
 
   return (
-    <div className="relative overflow-hidden w-full sm:max-w-3xl bg-gradient-to-b from-muted/50 to-muted flex flex-row border-2 rounded-md">
-      <div className="py-3 px-4 sm:px-6 flex flex-1 flex-row gap-x-4 lg:flex-col flex-wrap">
-        <div className=" font-semibold text-sm sm:text-base whitespace-nowrap">
+    <div className="relative overflow-hidden w-[calc(100%-48px)] self-start md:self-center md:w-full sm:max-w-3xl bg-gradient-to-b from-muted/50 to-muted flex flex-row border-2 rounded-md">
+      <div className="py-3 px-4 sm:px-6 justify-center flex flex-1 flex-row gap-x-4 lg:flex-col flex-wrap">
+        <div className="hidden sm:block font-semibold text-sm sm:text-base whitespace-nowrap">
           Total Registrations
           <p className="font-medium text-xs whitespace-nowrap">done by today</p>
         </div>
@@ -36,8 +36,8 @@ const StatsHeader = () => {
         </div>
       </div>
 
-      <div className="py-3 px-4 sm:px-6 flex flex-1 flex-row gap-x-4 lg:flex-col flex-wrap">
-        <div className=" font-semibold text-sm sm:text-base whitespace-nowrap">
+      <div className="py-3 px-4 sm:px-6 justify-center flex flex-1 flex-row gap-x-4 lg:flex-col flex-wrap">
+        <div className="hidden sm:block font-semibold text-sm sm:text-base whitespace-nowrap">
           Total Attended
           <p className=" font-medium text-xs whitespace-nowrap">
             patient by today

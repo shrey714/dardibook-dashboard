@@ -373,7 +373,7 @@ const CurrentBedPatients = () => {
           <DrawerTrigger asChild>
             <Button
               variant="outline"
-              className="py-2 px-3 absolute right-2 md:right-5 h-[59px]"
+              className="py-2 px-3 absolute right-2 sm:right-5 h-[59px]"
             >
               <Bed />
             </Button>
