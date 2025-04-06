@@ -1,6 +1,4 @@
 "use client";
-import { columns } from "@/components/History/components/columns";
-import { DataTable } from "@/components/History/components/data-table";
 import { useEffect, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
 import Loader from "@/components/common/Loader";

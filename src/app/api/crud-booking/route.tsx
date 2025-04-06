@@ -1,7 +1,7 @@
 import { withAuth } from "@/server/withAuth";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/firebase/firebaseConfig";
-import { arrayRemove, arrayUnion, collection, doc, getDoc, query, setDoc, updateDoc, where } from "firebase/firestore";
+import { arrayRemove, arrayUnion, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 
 const addBooking = async (request: NextRequest) => {
     try {

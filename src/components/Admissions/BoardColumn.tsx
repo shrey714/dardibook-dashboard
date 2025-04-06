@@ -1,37 +1,43 @@
 import { SortableContext, useSortable } from "@dnd-kit/sortable";
 import { useDndContext, type UniqueIdentifier } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
-import { useMemo } from "react";
-import { Task, TaskCard } from "./TaskCard";
+import { useEffect, useMemo } from "react";
+import { TaskCard } from "./TaskCard";
 import { cva } from "class-variance-authority";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
 import { BadgePlusIcon, GripVertical } from "lucide-react";
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
-import Bed from "./Bed";
+import { BedInfo, BedPatientTypes, OrgBed } from "@/types/FormTypes";
 
 export interface Column {
   id: UniqueIdentifier;
-  // title: string;
 }
 
 export type ColumnType = "Column";
 
 export interface ColumnDragData {
   type: ColumnType;
-  column: Column;
+  column: BedInfo;
 }
 
 interface BoardColumnProps {
-  column: Column;
-  tasks: Task[];
+  column: BedInfo;
+  tasks: OrgBed[];
   isOverlay?: boolean;
-  setIsModalOpen: any
+  setIsModalOpen: any;
+  setIsEditModalOpen: any;
+  setbedId: any;
+  bedPatients: Record<string, BedPatientTypes>;
+  setbookingId: any;
 }
 
-export function BoardColumn({ column, tasks, isOverlay,setIsModalOpen }: BoardColumnProps) {
+export function BoardColumn({ column, tasks, isOverlay,setIsModalOpen, setbedId, bedPatients,setIsEditModalOpen,setbookingId }: BoardColumnProps) {
+  useEffect(()=>{
+    setbedId(column.id);
+  },[])
   const tasksIds = useMemo(() => {
-    return tasks.map((task) => task.id);
+    return tasks.map((task) => task.bedBookingId);
   }, [tasks]);
 
   const {
@@ -91,7 +97,7 @@ export function BoardColumn({ column, tasks, isOverlay,setIsModalOpen }: BoardCo
                 <span className="sr-only">{`Move column: ${column.id}`}</span>
                 <GripVertical />
               </Button>
-              <p className="flex flex-1 justify-center">bedInfo.id</p>
+              <p className="flex flex-1 justify-center">${column.id}</p>
             </CardTitle>
             <CardContent className="p-2">
               <p className="flex justify-around items-center">
@@ -106,12 +112,9 @@ export function BoardColumn({ column, tasks, isOverlay,setIsModalOpen }: BoardCo
       </CardHeader>
       <CardContent className="p-4 overflow-auto flex gap-2 flex-col">
           <SortableContext items={tasksIds}>
-          {tasks.map((task) => (
-              <TaskCard key={task.id} task={task} />
-            ))}
-          {/* {
-              admissionInfo.length>0?admissionInfo.map((admissionInfo,index)=>(<PatientList />)):<>noadmission</>
-            } */}
+          {tasks.map((task) => {
+            return <TaskCard key={task.bedBookingId} task={task} bedPatientData={bedPatients[task.patient_id]} setIsEditModalOpen={setIsEditModalOpen} setbookingId={setbookingId} />
+          })}
           </SortableContext>
         </CardContent>
     </Card>

@@ -30,6 +30,7 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
   const hours = Array.from({ length: 12 }, (_, i) => i + 1);
   const handleDateSelect = (selectedDate: Date | undefined) => {
     if (selectedDate) {
+      console.log(selectedDate)
       setDate(selectedDate);
     }
   };

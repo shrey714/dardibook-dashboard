@@ -17,156 +17,33 @@ import {
   MouseSensor,
 } from "@dnd-kit/core";
 import { SortableContext, arrayMove } from "@dnd-kit/sortable";
-import { type Task, TaskCard } from "./TaskCard";
-import type { Column } from "./BoardColumn";
+import { TaskCard } from "./TaskCard";
 import { hasDraggableData } from "./utils";
 import { coordinateGetter } from "./multipleContainersKeyboardPreset";
 import { db } from "@/firebase/firebaseConfig";
 import { BedInfo, OrgBed } from "@/types/FormTypes";
 import { useUser, useAuth } from "@clerk/nextjs";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { doc, writeBatch } from "firebase/firestore";
+import { useBedsStore } from "@/lib/stores/useBedsStore";
+import { getTime } from "date-fns";
+import toast from "react-hot-toast";
 
-const defaultCols = [
-  {
-    id: "todo" as const,
-    // title: "Todo",
-  },
-  {
-    id: "in-progress" as const,
-    // title: "In progress",
-  },
-  {
-    id: "done" as const,
-    // title: "Done",
-  },
-] satisfies Column[];
+export type ColumnId = string;
 
-export type ColumnId = (typeof defaultCols)[number]["id"];
-
-const initialTasks: Task[] = [
-  {
-    id: "task1",
-    columnId: "done",
-    content: "Project initiation and planning",
-  },
-  {
-    id: "task2",
-    columnId: "done",
-    content: "Gather requirements from stakeholders",
-  },
-  {
-    id: "task3",
-    columnId: "done",
-    content: "Create wireframes and mockups",
-  },
-  {
-    id: "task4",
-    columnId: "in-progress",
-    content: "Develop homepage layout",
-  },
-  {
-    id: "task5",
-    columnId: "in-progress",
-    content: "Design color scheme and typography",
-  },
-  {
-    id: "task6",
-    columnId: "todo",
-    content: "Implement user authentication",
-  },
-  {
-    id: "task7",
-    columnId: "todo",
-    content: "Build contact us page",
-  },
-  {
-    id: "task8",
-    columnId: "todo",
-    content: "Create product catalog",
-  },
-  {
-    id: "task9",
-    columnId: "todo",
-    content: "Develop about us page",
-  },
-  {
-    id: "task10",
-    columnId: "todo",
-    content: "Optimize website for mobile devices",
-  },
-  {
-    id: "task11",
-    columnId: "todo",
-    content: "Integrate payment gateway",
-  },
-  {
-    id: "task12",
-    columnId: "todo",
-    content: "Perform testing and bug fixing",
-  },
-  {
-    id: "task13",
-    columnId: "todo",
-    content: "Launch website and deploy to server",
-  },
-];
-
-export const KanbanBoard = ({setIsModalOpen}:any)=> {
+export const KanbanBoard = ({
+  setIsModalOpen,
+  setbedId,
+  setbookingId,
+  setIsEditModalOpen,
+}: any) => {
   const { isLoaded, user } = useUser();
-  const { orgId } = useAuth();
-
-  // const [bedInfo, setBedInfo] = useState<BedInfo[]>([]);
-  const [admissions, setAdmissions] = useState<OrgBed[]>([]);
-  const [columns, setColumns] = useState<Column[]>(defaultCols);
-
-
-  useEffect(() => {
-    const fetchBedMetaData = () => {
-      if (user && user.publicMetadata) {
-        const bedMetaData: BedInfo[] =
-          (user.publicMetadata?.bedMetaData as BedInfo[]) || [];
-          setColumns(bedMetaData);
-      }
-    };
-
-    const fetchAdmissions = async () => {
-      if (!orgId) return;
-      try {
-        console.log(orgId);
-        const admissionsRef = collection(
-          db,
-          "doctor",
-          "org_2u8hy06577z6Iakfqu70FH3b6Xk",
-          "beds"
-        );
-        const admissionsSnapshot = await getDocs(
-          query(admissionsRef, where("dischargeMarked", "==", true))
-        );
-        let admissionsData: OrgBed[] = [];
-        admissionsSnapshot.forEach((doc) => {
-          const data = doc.data() as OrgBed;
-          admissionsData.push(data);
-        });
-        console.log("admissionsData : ",admissionsData)
-        setAdmissions(admissionsData);
-      } catch (error) {
-        console.log("Error = ", error);
-      }
-    };
-
-    if (isLoaded && user) {
-      fetchBedMetaData();
-      fetchAdmissions();
-    }
-  }, [isLoaded, user]);
+  const { beds, bedPatients, loading } = useBedsStore((state) => state);
+  const [columns, setColumns] = useState<BedInfo[]>([]);
   const pickedUpTaskColumn = useRef<ColumnId | null>(null);
   const columnsId = useMemo(() => columns.map((col) => col.id), [columns]);
-
-  const [tasks, setTasks] = useState<Task[]>(initialTasks);
-
-  const [activeColumn, setActiveColumn] = useState<Column | null>(null);
-
-  const [activeTask, setActiveTask] = useState<Task | null>(null);
+  const [tasks, setTasks] = useState<OrgBed[]>([]);
+  const [activeColumn, setActiveColumn] = useState<BedInfo | null>(null);
+  const [activeTask, setActiveTask] = useState<OrgBed | null>(null);
 
   const sensors = useSensors(
     useSensor(MouseSensor),
@@ -176,9 +53,26 @@ export const KanbanBoard = ({setIsModalOpen}:any)=> {
     })
   );
 
+  useEffect(() => {
+    const fetchBedMetaData = () => {
+      if (user && user.publicMetadata) {
+        const bedMetaData: BedInfo[] =
+          (user.publicMetadata?.bedMetaData as BedInfo[]) || [];
+        setColumns(bedMetaData);
+      }
+    };
+
+    if (isLoaded && user && !loading) {
+      fetchBedMetaData();
+      setTasks(beds);
+    }
+  }, [isLoaded, loading, user, beds, bedPatients]);
+
   function getDraggingTaskData(taskId: UniqueIdentifier, columnId: ColumnId) {
-    const tasksInColumn = tasks.filter((task) => task.columnId === columnId);
-    const taskPosition = tasksInColumn.findIndex((task) => task.id === taskId);
+    const tasksInColumn = tasks.filter((task) => task.bedId === columnId);
+    const taskPosition = tasksInColumn.findIndex(
+      (task) => task.bedBookingId === taskId
+    );
     const column = columns.find((col) => col.id === columnId);
     return {
       tasksInColumn,
@@ -197,13 +91,13 @@ export const KanbanBoard = ({setIsModalOpen}:any)=> {
           startColumnIdx + 1
         } of ${columnsId.length}`;
       } else if (active.data.current?.type === "Task") {
-        pickedUpTaskColumn.current = active.data.current.task.columnId;
+        pickedUpTaskColumn.current = active.data.current.task.bedId;
         const { tasksInColumn, taskPosition, column } = getDraggingTaskData(
           active.id,
           pickedUpTaskColumn.current
         );
         return `Picked up Task ${
-          active.data.current.task.content
+          active.data.current.task.patient_id
         } at position: ${taskPosition + 1} of ${
           tasksInColumn.length
         } in column ${column?.id}`;
@@ -226,11 +120,11 @@ export const KanbanBoard = ({setIsModalOpen}:any)=> {
       ) {
         const { tasksInColumn, taskPosition, column } = getDraggingTaskData(
           over.id,
-          over.data.current.task.columnId
+          over.data.current.task.bedId
         );
-        if (over.data.current.task.columnId !== pickedUpTaskColumn.current) {
+        if (over.data.current.task.bedId !== pickedUpTaskColumn.current) {
           return `Task ${
-            active.data.current.task.content
+            active.data.current.task.patient_id
           } was moved over column ${column?.id} in position ${
             taskPosition + 1
           } of ${tasksInColumn.length}`;
@@ -262,9 +156,9 @@ export const KanbanBoard = ({setIsModalOpen}:any)=> {
       ) {
         const { tasksInColumn, taskPosition, column } = getDraggingTaskData(
           over.id,
-          over.data.current.task.columnId
+          over.data.current.task.bedId
         );
-        if (over.data.current.task.columnId !== pickedUpTaskColumn.current) {
+        if (over.data.current.task.bedId !== pickedUpTaskColumn.current) {
           return `Task was dropped into column ${column?.id} in position ${
             taskPosition + 1
           } of ${tasksInColumn.length}`;
@@ -298,8 +192,12 @@ export const KanbanBoard = ({setIsModalOpen}:any)=> {
             <BoardColumn
               key={col.id}
               column={col}
-              tasks={tasks.filter((task) => task.columnId === col.id)}
+              tasks={tasks.filter((task) => task.bedId === col.id)}
               setIsModalOpen={setIsModalOpen}
+              setIsEditModalOpen={setIsEditModalOpen}
+              setbedId={setbedId}
+              setbookingId={setbookingId}
+              bedPatients={bedPatients}
             />
           ))}
         </SortableContext>
@@ -312,13 +210,23 @@ export const KanbanBoard = ({setIsModalOpen}:any)=> {
               <BoardColumn
                 isOverlay
                 column={activeColumn}
-                tasks={tasks.filter(
-                  (task) => task.columnId === activeColumn.id
-                )}
-              setIsModalOpen={setIsModalOpen}
+                tasks={tasks.filter((task) => task.bedId === activeColumn.id)}
+                setIsModalOpen={setIsModalOpen}
+                setIsEditModalOpen={setIsEditModalOpen}
+                setbedId={setbedId}
+                bedPatients={bedPatients}
+                setbookingId={setbookingId}
               />
             )}
-            {activeTask && <TaskCard task={activeTask} isOverlay />}
+            {activeTask && (
+              <TaskCard
+                task={activeTask}
+                isOverlay
+                bedPatientData={bedPatients[activeTask.patient_id]}
+                setIsEditModalOpen={setIsEditModalOpen}
+                setbookingId={setbookingId}
+              />
+            )}
           </DragOverlay>,
           document.body
         )}
@@ -389,16 +297,12 @@ export const KanbanBoard = ({setIsModalOpen}:any)=> {
     // Im dropping a Task over another Task
     if (isActiveATask && isOverATask) {
       setTasks((tasks) => {
-        const activeIndex = tasks.findIndex((t) => t.id === activeId);
-        const overIndex = tasks.findIndex((t) => t.id === overId);
+        const activeIndex = tasks.findIndex((t) => t.bedBookingId === activeId);
+        const overIndex = tasks.findIndex((t) => t.bedBookingId === overId);
         const activeTask = tasks[activeIndex];
         const overTask = tasks[overIndex];
-        if (
-          activeTask &&
-          overTask &&
-          activeTask.columnId !== overTask.columnId
-        ) {
-          activeTask.columnId = overTask.columnId;
+        if (activeTask && overTask && activeTask.bedId !== overTask.bedId) {
+          activeTask.bedId = overTask.bedId;
           return arrayMove(tasks, activeIndex, overIndex - 1);
         }
 
@@ -411,14 +315,14 @@ export const KanbanBoard = ({setIsModalOpen}:any)=> {
     // Im dropping a Task over a column
     if (isActiveATask && isOverAColumn) {
       setTasks((tasks) => {
-        const activeIndex = tasks.findIndex((t) => t.id === activeId);
+        const activeIndex = tasks.findIndex((t) => t.bedBookingId === activeId);
         const activeTask = tasks[activeIndex];
         if (activeTask) {
-          activeTask.columnId = overId as ColumnId;
+          activeTask.bedId = overId as ColumnId;
           return arrayMove(tasks, activeIndex, activeIndex);
         }
         return tasks;
       });
     }
   }
-}
+};

@@ -2,17 +2,11 @@ import { withAuth } from "@/server/withAuth";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/firebase/firebaseConfig";
 import {
-  arrayRemove,
-  arrayUnion,
   collection,
   deleteDoc,
   doc,
-  getDoc,
   getDocs,
-  query,
   setDoc,
-  updateDoc,
-  where,
 } from "firebase/firestore";
 
 const checkAvalability = async (request: NextRequest) => {

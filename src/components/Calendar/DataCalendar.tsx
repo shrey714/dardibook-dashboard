@@ -7,7 +7,6 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import { format, formatRelative } from "date-fns";
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogTitle,
   DialogDescription,
