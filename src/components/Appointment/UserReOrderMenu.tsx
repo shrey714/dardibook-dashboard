@@ -375,11 +375,14 @@ export const UserReOrderMenu: React.FC<UserReOrderMenuProps> = ({
                   identifier,
                 } = member.publicUserData;
 
-                const selectedMember = {
-                  id: userId,
-                  name: `${firstName} ${lastName}`.trim(),
-                  email: identifier,
-                };
+                const fullName = [firstName, lastName]
+                .filter(Boolean)
+                .join(" ");
+              const selectedMember = {
+                id: userId,
+                name: fullName,
+                email: identifier,
+              };
                 handleDoctorChange(selectedMember);
               }
             }}
@@ -398,8 +401,12 @@ export const UserReOrderMenu: React.FC<UserReOrderMenuProps> = ({
                       value={member.publicUserData.userId}
                       key={index}
                     >
-                      {member.publicUserData.firstName}{" "}
-                      {member.publicUserData.lastName}
+                       {[
+                        member.publicUserData.firstName,
+                        member.publicUserData.lastName,
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
                     </SelectItem>
                   ) : (
                     <></>

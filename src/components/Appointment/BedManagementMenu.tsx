@@ -193,10 +193,12 @@ export const BedManagementMenu: React.FC<BedManagementMenuProps> = ({
                   lastName = "",
                   identifier,
                 } = member.publicUserData;
-
+                const fullName = [firstName, lastName]
+                  .filter(Boolean)
+                  .join(" ");
                 const selectedMember = {
                   id: userId,
-                  name: `${firstName} ${lastName}`.trim(),
+                  name: fullName,
                   email: identifier,
                 };
                 handleDoctorChange(selectedMember);
@@ -217,8 +219,12 @@ export const BedManagementMenu: React.FC<BedManagementMenuProps> = ({
                       value={member.publicUserData.userId}
                       key={index}
                     >
-                      {member.publicUserData.firstName}{" "}
-                      {member.publicUserData.lastName}
+                      {[
+                        member.publicUserData.firstName,
+                        member.publicUserData.lastName,
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
                     </SelectItem>
                   ) : (
                     <></>

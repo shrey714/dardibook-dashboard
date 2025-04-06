@@ -149,8 +149,12 @@ const ReOrderingList: React.FC = () => {
                           value={member.publicUserData.userId}
                           key={index}
                         >
-                          {member.publicUserData.firstName}{" "}
-                          {member.publicUserData.lastName}
+                         {[
+                        member.publicUserData.firstName,
+                        member.publicUserData.lastName,
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
                         </SelectItem>
                       ) : (
                         <></>
@@ -185,8 +189,12 @@ const ReOrderingList: React.FC = () => {
                         value={member.publicUserData.userId}
                         key={index}
                       >
-                        {member.publicUserData.firstName}{" "}
-                        {member.publicUserData.lastName}
+                        {[
+                        member.publicUserData.firstName,
+                        member.publicUserData.lastName,
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
                       </SelectItem>
                     ) : (
                       <></>
@@ -286,8 +294,12 @@ const ReOrderingList: React.FC = () => {
                                 value={member.publicUserData.userId}
                                 key={index}
                               >
-                                {member.publicUserData.firstName}{" "}
-                                {member.publicUserData.lastName}
+                                {[
+                        member.publicUserData.firstName,
+                        member.publicUserData.lastName,
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
                               </SelectItem>
                             ) : (
                               <></>
@@ -322,8 +334,12 @@ const ReOrderingList: React.FC = () => {
                               value={member.publicUserData.userId}
                               key={index}
                             >
-                              {member.publicUserData.firstName}{" "}
-                              {member.publicUserData.lastName}
+                              {[
+                        member.publicUserData.firstName,
+                        member.publicUserData.lastName,
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
                             </SelectItem>
                           ) : (
                             <></>

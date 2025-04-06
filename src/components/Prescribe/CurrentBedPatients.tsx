@@ -138,8 +138,12 @@ const CurrentBedPatients = () => {
                             value={member.publicUserData.userId}
                             key={index}
                           >
-                            {member.publicUserData.firstName}{" "}
-                            {member.publicUserData.lastName}
+                            {[
+                              member.publicUserData.firstName,
+                              member.publicUserData.lastName,
+                            ]
+                              .filter(Boolean)
+                              .join(" ")}
                           </SelectItem>
                         ) : (
                           <></>
@@ -367,7 +371,10 @@ const CurrentBedPatients = () => {
       ) : (
         <Drawer autoFocus>
           <DrawerTrigger asChild>
-            <Button variant="outline" className="py-2 px-3 absolute right-2 md:right-5 h-[59px]">
+            <Button
+              variant="outline"
+              className="py-2 px-3 absolute right-2 md:right-5 h-[59px]"
+            >
               <Bed />
             </Button>
           </DrawerTrigger>
@@ -419,8 +426,12 @@ const CurrentBedPatients = () => {
                               value={member.publicUserData.userId}
                               key={index}
                             >
-                              {member.publicUserData.firstName}{" "}
-                              {member.publicUserData.lastName}
+                              {[
+                                member.publicUserData.firstName,
+                                member.publicUserData.lastName,
+                              ]
+                                .filter(Boolean)
+                                .join(" ")}
                             </SelectItem>
                           ) : (
                             <></>
@@ -475,7 +486,11 @@ const CurrentBedPatients = () => {
                   {filteredPatients.map((bed, index) => {
                     const matchingPatient = bedPatients[bed.patient_id];
                     return (
-                      <AccordionItem key={index} value={`${index}`} className="border-b-0">
+                      <AccordionItem
+                        key={index}
+                        value={`${index}`}
+                        className="border-b-0"
+                      >
                         <AccordionTrigger className="py-0 border-0 hover:no-underline gap-x-2 pr-2">
                           <div className="flex w-full flex-1 flex-row rounded-md bg-border h-24 sm:h-12 overflow-hidden">
                             {startOfDay(bed.admission_at).toDateString() ===

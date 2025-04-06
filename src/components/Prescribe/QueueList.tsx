@@ -160,8 +160,12 @@ const QueueList: React.FC = () => {
                           value={member.publicUserData.userId}
                           key={index}
                         >
-                          {member.publicUserData.firstName}{" "}
-                          {member.publicUserData.lastName}
+                          {[
+                            member.publicUserData.firstName,
+                            member.publicUserData.lastName,
+                          ]
+                            .filter(Boolean)
+                            .join(" ")}
                         </SelectItem>
                       ) : (
                         <></>
@@ -196,8 +200,12 @@ const QueueList: React.FC = () => {
                         value={member.publicUserData.userId}
                         key={index}
                       >
-                        {member.publicUserData.firstName}{" "}
-                        {member.publicUserData.lastName}
+                        {[
+                          member.publicUserData.firstName,
+                          member.publicUserData.lastName,
+                        ]
+                          .filter(Boolean)
+                          .join(" ")}
                       </SelectItem>
                     ) : (
                       <></>
@@ -297,8 +305,12 @@ const QueueList: React.FC = () => {
                                 value={member.publicUserData.userId}
                                 key={index}
                               >
-                                {member.publicUserData.firstName}{" "}
-                                {member.publicUserData.lastName}
+                                {[
+                                  member.publicUserData.firstName,
+                                  member.publicUserData.lastName,
+                                ]
+                                  .filter(Boolean)
+                                  .join(" ")}
                               </SelectItem>
                             ) : (
                               <></>
@@ -333,8 +345,12 @@ const QueueList: React.FC = () => {
                               value={member.publicUserData.userId}
                               key={index}
                             >
-                              {member.publicUserData.firstName}{" "}
-                              {member.publicUserData.lastName}
+                              {[
+                                member.publicUserData.firstName,
+                                member.publicUserData.lastName,
+                              ]
+                                .filter(Boolean)
+                                .join(" ")}
                             </SelectItem>
                           ) : (
                             <></>
@@ -415,7 +431,7 @@ const QueueList: React.FC = () => {
                   <AnimatePresence initial={false}>
                     <table className="w-full">
                       <tbody className="rounded-lg">
-                      {/* [...filteredPatients, ...Array(20).fill(filteredPatients[0])] */}
+                        {/* [...filteredPatients, ...Array(20).fill(filteredPatients[0])] */}
                         {filteredPatients.map((item, key: number) => {
                           const select =
                             CurrentToken === filteredPatients?.length - key
