@@ -1,14 +1,16 @@
 import { SortableContext, useSortable } from "@dnd-kit/sortable";
 import { useDndContext, type UniqueIdentifier } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
-import { useEffect, useMemo } from "react";
+import { useMemo, useState } from "react";
 import { TaskCard } from "./TaskCard";
 import { cva } from "class-variance-authority";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import { Button } from "../ui/button";
-import { BadgePlusIcon, GripVertical } from "lucide-react";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../ui/card";
+import { Button } from "@/components/ui/button";
+import { BadgePlusIcon, GripVertical, Trash } from "lucide-react";
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 import { BedInfo, BedPatientTypes, OrgBed } from "@/types/FormTypes";
+import toast from "react-hot-toast";
+import Loader from "../common/Loader";
 
 export interface Column {
   id: UniqueIdentifier;
@@ -27,15 +29,23 @@ interface BoardColumnProps {
   isOverlay?: boolean;
   setIsModalOpen: any;
   setIsEditModalOpen: any;
-  setbedId: any;
   bedPatients: Record<string, BedPatientTypes>;
-  setbookingId: any;
+  openAddModal: any;
+  openEditModal: any;
+  deleteBed: any;
 }
 
-export function BoardColumn({ column, tasks, isOverlay,setIsModalOpen, setbedId, bedPatients,setIsEditModalOpen,setbookingId }: BoardColumnProps) {
-  useEffect(()=>{
-    setbedId(column.id);
-  },[])
+export function BoardColumn({
+  column,
+  tasks,
+  isOverlay,
+  setIsModalOpen,
+  bedPatients,
+  setIsEditModalOpen,
+  openAddModal,
+  openEditModal,
+  deleteBed
+}: BoardColumnProps) {
   const tasksIds = useMemo(() => {
     return tasks.map((task) => task.bedBookingId);
   }, [tasks]);
@@ -76,6 +86,14 @@ export function BoardColumn({ column, tasks, isOverlay,setIsModalOpen, setbedId,
     }
   );
 
+  const [deleteLoader, setDeleteLoader] = useState(false);
+
+  const deleteHandler = ()=>{
+    setDeleteLoader(true)
+    deleteBed(column.id)
+    // setDeleteLoader(false)
+  }
+
   return (
     <Card
       ref={setNodeRef}
@@ -102,7 +120,14 @@ export function BoardColumn({ column, tasks, isOverlay,setIsModalOpen, setbedId,
             <CardContent className="p-2">
               <p className="flex justify-around items-center">
                 Admit Patient
-                <Button className="" variant="outline" size="sm" onClick={()=>{setIsModalOpen(true)}}>
+                <Button
+                  className=""
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    openAddModal(column.id);
+                  }}
+                >
                   <BadgePlusIcon />
                 </Button>
               </p>
@@ -110,13 +135,40 @@ export function BoardColumn({ column, tasks, isOverlay,setIsModalOpen, setbedId,
           </CardHeader>
         </Card>
       </CardHeader>
-      <CardContent className="p-4 overflow-auto flex gap-2 flex-col">
+      <CardContent
+        className={`p-4 overflow-auto flex gap-2 flex-col ${
+          tasks.length == 0 ? "h-full" : ""
+        }`}
+      >
+        {tasks.length == 0 ? (
+          <>
+            <div className="w-full h-full flex justify-center items-center text-sm">
+              This Bed is Empty
+            </div>
+          </>
+        ) : (
           <SortableContext items={tasksIds}>
-          {tasks.map((task) => {
-            return <TaskCard key={task.bedBookingId} task={task} bedPatientData={bedPatients[task.patient_id]} setIsEditModalOpen={setIsEditModalOpen} setbookingId={setbookingId} />
-          })}
+            {tasks.map((task) => {
+              return (
+                <TaskCard
+                  key={task.bedBookingId}
+                  task={task}
+                  bedPatientData={bedPatients[task.patient_id]}
+                  setIsEditModalOpen={setIsEditModalOpen}
+                  openEditModal={openEditModal}
+                />
+              );
+            })}
           </SortableContext>
-        </CardContent>
+        )}
+      </CardContent>
+      {
+        !tasks.length && <CardFooter className="p-0">
+        <Button className="w-full mx-4" variant={"destructive"} onClick={deleteHandler}>
+          {deleteLoader?<Loader />:<><Trash /> Delete Bed</>}
+        </Button>
+      </CardFooter>
+      }
     </Card>
   );
 }
@@ -135,13 +187,11 @@ export function BoardContainer({ children }: { children: React.ReactNode }) {
 
   return (
     <ScrollArea
-      className={variations({
+      className={`h-full ${variations({
         dragging: dndContext.active ? "active" : "default",
-      })}
+      })}`}
     >
-      <div className="flex flex-wrap gap-4 items-start">
-        {children}
-      </div>
+      <div className="flex flex-wrap gap-4 items-start h-full">{children}</div>
       <ScrollBar orientation="horizontal" />
     </ScrollArea>
   );

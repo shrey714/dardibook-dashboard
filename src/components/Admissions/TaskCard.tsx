@@ -5,8 +5,6 @@ import { Button } from "@/components/ui/button";
 import { cva } from "class-variance-authority";
 import {
   BadgeMinusIcon,
-  BedSingle,
-  CircleX,
   GripVertical,
   LogIn,
   LogOut,
@@ -14,15 +12,7 @@ import {
 import { ColumnId } from "./KanbanBoard";
 import { format, getTime } from "date-fns";
 import { BedPatientTypes, OrgBed } from "@/types/FormTypes";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
-import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { db } from "@/firebase/firebaseConfig";
 import { writeBatch, doc } from "firebase/firestore";
 import toast from "react-hot-toast";
@@ -41,7 +31,7 @@ interface TaskCardProps {
   isOverlay?: boolean;
   bedPatientData: BedPatientTypes;
   setIsEditModalOpen:any;
-  setbookingId:any;
+  openEditModal:any;
 }
 
 export type TaskType = "Task";
@@ -51,7 +41,7 @@ export interface TaskDragData {
   task: OrgBed;
   bedPatientData: BedPatientTypes;
   setIsEditModalOpen:any;
-  setbookingId:any;
+  openEditModal:any;
 }
 
 export function TaskCard({
@@ -59,7 +49,7 @@ export function TaskCard({
   isOverlay,
   bedPatientData,
   setIsEditModalOpen,
-  setbookingId
+  openEditModal
 }: TaskCardProps) {
   const [dischargeLoader, setDischargeLoader] = useState(false);
   const {user} = useUser();
@@ -78,7 +68,7 @@ export function TaskCard({
       task,
       bedPatientData,
       setIsEditModalOpen,
-      setbookingId
+      openEditModal
     } satisfies TaskDragData,
     attributes: {
       roleDescription: "Task",
@@ -98,68 +88,6 @@ export function TaskCard({
       },
     },
   });
-
-  useEffect(()=>{
-      setbookingId(task.bedBookingId);
-    },[])
-
-  const dischargePatient = async (bedData: OrgBed) => {
-      setDischargeLoader(true);
-      if (!orgId || !user) return;
-  
-      try {
-        const batch = writeBatch(db);
-  
-        const bedRef = doc(db, "doctor", orgId, "beds", bedData.bedBookingId);
-        batch.update(bedRef, {
-          dischargeMarked: true,
-          discharge_at:
-            bedData.discharge_at < getTime(new Date())
-              ? bedData.discharge_at
-              : getTime(new Date()),
-          discharged_by: {
-            id: user.id,
-            name: user.fullName,
-            email: user.primaryEmailAddress?.emailAddress,
-          },
-        });
-  
-        const patientRef = doc(
-          db,
-          "doctor",
-          orgId,
-          "patients",
-          bedPatientData.patient_id
-        );
-        const updatedBedInfo = bedPatientData.bed_info.map((patient_bed) =>
-          patient_bed.bedBookingId === bedData.bedBookingId
-            ? {
-                ...patient_bed,
-                dischargeMarked: true,
-                discharge_at:
-                  bedData.discharge_at < getTime(new Date())
-                    ? bedData.discharge_at
-                    : getTime(new Date()),
-                discharged_by: {
-                  id: user.id,
-                  name: user.fullName,
-                  email: user.primaryEmailAddress?.emailAddress,
-                },
-              }
-            : patient_bed
-        );
-  
-        batch.update(patientRef, { bed_info: updatedBedInfo });
-  
-        await batch.commit();
-      } catch (error) {
-        void error;
-        console.log(error)
-        toast.error("Error discharging");
-      } finally {
-        setDischargeLoader(false);
-      }
-    };
 
   return (
     <div
@@ -198,8 +126,7 @@ export function TaskCard({
             variant="outline"
             size="sm"
             onClick={() => {
-              setIsEditModalOpen(true);
-              // dischargePatient(task);
+              openEditModal(task.bedBookingId)
             }}
           >
             {dischargeLoader?<Loader size="small" />:<BadgeMinusIcon />}

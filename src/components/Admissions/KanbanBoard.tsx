@@ -22,21 +22,24 @@ import { hasDraggableData } from "./utils";
 import { coordinateGetter } from "./multipleContainersKeyboardPreset";
 import { db } from "@/firebase/firebaseConfig";
 import { BedInfo, OrgBed } from "@/types/FormTypes";
-import { useUser, useAuth } from "@clerk/nextjs";
+import { useUser, useAuth, useOrganization } from "@clerk/nextjs";
 import { doc, writeBatch } from "firebase/firestore";
 import { useBedsStore } from "@/lib/stores/useBedsStore";
 import { getTime } from "date-fns";
 import toast from "react-hot-toast";
+import { updateOrgMetadata } from "@/app/dashboard/settings/clinic/_actions";
+import Loader from "../common/Loader";
 
 export type ColumnId = string;
 
 export const KanbanBoard = ({
   setIsModalOpen,
-  setbedId,
-  setbookingId,
+  openAddModal,
+  openEditModal,
   setIsEditModalOpen,
+  refresh
 }: any) => {
-  const { isLoaded, user } = useUser();
+  const { organization, isLoaded } = useOrganization();
   const { beds, bedPatients, loading } = useBedsStore((state) => state);
   const [columns, setColumns] = useState<BedInfo[]>([]);
   const pickedUpTaskColumn = useRef<ColumnId | null>(null);
@@ -44,7 +47,6 @@ export const KanbanBoard = ({
   const [tasks, setTasks] = useState<OrgBed[]>([]);
   const [activeColumn, setActiveColumn] = useState<BedInfo | null>(null);
   const [activeTask, setActiveTask] = useState<OrgBed | null>(null);
-
   const sensors = useSensors(
     useSensor(MouseSensor),
     useSensor(TouchSensor),
@@ -54,19 +56,27 @@ export const KanbanBoard = ({
   );
 
   useEffect(() => {
+    console.log("isloaded : ",isLoaded)
     const fetchBedMetaData = () => {
-      if (user && user.publicMetadata) {
+      console.log("fetching again")
+      if (organization && organization.publicMetadata) {
         const bedMetaData: BedInfo[] =
-          (user.publicMetadata?.bedMetaData as BedInfo[]) || [];
+          (organization.publicMetadata?.bedMetaData as BedInfo[]) || [];
+          console.log(bedMetaData)
         setColumns(bedMetaData);
       }
     };
 
-    if (isLoaded && user && !loading) {
+    if (isLoaded && organization) {
       fetchBedMetaData();
-      setTasks(beds);
+      // setTasks(beds);
     }
-  }, [isLoaded, loading, user, beds, bedPatients]);
+  }, [isLoaded, organization,refresh]);
+
+  useEffect(() => {
+    if(!loading)
+      setTasks(beds);
+  }, [beds,bedPatients,loading]);
 
   function getDraggingTaskData(taskId: UniqueIdentifier, columnId: ColumnId) {
     const tasksInColumn = tasks.filter((task) => task.bedId === columnId);
@@ -80,6 +90,29 @@ export const KanbanBoard = ({
       column,
     };
   }
+
+  const deleteBed = async (bedIdToRemove: string) => {
+    if (!organization) return;
+    try {
+      console.log(bedIdToRemove);
+      const currentBeds = (organization.publicMetadata?.bedMetaData ||
+        []) as BedInfo[];
+
+      const updatedBeds = currentBeds.filter(
+        (bed: BedInfo) => bed.id !== bedIdToRemove
+      );
+
+      const data = await updateOrgMetadata({ bedMetaData: updatedBeds });
+      organization.reload();
+      setColumns(updatedBeds)
+      // setRefresh((prev)=>!prev);
+
+      console.log(data);
+    } catch (error) {
+      console.log(error);
+      toast.error("Error in deleting bed");
+    }
+  };
 
   const announcements: Announcements = {
     onDragStart({ active }) {
@@ -177,7 +210,8 @@ export const KanbanBoard = ({
   };
 
   return (
-    <DndContext
+    <>
+      {columns.length==0?<div className="flex justify-center items-center h-full">No Beds are adeed</div>:<DndContext
       accessibility={{
         announcements,
       }}
@@ -195,9 +229,10 @@ export const KanbanBoard = ({
               tasks={tasks.filter((task) => task.bedId === col.id)}
               setIsModalOpen={setIsModalOpen}
               setIsEditModalOpen={setIsEditModalOpen}
-              setbedId={setbedId}
-              setbookingId={setbookingId}
+              openAddModal={openAddModal}
+              openEditModal={openEditModal}
               bedPatients={bedPatients}
+              deleteBed={deleteBed}
             />
           ))}
         </SortableContext>
@@ -213,9 +248,10 @@ export const KanbanBoard = ({
                 tasks={tasks.filter((task) => task.bedId === activeColumn.id)}
                 setIsModalOpen={setIsModalOpen}
                 setIsEditModalOpen={setIsEditModalOpen}
-                setbedId={setbedId}
+                openAddModal={openAddModal}
+                openEditModal={openEditModal}
                 bedPatients={bedPatients}
-                setbookingId={setbookingId}
+                deleteBed={deleteBed}
               />
             )}
             {activeTask && (
@@ -224,13 +260,14 @@ export const KanbanBoard = ({
                 isOverlay
                 bedPatientData={bedPatients[activeTask.patient_id]}
                 setIsEditModalOpen={setIsEditModalOpen}
-                setbookingId={setbookingId}
+                openEditModal={openEditModal}
               />
             )}
           </DragOverlay>,
           document.body
         )}
-    </DndContext>
+    </DndContext>}
+    </>
   );
 
   function onDragStart(event: DragStartEvent) {
