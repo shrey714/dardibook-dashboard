@@ -1,19 +1,25 @@
 import React, { useEffect, useState } from "react";
-import * as animationData from "@/lottieFiles/Registered.json";
+import animationData from "@/lottieFiles/Registered.json";
 import Lottie from "react-lottie";
 import Link from "next/link";
-import PrintHandeler from "@/components/PrintForms/PrintHandeler";
-import getDataToPrint from "@/app/services/getDataToPrint";
+// import PrintHandeler from "@/components/PrintForms/PrintHandeler";
 import { Button } from "../ui/button";
 import Loader from "../common/Loader";
-const AttendedModal = ({
+import { PrescriptionFormTypes } from "@/types/FormTypes";
+
+interface AttendedModalProps {
+  isModalOpen:boolean;
+  setCloseModal:React.Dispatch<React.SetStateAction<boolean>>;
+  patientID:string;
+  PrescriptionAndReferData:PrescriptionFormTypes;
+} 
+
+const AttendedModal:React.FC<AttendedModalProps> = ({
   isModalOpen,
   setCloseModal,
   patientID,
-  uID,
   PrescriptionAndReferData,
-  receiptInfo,
-}: any) => {
+}) => {
   const [startAnimation, setStartAnimation] = useState(false);
   const [printDataLoader, setprintDataLoader] = useState(false);
   const [printOptions, setprintOptions] = useState({
@@ -21,7 +27,6 @@ const AttendedModal = ({
     IsRefer: PrescriptionAndReferData.refer.hospitalName ? true : false,
     IsReceipt: true,
   });
-  const [doctorAndPatientData, setdoctorAndPatientData] = useState<any>({});
   useEffect(() => {
     setprintOptions({
       IsPrescription: PrescriptionAndReferData.diseaseDetail ? true : false,
@@ -53,25 +58,6 @@ const AttendedModal = ({
     };
   }, [isModalOpen]);
 
-  useEffect(() => {
-    const getPrintData = async () => {
-      if (uID && patientID) {
-        setprintDataLoader(true);
-        const patientData = await getDataToPrint(uID, patientID);
-        if (patientData.status === 200) {
-          // console.log(patientData);
-          setdoctorAndPatientData(patientData);
-        } else {
-          console.log("No data available for the provided PatientID.");
-        }
-        setprintDataLoader(false);
-      } else {
-        setprintDataLoader(false);
-      }
-    };
-    getPrintData();
-  }, [patientID, uID]);
-
   return (
     <>
       <Lottie
@@ -90,14 +76,14 @@ const AttendedModal = ({
           onClick={() => setCloseModal(false)}
           className="flex flex-1"
         >
-          Edit
+          Close
         </Button>
         <Button asChild variant={"ghost"}>
           <Link
             href={"./"}
             className="flex flex-1 rounded-md bg-indigo-600 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           >
-            Go to list
+            Go to Queue
           </Link>
         </Button>
         <div className="flex flex-1 flex-col border rounded-md w-full">
@@ -169,14 +155,16 @@ const AttendedModal = ({
               <Loader size="medium" />
             </Button>
           ) : (
-            <PrintHandeler
+            <>
+            {/* <PrintHandeler
               styleForBtn={"bg-primary"}
               printOptions={printOptions}
               PrescriptionAndReferData={PrescriptionAndReferData}
               patientData={doctorAndPatientData?.patientData?.data}
               doctorData={doctorAndPatientData?.doctorData?.data}
-              receiptInfo={receiptInfo}
-            />
+              receiptInfo={PrescriptionAndReferData.receipt_details}
+            /> */}
+            </>
           )}
         </div>
       </div>

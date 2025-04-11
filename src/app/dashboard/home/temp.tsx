@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { db } from "@/firebase/firebaseConfig";
 import { useAuth } from "@clerk/nextjs";
-import { addMinutes, getTime, startOfDay } from "date-fns";
+import { addDays, addMinutes, getTime, startOfDay } from "date-fns";
 import { doc, setDoc } from "firebase/firestore";
 import React from "react";
 import uniqid from "uniqid";
@@ -33,14 +33,42 @@ const Temp = () => {
     const generatePatients = async (doctorId: string) => {
       const startDate = startOfDay(new Date());
       let currentTime = addMinutes(startDate, 10 * 60); // Start at 10 AM
-
+      const ids = ["m9ab2o8t", "m9ab2o8u", "m9ab2o8v", "m9ab2o8w"];
       const patients = Array.from({ length: 4 }, (_, index) => {
+        const patient_data = getRandomData();
         const patientData = {
-          ...getRandomData(),
-          bed_info: [],
+          ...patient_data,
+          patient_id: ids[index],
+          bed_info:
+            index === 2
+              ? [
+                  {
+                    admission_at: getTime(addMinutes(startDate, 30)),
+                    admission_by: {
+                      email: "pshrey0000@gmail.com",
+                      id: "user_2qTzDwsVbXO7tfelLadF95Fnpg0",
+                      name: "Shrey Patel",
+                    },
+                    admission_for: {
+                      email: "pshrey0000@gmail.com",
+                      id: "user_2qTzDwsVbXO7tfelLadF95Fnpg0",
+                      name: "Shrey Patel",
+                    },
+                    bedBookingId: "7PJLCUJoDbOt9lw7uRUg",
+                    bedId: "bed_1",
+                    dischargeMarked: false,
+                    discharge_at: getTime(addDays(currentTime, 3)),
+                    discharged_by: {
+                      email: "pshrey0000@gmail.com",
+                      id: "user_2qTzDwsVbXO7tfelLadF95Fnpg0",
+                      name: "Shrey Patel",
+                    },
+                  },
+                ]
+              : [],
           registered_date: [getTime(startDate)],
           registered_date_time: [getTime(currentTime)],
-          prescribed_date_time: [],
+          prescribed_date_time: index === 1 ? [getTime(currentTime)] : [],
           registerd_by: {
             email: "pshrey0000@gmail.com",
             id: "user_2qTzDwsVbXO7tfelLadF95Fnpg0",
@@ -65,7 +93,13 @@ const Temp = () => {
         return setDoc(patientRef, patient);
       });
 
-      await Promise.all(batchPromises);
+      const bedRef = doc(db, `doctor/${doctorId}/beds/7PJLCUJoDbOt9lw7uRUg`);
+      const bedPromise = setDoc(bedRef, {
+        ...patients[2].bed_info[0],
+        patient_id: patients[2].patient_id,
+      });
+
+      await Promise.all([...batchPromises, bedPromise]);
       console.log("Patients added successfully!", patients);
     };
 

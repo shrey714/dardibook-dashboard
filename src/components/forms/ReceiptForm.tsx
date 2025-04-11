@@ -1,117 +1,148 @@
 import React from "react";
+import { Button } from "../ui/button";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Plus, X } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import uniqid from "uniqid";
+import { PrescriptionFormTypes, ReceiptDetails } from "@/types/FormTypes";
 
-const ReceiptForm: React.FC<any> = ({ receiptInfo, setReceiptInfo }: any) => {
+interface ReceiptFormProps {
+  receiptInfo: ReceiptDetails[];
+  setReceiptInfo: React.Dispatch<React.SetStateAction<PrescriptionFormTypes>>;
+}
+
+const ReceiptForm: React.FC<ReceiptFormProps> = ({
+  receiptInfo,
+  setReceiptInfo,
+}) => {
   const handleInputChange = (
-    index: number,
-    field: "title" | "amount",
-    value: string
+    id: string,
+    name: "title" | "amount",
+    value: string | number
   ) => {
-    const updatedParticulars = [...receiptInfo.particulars];
-    updatedParticulars[index] = {
-      ...updatedParticulars[index],
-      [field]: value,
-    };
-
-    setReceiptInfo({
-      ...receiptInfo,
-      particulars: updatedParticulars,
-      totalAmount: calculateTotalAmount(updatedParticulars),
-    });
-  };
-
-  // Add a new entry to the particulars array
-  const addParticular = () => {
-    setReceiptInfo({
-      ...receiptInfo,
-      particulars: [...receiptInfo.particulars, { title: "", amount: "" }],
-    });
-  };
-
-  // Remove a particular entry
-  const removeParticular = (index: number) => {
-    const updatedParticulars = receiptInfo.particulars.filter(
-      (_: any, i: number) => i !== index
+    const updated_receipt_details = receiptInfo.map((item) =>
+      item.id === id ? { ...item, [name]: value } : item
     );
-    setReceiptInfo({
-      ...receiptInfo,
-      particulars: updatedParticulars,
-      totalAmount: calculateTotalAmount(updatedParticulars),
-    });
+    setReceiptInfo((prevData) => ({
+      ...prevData,
+      receipt_details: updated_receipt_details,
+    }));
   };
 
-  // Calculate total amount from the particulars array
-  const calculateTotalAmount = (particulars: { amount: string }[]) => {
-    return particulars
-      .reduce((total, particular) => {
-        const amount = parseFloat(particular.amount) || 0;
-        return total + amount;
-      }, 0)
-      .toFixed(2); // Adjust to fixed decimal places if needed
+  const addParticular = () => {
+    setReceiptInfo((prevData) => ({
+      ...prevData,
+      receipt_details: [
+        ...prevData.receipt_details,
+        { id: uniqid("Particular-"), title: "", amount: 0 },
+      ],
+    }));
+  };
+
+  const removeParticular = (id: string) => {
+    const updated_receipt_details = receiptInfo.filter(
+      (item) => item.id !== id
+    );
+    setReceiptInfo((prevData) => ({
+      ...prevData,
+      receipt_details: updated_receipt_details,
+    }));
+  };
+
+  const calculateTotalAmount = (particulars: ReceiptDetails[]) => {
+    const total = particulars.reduce((sum, { amount }) => {
+      return sum + (Number.isFinite(amount) ? amount : 0);
+    }, 0);
+
+    return new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(total);
   };
 
   return (
-    <div className="mt-4 sm:mt-6 col-span-full bg-white p-4 px-8 rounded-lg">
-      <label className="block text-lg font-semibold leading-7 text-gray-900">
-        Receipt Details
-      </label>
+    <Card className="bg-muted/50 border rounded-lg col-span-10 2xl:col-span-3 h-min">
+      <CardHeader className="border-b p-2 md:px-4 md:py-3">
+        <CardTitle className="flex items-center text-sm md:text-lg font-medium">
+          Receipt Details
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="p-2">
+        <AnimatePresence initial={false}>
+          {receiptInfo.map((particular, index: number) => (
+            <motion.div
+              key={particular.id}
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              style={{ overflow: "hidden" }}
+              className="grid grid-cols-7 gap-4"
+            >
+              <input
+                type="text"
+                required
+                name={`title-${index}`}
+                id={`title-${index}`}
+                autoComplete="off"
+                placeholder="Title*"
+                className="col-span-3 sm:max-w-md my-1.5 disabled:text-primary shadow-sm rounded-none border-border border-0 border-b-2 ring-0 outline-none focus:ring-0 bg-transparent form-input block py-1 pl-2 sm:text-sm sm:leading-6"
+                value={particular.title}
+                onChange={(e) =>
+                  handleInputChange(particular.id, "title", e.target.value)
+                }
+              />
+              <input
+                type="number"
+                name={`amount-${index}`}
+                id={`amount-${index}`}
+                autoComplete="off"
+                placeholder="Amount"
+                className="col-span-3 sm:max-w-md my-1.5 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input block py-1 pl-2 sm:text-sm sm:leading-6"
+                value={particular.amount}
+                onChange={(e) =>
+                  handleInputChange(
+                    particular.id,
+                    "amount",
+                    parseFloat(e.target.value)
+                  )
+                }
+              />
+              <Button
+                type="button"
+                variant={"destructive"}
+                className="rounded-full self-center col-span-1 size-9 aspect-square flex items-center justify-center"
+                onClick={() => removeParticular(particular.id)}
+              >
+                <X className="size-4" />
+              </Button>
+            </motion.div>
+          ))}
+        </AnimatePresence>
 
-      {receiptInfo.particulars.map((particular: any, index: number) => (
-        <div
-          key={index}
-          className="py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0 text-right"
-        >
-          <div className="sm:col-span-1 flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
-            <input
-              type="text"
-              required
-              name={`title-${index}`}
-              id={`title-${index}`}
-              autoComplete="off"
-              placeholder="Title*"
-              className="form-input block font-medium w-full flex-1 border-0 bg-transparent py-1 pl-2 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
-              value={particular.title}
-              onChange={(e) =>
-                handleInputChange(index, "title", e.target.value)
-              }
-            />
-          </div>
-          <div className="sm:col-span-1 flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md mt-2 sm:mt-0">
-            <input
-              type="text"
-              name={`amount-${index}`}
-              id={`amount-${index}`}
-              autoComplete="off"
-              placeholder="Amount"
-              className="form-input block w-full flex-1 border-0 bg-transparent py-1 pl-2 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
-              value={particular.amount}
-              onChange={(e) =>
-                handleInputChange(index, "amount", e.target.value)
-              }
-            />
-          </div>
-          <button
+        <div className="w-full grid grid-cols-7 gap-4">
+          <Button
+            variant={"outline"}
             type="button"
-            onClick={() => removeParticular(index)}
-            className="text-red-500 ml-4 hover:underline"
+            onClick={addParticular}
+            className={`rounded-full size-9 aspect-square flex items-center justify-center col-start-7`}
           >
-            Remove
-          </button>
+            <Plus className="size-4" />
+          </Button>
         </div>
-      ))}
-
-      <button
-        type="button"
-        onClick={addParticular}
-        className="mt-4 bg-gray-300 text-gray-900 font-medium py-2 text-sm px-4 rounded"
-      >
-        Add More
-      </button>
-
-      <div className="mt-4 text-right text-gray-900">
-        <strong>Total Amount: </strong>
-        {receiptInfo.totalAmount}
-      </div>
-    </div>
+      </CardContent>
+      <CardFooter className="justify-end p-2 md:px-4 md:py-3 border-t text-muted-foreground">
+        <strong>Total Fees : </strong>
+        <p className="px-2 font-medium">{calculateTotalAmount(receiptInfo)}</p>
+      </CardFooter>
+    </Card>
   );
 };
 

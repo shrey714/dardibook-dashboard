@@ -3,26 +3,14 @@ import { ChangeEvent, useState } from "react";
 import MedicineSuggetion from "../Prescribe/MedicineSuggetion";
 import uniqid from "uniqid";
 import { Plus, X } from "lucide-react";
-interface Dosage {
-  morning: string;
-  afternoon: string;
-  evening: string;
-  night: string;
-}
-
-interface Medicine {
-  id: string;
-  medicineName: string;
-  instruction: string;
-  dosages: Dosage;
-  duration: number;
-  durationType: string;
-  type: string;
-}
+import { Button } from "../ui/button";
+import { DosageTypes, MedicinesDetails } from "@/types/FormTypes";
+import { Kbd } from "../ui/kbd";
+import { useHotkeys } from "react-hotkeys-hook";
 
 interface PrescribeMedicineTableProps {
-  rows: Medicine[];
-  setRows: (medicines: Medicine[]) => void;
+  rows: MedicinesDetails[];
+  setRows: (medicines: MedicinesDetails[]) => void;
 }
 const medicineTypes = [
   { label: "Type", value: "", isDefault: true },
@@ -86,7 +74,7 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
     setRows(rows.filter((row) => row.id !== id));
   };
 
-  const statusLabels: Array<keyof Dosage> = [
+  const statusLabels: Array<keyof DosageTypes> = [
     "morning",
     "afternoon",
     "evening",
@@ -117,7 +105,7 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
 
   const handleDosageChangeFromCheckBox = (
     event: ChangeEvent<HTMLInputElement>,
-    row: Medicine,
+    row: MedicinesDetails,
     label: string
   ) => {
     const isChecked = event.target.checked;
@@ -134,7 +122,15 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
     );
   };
 
-  const handleComingData = (rowId: any, selectedOption: any) => {
+  const handleComingData = (
+    rowId: string,
+    selectedOption: {
+      value: string;
+      type: string;
+      instruction: string;
+      id: string;
+    }
+  ) => {
     setRows(
       rows?.map((row) =>
         row.id === rowId
@@ -149,26 +145,24 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
       )
     );
   };
+
+  useHotkeys("shift+n", () => addRow());
+
   return (
-    <div className="container mx-auto pt-4 px-1 text-center">
+    <div className="mx-auto px-0 text-center">
       <table className="table w-full">
-        <thead className="hidden sm:table-header-group">
-          <tr className="border-gray-300">
-            <th>Medicine Name*</th>
-            <th>Instruction</th>
-            <th>Dosages</th>
-            <th>Duration</th>
+        <thead className="hidden md:table-header-group">
+          <tr className="text-muted-foreground bg-border">
+            <th className="font-medium text-sm py-2">Medicine Name*</th>
+            <th className="font-medium text-sm py-2">Instruction</th>
+            <th className="font-medium text-sm py-2">Dosages</th>
+            <th className="font-medium text-sm py-2">Duration</th>
           </tr>
         </thead>
-        <tbody>
-          {rows?.map((row) => (
-            <tr
-              key={row.id}
-              className={
-                "border-gray-300 border-b-[1px] sm:border-0 flex flex-col sm:table-row"
-              }
-            >
-              <td className="align-top p-1 relative">
+        <tbody className="sm:px-8">
+          {rows?.map((row, index) => (
+            <tr key={row.id} className={`border-b flex flex-col sm:table-row`}>
+              <td className="align-top px-1 sm:pl-3 py-0.5 pt-2 sm:py-3 relative">
                 {/* implement search functionality here */}
                 <MedicineSuggetion
                   medicine={row.medicineName}
@@ -176,7 +170,7 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
                   handleComingData={handleComingData}
                 />
               </td>
-              <td className="align-top p-1">
+              <td className="align-top px-1 py-0.5 sm:py-3">
                 <input
                   type="text"
                   name="instruction"
@@ -184,18 +178,18 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
                   autoComplete="new-off"
                   value={row.instruction}
                   onChange={(event) => handleInputChange(row.id, event)}
-                  className="form-input w-full block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  className="py-1.5 w-full disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input block pl-2 sm:text-sm sm:leading-6"
                 />
               </td>
-              <td className="align-top p-1">
-                <div className="w-full ring-1 rounded-lg ring-gray-300 p-[2px]">
+              <td className="align-top px-1 py-0.5 sm:py-3">
+                <div className="w-full ring-1 rounded-lg ring-border p-[2px]">
                   <div className="w-full flex flex-row gap-[2px]">
                     <input
                       type="text"
                       value={`${row.dosages.morning}-${row.dosages.afternoon}-${row.dosages.evening}-${row.dosages.night}`}
                       autoComplete="new-off"
                       onChange={(event) => handleDosageChange(row.id, event)}
-                      className="form-input border-0 rounded-[6px] tracking-wider font-mono w-[70%] block py-1.5 text-gray-900 placeholder:text-gray-400 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 text-sm sm:leading-6"
+                      className="disabled:text-primary tracking-wider font-mono w-[70%] shadow-sm rounded-md border-border bg-transparent form-input block py-1 pl-2 sm:text-sm sm:leading-6"
                     />
 
                     <select
@@ -205,7 +199,7 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
                         handleInputChange(row.id, e);
                       }}
                       defaultValue={""}
-                      className="form-select border-0 rounded-[6px] flex flex-1 py-1 text-gray-900 placeholder:text-gray-400 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                      className="flex flex-1 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-select py-1 pl-2 sm:text-sm sm:leading-6"
                     >
                       {medicineTypes.map((type, index) => (
                         <option
@@ -232,7 +226,7 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
                         />
                         <label
                           htmlFor={`checkbox-${label}-${row.id}`}
-                          className="ms-2 text-sm font-medium text-gray-800"
+                          className="ms-2 text-sm font-medium text-muted-foreground"
                         >
                           {label.charAt(0)}
                         </label>
@@ -241,7 +235,7 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
                   </div>
                 </div>
               </td>
-              <td className="align-top p-1 flex flex-row items-center gap-2">
+              <td className="align-top px-1 sm:pr-3 py-0.5 pb-2 sm:py-3 flex flex-row items-start gap-2">
                 <div className="w-full flex flex-row gap-[2px]">
                   <input
                     type="number"
@@ -249,7 +243,7 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
                     autoComplete="new-off"
                     value={row.duration}
                     onChange={(event) => handleInputChange(row.id, event)}
-                    className="form-input flex flex-1 w-20 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    className="flex flex-1 w-20 py-1.5 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input pl-2 sm:text-sm sm:leading-6"
                   />
                   <select
                     value={row.durationType}
@@ -258,7 +252,7 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
                       handleInputChange(row.id, e);
                     }}
                     defaultValue={"day"}
-                    className="form-select flex flex-1 border-0 rounded-[6px]  py-1 text-gray-900 placeholder:text-gray-400 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    className="flex flex-1 py-1.5 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-select pl-2 sm:text-sm sm:leading-6"
                   >
                     {durationTypes.map((type, index) => (
                       <option
@@ -271,26 +265,42 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
                     ))}
                   </select>
                 </div>
-                <button
-                  type="button"
-                  disabled={rows.length > 1 ? false : true}
-                  onClick={() => deleteRow(row.id)}
-                  className="btn btn-xs btn-error btn-circle"
-                >
-                  <X className="size-4 text-white" />
-                </button>
+                <div className="flex flex-col gap-2">
+                  <Button
+                    type="button"
+                    variant={"destructive"}
+                    className="rounded-full size-9 aspect-square flex items-center justify-center"
+                    disabled={rows.length > 1 ? false : true}
+                    onClick={() => deleteRow(row.id)}
+                  >
+                    <X className="size-4" />
+                  </Button>
+                  <Button
+                    variant={"outline"}
+                    type="button"
+                    onClick={addRow}
+                    className={`rounded-full relative size-9 aspect-square flex items-center justify-center ${
+                      rows.length !== index + 1 ? "hidden" : ""
+                    }`}
+                  >
+                    <Plus className="size-4" />
+                    <Kbd
+                      variant="outline"
+                      className="hidden md:flex self-start absolute right-[calc(100%+8px)] border-0 rounded-full bg-border"
+                    >
+                      <span className="text-xs">⇧</span>n
+                    </Kbd>
+                  </Button>
+                </div>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-      <button
-        type="button"
-        onClick={addRow}
-        className="btn mt-2 animate-none btn-neutral btn-sm btn-wide"
-      >
-        <Plus className="size-4 text-white" />
-      </button>
+
+      <div className="w-full bg-border text-muted-foreground font-medium text-xs text-start pl-4 py-1">
+        Total {rows.length} medicines
+      </div>
     </div>
   );
 };

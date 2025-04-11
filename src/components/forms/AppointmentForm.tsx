@@ -31,7 +31,7 @@ interface AppointmentFormProps {
   setPatientFormData: React.Dispatch<
     React.SetStateAction<RegisterPatientFormTypes>
   >;
-  handleSubmit: any;
+  handleSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
   submissionLoader: boolean;
   registerForDate: Date;
   setRegisterForDate: React.Dispatch<React.SetStateAction<Date>>;

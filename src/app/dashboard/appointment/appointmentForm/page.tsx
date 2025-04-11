@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import uniqid from "uniqid";
 import { getPatientById } from "@/app/services/getPatientById";
-import NoPatientsFound from "@/components/Appointment/NoPatientsFound";
 import RegisteredModal from "@/components/Appointment/RegisteredModal";
 import Loader from "@/components/common/Loader";
 import { RegisterPatientFormTypes } from "@/types/FormTypes";
@@ -184,7 +183,9 @@ const Page: React.FC = () => {
           <Loader size="medium" />
         </div>
       ) : error ? (
-        <NoPatientsFound message={error} />
+        <div className="px-2 text-muted-foreground font-medium text-base justify-self-center max-w-4xl h-full flex flex-1 items-center justify-center z-10 overflow-hidden text-center">
+          {error}
+        </div>
       ) : (
         <AppointmentForm
           patientFormData={patientFormData}

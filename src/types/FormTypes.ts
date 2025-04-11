@@ -77,3 +77,49 @@ export interface TodayPatientsType {
     prescribed: boolean;
     inBed: boolean;
 }
+
+export interface DosageTypes {
+    morning: string;
+    afternoon: string;
+    evening: string;
+    night: string;
+}
+
+export interface MedicinesDetails {
+    id: string,
+    medicineName: string,
+    instruction: string,
+    dosages: DosageTypes,
+    type: string
+    duration: number,
+    durationType: string,
+}
+
+export interface ReferDetails {
+    hospitalName: string,
+    doctorName: string,
+    referMessage: string,
+}
+
+export interface ReceiptDetails {
+    id: string;
+    title: string;
+    amount: number;
+}
+
+export interface PrescriptionFormTypes {
+    prescription_id: string;
+    orgId: string;
+    prescription_for_bed: boolean;
+    diseaseId: string;
+    diseaseDetail: string;
+    medicines: MedicinesDetails[];
+    advice: string;
+    nextVisit: string;
+    refer: ReferDetails;
+    created_at: number;
+    registerd_by: orgUserType;
+    prescribed_by: orgUserType;
+    prescriber_assigned: orgUserType;
+    receipt_details: ReceiptDetails[];
+}
