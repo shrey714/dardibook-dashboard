@@ -1,6 +1,10 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "../ui/button";
-import { ArrowUpRight } from "lucide-react";
+import {
+  ArrowUpRight,
+  CalendarMinusIcon,
+  CalendarPlusIcon,
+} from "lucide-react";
 import { db } from "@/firebase/firebaseConfig";
 import { writeBatch, doc, arrayUnion } from "firebase/firestore";
 import { useTodayPatientStore } from "@/lib/providers/todayPatientsProvider";
@@ -16,9 +20,10 @@ import { useAuth, useOrganization, useUser } from "@clerk/nextjs";
 import { OrgBed } from "@/types/FormTypes";
 import { DateTimePicker } from "../Appointment/DateTimePicker";
 import toast from "react-hot-toast";
-import { getTime } from "date-fns";
+import { getTime, isBefore, isAfter } from "date-fns";
 import uniqid from "uniqid";
-
+import Availability from "./Availability";
+import { useBedsStore } from "@/lib/stores/useBedsStore";
 
 interface BedAdmissionModalProps {
   bedId: string;
@@ -27,20 +32,23 @@ interface BedAdmissionModalProps {
 
 interface SuggestionType {
   label: string;
-    value: string;
-    patient_id: string;
-    mobile: string;
-    inBed: boolean;
+  value: string;
+  patient_id: string;
+  mobile: string;
+  inBed: boolean;
 }
 
-const BedAdmissionModal: React.FC<BedAdmissionModalProps> = ({ bedId,setIsModalOpen }) => {
-    const { orgId } = useAuth();
-    const {user} = useUser();
+const BedAdmissionModal: React.FC<BedAdmissionModalProps> = ({
+  bedId,
+  setIsModalOpen,
+}) => {
+  const { orgId } = useAuth();
+  const { user } = useUser();
   const { todayPatients, loading } = useTodayPatientStore((state) => state);
   const [suggestions, setsuggestions] = useState<SuggestionType[]>([]);
-  const [fromDate, setFromDate] = useState<Date>(new Date());
-  const [patientId,setPatientId] = useState<string>("");
-  const [toDate, setToDate] = useState<Date>(new Date());
+  const [fromDate, setFromDate] = useState<Date>(new Date(0));
+  const [patientId, setPatientId] = useState<string>("");
+  const [toDate, setToDate] = useState<Date>(new Date(0));
 
   const { memberships } = useOrganization({
     memberships: {
@@ -51,84 +59,118 @@ const BedAdmissionModal: React.FC<BedAdmissionModalProps> = ({ bedId,setIsModalO
   });
 
   const [admissionInfo, setadmissionInfo] = useState<OrgBed | undefined>();
-  const [loader, setloader] = useState(false)
+  const [loader, setloader] = useState(false);
+  const [warning, setWarning] = useState<string>("");
+  const { beds, bedPatients } = useBedsStore((state) => state);
 
   useEffect(() => {
     console.log("todayPatients = ", todayPatients);
     const fetchedSuggestions = todayPatients.map(
-      (
-        todayPatient
-      ): SuggestionType => ({
+      (todayPatient): SuggestionType => ({
         label: todayPatient.name,
         value: todayPatient.patient_id,
         patient_id: todayPatient.patient_id,
         mobile: todayPatient.mobile,
-        inBed: todayPatient.inBed
+        inBed: todayPatient.inBed,
       })
     );
     setsuggestions(fetchedSuggestions);
-  }, [loading,todayPatients]);
+  }, [loading, todayPatients]);
 
-  const admitHandler = async()=>{
+  const admitHandler = async (e: { preventDefault: () => void }) => {
+    e.preventDefault();
     if (!orgId || !bedId || !user) return;
+
+    if (patientId == "") {
+      setWarning("Please Select the patient");
+      return;
+    }
+
+    if (
+      getTime(fromDate) === getTime(new Date(0)) ||
+      getTime(toDate) === getTime(new Date(0))
+    ) {
+      setWarning("Please Select appropriate booking times");
+      return;
+    }
+
+    const isClash = beds.some(({ admission_at, discharge_at }) => {
+      const existingStart = getTime(admission_at);
+      const existingEnd = getTime(discharge_at);
+
+      return (
+        isBefore(getTime(fromDate), existingEnd) &&
+        isAfter(getTime(toDate), existingStart)
+      );
+    });
+
+    if (isClash) {
+      setWarning("This time slot is already booked");
+      return;
+    }
+
     setloader(true);
-    console.log(orgId,bedId,user)
 
     try {
       const bedBookingId = uniqid.time();
       const batch = writeBatch(db);
-      const bedRef = doc(db,"doctor",orgId,"beds",bedBookingId);
-      batch.set(bedRef, {
-        ...admissionInfo,
-        patient_id:patientId,
-        bedBookingId: bedBookingId,
-        bedId:bedId,
-        admission_at:getTime(fromDate),
-        discharge_at:getTime(toDate),
-        dischargeMarked:false,
-        admission_by: {
-            id: user.id,
-            name: user.fullName,
-            email: user.primaryEmailAddress?.emailAddress,
-        },
-      }, { merge: true });
-      const patientRef = doc(db,"doctor",orgId,"patients",patientId);
-      batch.set(patientRef, {
-        bed_info:arrayUnion({
+      const bedRef = doc(db, "doctor", orgId, "beds", bedBookingId);
+      batch.set(
+        bedRef,
+        {
           ...admissionInfo,
-        bedBookingId: bedBookingId,
-        bedId:bedId,
-        admission_at:getTime(fromDate),
-        discharge_at:getTime(toDate),
-        dischargeMarked:false,
-        admission_by: {
+          patient_id: patientId,
+          bedBookingId: bedBookingId,
+          bedId: bedId,
+          admission_at: getTime(fromDate),
+          discharge_at: getTime(toDate),
+          dischargeMarked: false,
+          admission_by: {
             id: user.id,
             name: user.fullName,
             email: user.primaryEmailAddress?.emailAddress,
-        }
-        }
-      )
-      }, { merge: true });
-      await batch.commit()
-      
+          },
+        },
+        { merge: true }
+      );
+      const patientRef = doc(db, "doctor", orgId, "patients", patientId);
+      batch.set(
+        patientRef,
+        {
+          bed_info: arrayUnion({
+            ...admissionInfo,
+            bedBookingId: bedBookingId,
+            bedId: bedId,
+            admission_at: getTime(fromDate),
+            discharge_at: getTime(toDate),
+            dischargeMarked: false,
+            admission_by: {
+              id: user.id,
+              name: user.fullName,
+              email: user.primaryEmailAddress?.emailAddress,
+            },
+          }),
+        },
+        { merge: true }
+      );
+      await batch.commit();
     } catch (error) {
-      console.log(error)
+      console.log(error);
       toast.error("Error updating");
+    } finally {
+      setloader(false);
+      setIsModalOpen(false);
     }
-    finally{
-      setloader(false)
-      setIsModalOpen(false)
-    }
-  }
+  };
 
   return (
-    <div className="flex flex-col">
-      {bedId}
+    <form className="flex flex-col" onSubmit={admitHandler}>
+      <p className="text-center">Bed Id : {bedId}</p>
       <CreatableSelect
         components={{
           DropdownIndicator: () => null,
           IndicatorSeparator: () => null,
-          Option: (patient:any) => {
+          Option: (patient: any) => {
             console.log(patient);
             return (
               <div
@@ -161,12 +203,13 @@ const BedAdmissionModal: React.FC<BedAdmissionModalProps> = ({ bedId,setIsModalO
             );
           },
         }}
-        filterOption={(option:any, inputValue) => {
+        filterOption={(option: any, inputValue) => {
           const search = inputValue.toLowerCase();
           return (
             (option.data.label.toLowerCase().includes(search) ||
-            option.data.patient_id.toLowerCase().includes(search) ||
-            option.data.mobile.toLowerCase().includes(search)) && option.data.inBed==false
+              option.data.patient_id.toLowerCase().includes(search) ||
+              option.data.mobile.toLowerCase().includes(search)) &&
+            option.data.inBed == false
           );
         }}
         onChange={(val) => {
@@ -179,7 +222,7 @@ const BedAdmissionModal: React.FC<BedAdmissionModalProps> = ({ bedId,setIsModalO
         noOptionsMessage={() => "Empty"}
         backspaceRemovesValue={false}
         placeholder="Admit patient using ID, name, or phone number..."
-        className="max-w-2xl w-full mx-auto pr-9 xl:pr-0"
+        className="max-w-2xl w-full mx-auto xl:pr-0"
         classNames={{
           control: (state) =>
             `!shadow-sm !transition-all !duration-900 !bg-slate-50 dark:!bg-sidebar !py-1.5 ${
@@ -195,7 +238,7 @@ const BedAdmissionModal: React.FC<BedAdmissionModalProps> = ({ bedId,setIsModalO
           singleValue: () => "!text-primary !px-4",
           input: () => "!text-primary !px-4",
           menu: (state) =>
-            `!bg-slate-50 dark:!bg-sidebar !border-border !overflow-hidden !shadow-md !mt-0 !w-[calc(100%-2.25rem)] xl:!w-full ${
+            `!bg-slate-50 dark:!bg-sidebar !border-border !overflow-hidden !shadow-md !mt-0 xl:!w-full ${
               state.selectProps.menuIsOpen
                 ? "!border-t-0 !border-b-2 !border-x-2 !rounded-b-2xl !rounded-t-none"
                 : "!border-2 !rounded-2xl"
@@ -203,7 +246,8 @@ const BedAdmissionModal: React.FC<BedAdmissionModalProps> = ({ bedId,setIsModalO
           menuList: () => "!py-1 md:!py-2",
         }}
       />
-      <div className="px-4 py-1 md:py-6 md:grid md:grid-cols-3 sm:gap-4 md:px-8">
+      <Availability beds={beds} bedPatients={bedPatients} />
+      <div className=" py-1 md:grid md:grid-cols-3 sm:gap-4 md:px-8">
         <label
           htmlFor="registerd_for"
           className="text-sm font-medium leading-6  flex items-center gap-1"
@@ -233,7 +277,7 @@ const BedAdmissionModal: React.FC<BedAdmissionModalProps> = ({ bedId,setIsModalO
                 email: identifier,
               };
 
-              setadmissionInfo((prev:any) => ({
+              setadmissionInfo((prev: any) => ({
                 ...prev,
                 admission_for: selectedMember,
               }));
@@ -243,7 +287,7 @@ const BedAdmissionModal: React.FC<BedAdmissionModalProps> = ({ bedId,setIsModalO
           <SelectTrigger
             autoFocus={true}
             id="registerd_for"
-            className="w-full md:max-w-md lg:col-span-2 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input py-1 pl-2 sm:text-sm sm:leading-6"
+            className="w-full md:col-span-2 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input py-1 pl-2 sm:text-sm sm:leading-6"
           >
             <SelectValue placeholder="Doctor" />
           </SelectTrigger>
@@ -262,15 +306,29 @@ const BedAdmissionModal: React.FC<BedAdmissionModalProps> = ({ bedId,setIsModalO
           </SelectContent>
         </Select>
       </div>
-      <DateTimePicker
-        registered_date={[]}
-        date={fromDate}
-        setDate={setFromDate}
-      />
-      <DateTimePicker registered_date={[]} date={toDate} setDate={setToDate} />
-      <Button onClick={admitHandler}> {loader?"loading":"Add Patient"} </Button>                    
-
-    </div>
+      <div className="flex flex-col md:px-8 sm:flex-row gap-2 pt-1 pb-4">
+        <div className="flex-1">
+          <DateTimePicker
+            registered_date={[]}
+            date={fromDate}
+            setDate={setFromDate}
+            icon={<CalendarPlusIcon mr-2 h-4 w-4 />}
+          />
+        </div>
+        <div className="flex-1">
+          <DateTimePicker
+            registered_date={[]}
+            date={toDate}
+            setDate={setToDate}
+            icon={<CalendarMinusIcon mr-2 h-4 w-4 />}
+          />
+        </div>
+      </div>
+      {warning.length > 0 && (
+        <p className="text-center text-red-600 font-normal pb-4">{warning}</p>
+      )}
+      <Button type="submit"> {loader ? "loading" : "Add Patient"} </Button>
+    </form>
   );
 };
 

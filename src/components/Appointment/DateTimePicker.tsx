@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { CalendarIcon } from "@radix-ui/react-icons";
-import { format } from "date-fns";
+import { format, getTime } from "date-fns";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -18,12 +18,14 @@ interface DateTimePickerProps {
   registered_date: number[];
   date: Date;
   setDate: React.Dispatch<React.SetStateAction<Date>>;
+  icon?: any;
 }
 
 export const DateTimePicker: React.FC<DateTimePickerProps> = ({
   registered_date,
   date,
   setDate,
+  icon
 }) => {
   const [isOpen, setIsOpen] = React.useState(false);
 
@@ -68,8 +70,8 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
             !date && "text-muted-foreground"
           )}
         >
-          <CalendarIcon className="mr-2 h-4 w-4" />
-          {date ? (
+          {icon?icon:<CalendarIcon className="mr-2 h-4 w-4" />}
+          {getTime(date) !== getTime(new Date(0)) ? (
             format(date, "MM/dd/yyyy hh:mm aa")
           ) : (
             <span>MM/DD/YYYY hh:mm aa</span>

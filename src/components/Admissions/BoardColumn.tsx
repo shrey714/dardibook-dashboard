@@ -4,12 +4,17 @@ import { CSS } from "@dnd-kit/utilities";
 import { useMemo, useState } from "react";
 import { TaskCard } from "./TaskCard";
 import { cva } from "class-variance-authority";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "../ui/card";
 import { Button } from "@/components/ui/button";
 import { BadgePlusIcon, GripVertical, Trash } from "lucide-react";
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 import { BedInfo, BedPatientTypes, OrgBed } from "@/types/FormTypes";
-import toast from "react-hot-toast";
 import Loader from "../common/Loader";
 
 export interface Column {
@@ -27,7 +32,6 @@ interface BoardColumnProps {
   column: BedInfo;
   tasks: OrgBed[];
   isOverlay?: boolean;
-  setIsModalOpen: any;
   setIsEditModalOpen: any;
   bedPatients: Record<string, BedPatientTypes>;
   openAddModal: any;
@@ -39,12 +43,11 @@ export function BoardColumn({
   column,
   tasks,
   isOverlay,
-  setIsModalOpen,
   bedPatients,
   setIsEditModalOpen,
   openAddModal,
   openEditModal,
-  deleteBed
+  deleteBed,
 }: BoardColumnProps) {
   const tasksIds = useMemo(() => {
     return tasks.map((task) => task.bedBookingId);
@@ -88,11 +91,11 @@ export function BoardColumn({
 
   const [deleteLoader, setDeleteLoader] = useState(false);
 
-  const deleteHandler = ()=>{
-    setDeleteLoader(true)
-    deleteBed(column.id)
+  const deleteHandler = () => {
+    setDeleteLoader(true);
+    deleteBed(column.id);
     // setDeleteLoader(false)
-  }
+  };
 
   return (
     <Card
@@ -162,13 +165,23 @@ export function BoardColumn({
           </SortableContext>
         )}
       </CardContent>
-      {
-        !tasks.length && <CardFooter className="p-0">
-        <Button className="w-full mx-4" variant={"destructive"} onClick={deleteHandler}>
-          {deleteLoader?<Loader />:<><Trash /> Delete Bed</>}
-        </Button>
-      </CardFooter>
-      }
+      {!tasks.length && (
+        <CardFooter className="p-0">
+          <Button
+            className="w-full mx-4"
+            variant={"destructive"}
+            onClick={deleteHandler}
+          >
+            {deleteLoader ? (
+              <Loader />
+            ) : (
+              <>
+                <Trash /> Delete Bed
+              </>
+            )}
+          </Button>
+        </CardFooter>
+      )}
     </Card>
   );
 }

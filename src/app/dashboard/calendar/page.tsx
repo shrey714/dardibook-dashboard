@@ -24,7 +24,7 @@ export default function TaskPage() {
   const [loader, setLoader] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [patients, setPatients] = useState<PatientData[]>([]);
-  const [dateRange, setDateRange] = useState<DateRange | undefined>({
+  const [dateRange] = useState<DateRange | undefined>({
     from: startOfMonth(new Date()),
     to: endOfMonth(new Date()),
   });

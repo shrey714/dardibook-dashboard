@@ -20,24 +20,20 @@ import { SortableContext, arrayMove } from "@dnd-kit/sortable";
 import { TaskCard } from "./TaskCard";
 import { hasDraggableData } from "./utils";
 import { coordinateGetter } from "./multipleContainersKeyboardPreset";
-import { db } from "@/firebase/firebaseConfig";
 import { BedInfo, OrgBed } from "@/types/FormTypes";
-import { useUser, useAuth, useOrganization } from "@clerk/nextjs";
-import { doc, writeBatch } from "firebase/firestore";
+import { useOrganization } from "@clerk/nextjs";
 import { useBedsStore } from "@/lib/stores/useBedsStore";
-import { getTime } from "date-fns";
 import toast from "react-hot-toast";
 import { updateOrgMetadata } from "@/app/dashboard/settings/clinic/_actions";
-import Loader from "../common/Loader";
 
 export type ColumnId = string;
 
 export const KanbanBoard = ({
-  setIsModalOpen,
   openAddModal,
   openEditModal,
   setIsEditModalOpen,
-  refresh
+  refresh,
+  isEditModalOpen,
 }: any) => {
   const { organization, isLoaded } = useOrganization();
   const { beds, bedPatients, loading } = useBedsStore((state) => state);
@@ -47,6 +43,7 @@ export const KanbanBoard = ({
   const [tasks, setTasks] = useState<OrgBed[]>([]);
   const [activeColumn, setActiveColumn] = useState<BedInfo | null>(null);
   const [activeTask, setActiveTask] = useState<OrgBed | null>(null);
+  const [prevTaskState, setPrevTaskState] = useState<OrgBed | null>(null);
   const sensors = useSensors(
     useSensor(MouseSensor),
     useSensor(TouchSensor),
@@ -56,13 +53,25 @@ export const KanbanBoard = ({
   );
 
   useEffect(() => {
-    console.log("isloaded : ",isLoaded)
+    if (isEditModalOpen == false) {
+      if (prevTaskState) {
+        setTasks((tasks) =>
+          tasks.map((t) =>
+            t.bedBookingId === prevTaskState.bedBookingId
+              ? { ...prevTaskState }
+              : t
+          )
+        );
+        setPrevTaskState(null);
+      }
+    }
+  }, [isEditModalOpen]);
+
+  useEffect(() => {
     const fetchBedMetaData = () => {
-      console.log("fetching again")
       if (organization && organization.publicMetadata) {
         const bedMetaData: BedInfo[] =
           (organization.publicMetadata?.bedMetaData as BedInfo[]) || [];
-          console.log(bedMetaData)
         setColumns(bedMetaData);
       }
     };
@@ -71,12 +80,11 @@ export const KanbanBoard = ({
       fetchBedMetaData();
       // setTasks(beds);
     }
-  }, [isLoaded, organization,refresh]);
+  }, [isLoaded, organization, refresh]);
 
   useEffect(() => {
-    if(!loading)
-      setTasks(beds);
-  }, [beds,bedPatients,loading]);
+    if (!loading) setTasks(beds);
+  }, [beds, bedPatients, loading]);
 
   function getDraggingTaskData(taskId: UniqueIdentifier, columnId: ColumnId) {
     const tasksInColumn = tasks.filter((task) => task.bedId === columnId);
@@ -94,7 +102,6 @@ export const KanbanBoard = ({
   const deleteBed = async (bedIdToRemove: string) => {
     if (!organization) return;
     try {
-      console.log(bedIdToRemove);
       const currentBeds = (organization.publicMetadata?.bedMetaData ||
         []) as BedInfo[];
 
@@ -102,12 +109,11 @@ export const KanbanBoard = ({
         (bed: BedInfo) => bed.id !== bedIdToRemove
       );
 
-      const data = await updateOrgMetadata({ bedMetaData: updatedBeds });
+      await updateOrgMetadata({ bedMetaData: updatedBeds });
       organization.reload();
-      setColumns(updatedBeds)
+      setColumns(updatedBeds);
       // setRefresh((prev)=>!prev);
 
-      console.log(data);
     } catch (error) {
       console.log(error);
       toast.error("Error in deleting bed");
@@ -211,62 +217,68 @@ export const KanbanBoard = ({
 
   return (
     <>
-      {columns.length==0?<div className="flex justify-center items-center h-full">No Beds are adeed</div>:<DndContext
-      accessibility={{
-        announcements,
-      }}
-      sensors={sensors}
-      onDragStart={onDragStart}
-      onDragEnd={onDragEnd}
-      onDragOver={onDragOver}
-    >
-      <BoardContainer>
-        <SortableContext items={columnsId}>
-          {columns.map((col) => (
-            <BoardColumn
-              key={col.id}
-              column={col}
-              tasks={tasks.filter((task) => task.bedId === col.id)}
-              setIsModalOpen={setIsModalOpen}
-              setIsEditModalOpen={setIsEditModalOpen}
-              openAddModal={openAddModal}
-              openEditModal={openEditModal}
-              bedPatients={bedPatients}
-              deleteBed={deleteBed}
-            />
-          ))}
-        </SortableContext>
-      </BoardContainer>
+      {columns.length == 0 ? (
+        <div className="flex flex-1 justify-center items-center h-full">
+          No Beds are adeed
+        </div>
+      ) : (
+        <DndContext
+          accessibility={{
+            announcements,
+          }}
+          sensors={sensors}
+          onDragStart={onDragStart}
+          onDragEnd={onDragEnd}
+          onDragOver={onDragOver}
+        >
+          <BoardContainer>
+            <SortableContext items={columnsId}>
+              {columns.map((col) => (
+                <BoardColumn
+                  key={col.id}
+                  column={col}
+                  tasks={tasks.filter((task) => task.bedId === col.id)}
+                  setIsEditModalOpen={setIsEditModalOpen}
+                  openAddModal={openAddModal}
+                  openEditModal={openEditModal}
+                  bedPatients={bedPatients}
+                  deleteBed={deleteBed}
+                />
+              ))}
+            </SortableContext>
+          </BoardContainer>
 
-      {"document" in window &&
-        createPortal(
-          <DragOverlay>
-            {activeColumn && (
-              <BoardColumn
-                isOverlay
-                column={activeColumn}
-                tasks={tasks.filter((task) => task.bedId === activeColumn.id)}
-                setIsModalOpen={setIsModalOpen}
-                setIsEditModalOpen={setIsEditModalOpen}
-                openAddModal={openAddModal}
-                openEditModal={openEditModal}
-                bedPatients={bedPatients}
-                deleteBed={deleteBed}
-              />
+          {"document" in window &&
+            createPortal(
+              <DragOverlay>
+                {activeColumn && (
+                  <BoardColumn
+                    isOverlay
+                    column={activeColumn}
+                    tasks={tasks.filter(
+                      (task) => task.bedId === activeColumn.id
+                    )}
+                    setIsEditModalOpen={setIsEditModalOpen}
+                    openAddModal={openAddModal}
+                    openEditModal={openEditModal}
+                    bedPatients={bedPatients}
+                    deleteBed={deleteBed}
+                  />
+                )}
+                {activeTask && (
+                  <TaskCard
+                    task={activeTask}
+                    isOverlay
+                    bedPatientData={bedPatients[activeTask.patient_id]}
+                    setIsEditModalOpen={setIsEditModalOpen}
+                    openEditModal={openEditModal}
+                  />
+                )}
+              </DragOverlay>,
+              document.body
             )}
-            {activeTask && (
-              <TaskCard
-                task={activeTask}
-                isOverlay
-                bedPatientData={bedPatients[activeTask.patient_id]}
-                setIsEditModalOpen={setIsEditModalOpen}
-                openEditModal={openEditModal}
-              />
-            )}
-          </DragOverlay>,
-          document.body
-        )}
-    </DndContext>}
+        </DndContext>
+      )}
     </>
   );
 
@@ -280,6 +292,8 @@ export const KanbanBoard = ({
 
     if (data?.type === "Task") {
       setActiveTask(data.task);
+      pickedUpTaskColumn.current = data.task.bedId;
+      setPrevTaskState({ ...data.task });
       return;
     }
   }
@@ -289,27 +303,50 @@ export const KanbanBoard = ({
     setActiveTask(null);
 
     const { active, over } = event;
-    if (!over) return;
+    if (!over || !hasDraggableData(active)) return;
 
+    const activeData = active.data.current;
     const activeId = active.id;
     const overId = over.id;
 
-    if (!hasDraggableData(active)) return;
+    // Handle columns being reordered (no need to open modal here)
+    if (activeData?.type === "Column") {
+      if (activeId === overId) return;
 
-    const activeData = active.data.current;
+      setColumns((columns) => {
+        const oldIndex = columns.findIndex((col) => col.id === activeId);
+        const newIndex = columns.findIndex((col) => col.id === overId);
+        return arrayMove(columns, oldIndex, newIndex);
+      });
+      return;
+    }
 
-    if (activeId === overId) return;
+    // ✅ Handle task being dropped into new column
+    if (activeData?.type === "Task") {
+      const task = activeData.task;
+      const oldColumnId = pickedUpTaskColumn.current;
+      const newColumnId = over.data.current?.task?.bedId || over.id;
 
-    const isActiveAColumn = activeData?.type === "Column";
-    if (!isActiveAColumn) return;
+      if (oldColumnId === newColumnId) {
+        pickedUpTaskColumn.current = null;
+        return;
+      }
 
-    setColumns((columns) => {
-      const activeColumnIndex = columns.findIndex((col) => col.id === activeId);
+      if (oldColumnId !== newColumnId) {
+        setTasks((tasks) =>
+          tasks.map((t) =>
+            t.bedBookingId === task.bedBookingId
+              ? { ...t, bedId: newColumnId as ColumnId }
+              : t
+          )
+        );
 
-      const overColumnIndex = columns.findIndex((col) => col.id === overId);
+        // setIsEditModalOpen(true);
+        openEditModal(task.bedBookingId);
+      }
+    }
 
-      return arrayMove(columns, activeColumnIndex, overColumnIndex);
-    });
+    pickedUpTaskColumn.current = null;
   }
 
   function onDragOver(event: DragOverEvent) {

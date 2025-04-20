@@ -22,7 +22,7 @@ import { useTodayPatientStore } from "@/lib/providers/todayPatientsProvider";
 const Page = () => {
   const searchParams = useSearchParams();
   const patientId = searchParams.get("patientId");
-  const [startIndex, setstartIndex] = useState(0);
+  const [startIndex] = useState(0);
   const [drawerState, setdrawerState] = useState(false);
   // =============================================
 

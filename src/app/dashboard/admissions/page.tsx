@@ -2,7 +2,7 @@
 import BedAdmissionModal from "@/components/Admissions/BedAdmissionModal";
 import BedEditModal from "@/components/Admissions/BedEditModal";
 import { KanbanBoard } from "@/components/Admissions/KanbanBoard";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Loader } from "lucide-react";
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -17,7 +17,7 @@ function Admissions() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [bedId, setbedId] = useState("");
   const [bookingId, setbookingId] = useState("");
-  const { organization, isLoaded } = useOrganization();
+  const { organization } = useOrganization();
   const [bedAddLoader, setBedAddLoader] = useState(false);
   const [refresh, setRefresh] = useState(false);
 
@@ -72,9 +72,9 @@ function Admissions() {
           />
         </DialogContent>
       </Dialog>
-      <div className="w-full mb-16 mt-4 pl-4">
+      <div className="w-full mb-16 mt-4 pl-4 min-h-[calc(100%-5rem)] flex flex-col">
         <KanbanBoard
-          setIsModalOpen={setIsModalOpen}
+        isEditModalOpen={isEditModalOpen}
           bedId={bedId}
           setbedId={setbedId}
           openAddModal={openAddModal}

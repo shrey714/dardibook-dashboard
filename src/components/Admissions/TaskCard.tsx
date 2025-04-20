@@ -10,14 +10,9 @@ import {
   LogOut,
 } from "lucide-react";
 import { ColumnId } from "./KanbanBoard";
-import { format, getTime } from "date-fns";
+import { format } from "date-fns";
 import { BedPatientTypes, OrgBed } from "@/types/FormTypes";
 import { useState } from "react";
-import { db } from "@/firebase/firebaseConfig";
-import { writeBatch, doc } from "firebase/firestore";
-import toast from "react-hot-toast";
-import { useUser } from "@clerk/nextjs";
-import { useAuth } from "@clerk/clerk-react";
 import Loader from "../common/Loader";
 
 export interface Task {
@@ -52,8 +47,6 @@ export function TaskCard({
   openEditModal
 }: TaskCardProps) {
   const [dischargeLoader, setDischargeLoader] = useState(false);
-  const {user} = useUser();
-  const {orgId} = useAuth();
   const {
     setNodeRef,
     attributes,
