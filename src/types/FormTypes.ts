@@ -50,7 +50,6 @@ export interface BedPatientTypes {
     mobile: string;
     gender: "Male" | "Female" | "Other";
     age: string;
-    address: string;
     bed_info: patientBed[];
 }
 

@@ -109,7 +109,6 @@ const PatientsInBed = ({
                     gender,
                     age,
                     bed_info,
-                    address,
                   } = patientSnap.data();
                   patientsData[patientId] = {
                     patient_id,
@@ -118,7 +117,6 @@ const PatientsInBed = ({
                     gender,
                     age,
                     bed_info,
-                    address,
                   };
                 }
               })
