@@ -132,6 +132,7 @@ const Medical = () => {
                 variant={"outline"}
                 onClick={() => {
                   setSelectedPatient(undefined);
+                  setselectedPrescription(undefined);
                 }}
                 className="text-sm h-auto border-2 text-foreground shadow rounded-md w-full flex items-center justify-center py-2 flex-col gap-y-1.5 transition-all"
               >
