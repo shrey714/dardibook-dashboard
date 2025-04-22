@@ -9,6 +9,7 @@ import {
   SettingsIcon,
   SquarePenIcon,
   CalendarDaysIcon,
+  PillIcon,
 } from "lucide-react";
 
 import { NavMain } from "./nav-main";
@@ -73,9 +74,9 @@ const pages = [
     ],
   },
   {
-    title: "Medical",
-    url: "/dashboard/medical",
-    icon: BriefcaseMedicalIcon,
+    title: "Pharmacy",
+    url: "/dashboard/pharmacy",
+    icon: PillIcon,
     roles: ["org:clinic_head", "org:medical_staff"],
   },
   {

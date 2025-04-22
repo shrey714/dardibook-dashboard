@@ -1,11 +1,11 @@
 "use client";
 
 import {
-  BriefcaseMedicalIcon,
   Calendar1Icon,
   CalendarIcon,
   CheckCheck,
   CircleX,
+  ClipboardPlusIcon,
   MoreHorizontal,
   XIcon,
 } from "lucide-react";
@@ -42,12 +42,16 @@ interface UserReOrderMenuProps {
   patient: ScheduledPatientTypes;
   matchingDate: Date;
   disabled?: boolean;
+  customClassName?: string;
+  insideText?: string;
 }
 
 export const UserReOrderMenu: React.FC<UserReOrderMenuProps> = ({
   patient,
   matchingDate,
   disabled,
+  customClassName,
+  insideText,
 }) => {
   const patient_matching_reg_date =
     patient.registered_date.find(
@@ -162,9 +166,18 @@ export const UserReOrderMenu: React.FC<UserReOrderMenuProps> = ({
         <Button
           variant="ghost"
           disabled={disabled}
-          className="flex h-8 w-8 p-0 data-[state=open]:bg-muted border rounded-full disabled:invisible"
+          className={cn(
+            "flex h-8 w-8 p-0 data-[state=open]:bg-muted border rounded-full",
+            customClassName
+          )}
         >
-          {menuLoader ? <Loader size="small" /> : <MoreHorizontal />}
+          {menuLoader ? (
+            <Loader size="small" />
+          ) : (
+            <>
+              <MoreHorizontal /> {insideText}
+            </>
+          )}
           <span className="sr-only">Open menu</span>
         </Button>
       </DropdownMenuTrigger>
@@ -353,7 +366,7 @@ export const UserReOrderMenu: React.FC<UserReOrderMenuProps> = ({
 
         <div className="w-full flex flex-row gap-x-1">
           <span className="bg-green-500/10 flex h-auto px-2 rounded-md aspect-square items-center justify-center">
-            <BriefcaseMedicalIcon size={20} className="text-green-500" />
+            <ClipboardPlusIcon size={20} className="text-green-500" />
           </span>
           <Select
             disabled={menuLoader}
@@ -376,13 +389,13 @@ export const UserReOrderMenu: React.FC<UserReOrderMenuProps> = ({
                 } = member.publicUserData;
 
                 const fullName = [firstName, lastName]
-                .filter(Boolean)
-                .join(" ");
-              const selectedMember = {
-                id: userId,
-                name: fullName,
-                email: identifier,
-              };
+                  .filter(Boolean)
+                  .join(" ");
+                const selectedMember = {
+                  id: userId,
+                  name: fullName,
+                  email: identifier,
+                };
                 handleDoctorChange(selectedMember);
               }
             }}
@@ -401,7 +414,7 @@ export const UserReOrderMenu: React.FC<UserReOrderMenuProps> = ({
                       value={member.publicUserData.userId}
                       key={index}
                     >
-                       {[
+                      {[
                         member.publicUserData.firstName,
                         member.publicUserData.lastName,
                       ]

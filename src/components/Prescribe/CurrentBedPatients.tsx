@@ -12,7 +12,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
-  BriefcaseMedicalIcon,
   CalendarMinusIcon,
   CalendarPlusIcon,
   ClipboardX,
@@ -95,7 +94,6 @@ const CurrentBedPatients = () => {
 
     return true;
   });
-
   return (
     <>
       {isDesktop ? (
@@ -111,7 +109,7 @@ const CurrentBedPatients = () => {
           <CardContent className="p-2 flex flex-1 flex-col gap-y-2 overflow-y-hidden">
             <div className="flex w-full flex-row gap-x-1">
               <span className="bg-green-500/10 flex h-auto px-2 rounded-md aspect-square items-center justify-center">
-                <BriefcaseMedicalIcon size={20} className="text-green-500" />
+                <ClipboardPlusIcon size={20} className="text-green-500" />
               </span>
               <Select
                 value={filters?.admission_for}
@@ -322,7 +320,7 @@ const CurrentBedPatients = () => {
                                 {bed.admission_by.name}
                               </p>
                               <p className="!mt-0 flex bg-green-500/10 text-green-600 text-sm items-center gap-2 px-2 py-1 w-full rounded-b-sm">
-                                <BriefcaseMedicalIcon size={16} />{" "}
+                                <ClipboardPlusIcon size={16} />{" "}
                                 {bed.admission_for.name}
                               </p>
                               <p className="flex bg-green-500/10 text-green-600 text-sm items-center gap-2 px-2 py-1 w-full rounded-t-sm">
@@ -397,7 +395,7 @@ const CurrentBedPatients = () => {
             <div className="px-2 pb-2 h-min flex flex-col sm:flex-row flex-wrap gap-2 sm:items-start">
               <div className="flex flex-1 flex-row gap-x-1 items-center">
                 <span className="bg-green-500/10 flex h-auto px-2 rounded-md aspect-square items-center justify-center">
-                  <BriefcaseMedicalIcon size={20} className="text-green-500" />
+                  <ClipboardPlusIcon size={20} className="text-green-500" />
                 </span>
                 <Select
                   value={filters?.admission_for}
@@ -615,7 +613,7 @@ const CurrentBedPatients = () => {
                                 {bed.admission_by.name}
                               </p>
                               <p className="!mt-0 flex bg-green-500/10 text-green-600 text-sm items-center gap-2 px-2 py-1 w-full rounded-b-sm">
-                                <BriefcaseMedicalIcon size={16} />{" "}
+                                <ClipboardPlusIcon size={16} />{" "}
                                 {bed.admission_for.name}
                               </p>
                               <p className="flex bg-green-500/10 text-green-600 text-sm items-center gap-2 px-2 py-1 w-full rounded-t-sm">

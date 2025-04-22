@@ -13,10 +13,10 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   BedSingle,
   BedSingleIcon,
-  BriefcaseMedicalIcon,
   ClipboardCheck,
   ClipboardCheckIcon,
   ClipboardPlusIcon,
+  EllipsisVertical,
   History,
   ListFilter,
   PencilLineIcon,
@@ -50,6 +50,12 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface TodayPatientsFilter {
   registerd_for?: string;
@@ -133,7 +139,7 @@ const QueueList: React.FC = () => {
         <div className="px-2 pb-2 min-w-64 h-min flex flex-wrap gap-2 border-b 2xl:border-b-0 2xl:border-r items-center 2xl:items-stretch flex-row 2xl:flex-col">
           <div className="flex flex-1 flex-row gap-x-1">
             <span className="bg-green-500/10 flex h-auto px-2 rounded-md aspect-square items-center justify-center">
-              <BriefcaseMedicalIcon size={20} className="text-green-500" />
+              <ClipboardPlusIcon size={20} className="text-green-500" />
             </span>
             <Select
               value={filters?.registerd_for}
@@ -273,7 +279,7 @@ const QueueList: React.FC = () => {
               <div className="px-2 pb-2 min-w-64 h-min flex flex-wrap gap-2 items-stretch flex-col">
                 <div className="flex flex-1 flex-row gap-x-1">
                   <span className="bg-green-500/10 flex h-auto px-2 rounded-md aspect-square items-center justify-center">
-                    <BriefcaseMedicalIcon
+                    <ClipboardPlusIcon
                       size={20}
                       className="text-green-500"
                     />
@@ -549,61 +555,133 @@ const QueueList: React.FC = () => {
                               </td>
                               <td className="text-center table-cell">
                                 <div className="flex flex-row gap-x-1">
-                                  <UserReOrderMenu
-                                    patient={item}
-                                    matchingDate={new Date()}
-                                    disabled={item.prescribed || item.inBed}
-                                  />
-
-                                  <Tooltip delayDuration={100}>
-                                    <TooltipTrigger asChild>
-                                      <Button
-                                        variant="ghost"
-                                        className="flex h-8 w-8 p-0 data-[state=open]:bg-muted border rounded-full"
-                                        asChild
-                                      >
-                                        <Link
-                                          href={"#"}
-                                          role="button"
-                                          onClick={() =>
-                                            openModal({
-                                              patientId: item.patient_id,
-                                            })
-                                          }
-                                        >
-                                          <History />
-                                        </Link>
-                                      </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent side="left">
-                                      <p>History</p>
-                                    </TooltipContent>
-                                  </Tooltip>
-
-                                  <Tooltip delayDuration={100}>
-                                    <TooltipTrigger asChild>
-                                      <Button
-                                        variant="outline"
+                                  {isDesktop ? (
+                                    <>
+                                      <UserReOrderMenu
+                                        customClassName="disabled:invisible"
+                                        patient={item}
+                                        matchingDate={new Date()}
                                         disabled={item.prescribed || item.inBed}
-                                        className="bg-blue-700 hover:bg-blue-900 text-white hover:text-white flex h-8 w-8 p-0 border-0 rounded-full disabled:invisible"
-                                        asChild={!item.prescribed}
-                                      >
-                                        <Link
-                                          href={{
-                                            pathname: "prescribe/prescribeForm",
-                                            query: {
-                                              patientId: item.patient_id,
-                                            },
-                                          }}
-                                        >
-                                          <ClipboardPlusIcon className="size-4 sm:size-5" />
-                                        </Link>
-                                      </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent side="right">
-                                      <p>Prescribe</p>
-                                    </TooltipContent>
-                                  </Tooltip>
+                                      />
+
+                                      <Tooltip delayDuration={100}>
+                                        <TooltipTrigger asChild>
+                                          <Button
+                                            variant="ghost"
+                                            className="flex h-8 w-8 p-0 data-[state=open]:bg-muted border rounded-full"
+                                            asChild
+                                          >
+                                            <Link
+                                              href={"#"}
+                                              role="button"
+                                              onClick={() =>
+                                                openModal({
+                                                  patientId: item.patient_id,
+                                                })
+                                              }
+                                            >
+                                              <History />
+                                            </Link>
+                                          </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent side="left">
+                                          <p>History</p>
+                                        </TooltipContent>
+                                      </Tooltip>
+
+                                      <Tooltip delayDuration={100}>
+                                        <TooltipTrigger asChild>
+                                          <Button
+                                            variant="outline"
+                                            disabled={
+                                              item.prescribed || item.inBed
+                                            }
+                                            className="bg-blue-700 hover:bg-blue-900 text-white hover:text-white flex h-8 w-8 p-0 border-0 rounded-full disabled:invisible"
+                                            asChild={!item.prescribed}
+                                          >
+                                            <Link
+                                              href={{
+                                                pathname:
+                                                  "prescribe/prescribeForm",
+                                                query: {
+                                                  patientId: item.patient_id,
+                                                },
+                                              }}
+                                            >
+                                              <ClipboardPlusIcon className="size-4 sm:size-5" />
+                                            </Link>
+                                          </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent side="right">
+                                          <p>Prescribe</p>
+                                        </TooltipContent>
+                                      </Tooltip>
+                                    </>
+                                  ) : (
+                                    <DropdownMenu>
+                                      <DropdownMenuTrigger className="h-8 w-8 flex items-center justify-center rounded-full">
+                                        <EllipsisVertical className="size-4 sm:size-5" />
+                                      </DropdownMenuTrigger>
+                                      <DropdownMenuContent className="w-56 space-y-1">
+                                        <DropdownMenuItem asChild>
+                                          <UserReOrderMenu
+                                            customClassName="w-full rounded-md border-0 justify-start pl-3"
+                                            patient={item}
+                                            matchingDate={new Date()}
+                                            disabled={
+                                              item.prescribed || item.inBed
+                                            }
+                                            insideText="Schedule"
+                                          />
+                                        </DropdownMenuItem>
+
+                                        <DropdownMenuItem asChild>
+                                          <Button
+                                            variant="ghost"
+                                            className="flex h-8 w-full p-0 data-[state=open]:bg-muted justify-start pl-3 rounded-md"
+                                            asChild
+                                          >
+                                            <Link
+                                              href={"#"}
+                                              role="button"
+                                              onClick={() =>
+                                                openModal({
+                                                  patientId: item.patient_id,
+                                                })
+                                              }
+                                            >
+                                              <History /> History
+                                            </Link>
+                                          </Button>
+                                        </DropdownMenuItem>
+
+                                        <DropdownMenuItem asChild>
+                                          <Button
+                                            variant="ghost"
+                                            disabled={
+                                              item.prescribed || item.inBed
+                                            }
+                                            className="bg-blue-700 hover:bg-blue-900 text-white hover:text-white h-8 w-full p-0 pl-3 justify-start rounded-md"
+                                            asChild={!item.prescribed}
+                                          >
+                                            <Link
+                                              className="flex flex-1 flex-row gap-x-2"
+                                              href={{
+                                                pathname:
+                                                  "prescribe/prescribeForm",
+                                                query: {
+                                                  patientId: item.patient_id,
+                                                },
+                                              }}
+                                            >
+                                              <ClipboardPlusIcon className="size-4 sm:size-5" />{" "}
+                                              Prescribe
+                                            </Link>
+                                          </Button>
+                                        </DropdownMenuItem>
+                                      </DropdownMenuContent>
+                                    </DropdownMenu>
+                                  )}
                                 </div>
                               </td>
                             </Reorder.Item>

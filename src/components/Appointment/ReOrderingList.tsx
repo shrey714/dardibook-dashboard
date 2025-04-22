@@ -12,9 +12,9 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   BedSingle,
   BedSingleIcon,
-  BriefcaseMedicalIcon,
   ClipboardCheck,
   ClipboardCheckIcon,
+  ClipboardPlusIcon,
   ListFilter,
   PencilLineIcon,
   UserRoundPlus,
@@ -124,7 +124,7 @@ const ReOrderingList: React.FC = () => {
         <div className="px-2 pb-2 min-w-64 h-min flex flex-wrap gap-2 border-b 2xl:border-b-0 2xl:border-r items-center 2xl:items-stretch flex-row 2xl:flex-col">
           <div className="flex flex-1 flex-row gap-x-1">
             <span className="bg-green-500/10 flex h-auto px-2 rounded-md aspect-square items-center justify-center">
-              <BriefcaseMedicalIcon size={20} className="text-green-500" />
+              <ClipboardPlusIcon size={20} className="text-green-500" />
             </span>
             <Select
               value={filters?.registerd_for}
@@ -264,7 +264,7 @@ const ReOrderingList: React.FC = () => {
               <div className="px-2 pb-2 min-w-64 h-min flex flex-wrap gap-2 items-stretch flex-col">
                 <div className="flex flex-1 flex-row gap-x-1">
                   <span className="bg-green-500/10 flex h-auto px-2 rounded-md aspect-square items-center justify-center">
-                    <BriefcaseMedicalIcon
+                    <ClipboardPlusIcon
                       size={20}
                       className="text-green-500"
                     />

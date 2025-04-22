@@ -24,7 +24,7 @@ import { getTime } from "date-fns";
 import Link from "next/link";
 import {
   BedSingleIcon,
-  BriefcaseMedicalIcon,
+  ClipboardPlusIcon,
   Link2,
   PencilLineIcon,
   Phone,
@@ -187,10 +187,11 @@ const Page = () => {
         prescriptionData.prescription_id
       );
       batch.set(prescriptionDocRef, prescriptionData);
-      batch.update(patientDocRef, {
-        prescribed_date_time: arrayUnion(prescriptionData.created_at),
-      });
-
+      if (!prescriptionData.prescription_for_bed) {
+        batch.update(patientDocRef, {
+          prescribed_date_time: arrayUnion(prescriptionData.created_at),
+        });
+      }
       const diseaseDocRef = doc(
         db,
         "doctor",
@@ -211,7 +212,6 @@ const Page = () => {
         },
         { merge: true }
       );
-
       for (const medicine of prescriptionData.medicines) {
         if (medicine.medicineName || medicine.medicineName.trim() !== "") {
           const medicineDocRef = doc(
@@ -234,7 +234,6 @@ const Page = () => {
           );
         }
       }
-
       toast.promise(
         async () => {
           setSubmissionLoader(true);
@@ -399,7 +398,7 @@ const Page = () => {
               </div>
 
               <div className="flex items-center pl-3">
-                <BriefcaseMedicalIcon
+                <ClipboardPlusIcon
                   size={36}
                   className="hidden md:block mr-3 bg-green-500/10 text-green-600 border border-green-600 rounded-full p-2"
                 />

@@ -1,6 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { db } from "@/firebase/firebaseConfig";
+import { PharmacyTypes } from "@/types/FormTypes";
 import { useAuth } from "@clerk/nextjs";
 import { addDays, addMinutes, getTime, startOfDay } from "date-fns";
 import { doc, setDoc } from "firebase/firestore";
@@ -99,7 +100,128 @@ const Temp = () => {
         patient_id: patients[2].patient_id,
       });
 
-      await Promise.all([...batchPromises, bedPromise]);
+      const samplePharmacyData: PharmacyTypes[] = [
+        {
+          bill_id: uniqid.time(),
+          prescription_id: "RX-5001",
+          name: "Amit Sharma",
+          patient_id: "PAT-001",
+          mobile: "9876543210",
+          gender: "Male",
+          age: "35",
+          address: "123 MG Road, Delhi",
+          medicines: [],
+          services: [],
+          generated_at: Date.now(),
+          prescribed_by: {
+            email: "pshrey0000@gmail.com",
+            id: "user_2qTzDwsVbXO7tfelLadF95Fnpg0",
+            name: "Shrey Patel",
+          },
+          generated_by: {
+            email: "pshrey0000@gmail.com",
+            id: "user_2qTzDwsVbXO7tfelLadF95Fnpg0",
+            name: "Shrey Patel",
+          },
+          payment_status: "Paid",
+          total_amount: 1200,
+          discount: 100,
+          payment_method: "UPI",
+          tax_percentage: 5,
+          notes: "Take after meals",
+        },
+        {
+          bill_id: uniqid.time(),
+          name: "Sneha Mehta",
+          mobile: "9123456780",
+          gender: "Female",
+          age: "28",
+          address: "Plot 45, Bandra, Mumbai",
+          medicines: [],
+          services: [],
+          generated_at: getTime(addDays(new Date(), -4)),
+          prescribed_by: {
+            email: "pshrey0000@gmail.com",
+            id: "user_2qTzDwsVbXO7tfelLadF95Fnpg0",
+            name: "Shrey Patel",
+          },
+          generated_by: {
+            email: "pshrey0000@gmail.com",
+            id: "user_2qTzDwsVbXO7tfelLadF95Fnpg0",
+            name: "Shrey Patel",
+          },
+          payment_status: "Unpaid",
+          total_amount: 850,
+          tax_percentage: 12,
+        },
+        {
+          bill_id: uniqid.time(),
+          prescription_id: "RX-5003",
+          name: "Rahul Singh",
+          patient_id: "PAT-003",
+          mobile: "9988776655",
+          gender: "Male",
+          age: "42",
+          address: "Sector 21, Noida",
+          medicines: [],
+          services: [],
+          generated_at: getTime(addDays(new Date(), -2)),
+          prescribed_by: {
+            email: "pshrey0000@gmail.com",
+            id: "user_2qTzDwsVbXO7tfelLadF95Fnpg0",
+            name: "Shrey Patel",
+          },
+          generated_by: {
+            email: "pshrey0000@gmail.com",
+            id: "user_2qTzDwsVbXO7tfelLadF95Fnpg0",
+            name: "Shrey Patel",
+          },
+          payment_status: "Refunded",
+          total_amount: 500,
+          discount: 50,
+          payment_method: "Card",
+          tax_percentage: 0,
+          notes: "Refunded due to incorrect item",
+        },
+        {
+          bill_id: uniqid.time(),
+          name: "Priya Nair",
+          mobile: "9090909090",
+          gender: "Female",
+          age: "31",
+          address: "Kormangala, Bangalore",
+          medicines: [],
+          services: [],
+          generated_at: getTime(addDays(new Date(), -10)),
+          prescribed_by: {
+            email: "pshrey0000@gmail.com",
+            id: "user_2qTzDwsVbXO7tfelLadF95Fnpg0",
+            name: "Shrey Patel",
+          },
+          generated_by: {
+            email: "pshrey0000@gmail.com",
+            id: "user_2qTzDwsVbXO7tfelLadF95Fnpg0",
+            name: "Shrey Patel",
+          },
+          payment_status: "Not Required",
+          total_amount: 0,
+          notes: "Service provided free of charge",
+        },
+      ];
+
+      const billPromises = samplePharmacyData.map((bill, index) => {
+        const billRef = doc(db, `doctor/${doctorId}/bills/${bill.bill_id}`);
+        const matchingPatient = patients[index];
+        const newBill: PharmacyTypes = {
+          ...bill,
+          name: matchingPatient.name,
+          patient_id: matchingPatient.patient_id,
+        };
+
+        return setDoc(billRef, newBill);
+      });
+
+      await Promise.all([...batchPromises, ...billPromises, bedPromise]);
       console.log("Patients added successfully!", patients);
     };
 

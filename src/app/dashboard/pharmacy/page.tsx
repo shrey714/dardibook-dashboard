@@ -1,0 +1,155 @@
+"use client";
+import React, { useState } from "react";
+import { Bed, FileText, Calculator, PlusIcon } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  PharmacySelectedPatientType,
+  PharmacyTypes,
+  PrescriptionFormTypes,
+} from "@/types/FormTypes";
+import TodayRegisteredPatients from "@/components/Pharmacy/tabscontent/TodayRegisteredPatients";
+import PatientsInBed from "@/components/Pharmacy/tabscontent/PatientsInBed";
+import BillsGenerated from "@/components/Pharmacy/tabscontent/BillsGenerated";
+import BillsForPatient from "@/components/Pharmacy/RightScroll/BillsForPatient";
+import BillHistoryModal from "@/components/Pharmacy/BillHistoryModal";
+import PrescriptionsForPatient from "@/components/Pharmacy/middleForm/PrescriptionsForPatient";
+import BillForm from "@/components/Pharmacy/middleForm/BillForm";
+import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
+
+const Medical = () => {
+  const [billModal, setbillModal] = useState(false);
+  const [selectedPatient, setSelectedPatient] =
+    useState<PharmacySelectedPatientType>();
+  const [selectedBillData, setselectedBillData] = useState<PharmacyTypes>();
+  const [selectedPrescription, setselectedPrescription] =
+    useState<PrescriptionFormTypes>();
+
+  const handlePatientSelect = (patient: PharmacySelectedPatientType) => {
+    setSelectedPatient(patient);
+  };
+
+  const handleBedPatientSelect = (patient: PharmacySelectedPatientType) => {
+    setSelectedPatient(patient);
+  };
+
+  const handleViewBill = (bill: PharmacyTypes) => {
+    setbillModal(true);
+    setselectedBillData(bill);
+  };
+
+  return (
+    <main className="min-h-[calc(100svh-53px)] bg-background p-2 pt-3 pr-0">
+      <BillHistoryModal
+        billModal={billModal}
+        setbillModal={setbillModal}
+        selectedBillData={selectedBillData}
+        setselectedBillData={setselectedBillData}
+      />
+
+      <div className="w-full p-0 flex flex-row items-center absolute top-[35px] z-[1]">
+        <span className="flex flex-1 h-[2px] bg-gradient-to-r from-transparent to-primary"></span>
+        <div className=" flex items-center justify-center">
+          <p className="text-primary w-auto px-3 bg-background py-1 font-medium text-base rounded-full border-primary border-[2px]">
+            Pharmacy Space
+          </p>
+        </div>
+        <span className="flex flex-1 h-[2px] bg-gradient-to-l from-transparent to-primary"></span>
+      </div>
+
+      <div
+        className="grid gap-2 h-full"
+        style={{ gridTemplateColumns: "repeat(18, minmax(0, 1fr))" }}
+      >
+        {/* Lists Section */}
+        <div className="col-span-5 overflow-hidden flex flex-col sticky top-3 h-[calc(100svh-73px)]">
+          <Tabs defaultValue="registered" className="h-full">
+            <TabsList className="grid grid-cols-3">
+              <TabsTrigger
+                value="registered"
+                className="flex items-center gap-1"
+              >
+                <FileText className="h-4 w-4" />
+                <span className="hidden sm:inline">Registered</span>
+              </TabsTrigger>
+              <TabsTrigger value="inbed" className="flex items-center gap-1">
+                <Bed className="h-4 w-4" />
+                <span className="hidden sm:inline">In Bed</span>
+              </TabsTrigger>
+              <TabsTrigger value="bills" className="flex items-center gap-1">
+                <Calculator className="h-4 w-4" />
+                <span className="hidden sm:inline">Bills</span>
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="registered">
+              <TodayRegisteredPatients onSelectPatient={handlePatientSelect} />
+            </TabsContent>
+
+            <TabsContent value="inbed">
+              <PatientsInBed onSelectPatient={handleBedPatientSelect} />
+            </TabsContent>
+
+            <TabsContent value="bills">
+              <BillsGenerated onViewBill={handleViewBill} />
+            </TabsContent>
+          </Tabs>
+        </div>
+
+        {/* Bill Form Section */}
+        <motion.div
+          layout
+          transition={{ duration: 0.15, ease: "easeInOut" }}
+          className="overflow-hidden mt-3"
+          style={{
+            gridColumn: selectedPatient
+              ? "span 12 / span 12"
+              : "span 13 / span 13",
+          }}
+        >
+          {selectedPatient && (
+            <PrescriptionsForPatient
+              selectedPatient={selectedPatient}
+              setselectedPrescription={setselectedPrescription}
+              selectedPrescription={selectedPrescription}
+            />
+          )}
+          <motion.div layout transition={{ duration: 0.15, ease: "easeInOut" }}>
+            <BillForm
+              selectedPatient={selectedPatient}
+              selectedPrescription={selectedPrescription}
+            />
+          </motion.div>
+        </motion.div>
+
+        {/* Bill History Section */}
+        {selectedPatient && (
+          <ScrollArea className="col-span-1 overflow-hidden flex flex-col !sticky top-3 h-[calc(100svh-73px)]">
+            <div className="pr-3 pl-1 bg-background rounded-none sticky top-0 pb-3">
+              <Button
+                disabled={!selectedPatient}
+                variant={"outline"}
+                onClick={() => {
+                  setSelectedPatient(undefined);
+                }}
+                className="text-sm h-auto border-2 text-foreground shadow rounded-md w-full flex items-center justify-center py-2 flex-col gap-y-1.5 transition-all"
+              >
+                <PlusIcon className="text-muted-foreground !size-6" />
+                <p className="text-sm text-muted-foreground leading-tight line-clamp-1">
+                  Add
+                </p>
+              </Button>
+            </div>
+            <BillsForPatient
+              selectedPatient={selectedPatient}
+              onViewBill={handleViewBill}
+            />
+          </ScrollArea>
+        )}
+      </div>
+    </main>
+  );
+};
+
+export default Medical;

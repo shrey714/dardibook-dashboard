@@ -3,7 +3,7 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
-import { BriefcaseMedicalIcon, PencilLineIcon } from "lucide-react";
+import { ClipboardPlusIcon, PencilLineIcon } from "lucide-react";
 import { UserReOrderMenu } from "./UserReOrderMenu";
 import { Reorder } from "framer-motion";
 import { format } from "date-fns";
@@ -130,7 +130,7 @@ export const ScheduleList: React.FC<ScheduleListProps> = ({
                         {patient.registerd_by.name}
                       </p>
                       <p className="flex text-sm items-center gap-2">
-                        <BriefcaseMedicalIcon
+                        <ClipboardPlusIcon
                           size={16}
                           className="text-green-500"
                         />{" "}

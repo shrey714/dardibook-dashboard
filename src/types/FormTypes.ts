@@ -50,6 +50,7 @@ export interface BedPatientTypes {
     mobile: string;
     gender: "Male" | "Female" | "Other";
     age: string;
+    address: string;
     bed_info: patientBed[];
 }
 
@@ -122,4 +123,43 @@ export interface PrescriptionFormTypes {
     prescribed_by: orgUserType;
     prescriber_assigned: orgUserType;
     receipt_details: ReceiptDetails[];
+}
+
+export interface MedicineItems extends MedicinesDetails {
+    quantity: number;
+    price: number;
+}
+
+export interface ServiceItems {
+    service_id: string;
+    service_name: string;
+    quantity: number;
+    price: number;
+}
+
+export interface PharmacyTypes {
+    bill_id: string;
+    prescription_id?: string;
+    name: string;
+    patient_id?: string;
+    mobile: string;
+    gender?: "Male" | "Female" | "Other";
+    medicines: MedicineItems[];
+    services: ServiceItems[];
+    generated_at: number;
+    prescribed_by?: orgUserType;
+    generated_by: orgUserType;
+    payment_status: "Paid" | "Unpaid" | "Not Required" | "Refunded";
+    total_amount: number;
+    discount: number;
+    payment_method?: "Cash" | "Card" | "UPI" | "Online";
+    tax_percentage: number;
+    notes?: string;
+}
+
+export interface PharmacySelectedPatientType {
+    name: string;
+    patient_id?: string;
+    mobile: string;
+    gender?: "Male" | "Female" | "Other";
 }

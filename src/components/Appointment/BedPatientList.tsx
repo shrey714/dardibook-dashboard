@@ -4,9 +4,9 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import {
-  BriefcaseMedicalIcon,
   CalendarMinusIcon,
   CalendarPlusIcon,
+  ClipboardPlusIcon,
   ClipboardX,
   LogOut,
   PencilLineIcon,
@@ -150,7 +150,7 @@ export const BedPatientList: React.FC<bedPatientProps> = ({
                           <PencilLineIcon size={16} /> {bed.admission_by.name}
                         </p>
                         <p className="!mt-0 flex bg-green-500/10 text-green-600 text-sm items-center gap-2 px-2 py-1 w-full rounded-b-sm">
-                          <BriefcaseMedicalIcon size={16} />{" "}
+                          <ClipboardPlusIcon size={16} />{" "}
                           {bed.admission_for.name}
                         </p>
                         <p className="flex bg-green-500/10 text-green-600 text-sm items-center gap-2 px-2 py-1 w-full rounded-t-sm">

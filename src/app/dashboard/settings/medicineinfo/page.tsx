@@ -404,11 +404,6 @@ const EditMedicineDataModel: React.FC<EditMedicineDataModel> = ({
             () => {
               setUpdateLoader(false);
               setmedicines(
-                (medicines ?? []).filter(
-                  (medicine) => medicine.id !== editForMedicineId
-                )
-              );
-              setmedicines(
                 (medicines ?? []).map((medicine) =>
                   medicine.id === editForMedicineId
                     ? { ...medicine, active: status }
