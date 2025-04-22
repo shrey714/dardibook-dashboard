@@ -40,7 +40,7 @@ const Medical = () => {
   };
 
   return (
-    <main className="min-h-[calc(100svh-53px)] bg-background p-2 pt-3 pr-0">
+    <main className="min-h-[calc(100svh-53px)] bg-background p-2 pt-3">
       <BillHistoryModal
         billModal={billModal}
         setbillModal={setbillModal}
@@ -126,7 +126,7 @@ const Medical = () => {
         {/* Bill History Section */}
         {selectedPatient && (
           <ScrollArea className="col-span-1 overflow-hidden flex flex-col !sticky top-3 h-[calc(100svh-73px)]">
-            <div className="pr-3 pl-1 bg-background rounded-none sticky top-0 pb-3">
+            <div className="pr-1 pl-1 bg-background rounded-none sticky top-0 pb-3">
               <Button
                 disabled={!selectedPatient}
                 variant={"outline"}

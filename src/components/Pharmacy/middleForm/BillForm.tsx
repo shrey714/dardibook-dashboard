@@ -397,7 +397,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.15, ease: "easeInOut" }}
-            className="w-full bg-slate-50 dark:bg-gray-900 overflow-hidden"
+            className="w-full bg-slate-50 dark:bg-gray-900 overflow-hidden shadow-sm"
           >
             <div className="px-4 py-2 gap-y-1 flex flex-wrap border-b items-center justify-between">
               {/* Patient Info */}

@@ -147,7 +147,7 @@ const BillHistoryModal = ({
       >
         {selectedBillData ? (
           <>
-            <DialogHeader className="shadow-md">
+            <DialogHeader className="shadow-sm">
               <DialogTitle hidden></DialogTitle>
               <DialogDescription hidden></DialogDescription>
               <div className="w-full gap-y-1 bg-slate-50 dark:bg-gray-900 border-b px-4 py-2 flex flex-wrap items-center justify-between ">

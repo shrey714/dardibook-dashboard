@@ -58,7 +58,7 @@ const BillsForPatient = ({
   }, [isLoaded, orgId, selectedPatient]);
 
   return (
-    <div className="pr-3 pl-1">
+    <div className="pr-1 pl-1">
       <AnimatePresence mode="wait">
         {billsLoading ? (
           <motion.div
