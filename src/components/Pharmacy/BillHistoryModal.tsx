@@ -181,13 +181,13 @@ const BillHistoryModal = ({
                 </div>
 
                 {/* Registered by/for section */}
-                <div className="flex items-center divide-x-0 md:divide-x divide-gray-700 gap-x-3">
+                <div className="hidden md:flex items-center divide-x-0 md:divide-x divide-gray-700 gap-x-3">
                   <div className="flex items-center">
                     <CalendarClockIcon
                       size={36}
-                      className="hidden md:block mr-3 border border-foreground rounded-full p-2"
+                      className="mr-3 border border-foreground rounded-full p-2"
                     />
-                    <div className="hidden md:flex flex-col items-start">
+                    <div className="flex flex-col items-start">
                       <span className="text-xs text-muted-foreground">
                         Generated at
                       </span>
@@ -202,9 +202,9 @@ const BillHistoryModal = ({
                   <div className="flex items-center pl-3">
                     <ClipboardPlusIcon
                       size={36}
-                      className="hidden md:block mr-3 bg-green-500/10 text-green-600 border border-green-600 rounded-full p-2"
+                      className="mr-3 bg-green-500/10 text-green-600 border border-green-600 rounded-full p-2"
                     />
-                    <div className="hidden md:flex flex-col items-start">
+                    <div className="flex flex-col items-start">
                       <span className="text-xs text-muted-foreground">
                         Prescribed by
                       </span>
@@ -554,6 +554,10 @@ const BillHistoryModal = ({
           </>
         ) : (
           <div className="w-full h-full flex items-center flex-col gap-8 justify-center">
+            <DialogHeader className="p-0">
+              <DialogTitle hidden></DialogTitle>
+              <DialogDescription hidden></DialogDescription>
+            </DialogHeader>
             <img className="w-full max-w-[16rem]" src="/empty.svg" alt="" />
             <p className="text-muted-foreground text-base">
               No Bill Data Available.

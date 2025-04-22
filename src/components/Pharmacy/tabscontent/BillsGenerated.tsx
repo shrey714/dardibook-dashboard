@@ -137,7 +137,7 @@ const BillsGenerated = ({
           </TableRow>
         </TableHeader>
       </Table>
-      <CardContent className="p-0 flex-col overflow-y-auto h-[calc(100svh-296px)]">
+      <CardContent className="p-0 flex-col overflow-y-auto h-[var(--content-height)]">
         <Table>
           <TableBody>
             {billsLoader ? (

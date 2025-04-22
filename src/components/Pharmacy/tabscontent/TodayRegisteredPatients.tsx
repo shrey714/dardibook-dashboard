@@ -60,7 +60,7 @@ const TodayRegisteredPatients = ({
           </TableRow>
         </TableHeader>
       </Table>
-      <CardContent className="p-0 flex-col overflow-y-auto h-[calc(100svh-252px)]">
+      <CardContent className="p-0 flex-col overflow-y-auto h-[var(--content-height)]">
         <Table>
           <TableBody>
             {loading ? (
