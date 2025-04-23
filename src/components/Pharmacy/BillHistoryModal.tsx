@@ -243,8 +243,8 @@ const BillHistoryModal = ({
                 </div>
               </div>
             </DialogHeader>
-            <div className="flex flex-1 flex-col overflow-y-auto w-full p-6 gap-y-6">
-              <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="flex flex-1 flex-col overflow-y-auto w-full p-2 sm:p-6 gap-y-2 sm:gap-y-6">
+              <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-6">
                 <div>
                   <CommonHeader label={"Bill Details"} />
 
@@ -281,7 +281,7 @@ const BillHistoryModal = ({
                     </CardTitle>
                     <CardDescription hidden></CardDescription>
                   </CardHeader>
-                  <CardContent className="flex-grow space-y-2 p-6">
+                  <CardContent className="flex-grow space-y-2 p-2 sm:p-6">
                     <div className="flex justify-between">
                       <span>Medicines Total:</span>
                       <span>

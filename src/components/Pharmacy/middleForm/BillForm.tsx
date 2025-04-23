@@ -397,7 +397,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.15, ease: "easeInOut" }}
-            className="w-full bg-slate-50 dark:bg-gray-900 overflow-hidden shadow-sm"
+            className="w-full bg-muted/50 overflow-hidden shadow-sm"
           >
             <div className="px-4 py-2 gap-y-1 flex flex-wrap border-b items-center justify-between">
               {/* Patient Info */}
@@ -498,7 +498,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
         )}
       </AnimatePresence>
 
-      <CardContent className="overflow-auto flex-grow p-6">
+      <CardContent className="overflow-auto flex-grow p-6 bg-sidebar/70">
         {selectedPatient ? (
           selectedPrescription ? (
             <Form {...form}>
@@ -587,9 +587,9 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
               {/* Billing Details */}
               <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <h3 className="text-lg font-medium mb-2">Bill Details</h3>
+                  <CommonHeader label={"Bill Details"} />
 
-                  <div className="space-y-3">
+                  <div className="space-y-3 mt-3">
                     <div className="grid grid-cols-2 gap-2">
                       <div>
                         <FormLabel>Discount (%)</FormLabel>
@@ -671,10 +671,14 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                   </div>
                 </div>
 
-                <div className="bg-muted p-4 rounded-lg flex flex-col h-64">
-                  <h3 className="text-lg font-medium mb-4">Bill Summary</h3>
-
-                  <div className="flex-grow space-y-2">
+                <Card className="flex flex-col overflow-hidden">
+                  <CardHeader className="py-3 bg-muted/50 border-b">
+                    <CardTitle className="text-lg font-medium">
+                      Bill Summary
+                    </CardTitle>
+                    <CardDescription hidden></CardDescription>
+                  </CardHeader>
+                  <CardContent className="flex-grow space-y-2 p-2 sm:p-6">
                     <div className="flex justify-between">
                       <span>Medicines Total:</span>
                       <span>
@@ -687,7 +691,6 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                           .toFixed(2)}
                       </span>
                     </div>
-
                     <div className="flex justify-between">
                       <span>Services Total:</span>
                       <span>
@@ -701,7 +704,6 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                           .toFixed(2)}
                       </span>
                     </div>
-
                     {discount > 0 && (
                       <div className="flex justify-between text-muted-foreground">
                         <span>Discount ({discount}%):</span>
@@ -722,7 +724,6 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                         </span>
                       </div>
                     )}
-
                     {taxPercentage > 0 && (
                       <div className="flex justify-between text-muted-foreground">
                         <span>Tax ({taxPercentage}%):</span>
@@ -744,24 +745,21 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                         </span>
                       </div>
                     )}
-
-                    <div className="border-t pt-2 mt-4">
-                      <div className="flex justify-between font-bold text-lg">
-                        <span>Total Amount:</span>
-                        <span>₹{totalAmount.toFixed(2)}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                  </CardContent>
+                  <CardFooter className="border-t py-3 flex justify-between font-bold text-lg">
+                    <span>Total Amount:</span>
+                    <span>₹{totalAmount.toFixed(2)}</span>
+                  </CardFooter>
+                </Card>
               </div>
             </Form>
           ) : (
             <Form {...form}>
               {/* Medicines Section */}
               <div className="mt-0">
-                <h3 className="text-lg font-medium mb-2">Medicines</h3>
+                <CommonHeader label={"Medicines"} />
 
-                <div className="flex gap-2 mb-2">
+                <div className="flex gap-2 mb-2 mt-3">
                   <Select
                     value={medicineToAdd}
                     onValueChange={setMedicineToAdd}
@@ -867,9 +865,9 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
 
               {/* Services Section */}
               <div className="mt-6">
-                <h3 className="text-lg font-medium mb-2">Services</h3>
+                <CommonHeader label={"Services"} />
 
-                <div className="flex gap-2 mb-2">
+                <div className="flex gap-2 mb-2 mt-3">
                   <Select value={serviceToAdd} onValueChange={setServiceToAdd}>
                     <SelectTrigger className="flex-grow">
                       <SelectValue placeholder="Select service" />
@@ -963,9 +961,9 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
               {/* Billing Details */}
               <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <h3 className="text-lg font-medium mb-2">Bill Details</h3>
+                  <CommonHeader label="Bill Details" />
 
-                  <div className="space-y-3">
+                  <div className="space-y-3 mt-3">
                     <div className="grid grid-cols-2 gap-2">
                       <div>
                         <FormLabel>Discount (%)</FormLabel>
@@ -1047,10 +1045,14 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                   </div>
                 </div>
 
-                <div className="bg-muted p-4 rounded-lg flex flex-col h-64">
-                  <h3 className="text-lg font-medium mb-4">Bill Summary</h3>
-
-                  <div className="flex-grow space-y-2">
+                <Card className="flex flex-col overflow-hidden">
+                  <CardHeader className="py-3 bg-muted/50 border-b">
+                    <CardTitle className="text-lg font-medium">
+                      Bill Summary
+                    </CardTitle>
+                    <CardDescription hidden></CardDescription>
+                  </CardHeader>
+                  <CardContent className="flex-grow space-y-2 p-2 sm:p-6">
                     <div className="flex justify-between">
                       <span>Medicines Total:</span>
                       <span>
@@ -1063,7 +1065,6 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                           .toFixed(2)}
                       </span>
                     </div>
-
                     <div className="flex justify-between">
                       <span>Services Total:</span>
                       <span>
@@ -1077,7 +1078,6 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                           .toFixed(2)}
                       </span>
                     </div>
-
                     {discount > 0 && (
                       <div className="flex justify-between text-muted-foreground">
                         <span>Discount ({discount}%):</span>
@@ -1098,7 +1098,6 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                         </span>
                       </div>
                     )}
-
                     {taxPercentage > 0 && (
                       <div className="flex justify-between text-muted-foreground">
                         <span>Tax ({taxPercentage}%):</span>
@@ -1120,21 +1119,20 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                         </span>
                       </div>
                     )}
-
-                    <div className="border-t pt-2 mt-4">
-                      <div className="flex justify-between font-bold text-lg">
-                        <span>Total Amount:</span>
-                        <span>₹{totalAmount.toFixed(2)}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                  </CardContent>
+                  <CardFooter className="border-t py-3 flex justify-between font-bold text-lg">
+                    <span>Total Amount:</span>
+                    <span>₹{totalAmount.toFixed(2)}</span>
+                  </CardFooter>
+                </Card>
               </div>
             </Form>
           )
         ) : (
           <Form {...form}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            {/* Patient Information */}
+            <CommonHeader label="Patient Details" />
+            <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
               <FormField
                 control={form.control}
                 name="name"
@@ -1186,9 +1184,9 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
 
             {/* Medicines Section */}
             <div className="mt-6">
-              <h3 className="text-lg font-medium mb-2">Medicines</h3>
+              <CommonHeader label="Medicines" />
 
-              <div className="flex gap-2 mb-2">
+              <div className="flex gap-2 mb-2 mt-3">
                 <Select value={medicineToAdd} onValueChange={setMedicineToAdd}>
                   <SelectTrigger className="flex-grow">
                     <SelectValue placeholder="Select medicine" />
@@ -1291,9 +1289,9 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
 
             {/* Services Section */}
             <div className="mt-6">
-              <h3 className="text-lg font-medium mb-2">Services</h3>
+              <CommonHeader label="Services" />
 
-              <div className="flex gap-2 mb-2">
+              <div className="flex gap-2 mb-2 mt-3">
                 <Select value={serviceToAdd} onValueChange={setServiceToAdd}>
                   <SelectTrigger className="flex-grow">
                     <SelectValue placeholder="Select service" />
@@ -1387,9 +1385,9 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
             {/* Billing Details */}
             <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <h3 className="text-lg font-medium mb-2">Bill Details</h3>
+                <CommonHeader label="Bill Details" />
 
-                <div className="space-y-3">
+                <div className="space-y-3 mt-3">
                   <div className="grid grid-cols-2 gap-2">
                     <div>
                       <FormLabel>Discount (%)</FormLabel>
@@ -1471,10 +1469,14 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                 </div>
               </div>
 
-              <div className="bg-muted p-4 rounded-lg flex flex-col h-64">
-                <h3 className="text-lg font-medium mb-4">Bill Summary</h3>
-
-                <div className="flex-grow space-y-2">
+              <Card className="flex flex-col overflow-hidden">
+                <CardHeader className="py-3 bg-muted/50 border-b">
+                  <CardTitle className="text-lg font-medium">
+                    Bill Summary
+                  </CardTitle>
+                  <CardDescription hidden></CardDescription>
+                </CardHeader>
+                <CardContent className="flex-grow space-y-2 p-2 sm:p-6">
                   <div className="flex justify-between">
                     <span>Medicines Total:</span>
                     <span>
@@ -1484,7 +1486,6 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                         .toFixed(2)}
                     </span>
                   </div>
-
                   <div className="flex justify-between">
                     <span>Services Total:</span>
                     <span>
@@ -1498,7 +1499,6 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                         .toFixed(2)}
                     </span>
                   </div>
-
                   {discount > 0 && (
                     <div className="flex justify-between text-muted-foreground">
                       <span>Discount ({discount}%):</span>
@@ -1519,7 +1519,6 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                       </span>
                     </div>
                   )}
-
                   {taxPercentage > 0 && (
                     <div className="flex justify-between text-muted-foreground">
                       <span>Tax ({taxPercentage}%):</span>
@@ -1541,15 +1540,12 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                       </span>
                     </div>
                   )}
-
-                  <div className="border-t pt-2 mt-4">
-                    <div className="flex justify-between font-bold text-lg">
-                      <span>Total Amount:</span>
-                      <span>₹{totalAmount.toFixed(2)}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                </CardContent>
+                <CardFooter className="border-t py-3 flex justify-between font-bold text-lg">
+                  <span>Total Amount:</span>
+                  <span>₹{totalAmount.toFixed(2)}</span>
+                </CardFooter>
+              </Card>
             </div>
           </Form>
         )}
