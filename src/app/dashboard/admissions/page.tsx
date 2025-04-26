@@ -20,15 +20,18 @@ function Admissions() {
   const { organization } = useOrganization();
   const [bedAddLoader, setBedAddLoader] = useState(false);
   const [refresh, setRefresh] = useState(false);
+  const [wasEdited, setWasEdited] = useState(false);
 
   const openAddModal = (bedId: string) => {
     setIsModalOpen(true);
     setbedId(bedId);
   };
 
-  const openEditModal = (bookingId: string) => {
+  const openEditModal = (bookingId: string,bedId: string) => {
+    console.log("bedId : ",bedId);
     setIsEditModalOpen(true);
     setbookingId(bookingId);
+    setbedId(bedId);
   };
 
   const addNewBedHandler = async () => {
@@ -69,6 +72,8 @@ function Admissions() {
           <BedEditModal
             setIsEditModalOpen={setIsEditModalOpen}
             bookingId={bookingId}
+            bedId={bedId}
+            setWasEdited={setWasEdited}
           />
         </DialogContent>
       </Dialog>
@@ -80,6 +85,8 @@ function Admissions() {
           openAddModal={openAddModal}
           openEditModal={openEditModal}
           refresh={refresh}
+          setWasEdited={setWasEdited}
+          wasEdited={wasEdited}
         />
       </div>
       <div

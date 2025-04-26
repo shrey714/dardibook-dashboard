@@ -96,12 +96,12 @@ export function TaskCard({
         variant={"ghost"}
         {...attributes}
         {...listeners}
-        className="p-1 text-secondary-foreground/50 -ml-2 h-auto cursor-grab"
+        className="px-3 text-secondary-foreground/50 h-auto cursor-grab"
       >
         <span className="sr-only">Move task</span>
         <GripVertical />
       </Button>
-      <div>
+      <div className="flex-1">
         <p className="text-sm flex-[5]">{bedPatientData.name}</p>
         <div className="flex flex-[5] flex-wrap md:gap-2">
           <p className="text-xs flex gap-1">
@@ -119,7 +119,7 @@ export function TaskCard({
             variant="outline"
             size="sm"
             onClick={() => {
-              openEditModal(task.bedBookingId)
+              openEditModal(task.bedBookingId,task.bedId)
             }}
           >
             {dischargeLoader?<Loader size="small" />:<BadgeMinusIcon />}

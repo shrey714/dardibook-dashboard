@@ -5,6 +5,7 @@ export interface orgUserType {
     email: string;
 }
 
+
 export interface patientBed {
     bedId: string;
     bedBookingId: string;

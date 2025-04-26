@@ -15,9 +15,9 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../ui/select";
+} from "@/components/ui/select";
 import { useAuth, useOrganization, useUser } from "@clerk/nextjs";
-import { OrgBed } from "@/types/FormTypes";
+import { OrgBed, orgUserType } from "@/types/FormTypes";
 import { DateTimePicker } from "../Appointment/DateTimePicker";
 import toast from "react-hot-toast";
 import { getTime, isBefore, isAfter } from "date-fns";
@@ -45,7 +45,6 @@ const BedAdmissionModal: React.FC<BedAdmissionModalProps> = ({
   const { orgId } = useAuth();
   const { user } = useUser();
   const { todayPatients, loading } = useTodayPatientStore((state) => state);
-  const [suggestions, setsuggestions] = useState<SuggestionType[]>([]);
   const [fromDate, setFromDate] = useState<Date>(new Date(0));
   const [patientId, setPatientId] = useState<string>("");
   const [toDate, setToDate] = useState<Date>(new Date(0));
@@ -58,13 +57,15 @@ const BedAdmissionModal: React.FC<BedAdmissionModalProps> = ({
     },
   });
 
-  const [admissionInfo, setadmissionInfo] = useState<OrgBed | undefined>();
+  const [registeredFor, setRegisteredFor] = useState<orgUserType>({
+    id:"",
+    name:"",
+    email:""
+  });
   const [loader, setloader] = useState(false);
   const [warning, setWarning] = useState<string>("");
   const { beds, bedPatients } = useBedsStore((state) => state);
 
-  useEffect(() => {
-    console.log("todayPatients = ", todayPatients);
     const fetchedSuggestions = todayPatients.map(
       (todayPatient): SuggestionType => ({
         label: todayPatient.name,
@@ -74,8 +75,6 @@ const BedAdmissionModal: React.FC<BedAdmissionModalProps> = ({
         inBed: todayPatient.inBed,
       })
     );
-    setsuggestions(fetchedSuggestions);
-  }, [loading, todayPatients]);
 
   const admitHandler = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
@@ -118,7 +117,7 @@ const BedAdmissionModal: React.FC<BedAdmissionModalProps> = ({
       batch.set(
         bedRef,
         {
-          ...admissionInfo,
+          register_for: registeredFor,
           patient_id: patientId,
           bedBookingId: bedBookingId,
           bedId: bedId,
@@ -138,7 +137,7 @@ const BedAdmissionModal: React.FC<BedAdmissionModalProps> = ({
         patientRef,
         {
           bed_info: arrayUnion({
-            ...admissionInfo,
+            register_for: registeredFor,
             bedBookingId: bedBookingId,
             bedId: bedId,
             admission_at: getTime(fromDate),
@@ -218,7 +217,7 @@ const BedAdmissionModal: React.FC<BedAdmissionModalProps> = ({
         isClearable={true}
         isValidNewOption={() => false}
         allowCreateWhileLoading={false}
-        options={suggestions}
+        options={fetchedSuggestions}
         noOptionsMessage={() => "Empty"}
         backspaceRemovesValue={false}
         placeholder="Admit patient using ID, name, or phone number..."
@@ -263,7 +262,7 @@ const BedAdmissionModal: React.FC<BedAdmissionModalProps> = ({
               (mem) => mem.publicUserData.userId === val
             );
 
-            if (member) {
+            if (member && member.publicUserData.userId) {
               const {
                 userId,
                 firstName = "",
@@ -277,10 +276,7 @@ const BedAdmissionModal: React.FC<BedAdmissionModalProps> = ({
                 email: identifier,
               };
 
-              setadmissionInfo((prev: any) => ({
-                ...prev,
-                admission_for: selectedMember,
-              }));
+              setRegisteredFor(selectedMember);
             }
           }}
         >

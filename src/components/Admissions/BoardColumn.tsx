@@ -37,6 +37,7 @@ interface BoardColumnProps {
   openAddModal: any;
   openEditModal: any;
   deleteBed: any;
+  loading: boolean;
 }
 
 export function BoardColumn({
@@ -48,6 +49,7 @@ export function BoardColumn({
   openAddModal,
   openEditModal,
   deleteBed,
+  loading,
 }: BoardColumnProps) {
   const tasksIds = useMemo(() => {
     return tasks.map((task) => task.bedBookingId);
@@ -109,7 +111,7 @@ export function BoardColumn({
         <Card>
           <CardHeader className="p-1">
             <CardTitle className="text-center flex">
-              <Button
+              {/* <Button
                 variant={"ghost"}
                 {...attributes}
                 {...listeners}
@@ -117,7 +119,7 @@ export function BoardColumn({
               >
                 <span className="sr-only">{`Move column: ${column.id}`}</span>
                 <GripVertical />
-              </Button>
+              </Button> */}
               <p className="flex flex-1 justify-center">${column.id}</p>
             </CardTitle>
             <CardContent className="p-2">
@@ -143,7 +145,11 @@ export function BoardColumn({
           tasks.length == 0 ? "h-full" : ""
         }`}
       >
-        {tasks.length == 0 ? (
+        {loading ? (
+          <div className="w-full h-full flex justify-center items-center text-sm">
+            <Loader />
+          </div>
+        ) : tasks.length == 0 ? (
           <>
             <div className="w-full h-full flex justify-center items-center text-sm">
               This Bed is Empty
@@ -165,7 +171,7 @@ export function BoardColumn({
           </SortableContext>
         )}
       </CardContent>
-      {!tasks.length && (
+      {!tasks.length && !loading && (
         <CardFooter className="p-0">
           <Button
             className="w-full mx-4"

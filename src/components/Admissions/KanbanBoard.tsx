@@ -34,6 +34,8 @@ export const KanbanBoard = ({
   setIsEditModalOpen,
   refresh,
   isEditModalOpen,
+  setWasEdited,
+  wasEdited
 }: any) => {
   const { organization, isLoaded } = useOrganization();
   const { beds, bedPatients, loading } = useBedsStore((state) => state);
@@ -54,7 +56,7 @@ export const KanbanBoard = ({
 
   useEffect(() => {
     if (isEditModalOpen == false) {
-      if (prevTaskState) {
+      if (!wasEdited && prevTaskState) {
         setTasks((tasks) =>
           tasks.map((t) =>
             t.bedBookingId === prevTaskState.bedBookingId
@@ -64,6 +66,7 @@ export const KanbanBoard = ({
         );
         setPrevTaskState(null);
       }
+      setWasEdited(false);
     }
   }, [isEditModalOpen]);
 
@@ -242,6 +245,7 @@ export const KanbanBoard = ({
                   openAddModal={openAddModal}
                   openEditModal={openEditModal}
                   bedPatients={bedPatients}
+                  loading={loading}
                   deleteBed={deleteBed}
                 />
               ))}
@@ -263,6 +267,7 @@ export const KanbanBoard = ({
                     openEditModal={openEditModal}
                     bedPatients={bedPatients}
                     deleteBed={deleteBed}
+                    loading={loading}
                   />
                 )}
                 {activeTask && (
@@ -342,7 +347,7 @@ export const KanbanBoard = ({
         );
 
         // setIsEditModalOpen(true);
-        openEditModal(task.bedBookingId);
+        openEditModal(task.bedBookingId,task.bedId);
       }
     }
 
