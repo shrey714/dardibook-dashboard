@@ -34,7 +34,12 @@ import { enUS } from "date-fns/locale";
 import { EventImpl } from "@fullcalendar/core/internal";
 import Link from "next/link";
 import { Separator } from "../ui/separator";
-import { OrgBed, RegisterPatientFormTypes } from "@/types/FormTypes";
+import {
+  CalendarEventTypes,
+  OrgBed,
+  RegisterPatientFormTypes,
+} from "@/types/FormTypes";
+import { usePatientHistoryModalStore } from "@/lib/stores/patientHistoryModalStore";
 
 const customLocale = {
   ...enUS,
@@ -51,27 +56,22 @@ const customLocale = {
   },
 };
 
-interface CalendarDataTypes {
-  beds: OrgBed[];
-  patients: RegisterPatientFormTypes[];
-}
-
 export default function DataCalendar({
   calendarData,
   handleDatesSet,
 }: {
-  calendarData: CalendarDataTypes;
+  calendarData: CalendarEventTypes[];
   handleDatesSet: (arg: DatesSetArg) => void;
 }) {
   const [moreLinkModel, setMoreLinkModel] = useState(false);
   const [moreLinkEvents, setMoreLinkEvents] = useState<MoreLinkArg>();
   const [eventModel, setEventModel] = useState(false);
   const [eventData, setEventData] = useState<EventImpl | EventApi>();
-
+  const { openModal } = usePatientHistoryModalStore();
   return (
     <>
       {/* model for more links */}
-      <Dialog open={moreLinkModel} onOpenChange={setMoreLinkModel}>
+      {/* <Dialog open={moreLinkModel} onOpenChange={setMoreLinkModel}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
             <DialogTitle>
@@ -170,7 +170,7 @@ export default function DataCalendar({
                 </p>
               </Button>
             ))}
-            {/* pls arrnage according to the type of patient/appointment */}
+            
           </div>
           <DialogFooter className="sm:justify-center">
             <DialogClose asChild>
@@ -184,10 +184,10 @@ export default function DataCalendar({
             </DialogClose>
           </DialogFooter>
         </DialogContent>
-      </Dialog>
+      </Dialog> */}
 
       {/* model for event link */}
-      <Dialog open={eventModel} onOpenChange={setEventModel}>
+      {/* <Dialog open={eventModel} onOpenChange={setEventModel}>
         <DialogContent className="sm:max-w-[900px]">
           <DialogHeader>
             <DialogTitle>
@@ -195,7 +195,7 @@ export default function DataCalendar({
                 <Calendar className="w-6 h-6" />
                 <span className="ml-2">
                   Event timeline :{" "}
-                  {/* {eventData?.event?.start &&
+                  {eventData?.event?.start &&
                     formatRelative(eventData?.event?.start, new Date(), {
                       locale: customLocale,
                     })}
@@ -203,13 +203,13 @@ export default function DataCalendar({
                   {eventData?.event?.end &&
                     formatRelative(eventData?.event?.end, new Date(), {
                       locale: customLocale,
-                    })} */}
+                    })}
                 </span>
               </div>
             </DialogTitle>
             <DialogDescription>
               Click on an event to view more details.
-              {/* {eventData?.event?.title} */}
+              {eventData?.event?.title}
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 max-h-[50vh] overflow-y-auto bg-muted/50 max-w-full py-4 px-5 border-2 border-border rounded-md">
@@ -231,24 +231,24 @@ export default function DataCalendar({
             </DialogClose>
           </DialogFooter>
         </DialogContent>
-      </Dialog>
+      </Dialog> */}
 
       <FullCalendar
         datesSet={handleDatesSet}
         fixedWeekCount={false}
-        plugins={[dayGridPlugin, interactionPlugin, timeGridPlugin]}
+        plugins={[dayGridPlugin, interactionPlugin]} //timeGridPlugin
         dayMaxEventRows={true}
         headerToolbar={{
           right: "prev,next today",
           center: "title",
-          left: "dayGridMonth,timeGridWeek",
+          left: "", //dayGridMonth,timeGridWeek
         }}
         nowIndicator={true}
-        moreLinkClick={(events) => {
-          setMoreLinkEvents(events);
-          setMoreLinkModel(true);
-          return "none";
-        }}
+        // moreLinkClick={(events) => {
+        //   setMoreLinkEvents(events);
+        //   setMoreLinkModel(true);
+        //   return "none";
+        // }}
         // eventBackgroundColor="transparent"
         // eventBorderColor="transparent"
         height={"100%"}
@@ -256,54 +256,66 @@ export default function DataCalendar({
         editable={true}
         handleWindowResize={true}
         eventClick={(event) => {
-          setEventData(event?.event);
-          setEventModel(true);
+          // setEventData(event?.event);
+          // setEventModel(true);
+          openModal({
+            patientId: event?.event.extendedProps?.Data.patient_id,
+          });
           return "none";
         }}
         selectable={true}
         selectMirror={true}
         dateClick={() => {}}
-        events={[...calendarData.beds, ...calendarData.patients].map(
-          (event) => {
-            if ("bedId" in event) {
-              return {
-                title: `${event.bedId} (${event.patient_id})`,
-                start: format(new Date(event.admission_at), "yyyy-MM-dd"),
-                end: format(
-                  new Date(addDays(event.discharge_at, 1)),
-                  "yyyy-MM-dd"
-                ),
-                Data: event as OrgBed,
-                durationEditable: true,
-                borderColor: "hsl(var(--primary))",
-                backgroundColor: "hsl(var(--popover))",
-                textColor: "hsl(var(--accent-foreground))",
-              };
-            } else {
-              const prescribed = event.prescribed_date_time.some((dateTime) =>
-                isSameDay(dateTime, new Date())
-              );
-              return {
-                title: `${event.patient_id}`,
-                date: format(new Date(event.registered_date[0]), "yyyy-MM-dd"),
-                Data: event as RegisterPatientFormTypes,
-                durationEditable: true,
-                borderColor: prescribed
-                  ? "rgb(22 163 74 / 1)"
-                  : "rgb(37 99 235 / 1)",
-                backgroundColor: prescribed
-                  ? "rgb(22 163 74 / 0.1)"
-                  : "rgb(37 99 235 / 0.1)",
-                textColor: prescribed
-                  ? "rgb(22 163 74 / 1)"
-                  : "rgb(37 99 235 / 1)",
-              };
-            }
+        events={calendarData.map((event) => {
+          if (event.event_type === "bed") {
+            return {
+              title: `${event.bed_details.bedId} (${event.patient_id})`,
+              start: format(
+                new Date(event.bed_details.admission_at),
+                "yyyy-MM-dd'T'HH:mm:ss"
+              ),
+              end: format(
+                new Date(event.bed_details.discharge_at),
+                "yyyy-MM-dd'T'HH:mm:ss"
+              ),
+              Data: event as CalendarEventTypes,
+              durationEditable: false,
+              borderColor: event.bed_details.dischargeMarked
+                ? "rgb(220 38 38 / 1)"
+                : "hsl(var(--primary))",
+              backgroundColor: event.bed_details.dischargeMarked
+                ? "rgb(220 38 38 / 0.1)"
+                : "hsl(var(--popover))",
+              textColor: event.bed_details.dischargeMarked
+                ? "rgb(220 38 38 / 1)"
+                : "hsl(var(--accent-foreground))",
+            };
+          } else if (event.event_type === "appointment") {
+            return {
+              title: `${event.patient_id}`,
+              date: format(
+                new Date(event.appointment_details.registered_at),
+                "yyyy-MM-dd"
+              ),
+              Data: event as CalendarEventTypes,
+              durationEditable: false,
+              borderColor: event.appointment_details.prescribed
+                ? "rgb(22 163 74 / 1)"
+                : "rgb(37 99 235 / 1)",
+              backgroundColor: event.appointment_details.prescribed
+                ? "rgb(22 163 74 / 0.1)"
+                : "rgb(37 99 235 / 0.1)",
+              textColor: event.appointment_details.prescribed
+                ? "rgb(22 163 74 / 1)"
+                : "rgb(37 99 235 / 1)",
+            };
+          } else {
+            return {};
           }
-        )}
+        })}
         eventContent={(eventInfo) => (
           <span className="flex flex-row gap-1 items-center px-2">
-            {"bedId" in eventInfo.event.extendedProps?.Data ? (
+            {eventInfo.event.extendedProps?.Data.event_type === "bed" ? (
               <BedSingle size={15} />
             ) : (
               <UserPlus size={15} />
@@ -312,7 +324,7 @@ export default function DataCalendar({
           </span>
         )}
         eventAllow={(_, draggedEvent) =>
-          "bedId" in draggedEvent?.extendedProps?.Data ? true : false
+          draggedEvent?.extendedProps?.Data.event_type === "bed" ? false : false
         }
       />
     </>

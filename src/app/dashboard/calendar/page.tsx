@@ -8,17 +8,17 @@ import {
   endOfMonth,
   isSameMonth,
   addDays,
+  isSameDay,
 } from "date-fns";
 import DataCalendar from "@/components/Calendar/DataCalendar";
 import { query, collection, where, and, or, getDocs } from "firebase/firestore";
 import { db } from "@/firebase/firebaseConfig";
 import { DatesSetArg } from "@fullcalendar/core/index.js";
-import { OrgBed, RegisterPatientFormTypes } from "@/types/FormTypes";
-
-interface CalendarDataTypes {
-  beds: OrgBed[];
-  patients: RegisterPatientFormTypes[];
-}
+import {
+  CalendarEventTypes,
+  OrgBed,
+  RegisterPatientFormTypes,
+} from "@/types/FormTypes";
 
 function getAllStartOfDaysInMonth(date: Date) {
   const start = startOfMonth(date);
@@ -48,10 +48,7 @@ export default function TaskPage() {
   const { isLoaded, orgId } = useAuth();
   const [loader, setLoader] = useState(false);
   const [monthDate, setMonthDate] = useState<Date>();
-  const [calendarData, setCalendarData] = useState<CalendarDataTypes>({
-    beds: [],
-    patients: [],
-  });
+  const [calendarData, setCalendarData] = useState<CalendarEventTypes[]>([]);
 
   useEffect(() => {
     const getBillsGenerated = async () => {
@@ -92,28 +89,50 @@ export default function TaskPage() {
             ...patientQueryPromises,
           ]);
 
-          const bedsData: OrgBed[] = [];
-          const patientsData: RegisterPatientFormTypes[] = [];
+          const calendarEvents: CalendarEventTypes[] = [];
 
           // Collect beds
           bedsSnap.forEach((doc) => {
             const bed = doc.data() as OrgBed;
-            bedsData.push(bed);
+            calendarEvents.push({
+              patient_id: bed.patient_id,
+              event_type: "bed",
+              bed_details: {
+                bedId: bed.bedId,
+                admission_at: bed.admission_at,
+                discharge_at: bed.discharge_at,
+                dischargeMarked: bed.dischargeMarked,
+              },
+            });
           });
 
           // Collect all patients
           patientsSnaps.forEach((snap) => {
             snap.forEach((doc) => {
               const patient = doc.data() as RegisterPatientFormTypes;
-              patientsData.push(patient);
+
+              patient.registered_date_time.forEach((r_date_time) => {
+                if (isSameMonth(r_date_time, monthDate)) {
+                  calendarEvents.push({
+                    patient_id: patient.patient_id,
+                    event_type: "appointment",
+                    appointment_details: {
+                      registered_at: r_date_time,
+                      prescribed: patient.prescribed_date_time.some(
+                        (p_date_time) => isSameDay(p_date_time, r_date_time)
+                      ),
+                      prescribed_at: patient.prescribed_date_time.find(
+                        (p_date_time) => isSameDay(p_date_time, r_date_time)
+                      ),
+                    },
+                  });
+                }
+              });
             });
           });
 
           // Set final calendar data
-          setCalendarData({
-            beds: bedsData,
-            patients: patientsData,
-          });
+          setCalendarData(calendarEvents);
 
           setLoader(false);
         } catch (error) {
@@ -128,7 +147,6 @@ export default function TaskPage() {
 
   const handleDatesSet = (arg: DatesSetArg) => {
     const newDate = arg.view.calendar.getDate();
-    console.log("newDate------", newDate);
     if (!monthDate || !isSameMonth(monthDate, newDate)) {
       setMonthDate(newDate);
     }
@@ -137,7 +155,9 @@ export default function TaskPage() {
   return (
     <>
       <div className="w-full py-2 px-2 h-full">
-        {loader && <div className="h-full w-full bg-background/80 absolute z-[2]"></div>}
+        {loader && (
+          <div className="h-full w-full bg-background/80 absolute z-[2]"></div>
+        )}
 
         <DataCalendar
           calendarData={calendarData}
