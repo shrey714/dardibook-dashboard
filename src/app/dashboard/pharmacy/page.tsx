@@ -114,14 +114,14 @@ const Medical = () => {
               </TabsContent>
 
               <TabsContent
-                className="[--content-height:calc(100svh-252px)]"
+                className="[--content-height:calc(100svh-296px)]"
                 value="inbed"
               >
                 <PatientsInBed onSelectPatient={handleBedPatientSelect} />
               </TabsContent>
 
               <TabsContent
-                className="[--content-height:calc(100svh-252px)]"
+                className="[--content-height:calc(100svh-296px)]"
                 value="bills"
               >
                 <BillsGenerated onViewBill={handleViewBill} />

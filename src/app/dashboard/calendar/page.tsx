@@ -4,76 +4,146 @@ import { useAuth } from "@clerk/nextjs";
 import Loader from "@/components/common/Loader";
 import {
   getTime,
-  startOfYear,
-  endOfYear,
+  startOfMonth,
+  endOfMonth,
+  isSameMonth,
+  addDays,
 } from "date-fns";
-import { getAllPatients } from "@/app/services/getAllPatients";
-import { DateRange } from "react-day-picker";
 import DataCalendar from "@/components/Calendar/DataCalendar";
+import { query, collection, where, and, or, getDocs } from "firebase/firestore";
+import { db } from "@/firebase/firebaseConfig";
+import { DatesSetArg } from "@fullcalendar/core/index.js";
+import { OrgBed, RegisterPatientFormTypes } from "@/types/FormTypes";
 
-interface PatientData {
-  id: string;
-  first_name: string;
-  last_name: string;
-  mobile_number: string;
-  age: string;
-  gender: string;
-  appointed: boolean;
-  last_visited: number;
-  visitedDates: number[]; //array of timestamps in milliseconds
+interface CalendarDataTypes {
+  beds: OrgBed[];
+  patients: RegisterPatientFormTypes[];
+}
+
+function getAllStartOfDaysInMonth(date: Date) {
+  const start = startOfMonth(date);
+  const end = endOfMonth(date);
+
+  const days: number[] = [];
+  let current = start;
+
+  while (current <= end) {
+    days.push(getTime(current));
+    current = addDays(current, 1);
+  }
+
+  return days;
+}
+
+// Helper to chunk an array into pieces of chunkSize
+function chunkArray<T>(array: T[], chunkSize: number): T[][] {
+  const chunks: T[][] = [];
+  for (let i = 0; i < array.length; i += chunkSize) {
+    chunks.push(array.slice(i, i + chunkSize));
+  }
+  return chunks;
 }
 
 export default function TaskPage() {
   const { isLoaded, orgId } = useAuth();
-  const [loader, setLoader] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [patients, setPatients] = useState<PatientData[]>([]);
-  const [dateRange] = useState<DateRange | undefined>({
-    from: startOfYear(new Date(1717353000000)),
-    to: endOfYear(new Date()),
+  const [loader, setLoader] = useState(false);
+  const [monthDate, setMonthDate] = useState<Date>();
+  const [calendarData, setCalendarData] = useState<CalendarDataTypes>({
+    beds: [],
+    patients: [],
   });
 
   useEffect(() => {
-    const fetchPatients = async () => {
-      if (isLoaded && orgId) {
+    const getBillsGenerated = async () => {
+      if (isLoaded && orgId && monthDate) {
         try {
           setLoader(true);
-          const data = await getAllPatients(
-            orgId,
-            getTime(dateRange?.from || 0),
-            getTime(dateRange?.to || 0)
+
+          // Beds Query (same as yours)
+          const bedsQuery = query(
+            collection(db, "doctor", orgId, "beds"),
+            or(
+              and(
+                where("admission_at", ">=", getTime(startOfMonth(monthDate))),
+                where("admission_at", "<=", getTime(endOfMonth(monthDate)))
+              ),
+              and(
+                where("discharge_at", ">=", getTime(startOfMonth(monthDate))),
+                where("discharge_at", "<=", getTime(endOfMonth(monthDate)))
+              )
+            )
           );
-          if (data.data) {
-            setPatients(data.data);
-          } else {
-            setError("Error fetching patients");
-          }
+
+          // Prepare Patients Queries
+          const allStartOfDays = getAllStartOfDaysInMonth(monthDate);
+          const dayChunks = chunkArray(allStartOfDays, 30);
+
+          const patientQueryPromises = dayChunks.map((chunk) => {
+            const patientsQuery = query(
+              collection(db, "doctor", orgId, "patients"),
+              where("registered_date", "array-contains-any", chunk)
+            );
+            return getDocs(patientsQuery);
+          });
+
+          // Fetch beds and patients in parallel
+          const [bedsSnap, ...patientsSnaps] = await Promise.all([
+            getDocs(bedsQuery),
+            ...patientQueryPromises,
+          ]);
+
+          const bedsData: OrgBed[] = [];
+          const patientsData: RegisterPatientFormTypes[] = [];
+
+          // Collect beds
+          bedsSnap.forEach((doc) => {
+            const bed = doc.data() as OrgBed;
+            bedsData.push(bed);
+          });
+
+          // Collect all patients
+          patientsSnaps.forEach((snap) => {
+            snap.forEach((doc) => {
+              const patient = doc.data() as RegisterPatientFormTypes;
+              patientsData.push(patient);
+            });
+          });
+
+          // Set final calendar data
+          setCalendarData({
+            beds: bedsData,
+            patients: patientsData,
+          });
+
           setLoader(false);
         } catch (error) {
-          setError(`Error fetching patients : ${error}`);
+          console.log(error);
           setLoader(false);
         }
       }
     };
 
-    fetchPatients();
-  }, [orgId, isLoaded, dateRange]);
+    getBillsGenerated();
+  }, [isLoaded, monthDate, orgId]);
+
+  const handleDatesSet = (arg: DatesSetArg) => {
+    const newDate = arg.view.calendar.getDate();
+    console.log("newDate------", newDate);
+    if (!monthDate || !isSameMonth(monthDate, newDate)) {
+      setMonthDate(newDate);
+    }
+  };
 
   return (
     <>
-      {loader ? (
-        <div className="w-full h-full overflow-hidden flex items-center justify-center">
-          <Loader size="medium" />
-        </div>
-      ) : error ? (
-        <div className="w-full h-full overflow-hidden flex items-center justify-center">
-          {error}
-        </div>
-      ) : (
-        <div className="w-full py-2 px-2 h-full">
-          <DataCalendar data={patients} />
-        </div>
-      )}
+      <div className="w-full py-2 px-2 h-full">
+        {loader && <div className="h-full w-full bg-background/80 absolute z-[2]"></div>}
+
+        <DataCalendar
+          calendarData={calendarData}
+          handleDatesSet={handleDatesSet}
+        />
+      </div>
     </>
   );
 }

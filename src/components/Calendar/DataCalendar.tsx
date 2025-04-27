@@ -4,7 +4,16 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import timeGridPlugin from "@fullcalendar/timegrid";
-import { format, formatRelative } from "date-fns";
+import {
+  addDays,
+  endOfDay,
+  endOfMonth,
+  format,
+  formatRelative,
+  isSameDay,
+  startOfDay,
+  startOfMonth,
+} from "date-fns";
 import {
   Dialog,
   DialogContent,
@@ -15,24 +24,17 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { Button } from "../ui/button";
-import { BedSingle, Calendar, UserRoundPlus } from "lucide-react";
-import { EventApi, MoreLinkArg } from "@fullcalendar/core/index.js";
+import { BedSingle, Calendar, UserPlus, UserRoundPlus } from "lucide-react";
+import {
+  DatesSetArg,
+  EventApi,
+  MoreLinkArg,
+} from "@fullcalendar/core/index.js";
 import { enUS } from "date-fns/locale";
 import { EventImpl } from "@fullcalendar/core/internal";
 import Link from "next/link";
 import { Separator } from "../ui/separator";
-
-interface PatientData {
-  id: string;
-  first_name: string;
-  last_name: string;
-  mobile_number: string;
-  age: string;
-  gender: string;
-  appointed: boolean;
-  last_visited: number;
-  visitedDates: number[]; //array of timestamps in milliseconds
-}
+import { OrgBed, RegisterPatientFormTypes } from "@/types/FormTypes";
 
 const customLocale = {
   ...enUS,
@@ -49,7 +51,18 @@ const customLocale = {
   },
 };
 
-export default function DataCalendar({ data }: { data: PatientData[] }) {
+interface CalendarDataTypes {
+  beds: OrgBed[];
+  patients: RegisterPatientFormTypes[];
+}
+
+export default function DataCalendar({
+  calendarData,
+  handleDatesSet,
+}: {
+  calendarData: CalendarDataTypes;
+  handleDatesSet: (arg: DatesSetArg) => void;
+}) {
   const [moreLinkModel, setMoreLinkModel] = useState(false);
   const [moreLinkEvents, setMoreLinkEvents] = useState<MoreLinkArg>();
   const [eventModel, setEventModel] = useState(false);
@@ -221,6 +234,8 @@ export default function DataCalendar({ data }: { data: PatientData[] }) {
       </Dialog>
 
       <FullCalendar
+        datesSet={handleDatesSet}
+        fixedWeekCount={false}
         plugins={[dayGridPlugin, interactionPlugin, timeGridPlugin]}
         dayMaxEventRows={true}
         headerToolbar={{
@@ -234,7 +249,8 @@ export default function DataCalendar({ data }: { data: PatientData[] }) {
           setMoreLinkModel(true);
           return "none";
         }}
-        eventBackgroundColor="transparent"
+        // eventBackgroundColor="transparent"
+        // eventBorderColor="transparent"
         height={"100%"}
         dayMaxEvents={3}
         editable={true}
@@ -247,46 +263,57 @@ export default function DataCalendar({ data }: { data: PatientData[] }) {
         selectable={true}
         selectMirror={true}
         dateClick={() => {}}
-        events={data.map((event) => ({
-          title: `${event.first_name} ${event.last_name} ${format(
-            new Date(event.last_visited),
-            "hh:mm a"
-          )}`,
-          date: format(new Date(event.last_visited), "yyyy-MM-dd"),
-          patientData: event as PatientData,
-        }))}
-        // events={data.map((event) => {
-        //   return Math.floor(Math.random() * 2) === 0
-        //     ? {
-        //         title: `${event.first_name} ${event.last_name} ${format(
-        //           new Date(event.last_visited),
-        //           "hh:mm a"
-        //         )}`,
-        //         date: format(new Date(event.last_visited), "yyyy-MM-dd"),
-        //         patientData: event as PatientData,
-        //       }
-        //     : {
-        //         title: `${event.first_name} ${event.last_name} ${format(
-        //           new Date(event.last_visited),
-        //           "hh:mm a"
-        //         )}`,
-        //         start: format(new Date(event.last_visited), "yyyy-MM-dd"),
-        //         end: format(
-        //           addDays(
-        //             new Date(event.last_visited),
-        //             Math.floor(Math.random() * (5 - 2 + 1)) + 2
-        //           ),
-        //           "yyyy-MM-dd"
-        //         ),
-        //         patientData: event as PatientData,
-        //       };
-        // })}
-        // eventContent={(eventInfo) => (
-        //   <span className="flex flex-row gap-1 items-center px-2">
-        //     <BedSingle size={15} />
-        //     {eventInfo.event.title}
-        //   </span>
-        // )}
+        events={[...calendarData.beds, ...calendarData.patients].map(
+          (event) => {
+            if ("bedId" in event) {
+              return {
+                title: `${event.bedId} (${event.patient_id})`,
+                start: format(new Date(event.admission_at), "yyyy-MM-dd"),
+                end: format(
+                  new Date(addDays(event.discharge_at, 1)),
+                  "yyyy-MM-dd"
+                ),
+                Data: event as OrgBed,
+                durationEditable: true,
+                borderColor: "hsl(var(--primary))",
+                backgroundColor: "hsl(var(--popover))",
+                textColor: "hsl(var(--accent-foreground))",
+              };
+            } else {
+              const prescribed = event.prescribed_date_time.some((dateTime) =>
+                isSameDay(dateTime, new Date())
+              );
+              return {
+                title: `${event.patient_id}`,
+                date: format(new Date(event.registered_date[0]), "yyyy-MM-dd"),
+                Data: event as RegisterPatientFormTypes,
+                durationEditable: true,
+                borderColor: prescribed
+                  ? "rgb(22 163 74 / 1)"
+                  : "rgb(37 99 235 / 1)",
+                backgroundColor: prescribed
+                  ? "rgb(22 163 74 / 0.1)"
+                  : "rgb(37 99 235 / 0.1)",
+                textColor: prescribed
+                  ? "rgb(22 163 74 / 1)"
+                  : "rgb(37 99 235 / 1)",
+              };
+            }
+          }
+        )}
+        eventContent={(eventInfo) => (
+          <span className="flex flex-row gap-1 items-center px-2">
+            {"bedId" in eventInfo.event.extendedProps?.Data ? (
+              <BedSingle size={15} />
+            ) : (
+              <UserPlus size={15} />
+            )}
+            {eventInfo.event.title}
+          </span>
+        )}
+        eventAllow={(_, draggedEvent) =>
+          "bedId" in draggedEvent?.extendedProps?.Data ? true : false
+        }
       />
     </>
   );

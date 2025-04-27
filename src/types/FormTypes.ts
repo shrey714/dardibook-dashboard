@@ -162,3 +162,41 @@ export interface PharmacySelectedPatientType {
     mobile: string;
     gender?: "Male" | "Female" | "Other";
 }
+
+type BasePatientInfo = {
+    patient_id: string;
+    name: string;
+    mobile: string;
+    gender: "Male" | "Female" | "Other";
+    age: string;
+    street_address: string;
+    city: string;
+    state: string;
+    zip: string;
+};
+
+export type CalendarEventTypes =
+    | (BasePatientInfo & {
+        event_type: "appointment";
+        appointment_details: {
+            registered_at: number;
+            prescribed_at: number;
+            registerd_by: orgUserType;
+            registerd_for: orgUserType;
+        };
+        bed_details?: never;
+    })
+    | (BasePatientInfo & {
+        event_type: "bed";
+        bed_details: {
+            bedId: string;
+            bedBookingId: string;
+            admission_at: number;
+            admission_by: orgUserType;
+            admission_for: orgUserType;
+            discharge_at: number;
+            dischargeMarked: boolean;
+            discharged_by: orgUserType;
+        };
+        appointment_details?: never;
+    });
