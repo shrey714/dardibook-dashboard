@@ -103,7 +103,7 @@ const Page = () => {
               )}
             </div>
           </div>
-          <PatientHistoryTabs prescriptionsData={prescriptionsData} />
+          {/* <PatientHistoryTabs prescriptionsData={prescriptionsData} /> */}
         </div>
       )}
     </>

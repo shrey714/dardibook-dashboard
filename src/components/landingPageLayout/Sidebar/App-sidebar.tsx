@@ -5,7 +5,6 @@ import {
   Home,
   ClipboardPlusIcon,
   HistoryIcon,
-  BriefcaseMedicalIcon,
   SettingsIcon,
   SquarePenIcon,
   CalendarDaysIcon,

@@ -179,7 +179,7 @@ const PatientHistoryGlobalModal = () => {
     }
   };
 
-  let bill = billsData.find((bill) => bill.bill_id === selectedBillId);
+  const bill = billsData.find((bill) => bill.bill_id === selectedBillId);
 
   return (
     <>

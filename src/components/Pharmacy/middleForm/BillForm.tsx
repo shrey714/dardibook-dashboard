@@ -4,7 +4,6 @@ import {
   Calculator,
   CalendarClockIcon,
   ClipboardPlusIcon,
-  PencilLineIcon,
   Phone,
   User,
 } from "lucide-react";

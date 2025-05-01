@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
-import Loader from "@/components/common/Loader";
 import {
   getTime,
   startOfMonth,
