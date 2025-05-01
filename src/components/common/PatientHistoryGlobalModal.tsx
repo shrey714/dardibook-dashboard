@@ -184,9 +184,6 @@ const PatientHistoryGlobalModal = () => {
   return (
     <>
       <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
-        <DrawerTrigger asChild>
-          <Button variant="outline">Open Drawer</Button>
-        </DrawerTrigger>
         <DrawerContent className="max-h-[85%]">
           {billsData.length !== 0 && isDrawerOpen && (
             <ScrollArea className="overflow-hidden !absolute bg-background/40 bg-clip-padding backdrop-filter backdrop-blur-sm px-2 py-2.5 top-[-99px] rounded-lg left-0 right-0 mx-auto max-w-3xl">
