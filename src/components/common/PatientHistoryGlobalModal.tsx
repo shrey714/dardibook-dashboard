@@ -188,25 +188,27 @@ const PatientHistoryGlobalModal = () => {
           {billsData.length !== 0 && isDrawerOpen && (
             <ScrollArea className="overflow-hidden !absolute bg-background/40 bg-clip-padding backdrop-filter backdrop-blur-sm px-2 py-2.5 top-[-99px] rounded-lg left-0 right-0 mx-auto max-w-3xl">
               <div className="flex flex-1 flex-row gap-2">
-                {billsData.map((bill, index) => (
-                  <Button
-                    key={index}
-                    variant={"secondary"}
-                    onClick={() => {
-                      setSelectedBillId(bill.bill_id);
-                    }}
-                    className={`${
-                      bill.bill_id === selectedBillId
-                        ? "bg-blue-700 text-white hover:bg-blue-700"
-                        : "bg-border text-muted-foreground"
-                    } text-sm h-auto shadow flex items-center justify-center py-2 px-3 flex-col gap-y-2 `}
-                  >
-                    <ReceiptTextIcon className="!size-8" />
-                    <p className="text-xs leading-tight line-clamp-1">
-                      {format(bill.generated_at, "do MMM")}
-                    </p>
-                  </Button>
-                ))}
+                {billsData
+                  .sort((a, b) => b.generated_at - a.generated_at)
+                  .map((bill, index) => (
+                    <Button
+                      key={index}
+                      variant={"secondary"}
+                      onClick={() => {
+                        setSelectedBillId(bill.bill_id);
+                      }}
+                      className={`${
+                        bill.bill_id === selectedBillId
+                          ? "bg-blue-700 text-white hover:bg-blue-700"
+                          : "bg-border text-muted-foreground"
+                      } text-sm h-auto shadow flex items-center justify-center py-2 px-3 flex-col gap-y-2 `}
+                    >
+                      <ReceiptTextIcon className="!size-8" />
+                      <p className="text-xs leading-tight line-clamp-1">
+                        {format(bill.generated_at, "dd-MM-yyyy")}
+                      </p>
+                    </Button>
+                  ))}
               </div>
               <ScrollBar orientation="horizontal" />
             </ScrollArea>

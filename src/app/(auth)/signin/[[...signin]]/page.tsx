@@ -37,7 +37,9 @@ const Page = () => {
                     rootBox: "flex justify-center items-center w-full",
                     cardBox: "shadow-none w-full rounded-md",
                     card: "w-full shadow-none p-0",
-                    button: "bg-primary text-primary-foreground hover:text-primary hover:bg-secondary h-11 !border border-border rounded-md",
+                    main: "gap-0",
+                    button:
+                      "bg-primary text-primary-foreground hover:text-primary hover:bg-secondary h-11 !border border-border rounded-md",
                     footer: {
                       display: "none",
                     },

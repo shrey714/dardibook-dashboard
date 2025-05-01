@@ -35,11 +35,13 @@ const PatientHistoryTabs: React.FC<PatientHistoryTabsTypes> = ({
       ) : (
         <Tabs defaultValue="0" className="w-full max-h-full">
           <TabsList className="w-full rounded-none sticky top-0 h-auto flex-wrap justify-start z-[1]">
-            {prescriptionsData.map((history, key: number) => (
-              <TabsTrigger key={key} value={key.toString()}>
-                {format(history.created_at, "dd-MM-yyyy")}
-              </TabsTrigger>
-            ))}
+            {prescriptionsData
+              .sort((a, b) => b.created_at - a.created_at)
+              .map((history, key: number) => (
+                <TabsTrigger key={key} value={key.toString()}>
+                  {format(history.created_at, "dd-MM-yyyy")}
+                </TabsTrigger>
+              ))}
           </TabsList>
           {prescriptionsData.map((history, key: number) => {
             const billId = billsData.find(
