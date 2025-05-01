@@ -151,7 +151,7 @@ const BillHistoryModal = ({
               <DialogTitle hidden></DialogTitle>
               <DialogDescription hidden></DialogDescription>
               <div className="w-full gap-y-1 bg-slate-50 dark:bg-gray-900 border-b px-4 py-2 flex flex-wrap items-center justify-between ">
-                <div className="flex flex-1 items-center space-x-2 dm:space-x-4">
+                <div className="flex flex-1 items-center space-x-2 sm:space-x-4">
                   <User className="size-9 md:size-11 border border-muted-foreground rounded-full p-2 text-muted-foreground" />
                   <div>
                     <div className="flex items-center gap-2">
