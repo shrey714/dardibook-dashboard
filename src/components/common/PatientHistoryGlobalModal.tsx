@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { usePatientHistoryModalStore } from "@/lib/stores/patientHistoryModalStore";
-import PatientHistoryTabs from "@/components/Prescribe/PatientHistoryTabs";
+import PatientHistoryTabs from "@/components/History/PatientHistoryTabs";
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@clerk/nextjs";
