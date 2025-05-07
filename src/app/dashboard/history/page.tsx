@@ -1,81 +1,101 @@
-"use client";
-import { columns } from "@/components/History/components/columns";
-import { DataTable } from "@/components/History/components/data-table";
-import { useEffect, useState } from "react";
-import { useAuth } from "@clerk/nextjs";
-import Loader from "@/components/common/Loader";
-import { startOfMonth, endOfMonth, getTime } from "date-fns";
-import { getAllPatients } from "@/app/services/getAllPatients";
-import { DateRange } from "react-day-picker";
+import React from "react";
+import { auth } from "@clerk/nextjs/server";
+import { BentoCard, BentoGrid } from "@/components/ui/bento-grid";
+import {
+  UserSearchIcon,
+  CalendarClockIcon,
+  ClipboardPenIcon,
+  BedDoubleIcon,
+  ReceiptTextIcon,
+} from "lucide-react";
 
-interface PatientData {
-  id: string;
-  first_name: string;
-  last_name: string;
-  mobile_number: string;
-  age: string;
-  gender: string;
-  appointed: boolean;
-  last_visited: number;
-  visitedDates: number[]; //array of timestamps in milliseconds
-}
+const page = async () => {
+  const orgId = (await auth()).orgId;
 
-export default function TaskPage() {
-  const { isLoaded, orgId } = useAuth();
-  const [loader, setLoader] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [patients, setPatients] = useState<PatientData[]>([]);
-  const [dateRange, setDateRange] = useState<DateRange | undefined>({
-    from: startOfMonth(new Date()),
-    to: endOfMonth(new Date()),
-  });
-
-  useEffect(() => {
-    const fetchPatients = async () => {
-      if (isLoaded && orgId) {
-        try {
-          setLoader(true);
-          const data = await getAllPatients(
-            orgId,
-            getTime(dateRange?.from || 0),
-            getTime(dateRange?.to || 0)
-          );
-          if (data.data) {
-            setPatients(data.data);
-          } else {
-            setError("Error fetching patients");
-          }
-          setLoader(false);
-        } catch (error) {
-          setError(`Error fetching patients : ${error}`);
-          setLoader(false);
-        }
-      }
-    };
-
-    fetchPatients();
-  }, [orgId, isLoaded, dateRange]);
+  if (!orgId) {
+    return <div>Orgid not exist</div>;
+  }
 
   return (
-    <>
-      {loader ? (
-        <div className="w-full h-full overflow-hidden flex items-center justify-center">
-          <Loader size="medium" />
-        </div>
-      ) : error ? (
-        <div className="w-full h-full overflow-hidden flex items-center justify-center">
-          {error}
-        </div>
-      ) : (
-        <div className="flex flex-1 px-2 py-2 flex-col h-full overflow-hidden">
-          <DataTable
-            data={patients}
-            columns={columns}
-            setDateRange={setDateRange}
-            dateRange={dateRange}
-          />
-        </div>
-      )}
-    </>
+    <BentoGrid className="lg:grid-rows-4 p-4">
+      {features.map((feature) => (
+        <BentoCard key={feature.name} {...feature} />
+      ))}
+    </BentoGrid>
   );
-}
+};
+
+export default page;
+
+const features = [
+  {
+    Icon: UserSearchIcon,
+    name: "Patients",
+    description: "We automatically save your files as you type.",
+    href: "/dashboard/history/patients",
+    cta: "Patients",
+    background: (
+      <img
+        src="/404.svg"
+        className="absolute right-0 top-10 origin-top scale-75 rounded-md border transition-all duration-300 ease-out [mask-image:linear-gradient(to_top,transparent_10%,#000_100%)] group-hover:scale-90"
+      />
+    ),
+    className: "lg:row-start-1 lg:row-end-5 lg:col-start-2 lg:col-end-3",
+  },
+  {
+    Icon: CalendarClockIcon,
+    name: "Registrations",
+    description: "Search through all your files in one place.",
+    href: "/dashboard/history/registrations",
+    cta: "Registrations",
+    background: (
+      <img
+        src="/404.svg"
+        className="absolute right-0 top-10 origin-top scale-75 rounded-md border transition-all duration-300 ease-out [mask-image:linear-gradient(to_top,transparent_10%,#000_100%)] group-hover:scale-90"
+      />
+    ),
+    className: "lg:col-start-1 lg:col-end-2 lg:row-start-1 lg:row-end-4",
+  },
+  {
+    Icon: ClipboardPenIcon,
+    name: "Prescriptions",
+    description: "Supports 100+ languages and counting.",
+    href: "/dashboard/history/prescriptions",
+    cta: "Prescriptions",
+    background: (
+      <img
+        src="/404.svg"
+        className="absolute right-0 top-10 origin-top scale-75 rounded-md border transition-all duration-300 ease-out [mask-image:linear-gradient(to_top,transparent_10%,#000_100%)] group-hover:scale-90"
+      />
+    ),
+    className: "lg:col-start-1 lg:col-end-2 lg:row-start-4 lg:row-end-5",
+  },
+  {
+    Icon: BedDoubleIcon,
+    name: "Admissions",
+    description: "Use the calendar to filter your files by date.",
+    href: "/dashboard/history/admissions",
+    cta: "Admissions",
+    background: (
+      <img
+        src="/404.svg"
+        className="absolute right-0 top-10 origin-top scale-75 rounded-md border transition-all duration-300 ease-out [mask-image:linear-gradient(to_top,transparent_10%,#000_100%)] group-hover:scale-90"
+      />
+    ),
+    className: "lg:col-start-3 lg:col-end-3 lg:row-start-1 lg:row-end-3",
+  },
+  {
+    Icon: ReceiptTextIcon,
+    name: "Bills",
+    description: "Get notified when someone shares a file.",
+    href: "/dashboard/history/bills",
+    cta: "Bills",
+    background: (
+      <img
+        src="/404.svg"
+        className="absolute right-0 top-10 origin-top scale-75 rounded-md border transition-all duration-300 ease-out [mask-image:linear-gradient(to_top,transparent_10%,#000_100%)] group-hover:scale-90"
+      />
+    ),
+    className: "lg:col-start-3 lg:col-end-3 lg:row-start-3 lg:row-end-5",
+  },
+];

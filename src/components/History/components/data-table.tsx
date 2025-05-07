@@ -28,19 +28,16 @@ import {
 import { DataTablePagination } from "./data-table-pagination";
 import { DataTableToolbar } from "./data-table-toolbar";
 import { DateRange } from "react-day-picker";
+import { endOfMonth, startOfMonth } from "date-fns";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  setDateRange: React.Dispatch<React.SetStateAction<DateRange | undefined>>;
-  dateRange: DateRange | undefined;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
-  setDateRange,
-  dateRange,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
@@ -49,7 +46,12 @@ export function DataTable<TData, TValue>({
     []
   );
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [globalFilter, setGlobalFilter] = React.useState<any>([])
+  const [globalFilter, setGlobalFilter] = React.useState<any>([]);
+
+  const [dateRange, setDateRange] = React.useState<DateRange | undefined>({
+    from: startOfMonth(new Date()),
+    to: endOfMonth(new Date()),
+  });
 
   const table = useReactTable({
     initialState: {
@@ -78,7 +80,7 @@ export function DataTable<TData, TValue>({
     getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
-    globalFilterFn: "includesString"
+    globalFilterFn: "includesString",
   });
 
   return (
@@ -95,7 +97,11 @@ export function DataTable<TData, TValue>({
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id} colSpan={header.colSpan} className="border-x px-4 py-1">
+                    <TableHead
+                      key={header.id}
+                      colSpan={header.colSpan}
+                      className="border-x px-4 py-1"
+                    >
                       {header.isPlaceholder
                         ? null
                         : flexRender(

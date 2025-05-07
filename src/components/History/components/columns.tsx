@@ -8,8 +8,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 // import { labels, priorities, statuses } from "../data/data";
 import { Patient } from "../data/schema";
 import { DataTableColumnHeader } from "./data-table-column-header";
-import { Badge } from "@/components/ui/badge";
-import { format } from "date-fns";
 import Link from "next/link";
 import { CalendarIcon, SquareArrowOutUpRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -47,80 +45,52 @@ export const columns: ColumnDef<Patient>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "id",
+    accessorKey: "patient_id",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Id" />
+      <DataTableColumnHeader column={column} title="patient_id" />
     ),
     cell: ({ row }) => (
       <div
         className="min-w-[80px] align-middle flex gap-2 flex-row items-center"
         style={{ verticalAlign: "middle" }}
       >
-        {row.getValue("id")}
-        <CopyButton className="align-middle z-0" value={row.getValue("id")} />
+        {row.getValue("patient_id")}
+        <CopyButton className="align-middle z-0" value={row.getValue("patient_id")} />
       </div>
     ),
     enableSorting: false,
     enableHiding: false,
   },
   {
-    accessorKey: "first_name",
+    accessorKey: "name",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Name" />
     ),
     cell: ({ row }) => (
       <div className="flex space-x-2">
         <span className="max-w-[500px] truncate font-medium">
-          {row.getValue("first_name")} {row.original.last_name}
+          {row.getValue("name")} {row.original.name}
         </span>
       </div>
     ),
   },
   {
-    accessorKey: "mobile_number",
+    accessorKey: "mobile",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Number" />
     ),
     cell: ({ row }) => (
-      <div className="w-[80px]">{row.getValue("mobile_number")}</div>
+      <div className="w-[80px]">{row.getValue("mobile")}</div>
     ),
     enableSorting: false,
-  },
-  {
-    accessorKey: "appointed",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Appointed" />
-    ),
-    cell: ({ row }) => (
-      <div className="flex space-x-2">
-        <Badge variant={row.getValue("appointed") ? "success" : "failure"}>
-          {row.getValue("appointed") ? "yes" : "no"}
-        </Badge>
-      </div>
-    ),
-    enableSorting: false,
-    enableGlobalFilter: false,
   },
   {
     accessorKey: "gender",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Gender" />
+      <DataTableColumnHeader column={column} title="gender" />
     ),
     cell: ({ row }) => (
       <div className="space-x-2">{row.getValue("gender")}</div>
-    ),
-    enableSorting: false,
-    enableGlobalFilter: false,
-  },
-  {
-    accessorKey: "last_visited",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Visited Date" />
-    ),
-    cell: ({ row }) => (
-      <div className="min-w-[80px] ">
-        {format(row.getValue("last_visited"), "dd-MM-yyyy HH:mm")}
-      </div>
     ),
     enableSorting: false,
     enableGlobalFilter: false,
@@ -139,7 +109,7 @@ export const columns: ColumnDef<Patient>[] = [
                 <Link
                   href={{
                     pathname: "appointment/appointmentForm",
-                    query: { patientId: row.getValue("id") },
+                    query: { patientId: row.getValue("patient_id") },
                   }}
                   type="button"
                 >
@@ -162,7 +132,7 @@ export const columns: ColumnDef<Patient>[] = [
                 <Link
                   href={{
                     pathname: "history/patientHistory",
-                    query: { patientId: row.getValue("id") },
+                    query: { patientId: row.getValue("patient_id") },
                   }}
                   type="button"
                 >

@@ -1,9 +1,8 @@
 import { ReactNode } from "react";
 import type { Metadata } from "next";
 export const metadata: Metadata = {
-  title: "DardiBook | History",
-  description:
-    "Organisation History of patients, registrations, prescriptions, admissions and bills",
+  title: "DardiBook | Prescriptions",
+  description: "Previous prescriptions history",
 };
 export default async function RootLayout({
   children,
