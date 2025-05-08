@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import type { Metadata } from "next";
+import { NavigationDock } from "@/components/History/NavigationDock";
 export const metadata: Metadata = {
   title: "DardiBook | History",
   description:
@@ -10,5 +11,10 @@ export default async function RootLayout({
 }: {
   children?: ReactNode;
 }) {
-  return <>{children}</>;
+  return (
+    <>
+      {children}
+      <NavigationDock />
+    </>
+  );
 }
