@@ -10,17 +10,19 @@ import {
 } from "lucide-react";
 
 const page = async () => {
-  const orgId = (await auth()).orgId;
+  const orgRole = (await auth()).orgRole;
 
-  if (!orgId) {
-    return <div>Orgid not exist</div>;
+  if (!orgRole) {
+    return <div>User does not exist with an appropriate role..</div>;
   }
 
   return (
-    <BentoGrid className="lg:grid-rows-4 p-4">
-      {features.map((feature) => (
-        <BentoCard key={feature.name} {...feature} />
-      ))}
+    <BentoGrid className="lg:grid-rows-4 p-4 min-h-full">
+      {features
+        .filter((page) => page.roles.includes(orgRole))
+        .map((feature) => (
+          <BentoCard key={feature.name} {...feature} />
+        ))}
     </BentoGrid>
   );
 };
@@ -29,73 +31,98 @@ export default page;
 
 const features = [
   {
-    Icon: UserSearchIcon,
-    name: "Patients",
-    description: "We automatically save your files as you type.",
-    href: "/dashboard/history/patients",
-    cta: "Patients",
-    background: (
-      <img
-        src="/404.svg"
-        className="absolute right-0 top-10 origin-top scale-75 rounded-md border transition-all duration-300 ease-out [mask-image:linear-gradient(to_top,transparent_10%,#000_100%)] group-hover:scale-90"
-      />
-    ),
-    className: "lg:row-start-1 lg:row-end-5 lg:col-start-2 lg:col-end-3",
-  },
-  {
     Icon: CalendarClockIcon,
     name: "Registrations",
-    description: "Search through all your files in one place.",
+    description:
+      "Streamline patient registration with quick and organized record-keeping.",
     href: "/dashboard/history/registrations",
     cta: "Registrations",
     background: (
       <img
-        src="/404.svg"
-        className="absolute right-0 top-10 origin-top scale-75 rounded-md border transition-all duration-300 ease-out [mask-image:linear-gradient(to_top,transparent_10%,#000_100%)] group-hover:scale-90"
+        src="/placeholders/Registrations.jfif"
+        className="h-full object-cover w-full absolute right-0 top-0 origin-top rounded-md border transition-all duration-300 ease-out [mask-image:linear-gradient(to_top,transparent_10%,#000_80%)] dark:[mask-image:linear-gradient(to_top,transparent_10%,#000_100%)] group-hover:scale-110"
       />
     ),
-    className: "lg:col-start-1 lg:col-end-2 lg:row-start-1 lg:row-end-4",
+    className: "lg:row-span-2 lg:col-span-1",
+    roles: ["org:clinic_head", "org:doctor", "org:assistant_doctor"],
+  },
+  {
+    Icon: UserSearchIcon,
+    name: "Patients",
+    description:
+      "Easily manage and access patient information with real-time search capabilities.",
+    href: "/dashboard/history/patients",
+    cta: "Patients",
+    background: (
+      <img
+        src="/placeholders/Patients.jfif"
+        className="h-full object-cover w-full absolute right-0 top-0 origin-top rounded-md border transition-all duration-300 ease-out [mask-image:linear-gradient(to_top,transparent_10%,#000_80%)] dark:[mask-image:linear-gradient(to_top,transparent_10%,#000_100%)] group-hover:scale-110"
+      />
+    ),
+    className: "lg:row-span-4 lg:col-span-1",
+    roles: [
+      "org:clinic_head",
+      "org:doctor",
+      "org:assistant_doctor",
+      "org:medical_staff",
+    ],
   },
   {
     Icon: ClipboardPenIcon,
     name: "Prescriptions",
-    description: "Supports 100+ languages and counting.",
+    description:
+      "Generate and manage prescriptions seamlessly with accurate record tracking.",
     href: "/dashboard/history/prescriptions",
     cta: "Prescriptions",
     background: (
       <img
-        src="/404.svg"
-        className="absolute right-0 top-10 origin-top scale-75 rounded-md border transition-all duration-300 ease-out [mask-image:linear-gradient(to_top,transparent_10%,#000_100%)] group-hover:scale-90"
+        src="/placeholders/Prescriptions.jfif"
+        className="h-full object-cover w-full absolute right-0 top-0 origin-top rounded-md border transition-all duration-300 ease-out [mask-image:linear-gradient(to_top,transparent_10%,#000_80%)] dark:[mask-image:linear-gradient(to_top,transparent_10%,#000_100%)] group-hover:scale-110"
       />
     ),
-    className: "lg:col-start-1 lg:col-end-2 lg:row-start-4 lg:row-end-5",
+    className: "lg:row-span-2 lg:col-span-1",
+    roles: ["org:clinic_head", "org:doctor", "org:assistant_doctor"],
   },
   {
     Icon: BedDoubleIcon,
     name: "Admissions",
-    description: "Use the calendar to filter your files by date.",
+    description:
+      "Effortlessly handle patient admissions with detailed status and room assignments.",
     href: "/dashboard/history/admissions",
     cta: "Admissions",
     background: (
       <img
-        src="/404.svg"
-        className="absolute right-0 top-10 origin-top scale-75 rounded-md border transition-all duration-300 ease-out [mask-image:linear-gradient(to_top,transparent_10%,#000_100%)] group-hover:scale-90"
+        src="/placeholders/Admissions.jfif"
+        className="h-full object-cover w-full absolute right-0 top-0 origin-top rounded-md border transition-all duration-300 ease-out [mask-image:linear-gradient(to_top,transparent_10%,#000_80%)] dark:[mask-image:linear-gradient(to_top,transparent_10%,#000_100%)] group-hover:scale-110"
       />
     ),
-    className: "lg:col-start-3 lg:col-end-3 lg:row-start-1 lg:row-end-3",
+    className: "lg:row-span-2 lg:col-span-1",
+    roles: [
+      "org:clinic_head",
+      "org:doctor",
+      "org:assistant_doctor",
+      "org:medical_staff",
+    ],
   },
   {
     Icon: ReceiptTextIcon,
     name: "Bills",
-    description: "Get notified when someone shares a file.",
+    description:
+      "Track and manage billing details with clear and organized documentation.",
     href: "/dashboard/history/bills",
     cta: "Bills",
     background: (
       <img
-        src="/404.svg"
-        className="absolute right-0 top-10 origin-top scale-75 rounded-md border transition-all duration-300 ease-out [mask-image:linear-gradient(to_top,transparent_10%,#000_100%)] group-hover:scale-90"
+        src="/placeholders/Bills.jfif"
+        className="h-full object-cover w-full absolute right-0 top-0 origin-top rounded-md border transition-all duration-300 ease-out [mask-image:linear-gradient(to_top,transparent_10%,#000_80%)] dark:[mask-image:linear-gradient(to_top,transparent_10%,#000_100%)] group-hover:scale-110"
       />
     ),
-    className: "lg:col-start-3 lg:col-end-3 lg:row-start-3 lg:row-end-5",
+    className: "lg:row-span-2 lg:col-span-1",
+    roles: [
+      "org:clinic_head",
+      "org:doctor",
+      "org:assistant_doctor",
+      "org:medical_staff",
+    ],
   },
 ];
