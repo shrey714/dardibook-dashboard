@@ -1,13 +1,13 @@
 "use server";
-import { columns } from "@/components/History/components/columns";
-import { DataTable } from "@/components/History/components/data-table";
+import { columns } from "@/components/History/patients/columns";
+import { DataTable } from "@/components/History/patients/data-table";
 import { db } from "@/firebase/firebaseConfig";
 import { collection, getDocs, query } from "firebase/firestore";
 import { auth } from "@clerk/nextjs/server";
 import { RegisterPatientFormTypes } from "@/types/FormTypes";
 import { error } from "console";
 
-export default async function PatientsPage() {
+export default async function Page() {
   let patients: RegisterPatientFormTypes[] = [];
 
   try {

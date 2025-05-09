@@ -6,8 +6,8 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "@/components/ui/checkbox";
 
 // import { labels, priorities, statuses } from "../data/data";
-import { Patient } from "../data/schema";
-import { DataTableColumnHeader } from "./data-table-column-header";
+import { Patient } from "@/components/History/dataSchema/schema";
+import { DataTableColumnHeader } from "@/components/History/common/data-table-column-header";
 import Link from "next/link";
 import { CalendarIcon, SquareArrowOutUpRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -55,7 +55,10 @@ export const columns: ColumnDef<Patient>[] = [
         style={{ verticalAlign: "middle" }}
       >
         {row.getValue("patient_id")}
-        <CopyButton className="align-middle z-0" value={row.getValue("patient_id")} />
+        <CopyButton
+          className="align-middle z-0"
+          value={row.getValue("patient_id")}
+        />
       </div>
     ),
     enableSorting: false,
@@ -79,9 +82,7 @@ export const columns: ColumnDef<Patient>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Number" />
     ),
-    cell: ({ row }) => (
-      <div className="w-[80px]">{row.getValue("mobile")}</div>
-    ),
+    cell: ({ row }) => <div className="w-[80px]">{row.getValue("mobile")}</div>,
     enableSorting: false,
   },
   {

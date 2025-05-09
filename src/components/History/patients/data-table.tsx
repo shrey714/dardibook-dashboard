@@ -25,8 +25,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import { DataTablePagination } from "./data-table-pagination";
-import { DataTableToolbar } from "./data-table-toolbar";
+import { DataTablePagination } from "@/components/History/common/data-table-pagination";
+import { DataTableToolbar } from "@/components/History/patients/data-table-toolbar";
 import { DateRange } from "react-day-picker";
 import { endOfMonth, startOfMonth } from "date-fns";
 

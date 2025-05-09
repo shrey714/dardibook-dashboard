@@ -50,7 +50,7 @@ export function NavigationDock() {
     historyPages.some((page) => page.href === pathname)
   ) {
     return (
-      <HoverCard openDelay={60} open={isVisible}>
+      <HoverCard openDelay={60} closeDelay={600} open={isVisible}>
         <HoverCardTrigger asChild>
           <Button
             className={`absolute shadow-[inset_0px_0px_5px_8px_#00000024] border-b-0 bg-border left-1/2 -translate-x-1/2 bottom-0 p-0 m-0 w-60 h-2.5 rounded-b-none transition-all duration-500 ease-out`}

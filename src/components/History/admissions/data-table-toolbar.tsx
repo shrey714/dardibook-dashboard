@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils";
 import { CalendarIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
-import { DataTableFacetedFilter } from "./data-table-faceted-filter";
+import { DataTableFacetedFilter } from "@/components/History/common/data-table-faceted-filter";
 import { DateRange } from "react-day-picker";
 
 const genders = [
