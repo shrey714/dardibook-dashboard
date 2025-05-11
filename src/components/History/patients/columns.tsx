@@ -116,72 +116,75 @@ export const columns: ColumnDef<Patient>[] = [
   },
   {
     id: "actions",
-    cell: ({ row }) => {
-      const { isLoaded, orgRole } = useAuth();
-      const isAccess =
-        isLoaded &&
-        (orgRole === "org:clinic_head" ||
-          orgRole === "org:doctor" ||
-          orgRole === "org:assistant_doctor");
-      const { openModal } = usePatientHistoryModalStore();
-      return (
-        <div className="min-w-min p-0 align-middle flex gap-2 flex-row items-center">
-          <TooltipProvider>
-            <Tooltip delayDuration={300}>
-              <TooltipTrigger asChild>
-                <Button
-                  className={`flex h-8 w-8 p-0 border-green-500 bg-green-500/10 text-green-600 hover:bg-green-500/20 ${
-                    !isAccess ? "opacity-50" : ""
-                  }`}
-                  asChild
-                >
-                  {isAccess ? (
-                    <Link
-                      href={{
-                        pathname: "/dashboard/appointment/appointmentForm",
-                        query: { patientId: row.getValue("patient_id") },
-                      }}
-                      type="button"
-                    >
-                      <CalendarIcon />
-                    </Link>
-                  ) : (
-                    <div className="flex items-center justify-center cursor-not-allowed">
-                      <CalendarIcon />
-                    </div>
-                  )}
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                {isAccess ? <p>Register</p> : <p>You don't have access.</p>}
-              </TooltipContent>
-            </Tooltip>
-
-            <Tooltip delayDuration={300}>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="flex h-8 w-8 p-0 data-[state=open]:bg-muted border-border border"
-                  onClick={() => {
-                    row.getValue("patient_id") &&
-                      openModal({
-                        patientId: row.getValue("patient_id"),
-                      });
-                  }}
-                >
-                  <HistoryIcon />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Patient History</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
-      );
-    },
+    cell: ({ row }) => <ActionButtons patientId={row.getValue("patient_id")} />,
     enableSorting: false,
     enableHiding: false,
     enableGlobalFilter: false,
   },
 ];
+
+const ActionButtons = ({ patientId }: { patientId: string }) => {
+  const { isLoaded, orgRole } = useAuth();
+  const { openModal } = usePatientHistoryModalStore();
+
+  const isAccess =
+    isLoaded &&
+    orgRole &&
+    ["org:clinic_head", "org:doctor", "org:assistant_doctor"].includes(orgRole);
+
+  return (
+    <div className="min-w-min p-0 align-middle flex gap-1 flex-row items-center">
+      <TooltipProvider>
+        <Tooltip delayDuration={300}>
+          <TooltipTrigger asChild>
+            <Button
+              className={`flex h-8 w-8 p-0 border-green-500 bg-green-500/10 text-green-600 hover:bg-green-500/20 ${
+                !isAccess ? "opacity-50" : ""
+              }`}
+              asChild
+            >
+              {isAccess ? (
+                <Link
+                  href={{
+                    pathname: "/dashboard/appointment/appointmentForm",
+                    query: { patientId: patientId },
+                  }}
+                  type="button"
+                >
+                  <CalendarIcon />
+                </Link>
+              ) : (
+                <div className="flex items-center justify-center cursor-not-allowed">
+                  <CalendarIcon />
+                </div>
+              )}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            {isAccess ? <p>Register</p> : <p>You don't have access.</p>}
+          </TooltipContent>
+        </Tooltip>
+
+        <Tooltip delayDuration={300}>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              className="flex h-8 w-8 p-0 data-[state=open]:bg-muted border-border border"
+              onClick={() => {
+                patientId &&
+                  openModal({
+                    patientId: patientId,
+                  });
+              }}
+            >
+              <HistoryIcon />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Patient History</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    </div>
+  );
+};
