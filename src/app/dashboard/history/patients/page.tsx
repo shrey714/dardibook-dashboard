@@ -6,13 +6,13 @@ import { collection, getDocs, query } from "firebase/firestore";
 import { auth } from "@clerk/nextjs/server";
 import {
   RegisterPatientFormTypes,
-  Patient_History_Types,
 } from "@/types/FormTypes";
 import { error } from "console";
 import { DataTableToolbar } from "@/components/History/patients/data-table-toolbar";
+import { Patient } from "@/components/History/dataSchema/schema";
 
 export default async function Page() {
-  let patients: Patient_History_Types[] = [];
+  let patients: Patient[] = [];
 
   try {
     const orgId = (await auth()).orgId;

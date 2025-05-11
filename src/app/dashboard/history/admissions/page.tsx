@@ -4,12 +4,13 @@ import { DataTable } from "@/components/History/common/data-table";
 import { db } from "@/firebase/firebaseConfig";
 import { collection, getDocs, orderBy, query } from "firebase/firestore";
 import { auth } from "@clerk/nextjs/server";
-import { Admissions_History_Types, OrgBed } from "@/types/FormTypes";
+import { OrgBed } from "@/types/FormTypes";
 import { error } from "console";
 import { DataTableToolbar } from "@/components/History/admissions/data-table-toolbar";
+import { Admission } from "@/components/History/dataSchema/schema";
 
 export default async function Page() {
-  let admissions: Admissions_History_Types[] = [];
+  let admissions: Admission[] = [];
 
   try {
     const orgId = (await auth()).orgId;

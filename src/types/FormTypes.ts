@@ -187,27 +187,3 @@ export type CalendarEventTypes =
         };
         appointment_details?: never;
     });
-
-
-// ----------------------   History Types   --------------------
-
-export interface Patient_History_Types {
-    patient_id: string;
-    name: string;
-    mobile: string;
-    gender: "Male" | "Female" | "Other";
-    age: string;
-    address: string;
-}
-
-export interface Admissions_History_Types {
-    bedBookingId: string;
-    bedId: string;
-    patient_id: string;
-    admission_at: number;
-    discharge_at: number;
-    dischargeMarked: "YES" | "NO";
-    admission_by: string;
-    admission_for: string;
-    discharged_by?: string;
-}

@@ -1,151 +1,189 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-
-// import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
-
-// import { labels, priorities, statuses } from "../data/data";
-import { Patient } from "@/components/History/dataSchema/schema";
+import { Bill } from "@/components/History/dataSchema/schema";
 import { DataTableColumnHeader } from "@/components/History/common/data-table-column-header";
-import Link from "next/link";
-import { CalendarIcon, SquareArrowOutUpRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CopyButton } from "@/components/common/CopyToClipboard";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { usePatientHistoryModalStore } from "@/lib/stores/patientHistoryModalStore";
+import { format } from "date-fns";
+import { DataTableColumnFilter } from "../common/data-table-column-filter";
+import { Badge } from "@/components/ui/badge";
 
-export const columns: ColumnDef<Patient>[] = [
+export const columns: ColumnDef<Bill>[] = [
   {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-        className="translate-y-[2px]"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-        className="translate-y-[2px]"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    accessorKey: "patient_id",
+    accessorKey: "bill_id",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="patient_id" />
+      <DataTableColumnHeader column={column} title="Bill Id" />
     ),
     cell: ({ row }) => (
-      <div
-        className="min-w-[80px] align-middle flex gap-2 flex-row items-center"
-        style={{ verticalAlign: "middle" }}
-      >
-        {row.getValue("patient_id")}
-        <CopyButton className="align-middle z-0" value={row.getValue("patient_id")} />
+      <div className="flex flex-col justify-start items-start">
+        <p className="text-sm font-normal flex flex-row gap-2">
+          {row.original.bill_id}
+          <CopyButton
+            className="align-middle z-0"
+            value={row.original.bill_id}
+          />
+        </p>
+        <p className="text-sm text-muted-foreground">
+          {row.original.prescription_id ?? "-"}
+        </p>
       </div>
     ),
     enableSorting: false,
     enableHiding: false,
+    enableGlobalFilter: true,
   },
   {
     accessorKey: "name",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Name" />
+      <DataTableColumnHeader column={column} title="Patient" />
     ),
     cell: ({ row }) => (
-      <div className="flex space-x-2">
-        <span className="max-w-[500px] truncate font-medium">
-          {row.getValue("name")} {row.original.name}
-        </span>
+      <div className="flex flex-col justify-start items-start">
+        <p className="text-sm font-normal">{row.original.name}</p>
+        <p className="text-sm text-muted-foreground">
+          {row.original.patient_id ? (
+            <PatientButton patientId={row.original.patient_id} />
+          ) : (
+            "-"
+          )}
+        </p>
       </div>
     ),
+    enableSorting: false,
+    enableHiding: false,
+    enableGlobalFilter: true,
   },
   {
-    accessorKey: "mobile",
+    accessorKey: "generated_at",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Number" />
+      <DataTableColumnHeader column={column} title="Generated At" />
     ),
     cell: ({ row }) => (
-      <div className="w-[80px]">{row.getValue("mobile")}</div>
+      <div className="space-x-2 text-nowrap">
+        {format(row.original.generated_at, "dd/MM/yyyy hh:mm a")}
+      </div>
     ),
-    enableSorting: false,
-  },
-  {
-    accessorKey: "gender",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="gender" />
-    ),
-    cell: ({ row }) => (
-      <div className="space-x-2">{row.getValue("gender")}</div>
-    ),
-    enableSorting: false,
+    enableSorting: true,
+    enableHiding: false,
     enableGlobalFilter: false,
   },
   {
-    id: "actions",
+    accessorKey: "prescribed_by",
+    header: ({ column }) => (
+      <>
+        <DataTableColumnHeader column={column} title="Prescribed By" />
+        <DataTableColumnFilter column={column} />
+      </>
+    ),
     cell: ({ row }) => (
-      <div className="min-w-min align-middle flex gap-2 flex-row items-center">
-        <TooltipProvider>
-          <Tooltip delayDuration={100}>
-            <TooltipTrigger asChild>
-              <Button
-                className="flex h-8 w-8 p-0 border-green-500 bg-green-500/10 text-green-600 hover:bg-green-500/20"
-                asChild
-              >
-                <Link
-                  href={{
-                    pathname: "appointment/appointmentForm",
-                    query: { patientId: row.getValue("patient_id") },
-                  }}
-                  type="button"
-                >
-                  <CalendarIcon />
-                </Link>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Register</p>
-            </TooltipContent>
-          </Tooltip>
-
-          <Tooltip delayDuration={100}>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                className="flex h-8 w-8 p-0 data-[state=open]:bg-muted border-border border"
-                asChild
-              >
-                <Link
-                  href={{
-                    pathname: "history/patientHistory",
-                    query: { patientId: row.getValue("patient_id") },
-                  }}
-                  type="button"
-                >
-                  <SquareArrowOutUpRight />
-                </Link>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Profile</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+      <div className="space-x-2">{row.original.prescribed_by ?? "-"}</div>
+    ),
+    enableSorting: false,
+    enableHiding: false,
+    enableGlobalFilter: false,
+    meta: {
+      filterVariant: "select",
+    },
+  },
+  {
+    accessorKey: "generated_by",
+    header: ({ column }) => (
+      <>
+        <DataTableColumnHeader column={column} title="Generated By" />
+        <DataTableColumnFilter column={column} />
+      </>
+    ),
+    cell: ({ row }) => (
+      <div className="space-x-2">{row.original.generated_by}</div>
+    ),
+    enableSorting: false,
+    enableHiding: false,
+    enableGlobalFilter: false,
+    meta: {
+      filterVariant: "select",
+    },
+  },
+  {
+    accessorKey: "payment_status",
+    header: ({ column }) => (
+      <>
+        <DataTableColumnHeader column={column} title="Payment Status" />
+        <DataTableColumnFilter column={column} />
+      </>
+    ),
+    cell: ({ row }) => (
+      <div className="flex space-x-2">
+        <Badge
+          className={`font-medium ${
+            row.original.payment_status === "Paid"
+              ? "bg-green-200 text-green-800"
+              : row.original.payment_status === "Unpaid"
+              ? "bg-red-200 text-red-800"
+              : row.original.payment_status === "Refunded"
+              ? "bg-yellow-200 text-yellow-800"
+              : "bg-gray-200 text-gray-800"
+          }`}
+        >
+          {row.original.payment_status}
+        </Badge>
       </div>
     ),
+    enableSorting: false,
+    enableHiding: false,
+    enableGlobalFilter: false,
+    meta: {
+      filterVariant: "select",
+    },
+  },
+  {
+    accessorKey: "payment_method",
+    header: ({ column }) => (
+      <>
+        <DataTableColumnHeader column={column} title="Payment Method" />
+        <DataTableColumnFilter column={column} />
+      </>
+    ),
+    cell: ({ row }) => (
+      <div className="space-x-2">{row.original.payment_method ?? "-"}</div>
+    ),
+    enableSorting: false,
+    enableHiding: false,
+    enableGlobalFilter: false,
+    meta: {
+      filterVariant: "select",
+    },
+  },
+  {
+    accessorKey: "total_amount",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Total Amount" />
+    ),
+    cell: ({ row }) => (
+      <div className="flex flex-col justify-start items-start">
+        <p className="text-sm font-normal">₹{row.original.total_amount}</p>
+        <p className="text-xs text-muted-foreground">
+          - ₹{row.original.discount} / {row.original.tax_percentage}%
+        </p>
+      </div>
+    ),
+    enableSorting: true,
+    enableHiding: false,
+    enableGlobalFilter: false,
   },
 ];
+
+const PatientButton = ({ patientId }: { patientId: string }) => {
+  const { openModal } = usePatientHistoryModalStore();
+
+  return (
+    <Button
+      variant="link"
+      className="text-muted-foreground text-sm p-0 h-min underline"
+      onClick={() => openModal({ patientId })}
+    >
+      {patientId}
+    </Button>
+  );
+};
