@@ -13,7 +13,7 @@ export interface patientBed {
     admission_for: orgUserType;
     discharge_at: number;
     dischargeMarked: boolean;
-    discharged_by: orgUserType;
+    discharged_by?: orgUserType;
 }
 export interface RegisterPatientFormTypes {
     patient_id: string;
@@ -62,7 +62,7 @@ export interface OrgBed {
     admission_for: orgUserType;
     discharge_at: number;
     dischargeMarked: boolean;
-    discharged_by: orgUserType;
+    discharged_by?: orgUserType;
 }
 
 export interface TodayPatientsType {
@@ -198,4 +198,16 @@ export interface Patient_History_Types {
     gender: "Male" | "Female" | "Other";
     age: string;
     address: string;
+}
+
+export interface Admissions_History_Types {
+    bedBookingId: string;
+    bedId: string;
+    patient_id: string;
+    admission_at: number;
+    discharge_at: number;
+    dischargeMarked: "YES" | "NO";
+    admission_by: string;
+    admission_for: string;
+    discharged_by?: string;
 }

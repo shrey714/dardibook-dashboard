@@ -3,6 +3,7 @@
 import * as React from "react";
 import {
   ColumnDef,
+  RowData,
   SortingState,
   VisibilityState,
   flexRender,
@@ -26,6 +27,12 @@ import {
 
 import { DataTablePagination } from "@/components/History/common/data-table-pagination";
 import { DataTableToolbar } from "@/components/History/patients/data-table-toolbar";
+
+declare module "@tanstack/react-table" {
+  interface ColumnMeta<TData extends RowData, TValue> {
+    filterVariant?: "text" | "range" | "select";
+  }
+}
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];

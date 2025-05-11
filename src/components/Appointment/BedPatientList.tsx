@@ -168,7 +168,7 @@ export const BedPatientList: React.FC<bedPatientProps> = ({
                     {bed.dischargeMarked ? (
                       <div className="bg-red-500/10 mt-2 w-full rounded-md text-red-600 flex flex-row gap-4 px-3 py-1 items-center">
                         <LogOut className="w-5 h-5" /> Discharged by{" "}
-                        {bed.discharged_by.name}
+                        {bed?.discharged_by?.name}
                       </div>
                     ) : (
                       <></>
