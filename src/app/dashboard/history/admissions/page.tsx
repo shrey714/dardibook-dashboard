@@ -40,6 +40,7 @@ export default async function Page() {
       };
     });
   } catch (error) {
+    console.log(error);
     return (
       <div className="p-4 text-red-600">
         Failed to load admissions. Please try again later.

@@ -4,7 +4,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Patient } from "@/components/History/dataSchema/schema";
 import { DataTableColumnHeader } from "@/components/History/common/data-table-column-header";
 import Link from "next/link";
-import { CalendarIcon, HistoryIcon, SquareArrowOutUpRight } from "lucide-react";
+import { CalendarIcon, HistoryIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CopyButton } from "@/components/common/CopyToClipboard";
 import {

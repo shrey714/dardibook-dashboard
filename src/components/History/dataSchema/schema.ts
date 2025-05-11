@@ -42,3 +42,17 @@ export const billSchema = z.object({
 });
 
 export type Bill = z.infer<typeof billSchema>;
+
+export const prescriptionSchema = z.object({
+  prescription_id: z.string(),
+  prescription_for_bed: z.boolean(),
+  patient_id: z.string(),
+  diseaseDetail: z.string(),
+  nextVisit: z.string(),
+  created_at: z.number(),
+  registerd_by: z.string(),
+  prescribed_by: z.string(),
+  prescriber_assigned: z.string(),
+});
+
+export type Prescription = z.infer<typeof prescriptionSchema>;
