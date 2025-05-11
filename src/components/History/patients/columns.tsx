@@ -170,12 +170,7 @@ const ActionButtons = ({ patientId }: { patientId: string }) => {
             <Button
               variant="ghost"
               className="flex h-8 w-8 p-0 data-[state=open]:bg-muted border-border border"
-              onClick={() => {
-                patientId &&
-                  openModal({
-                    patientId: patientId,
-                  });
-              }}
+              onClick={() => isAccess && openModal({ patientId })}
             >
               <HistoryIcon />
             </Button>
