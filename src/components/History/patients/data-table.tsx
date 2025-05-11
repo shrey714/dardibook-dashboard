@@ -3,7 +3,6 @@
 import * as React from "react";
 import {
   ColumnDef,
-  ColumnFiltersState,
   SortingState,
   VisibilityState,
   flexRender,
@@ -27,8 +26,6 @@ import {
 
 import { DataTablePagination } from "@/components/History/common/data-table-pagination";
 import { DataTableToolbar } from "@/components/History/patients/data-table-toolbar";
-import { DateRange } from "react-day-picker";
-import { endOfMonth, startOfMonth } from "date-fns";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -39,19 +36,10 @@ export function DataTable<TData, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
-  const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  );
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = React.useState<any>([]);
-
-  const [dateRange, setDateRange] = React.useState<DateRange | undefined>({
-    from: startOfMonth(new Date()),
-    to: endOfMonth(new Date()),
-  });
 
   const table = useReactTable({
     initialState: {
@@ -64,15 +52,10 @@ export function DataTable<TData, TValue>({
     state: {
       sorting,
       columnVisibility,
-      rowSelection,
-      columnFilters,
       globalFilter,
     },
     onGlobalFilterChange: setGlobalFilter,
-    enableRowSelection: true,
-    onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
@@ -85,22 +68,21 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="space-y-2 h-full flex flex-col">
-      <DataTableToolbar
-        table={table}
-        setDateFilters={setDateRange}
-        dateRange={dateRange}
-      />
+      <DataTableToolbar table={table} />
       <div className="rounded-md border flex flex-1 overflow-y-auto">
         <Table>
           <TableHeader className="sticky top-0 bg-background z-[1]">
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
+              <TableRow
+                className="bg-muted/50 [&_th:last-child]:border-0"
+                key={headerGroup.id}
+              >
                 {headerGroup.headers.map((header) => {
                   return (
                     <TableHead
                       key={header.id}
                       colSpan={header.colSpan}
-                      className="border-x px-4 py-1"
+                      className="border-r px-4 py-1"
                     >
                       {header.isPlaceholder
                         ? null
@@ -115,10 +97,11 @@ export function DataTable<TData, TValue>({
             ))}
           </TableHeader>
           <TableBody className="overflow-y-auto">
-            {table.getRowModel().rows?.length ? (
+            {table.getRowModel().rows.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
+                  className="[&_td:last-child]:border-r-0 [&_td:first-child]:border-l-0"
                   data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (

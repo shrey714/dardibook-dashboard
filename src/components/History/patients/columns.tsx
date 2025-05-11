@@ -1,15 +1,10 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-
-// import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
-
-// import { labels, priorities, statuses } from "../data/data";
 import { Patient } from "@/components/History/dataSchema/schema";
 import { DataTableColumnHeader } from "@/components/History/common/data-table-column-header";
 import Link from "next/link";
-import { CalendarIcon, SquareArrowOutUpRight } from "lucide-react";
+import { CalendarIcon, HistoryIcon, SquareArrowOutUpRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CopyButton } from "@/components/common/CopyToClipboard";
 import {
@@ -18,36 +13,14 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useAuth } from "@clerk/nextjs";
+import { usePatientHistoryModalStore } from "@/lib/stores/patientHistoryModalStore";
 
 export const columns: ColumnDef<Patient>[] = [
   {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-        className="translate-y-[2px]"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-        className="translate-y-[2px]"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
     accessorKey: "patient_id",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="patient_id" />
+      <DataTableColumnHeader column={column} title="Patient Id" />
     ),
     cell: ({ row }) => (
       <div
@@ -63,6 +36,7 @@ export const columns: ColumnDef<Patient>[] = [
     ),
     enableSorting: false,
     enableHiding: false,
+    enableGlobalFilter: true,
   },
   {
     accessorKey: "name",
@@ -72,81 +46,142 @@ export const columns: ColumnDef<Patient>[] = [
     cell: ({ row }) => (
       <div className="flex space-x-2">
         <span className="max-w-[500px] truncate font-medium">
-          {row.getValue("name")} {row.original.name}
+          {row.getValue("name")}
         </span>
       </div>
     ),
+    enableSorting: true,
+    enableHiding: false,
+    enableGlobalFilter: true,
   },
   {
     accessorKey: "mobile",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Number" />
+      <DataTableColumnHeader column={column} title="Contact" />
     ),
     cell: ({ row }) => <div className="w-[80px]">{row.getValue("mobile")}</div>,
     enableSorting: false,
+    enableHiding: false,
+    enableGlobalFilter: true,
   },
   {
     accessorKey: "gender",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="gender" />
+      <DataTableColumnHeader column={column} title="Gender" />
     ),
     cell: ({ row }) => (
       <div className="space-x-2">{row.getValue("gender")}</div>
     ),
-    enableSorting: false,
+    enableSorting: true,
+    enableHiding: false,
     enableGlobalFilter: false,
   },
   {
-    id: "actions",
-    cell: ({ row }) => (
-      <div className="min-w-min align-middle flex gap-2 flex-row items-center">
-        <TooltipProvider>
-          <Tooltip delayDuration={100}>
-            <TooltipTrigger asChild>
-              <Button
-                className="flex h-8 w-8 p-0 border-green-500 bg-green-500/10 text-green-600 hover:bg-green-500/20"
-                asChild
-              >
-                <Link
-                  href={{
-                    pathname: "appointment/appointmentForm",
-                    query: { patientId: row.getValue("patient_id") },
-                  }}
-                  type="button"
-                >
-                  <CalendarIcon />
-                </Link>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Register</p>
-            </TooltipContent>
-          </Tooltip>
-
-          <Tooltip delayDuration={100}>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                className="flex h-8 w-8 p-0 data-[state=open]:bg-muted border-border border"
-                asChild
-              >
-                <Link
-                  href={{
-                    pathname: "history/patientHistory",
-                    query: { patientId: row.getValue("patient_id") },
-                  }}
-                  type="button"
-                >
-                  <SquareArrowOutUpRight />
-                </Link>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Profile</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      </div>
+    accessorKey: "age",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Age" />
     ),
+    cell: ({ row }) => <div className="space-x-2">{row.getValue("age")}</div>,
+    enableSorting: true,
+    enableHiding: false,
+    enableGlobalFilter: false,
+  },
+  {
+    accessorKey: "address",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Address" />
+    ),
+    cell: ({ row }) => {
+      const value = row.getValue("address") as string;
+      const maxLength = 40;
+
+      return (
+        <Tooltip delayDuration={200}>
+          <TooltipTrigger asChild>
+            <div className={`truncate cursor-pointer`}>
+              {value.length > maxLength
+                ? `${value.slice(0, maxLength)}...`
+                : value}
+            </div>
+          </TooltipTrigger>
+          {value.length > maxLength && (
+            <TooltipContent className="max-w-xs">{value}</TooltipContent>
+          )}
+        </Tooltip>
+      );
+    },
+    enableSorting: false,
+    enableHiding: false,
+    enableGlobalFilter: true,
+  },
+  {
+    id: "actions",
+    cell: ({ row }) => {
+      const { isLoaded, orgRole } = useAuth();
+      const isAccess =
+        isLoaded &&
+        (orgRole === "org:clinic_head" ||
+          orgRole === "org:doctor" ||
+          orgRole === "org:assistant_doctor");
+      const { openModal } = usePatientHistoryModalStore();
+      return (
+        <div className="min-w-min p-0 align-middle flex gap-2 flex-row items-center">
+          <TooltipProvider>
+            <Tooltip delayDuration={300}>
+              <TooltipTrigger asChild>
+                <Button
+                  className={`flex h-8 w-8 p-0 border-green-500 bg-green-500/10 text-green-600 hover:bg-green-500/20 ${
+                    !isAccess ? "opacity-50" : ""
+                  }`}
+                  asChild
+                >
+                  {isAccess ? (
+                    <Link
+                      href={{
+                        pathname: "/dashboard/appointment/appointmentForm",
+                        query: { patientId: row.getValue("patient_id") },
+                      }}
+                      type="button"
+                    >
+                      <CalendarIcon />
+                    </Link>
+                  ) : (
+                    <div className="flex items-center justify-center cursor-not-allowed">
+                      <CalendarIcon />
+                    </div>
+                  )}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                {isAccess ? <p>Register</p> : <p>You don't have access.</p>}
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip delayDuration={300}>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="flex h-8 w-8 p-0 data-[state=open]:bg-muted border-border border"
+                  onClick={() => {
+                    row.getValue("patient_id") &&
+                      openModal({
+                        patientId: row.getValue("patient_id"),
+                      });
+                  }}
+                >
+                  <HistoryIcon />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Patient History</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
+      );
+    },
+    enableSorting: false,
+    enableHiding: false,
+    enableGlobalFilter: false,
   },
 ];

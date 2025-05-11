@@ -4,11 +4,14 @@ import { DataTable } from "@/components/History/patients/data-table";
 import { db } from "@/firebase/firebaseConfig";
 import { collection, getDocs, query } from "firebase/firestore";
 import { auth } from "@clerk/nextjs/server";
-import { RegisterPatientFormTypes } from "@/types/FormTypes";
+import {
+  RegisterPatientFormTypes,
+  Patient_History_Types,
+} from "@/types/FormTypes";
 import { error } from "console";
 
 export default async function Page() {
-  let patients: RegisterPatientFormTypes[] = [];
+  let patients: Patient_History_Types[] = [];
 
   try {
     const orgId = (await auth()).orgId;
@@ -20,11 +23,20 @@ export default async function Page() {
 
     const querySnapshot = await getDocs(patientsQuery);
 
-    patients = querySnapshot.docs.map((doc) => ({
-      ...doc.data(),
-    })) as RegisterPatientFormTypes[];
+    patients = querySnapshot.docs.map((doc) => {
+      const data = doc.data() as RegisterPatientFormTypes;
+      return {
+        patient_id: data.patient_id,
+        name: data.name,
+        mobile: data.mobile,
+        gender: data.gender,
+        age: data.age,
+        address: [data.street_address, data.city, data.state, data.zip]
+          .filter(Boolean)
+          .join(", "),
+      };
+    });
   } catch (error) {
-    console.error("Error fetching patients:", error);
     return (
       <div className="p-4 text-red-600">
         Failed to load patients. Please try again later.

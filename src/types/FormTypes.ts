@@ -187,3 +187,15 @@ export type CalendarEventTypes =
         };
         appointment_details?: never;
     });
+
+
+// ----------------------   History Types   --------------------
+
+export interface Patient_History_Types {
+    patient_id: string;
+    name: string;
+    mobile: string;
+    gender: "Male" | "Female" | "Other";
+    age: string;
+    address: string;
+}
