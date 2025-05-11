@@ -161,7 +161,7 @@ const ActionButtons = ({ patientId }: { patientId: string }) => {
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            {isAccess ? <p>Register</p> : <p>You don't have access.</p>}
+            {isAccess ? <p>Register</p> : <p>You don&apos;t have access.</p>}
           </TooltipContent>
         </Tooltip>
 
