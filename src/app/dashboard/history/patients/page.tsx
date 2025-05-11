@@ -1,6 +1,6 @@
 "use server";
 import { columns } from "@/components/History/patients/columns";
-import { DataTable } from "@/components/History/patients/data-table";
+import { DataTable } from "@/components/History/common/data-table";
 import { db } from "@/firebase/firebaseConfig";
 import { collection, getDocs, query } from "firebase/firestore";
 import { auth } from "@clerk/nextjs/server";
@@ -9,6 +9,7 @@ import {
   Patient_History_Types,
 } from "@/types/FormTypes";
 import { error } from "console";
+import { DataTableToolbar } from "@/components/History/patients/data-table-toolbar";
 
 export default async function Page() {
   let patients: Patient_History_Types[] = [];
@@ -54,7 +55,11 @@ export default async function Page() {
 
   return (
     <div className="flex flex-1 px-2 py-2 flex-col h-full overflow-hidden">
-      <DataTable data={patients} columns={columns} />
+      <DataTable
+        data={patients}
+        columns={columns}
+        ToolbarComponent={DataTableToolbar}
+      />
     </div>
   );
 }
