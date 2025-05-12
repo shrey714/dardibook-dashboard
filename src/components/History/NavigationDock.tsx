@@ -17,10 +17,6 @@ import { Dock, DockIcon } from "@/components/ui/dock";
 import { useAuth } from "@clerk/nextjs";
 import { historyPages } from "@/app/dashboard/history/_actions";
 import { usePathname } from "next/navigation";
-
-import { CalendarIcon } from "lucide-react";
-
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   HoverCard,
@@ -35,6 +31,7 @@ export function NavigationDock() {
   const pathname = usePathname();
 
   const [isVisible, setIsVisible] = useState<true | undefined>(undefined);
+  const pathChanged = pathname === "/dashboard/history";
 
   useEffect(() => {
     setIsVisible(true);
@@ -42,7 +39,7 @@ export function NavigationDock() {
       setIsVisible(undefined);
     }, 2000);
     return () => clearTimeout(timer);
-  }, [pathname]);
+  }, [pathChanged]);
 
   if (
     orgRole &&
