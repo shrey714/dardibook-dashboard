@@ -8,6 +8,7 @@ import { CopyButton } from "@/components/common/CopyToClipboard";
 import { usePatientHistoryModalStore } from "@/lib/stores/patientHistoryModalStore";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
+import { DataTableColumnFilter } from "../common/data-table-column-filter";
 
 export const columns: ColumnDef<Registration>[] = [
   {
@@ -46,16 +47,22 @@ export const columns: ColumnDef<Registration>[] = [
   {
     accessorKey: "registred_on",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Registred On" />
+      <>
+        <DataTableColumnHeader column={column} title="Registred On" />
+        <DataTableColumnFilter column={column} />
+      </>
     ),
     cell: ({ row }) => (
       <div className="space-x-2 text-nowrap">
-        {format(row.original.registred_on, "dd/MM/yyyy hh:mm a")}
+        {format(row.original.registred_on, "MMM dd ,yy hh:mm a")}
       </div>
     ),
     enableSorting: true,
     enableHiding: false,
     enableGlobalFilter: false,
+    meta: {
+      filterVariant: "date-range",
+    },
   },
   {
     accessorKey: "is_prescribed",

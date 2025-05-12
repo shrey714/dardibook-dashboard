@@ -29,7 +29,7 @@ import { DataTablePagination } from "@/components/History/common/data-table-pagi
 
 declare module "@tanstack/react-table" {
   interface ColumnMeta<TData extends RowData, TValue> {
-    filterVariant?: "text" | "range" | "select";
+    filterVariant?: "text" | "range" | "select" | "date-range";
   }
 }
 

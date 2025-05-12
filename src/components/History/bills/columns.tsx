@@ -41,7 +41,7 @@ export const columns: ColumnDef<Bill>[] = [
     ),
     cell: ({ row }) => (
       <div className="flex flex-col justify-start items-start">
-        <p className="text-sm font-normal">{row.original.name}</p>
+        <p className="text-sm font-normal text-nowrap">{row.original.name}</p>
         <p className="text-sm text-muted-foreground">
           {row.original.patient_id ? (
             <PatientButton patientId={row.original.patient_id} />
@@ -58,16 +58,22 @@ export const columns: ColumnDef<Bill>[] = [
   {
     accessorKey: "generated_at",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Generated At" />
+      <>
+        <DataTableColumnHeader column={column} title="Generated At" />
+        <DataTableColumnFilter column={column} />
+      </>
     ),
     cell: ({ row }) => (
       <div className="space-x-2 text-nowrap">
-        {format(row.original.generated_at, "dd/MM/yyyy hh:mm a")}
+        {format(row.original.generated_at, "MMM dd ,yy hh:mm a")}
       </div>
     ),
     enableSorting: true,
     enableHiding: false,
     enableGlobalFilter: false,
+    meta: {
+      filterVariant: "date-range",
+    },
   },
   {
     accessorKey: "prescribed_by",
@@ -116,6 +122,7 @@ export const columns: ColumnDef<Bill>[] = [
     cell: ({ row }) => (
       <div className="flex space-x-2">
         <Badge
+        variant={"outline"}
           className={`font-medium ${
             row.original.payment_status === "Paid"
               ? "bg-green-200 text-green-800"

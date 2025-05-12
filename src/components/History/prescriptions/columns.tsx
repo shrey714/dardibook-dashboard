@@ -93,16 +93,22 @@ export const columns: ColumnDef<Prescription>[] = [
   {
     accessorKey: "created_at",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Created At" />
+      <>
+        <DataTableColumnHeader column={column} title="Created At" />
+        <DataTableColumnFilter column={column} />
+      </>
     ),
     cell: ({ row }) => (
       <div className="space-x-2 text-nowrap">
-        {format(row.original.created_at, "dd/MM/yyyy hh:mm a")}
+        {format(row.original.created_at, "MMM dd ,yy hh:mm a")}
       </div>
     ),
     enableSorting: true,
     enableHiding: false,
     enableGlobalFilter: false,
+    meta: {
+      filterVariant: "date-range",
+    },
   },
   {
     accessorKey: "nextVisit",
@@ -110,9 +116,7 @@ export const columns: ColumnDef<Prescription>[] = [
       <DataTableColumnHeader column={column} title="next Visit" />
     ),
     cell: ({ row }) => (
-      <div className="space-x-2 text-nowrap">
-        {row.original.nextVisit}
-      </div>
+      <div className="space-x-2 text-nowrap">{row.original.nextVisit}</div>
     ),
     enableSorting: true,
     enableHiding: false,

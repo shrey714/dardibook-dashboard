@@ -67,30 +67,42 @@ export const columns: ColumnDef<Admission>[] = [
   {
     accessorKey: "admission_at",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Admission At" />
+      <>
+        <DataTableColumnHeader column={column} title="Admission At" />
+        <DataTableColumnFilter column={column} />
+      </>
     ),
     cell: ({ row }) => (
       <div className="space-x-2 text-xs text-nowrap">
-        {format(row.original.admission_at, "dd/MM/yyyy hh:mm a")}
+        {format(row.original.admission_at, "MMM dd ,yy hh:mm a")}
       </div>
     ),
     enableSorting: true,
     enableHiding: false,
     enableGlobalFilter: false,
+    meta: {
+      filterVariant: "date-range",
+    },
   },
   {
     accessorKey: "discharge_at",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Discharge At" />
+      <>
+        <DataTableColumnHeader column={column} title="Discharge At" />
+        <DataTableColumnFilter column={column} />
+      </>
     ),
     cell: ({ row }) => (
       <div className="space-x-2 text-xs text-nowrap">
-        {format(row.original.discharge_at, "dd/MM/yyyy hh:mm a")}
+        {format(row.original.discharge_at, "MMM dd ,yy hh:mm a")}
       </div>
     ),
     enableSorting: true,
     enableHiding: false,
     enableGlobalFilter: false,
+    meta: {
+      filterVariant: "date-range",
+    },
   },
   {
     accessorKey: "dischargeMarked",

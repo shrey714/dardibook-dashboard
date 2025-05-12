@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Calendar } from "@/components/ui/calendar";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
   Sidebar3,
   SidebarContent3,

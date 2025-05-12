@@ -8,6 +8,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { endOfDay, format, startOfDay } from "date-fns";
+import { CalendarIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface DataTableColumnHeaderProps<TData, TValue>
   extends React.HTMLAttributes<HTMLDivElement> {
@@ -41,7 +50,7 @@ function Filter({ column }: { column: Column<any, unknown> }) {
         : Array.from(column.getFacetedUniqueValues().keys())
             .sort()
             .slice(0, 5000),
-    [column.getFacetedUniqueValues(), filterVariant]
+    [column, filterVariant]
   );
 
   return filterVariant === "range" ? (
@@ -90,13 +99,81 @@ function Filter({ column }: { column: Column<any, unknown> }) {
       </SelectTrigger>
       <SelectContent>
         <SelectItem value="all">All</SelectItem>
-        {sortedUniqueValues.map((value,index) => (
+        {sortedUniqueValues.map((value, index) => (
           <SelectItem value={value} key={index}>
             {value}
           </SelectItem>
         ))}
       </SelectContent>
     </Select>
+  ) : filterVariant === "date-range" ? (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button
+          id="date"
+          variant="outline"
+          className={cn(
+            "justify-start text-left gap-1 py-0 px-2 h-6 font-normal w-auto min-w-[120px]",
+            !(
+              (columnFilterValue as [number, number])?.[0] &&
+              (columnFilterValue as [number, number])?.[1]
+            ) && "text-muted-foreground"
+          )}
+        >
+          <CalendarIcon className="mr-1 !size-3.5" />
+          {(columnFilterValue as [number, number])?.[0] ? (
+            (columnFilterValue as [number, number])?.[1] ? (
+              <>
+                {format(
+                  new Date((columnFilterValue as [number, number])?.[0] ?? 0),
+                  "MMM dd, yy"
+                )}{" "}
+                -{" "}
+                {format(
+                  new Date((columnFilterValue as [number, number])?.[1] ?? 0),
+                  "MMM dd, yy"
+                )}
+              </>
+            ) : (
+              format(
+                new Date((columnFilterValue as [number, number])?.[0] ?? 0),
+                "MMM dd, y"
+              )
+            )
+          ) : (
+            <span>Pick a date</span>
+          )}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-auto p-0" align="start">
+        <Calendar
+          mode="range"
+          defaultMonth={new Date()}
+          selected={{
+            from: (columnFilterValue as [number, number])?.[0]
+              ? new Date((columnFilterValue as [number, number])[0])
+              : undefined,
+            to: (columnFilterValue as [number, number])?.[1]
+              ? new Date((columnFilterValue as [number, number])[1])
+              : undefined,
+          }}
+          onSelect={(value) => {
+            if (value?.from && value?.to) {
+              column.setFilterValue(() => [
+                startOfDay(value.from || 0)?.getTime(),
+                endOfDay(value.to || 0)?.getTime(),
+              ]);
+            } else if (value?.from) {
+              column.setFilterValue(() => [
+                startOfDay(value.from || 0)?.getTime(),
+                endOfDay(value.from || 0)?.getTime(),
+              ]);
+            }
+          }}
+          numberOfMonths={2}
+        />
+      </PopoverContent>
+    </Popover>
   ) : (
     <>
       {/* Autocomplete suggestions from faceted values feature */}
@@ -141,7 +218,7 @@ function DebouncedInput({
     }, debounce);
 
     return () => clearTimeout(timeout);
-  }, [value]);
+  }, [debounce, onChange, value]);
 
   return (
     <input
