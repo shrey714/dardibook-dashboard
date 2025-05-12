@@ -230,12 +230,12 @@ export function BedSidebar({
           <SidebarGroupLabel3 className="justify-center">
             Bed Management
           </SidebarGroupLabel3>
-          <SidebarGroupContent3>
+          <SidebarGroupContent3 className="flex justify-center">
             <Calendar
               month={startOfMonth(currentDate)}
-              classNames={{
-                hidden: "none",
-              }}
+              // classNames={{
+              // hidden: "none",
+              // }}
               mode="single"
               selected={date}
               onSelect={(d) => {
@@ -258,12 +258,6 @@ export function BedSidebar({
                 PreviousMonthButton: (props) => (
                   <PreviousMonthButton {...props} onClick={getPreviousWeek} />
                 ),
-                Chevron: (props) => {
-                  if (props.orientation === "left") {
-                    return <ChevronLeft className="h-4 w-4" {...props} />;
-                  }
-                  return <ChevronRight className="h-4 w-4" {...props} />;
-                },
               }}
             />
           </SidebarGroupContent3>

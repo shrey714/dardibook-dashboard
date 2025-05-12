@@ -119,7 +119,7 @@ export function ScheduleSidebar({
           <SidebarGroupLabel2 className="justify-center">
             Scheduled Patients
           </SidebarGroupLabel2>
-          <SidebarGroupContent2>
+          <SidebarGroupContent2 className="flex justify-center">
             <Calendar
               mode="single"
               selected={date}
