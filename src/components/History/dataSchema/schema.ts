@@ -56,3 +56,12 @@ export const prescriptionSchema = z.object({
 });
 
 export type Prescription = z.infer<typeof prescriptionSchema>;
+
+export const registrationSchema = z.object({
+  patient_id: z.string(),
+  name: z.string(),
+  registred_on: z.number(),
+  is_prescribed: z.enum(["YES", "NO"]),
+})
+
+export type Registration = z.infer<typeof registrationSchema>
