@@ -202,7 +202,7 @@ const PatientHistoryGlobalModal = () => {
       <Drawer open={isAdmDrawerOpen} onOpenChange={setIsAdmDrawerOpen}>
         <DrawerContent className="max-h-[85%]">
           {admsData.length !== 0 && isAdmDrawerOpen && (
-            <ScrollArea className="overflow-hidden !absolute bg-background/40 bg-clip-padding backdrop-filter backdrop-blur-sm px-2 py-2.5 top-[-99px] rounded-lg left-0 right-0 mx-auto max-w-3xl w-fit">
+            <ScrollArea className="overflow-hidden !absolute bg-background/40 bg-clip-padding backdrop-filter backdrop-blur-sm px-2 py-2.5 top-[-99px] rounded-lg left-0 right-0 mx-w-2xl w-auto">
               <div className="flex flex-1 flex-row gap-2">
                 {admsData
                   .sort((a, b) => b.admission_at - a.admission_at)
@@ -270,7 +270,7 @@ const PatientHistoryGlobalModal = () => {
                   <Button
                     variant="outline"
                     onClick={() => {
-                      setIsBillDrawerOpen(false);
+                      setIsAdmDrawerOpen(false);
                     }}
                     className="text-muted-foreground p-2.5 aspect-auto w-auto h-auto"
                   >
@@ -427,7 +427,7 @@ const PatientHistoryGlobalModal = () => {
       <Drawer open={isBillDrawerOpen} onOpenChange={setIsBillDrawerOpen}>
         <DrawerContent className="max-h-[85%]">
           {billsData.length !== 0 && isBillDrawerOpen && (
-            <ScrollArea className="overflow-hidden !absolute bg-background/40 bg-clip-padding backdrop-filter backdrop-blur-sm px-2 py-2.5 top-[-99px] rounded-lg left-0 right-0 mx-auto max-w-3xl w-fit">
+            <ScrollArea className="overflow-hidden !absolute bg-background/40 bg-clip-padding backdrop-filter backdrop-blur-sm px-2 py-2.5 top-[-99px] rounded-lg left-0 right-0 mx-auto max-w-2xl w-auto">
               <div className="flex flex-1 flex-row gap-2">
                 {billsData
                   .sort((a, b) => b.generated_at - a.generated_at)
