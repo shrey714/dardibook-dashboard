@@ -13,7 +13,7 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="border-t flex w-full flex-col lg:flex-row-reverse gap-y-1 gap-x-4 items-center justify-center my-1 px-2">
+    <footer className="border-t flex w-full flex-col lg:flex-row-reverse gap-y-1 gap-x-4 items-center justify-center my-1 px-2 pt-1">
       <div className="flex flex-row flex-wrap justify-center">
         {allPaths.map((path, key) => (
           <Link

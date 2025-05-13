@@ -13,11 +13,14 @@ import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@clerk/nextjs";
 import {
+  BedDoubleIcon,
+  BedIcon,
   CalendarClockIcon,
   CalendarMinus,
   CalendarPlus,
   CircleHelp,
   ClipboardPlusIcon,
+  LogOutIcon,
   MapPinHouse,
   PencilLineIcon,
   Phone,
@@ -28,6 +31,7 @@ import {
   X,
 } from "lucide-react";
 import {
+  patientBed,
   PharmacyTypes,
   PrescriptionFormTypes,
   RegisterPatientFormTypes,
@@ -61,7 +65,6 @@ import {
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
-  DrawerTrigger,
 } from "@/components/ui/drawer";
 import {
   Card,
@@ -90,16 +93,21 @@ import {
 
 interface TimelineInstanceType {
   time: number;
-  type: "Register" | "Prescribe" | "Bill" | "BedIn" | "BedOut";
+  type: "Register" | "Prescribe" | "Bill" | "BedIn" | "BedOut" | "Discharged";
 }
 
 const PatientHistoryGlobalModal = () => {
   const { isOpen, modalProps, closeModal } = usePatientHistoryModalStore();
   const { isLoaded, orgId, orgRole } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isBillDrawerOpen, setIsBillDrawerOpen] = useState(false);
   const [billsData, setBillsData] = useState<PharmacyTypes[]>([]);
   const [selectedBillId, setSelectedBillId] = useState<string>();
+
+  const [isAdmDrawerOpen, setIsAdmDrawerOpen] = useState(false);
+  const [admsData, setAdmsData] = useState<patientBed[]>([]);
+  const [selectedAdmId, setSelectedAdmId] = useState<string>();
+
   const [patientData, setPatientData] = useState<RegisterPatientFormTypes>();
   const [prescriptionsData, setPrescriptionsData] = useState<
     PrescriptionFormTypes[]
@@ -159,14 +167,21 @@ const PatientHistoryGlobalModal = () => {
         );
         const bills = billsSnap.docs.map((doc) => doc.data() as PharmacyTypes);
 
+        setAdmsData(patientData.bed_info);
         setBillsData(bills);
         setPatientData(patientData);
         setPrescriptionsData(prescriptions);
         setLoader(false);
+        setSelectedBillId(undefined);
+        setSelectedAdmId(undefined);
       } else {
         setLoader(false);
+        setAdmsData([]);
+        setBillsData([]);
         setPatientData(undefined);
         setPrescriptionsData([]);
+        setSelectedBillId(undefined);
+        setSelectedAdmId(undefined);
       }
     };
     getPatientData();
@@ -174,19 +189,245 @@ const PatientHistoryGlobalModal = () => {
 
   const handleBillIdSelection = (id: string) => {
     if (id) {
-      setIsDrawerOpen(true);
+      setIsBillDrawerOpen(true);
       setSelectedBillId(id);
     }
   };
 
   const bill = billsData.find((bill) => bill.bill_id === selectedBillId);
+  const adm = admsData.find((adm) => adm.bedBookingId === selectedAdmId);
 
   return (
     <>
-      <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+      <Drawer open={isAdmDrawerOpen} onOpenChange={setIsAdmDrawerOpen}>
         <DrawerContent className="max-h-[85%]">
-          {billsData.length !== 0 && isDrawerOpen && (
-            <ScrollArea className="overflow-hidden !absolute bg-background/40 bg-clip-padding backdrop-filter backdrop-blur-sm px-2 py-2.5 top-[-99px] rounded-lg left-0 right-0 mx-auto max-w-3xl">
+          {admsData.length !== 0 && isAdmDrawerOpen && (
+            <ScrollArea className="overflow-hidden !absolute bg-background/40 bg-clip-padding backdrop-filter backdrop-blur-sm px-2 py-2.5 top-[-99px] rounded-lg left-0 right-0 mx-auto max-w-3xl w-fit">
+              <div className="flex flex-1 flex-row gap-2">
+                {admsData
+                  .sort((a, b) => b.admission_at - a.admission_at)
+                  .map((adm, index) => (
+                    <Button
+                      key={index}
+                      variant={"secondary"}
+                      onClick={() => {
+                        setSelectedAdmId(adm.bedBookingId);
+                      }}
+                      className={`${
+                        adm.bedBookingId === selectedAdmId
+                          ? "bg-blue-700 text-white hover:bg-blue-700"
+                          : "bg-border text-muted-foreground"
+                      } text-sm h-auto shadow flex items-center justify-center py-2 px-3 flex-col gap-y-2 `}
+                    >
+                      <BedIcon className="!size-8" />
+                      <p className="text-xs leading-tight line-clamp-1">
+                        {format(adm.admission_at, "dd-MM-yy")}
+                        {" / "}
+                        {format(adm.discharge_at, "dd-MM-yy")}
+                      </p>
+                    </Button>
+                  ))}
+              </div>
+              <ScrollBar orientation="horizontal" />
+            </ScrollArea>
+          )}
+
+          <DrawerHeader className={`${adm ? "shadow-sm px-0 pb-0" : "p-0"}`}>
+            <DrawerTitle hidden></DrawerTitle>
+            <DrawerDescription hidden></DrawerDescription>
+            {adm && patientData && (
+              <div className="w-full gap-y-1 bg-slate-50 dark:bg-gray-900 border-b px-4 py-2 flex flex-wrap items-center justify-between ">
+                <div className="flex flex-1 items-center space-x-2 sm:space-x-4">
+                  <User className="size-9 md:size-11 border border-muted-foreground rounded-full p-2 text-muted-foreground" />
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-sm md:text-base font-medium line-clamp-1">
+                        {patientData.name}
+                      </h3>
+                      <Badge
+                        variant={"outline"}
+                        className="bg-blue-500/10 border-blue-500 text-blue-500 rounded-full line-clamp-1"
+                      >
+                        {patientData.patient_id}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center mt-1 text-sm text-muted-foreground gap-3">
+                      <div className="flex items-center gap-1">
+                        <span className="h-2 w-2 rounded-full bg-muted-foreground"></span>
+                        <span>{patientData.gender} </span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Phone className="h-3 w-3" />
+                        <span className="line-clamp-1">
+                          {patientData.mobile}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {/* Action buttons */}
+                <div className="flex items-center h-full justify-center ml-4">
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setIsBillDrawerOpen(false);
+                    }}
+                    className="text-muted-foreground p-2.5 aspect-auto w-auto h-auto"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
+          </DrawerHeader>
+          {admsData.length === 0 ? (
+            <div className="w-full h-full flex items-center flex-col gap-8 pt-6 pb-2 justify-center">
+              <img className="w-full max-w-[16rem]" src="/empty.svg" alt="" />
+              <p className="text-muted-foreground text-base">
+                No Admission Data Available.
+              </p>
+            </div>
+          ) : adm ? (
+            <div className="flex flex-1 flex-col overflow-y-auto w-full p-2 sm:p-6 gap-y-2 sm:gap-y-6 max-w-4xl mx-auto">
+              <Timeline
+                orientation="horizontal"
+                className="w-full max-w-3xl py-4 px-2"
+              >
+                <TimelineItem className="flex-1">
+                  <TimelineSeparator>
+                    <TimelineDot className="size-8 [&_svg]:size-6">
+                      <CalendarPlus className="text-yellow-400" />
+                    </TimelineDot>
+                    <TimelineConnector className="bg-gradient-to-r from-yellow-400 to-red-500" />
+                  </TimelineSeparator>
+                  <TimelineContent>
+                    <TimelineTitle>Admitted on</TimelineTitle>
+                    <TimelineDescription className="whitespace-nowrap">
+                      {format(adm.admission_at, "h.mm a, MMMM d, yyyy")}
+                    </TimelineDescription>
+                  </TimelineContent>
+                </TimelineItem>
+
+                <TimelineItem>
+                  <TimelineSeparator>
+                    <TimelineDot className="!size-8 [&_svg]:size-6">
+                      <CalendarMinus className="text-red-500" />
+                    </TimelineDot>
+                  </TimelineSeparator>
+                  <TimelineContent>
+                    <TimelineTitle>
+                      {adm.dischargeMarked ? "Discharged on" : "Discharge on"}
+                    </TimelineTitle>
+                    <TimelineDescription className="whitespace-nowrap">
+                      {format(adm.discharge_at, "h.mm a, MMMM d, yyyy")}
+                    </TimelineDescription>
+                  </TimelineContent>
+                </TimelineItem>
+              </Timeline>
+
+              <div className="w-full flex flex-col-reverse md:flex-row gap-3 sm:gap-6">
+                <div className="flex flex-col flex-1">
+                  <CommonHeader label={"Admission Details"} />
+                  <div className="space-y-3 mt-3 px-3">
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium">Admission Id</p>
+                      <div className="flex items-center h-9 text-muted-foreground w-full rounded-md border px-3 text-base md:text-sm !leading-9 shadow-sm">
+                        {adm.bedBookingId}
+                      </div>
+                    </div>
+
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium">Bed Id</p>
+                      <div className="flex items-center h-9 text-muted-foreground w-full rounded-md border px-3 text-base md:text-sm !leading-9 shadow-sm">
+                        {adm.bedId}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex flex-col overflow-hidden gap-y-2 md:pr-8">
+                  <Badge
+                    className="text-base rounded-full px-2 py-1 justify-center"
+                    variant={adm.dischargeMarked ? "failure" : "success"}
+                  >
+                    {adm.dischargeMarked ? "Discharged" : "In Bed"}
+                  </Badge>
+
+                  <div className="flex items-center">
+                    <PencilLineIcon
+                      size={36}
+                      className="mr-3 bg-blue-600/10 text-blue-600 border-blue-600 border rounded-full p-2"
+                    />
+                    <div className="flex flex-col items-start">
+                      <span className="text-xs text-muted-foreground">
+                        Admitted by
+                      </span>
+                      <span className="text-base font-medium">
+                        {adm.admission_by.name}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-center">
+                    <ClipboardPlusIcon
+                      size={36}
+                      className="mr-3 bg-blue-600/10 text-green-600 border border-green-600 rounded-full p-2"
+                    />
+                    <div className="flex flex-col items-start">
+                      <span className="text-xs text-muted-foreground">
+                        Admitted for
+                      </span>
+                      <span className="text-base font-medium">
+                        {adm.admission_for.name}
+                      </span>
+                    </div>
+                  </div>
+                  {adm.dischargeMarked && (
+                    <div className="flex items-center">
+                      <LogOutIcon
+                        size={36}
+                        className="mr-3 bg-green-500/10 text-red-500 border border-red-500 rounded-full p-2"
+                      />
+                      <div className="flex flex-col items-start">
+                        <span className="text-xs text-muted-foreground">
+                          Discharged by
+                        </span>
+                        <span className="text-base font-medium">
+                          {adm.discharged_by?.name}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          ) : selectedAdmId ? (
+            <div className="w-full h-full flex items-center flex-col gap-8 pt-6 pb-2 justify-center">
+              <img className="w-full max-w-[16rem]" src="/empty.svg" alt="" />
+              <p className="text-muted-foreground text-base">
+                Admission Id is not valid.
+              </p>
+            </div>
+          ) : (
+            <div className="w-full h-full flex items-center flex-col gap-8 pt-6 pb-2 justify-center">
+              <img className="w-full max-w-[16rem]" src="/empty.svg" alt="" />
+              <p className="text-muted-foreground text-base">
+                Please Select Admission.
+              </p>
+            </div>
+          )}
+          <DrawerFooter className="items-center flex-row justify-center">
+            <DrawerClose asChild>
+              <Button className="max-w-sm w-full" variant="outline">
+                Close
+              </Button>
+            </DrawerClose>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
+
+      <Drawer open={isBillDrawerOpen} onOpenChange={setIsBillDrawerOpen}>
+        <DrawerContent className="max-h-[85%]">
+          {billsData.length !== 0 && isBillDrawerOpen && (
+            <ScrollArea className="overflow-hidden !absolute bg-background/40 bg-clip-padding backdrop-filter backdrop-blur-sm px-2 py-2.5 top-[-99px] rounded-lg left-0 right-0 mx-auto max-w-3xl w-fit">
               <div className="flex flex-1 flex-row gap-2">
                 {billsData
                   .sort((a, b) => b.generated_at - a.generated_at)
@@ -297,7 +538,7 @@ const PatientHistoryGlobalModal = () => {
                   <Button
                     variant="outline"
                     onClick={() => {
-                      setIsDrawerOpen(false);
+                      setIsBillDrawerOpen(false);
                     }}
                     className="text-muted-foreground p-2.5 aspect-auto w-auto h-auto"
                   >
@@ -669,12 +910,23 @@ const PatientHistoryGlobalModal = () => {
                 <Button
                   variant="default"
                   onClick={() => {
-                    setIsDrawerOpen(true);
+                    setIsAdmDrawerOpen(true);
+                  }}
+                  className="p-2.5 leading-[normal] aspect-auto w-auto h-auto"
+                >
+                  <BedDoubleIcon className="h-4 w-4" />
+                  <p className="hidden md:block">Adms</p>
+                </Button>
+
+                <Button
+                  variant="default"
+                  onClick={() => {
+                    setIsBillDrawerOpen(true);
                   }}
                   className="p-2.5 leading-[normal] aspect-auto w-auto h-auto"
                 >
                   <ReceiptTextIcon className="h-4 w-4" />
-                  Bills
+                  <p className="hidden md:block">Bills</p>
                 </Button>
 
                 <Button
@@ -756,7 +1008,7 @@ const PatientHistoryGlobalModal = () => {
                     });
                     TimeLineData.push({
                       time: bed.discharge_at,
-                      type: "BedOut",
+                      type: bed.dischargeMarked ? "Discharged" : "BedOut",
                     });
                   });
                   billsData.forEach((bill) => {
@@ -775,14 +1027,18 @@ const PatientHistoryGlobalModal = () => {
                           (event, index) => {
                             if (event.type === "BedIn") {
                               bedStart = false;
-                            } else if (event.type === "BedOut") {
+                            } else if (
+                              event.type === "BedOut" ||
+                              event.type === "Discharged"
+                            ) {
                               bedStart = true;
                             }
                             return (
                               <TimelineItem key={index} className="">
                                 {event.type === "BedIn" ? (
                                   <div className="h-4 border-l-2"></div>
-                                ) : event.type === "BedOut" ? (
+                                ) : event.type === "BedOut" ||
+                                  event.type === "Discharged" ? (
                                   <div className="h-4 border-l-2 border-t-2"></div>
                                 ) : (
                                   <div
@@ -799,7 +1055,8 @@ const PatientHistoryGlobalModal = () => {
                                       <ClipboardPlusIcon className="text-green-500" />
                                     ) : event.type === "BedIn" ? (
                                       <CalendarPlus className="text-yellow-400" />
-                                    ) : event.type === "BedOut" ? (
+                                    ) : event.type === "BedOut" ||
+                                      event.type === "Discharged" ? (
                                       <CalendarMinus className="text-red-500" />
                                     ) : event.type === "Bill" ? (
                                       <ReceiptText className="text-blue-600" />
