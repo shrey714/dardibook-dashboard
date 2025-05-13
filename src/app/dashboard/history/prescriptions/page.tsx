@@ -2,12 +2,7 @@
 import { columns } from "@/components/History/prescriptions/columns";
 import { DataTable } from "@/components/History/common/data-table";
 import { db } from "@/firebase/firebaseConfig";
-import {
-  collectionGroup,
-  getDocs,
-  orderBy,
-  query,
-} from "firebase/firestore";
+import { collectionGroup, getDocs, orderBy, query } from "firebase/firestore";
 import { auth } from "@clerk/nextjs/server";
 import { PrescriptionFormTypes } from "@/types/FormTypes";
 import { error } from "console";
@@ -47,16 +42,13 @@ export default async function Page() {
   } catch (error) {
     console.log(error);
     return (
-      <div className="p-4 text-red-600">
+      <div className="w-full h-full text-red-600 text-sm md:text-base p-4 overflow-hidden flex items-center justify-center gap-4 flex-col">
+        <img
+          className="w-full max-w-40 lg:mx-auto"
+          src="/ErrorTriangle.svg"
+          alt=""
+        />
         Failed to load prescriptions. Please try again later.
-      </div>
-    );
-  }
-
-  if (!prescriptions.length) {
-    return (
-      <div className="w-full h-full overflow-hidden flex items-center justify-center">
-        No prescriptions found.
       </div>
     );
   }

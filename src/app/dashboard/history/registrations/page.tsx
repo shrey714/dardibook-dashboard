@@ -39,16 +39,13 @@ export default async function Page() {
   } catch (error) {
     console.log(error);
     return (
-      <div className="p-4 text-red-600">
+      <div className="w-full h-full text-red-600 text-sm md:text-base p-4 overflow-hidden flex items-center justify-center gap-4 flex-col">
+        <img
+          className="w-full max-w-40 lg:mx-auto"
+          src="/ErrorTriangle.svg"
+          alt=""
+        />
         Failed to load registrations. Please try again later.
-      </div>
-    );
-  }
-
-  if (!registrations.length) {
-    return (
-      <div className="w-full h-full overflow-hidden flex items-center justify-center">
-        No registrations found.
       </div>
     );
   }

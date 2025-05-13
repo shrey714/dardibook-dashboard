@@ -41,16 +41,13 @@ export default async function Page() {
     });
   } catch (error) {
     return (
-      <div className="p-4 text-red-600">
+      <div className="w-full h-full text-red-600 text-sm md:text-base p-4 overflow-hidden flex items-center justify-center gap-4 flex-col">
+        <img
+          className="w-full max-w-40 lg:mx-auto"
+          src="/ErrorTriangle.svg"
+          alt=""
+        />
         Failed to load bills. Please try again later.
-      </div>
-    );
-  }
-
-  if (!bills.length) {
-    return (
-      <div className="w-full h-full overflow-hidden flex items-center justify-center">
-        No bills found.
       </div>
     );
   }
