@@ -22,7 +22,7 @@ const DiseaseRow: React.FC<DisplayDiseaseProps> = ({
 }) => {
   return (
     <div
-      className={`grid grid-cols-12 gap-1 w-full p-4 ${
+      className={`grid grid-cols-12 gap-1 w-full p-2 sm:p-4 ${
         index !== 0 ? "border-t" : "border-0"
       }`}
     >
@@ -43,7 +43,7 @@ const DiseaseRow: React.FC<DisplayDiseaseProps> = ({
         placeholder="No Medicines"
         disabled
         hidePlaceholderWhenSelected
-        className={`border-none ${"p-3"}`}
+        className={`border-none p-2 sm:p-3`}
         badgeClassName="text-sm p-0"
       />
 
