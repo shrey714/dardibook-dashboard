@@ -19,8 +19,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-const SIDEBAR_COOKIE_NAME = "sidebar:state";
-const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
+const SIDEBAR_COOKIE_NAME = "main-sidebar:state";
+const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 30;
 const SIDEBAR_WIDTH = "16rem";
 const SIDEBAR_WIDTH_MOBILE = "18rem";
 const SIDEBAR_WIDTH_ICON = "3rem";
@@ -78,7 +78,11 @@ const SidebarProvider = React.forwardRef<
         .split("; ")
         .find((row) => row.startsWith(SIDEBAR_COOKIE_NAME))
         ?.split("=")[1];
-      return cookieValue === "true" ? true : defaultOpen;
+      return cookieValue
+        ? cookieValue === "true"
+          ? true
+          : false
+        : defaultOpen;
     });
     const open = openProp ?? _open;
     const setOpen = React.useCallback(
