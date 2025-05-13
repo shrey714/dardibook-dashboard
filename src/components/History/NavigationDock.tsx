@@ -15,7 +15,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Dock, DockIcon } from "@/components/ui/dock";
 import { useAuth } from "@clerk/nextjs";
-import { historyPages } from "@/app/dashboard/history/_actions";
+import { historyPages } from "@/app/dashboard/history/(history)/_actions";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {

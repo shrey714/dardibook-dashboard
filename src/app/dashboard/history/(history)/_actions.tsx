@@ -7,11 +7,11 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 
-import Registrations from "../../../../public/Registrations.jpg";
-import Patients from "../../../../public/Patients.jpg";
-import Prescriptions from "../../../../public/Prescriptions.jpg";
-import Admissions from "../../../../public/Admissions.jpg";
-import Bills from "../../../../public/Bills.jpg";
+import Registrations from "../../../../../public/Registrations.jpg";
+import Patients from "../../../../../public/Patients.jpg";
+import Prescriptions from "../../../../../public/Prescriptions.jpg";
+import Admissions from "../../../../../public/Admissions.jpg";
+import Bills from "../../../../../public/Bills.jpg";
 
 export const historyPages = [
   {
