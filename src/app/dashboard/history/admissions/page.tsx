@@ -8,16 +8,36 @@ import { OrgBed } from "@/types/FormTypes";
 import { error } from "console";
 import { DataTableToolbar } from "@/components/History/admissions/data-table-toolbar";
 import { Admission } from "@/components/History/dataSchema/schema";
+import { checkPageAccess } from "@/app/dashboard/history/(history)/_actions";
 
 export default async function Page() {
   let admissions: Admission[] = [];
 
   try {
-    const orgId = (await auth()).orgId;
-    if (!orgId) {
-      throw error("OrgId does not exist");
+    const authInstance = await auth();
+    if (!authInstance.orgId || !authInstance.orgRole) {
+      throw error("User is not authorized for this organization.");
     }
-    const admissionsCollection = collection(db, "doctor", orgId, "beds");
+
+    if (!checkPageAccess(authInstance.orgRole, "Admissions")) {
+      return (
+        <div className="w-full h-full text-muted-foreground text-sm md:text-base p-4 overflow-hidden flex items-center justify-center gap-4 flex-col">
+          <img
+            className="w-full max-w-40 lg:mx-auto"
+            src="/NoAccess.svg"
+            alt="No Access"
+          />
+          You do not have access to view Admissions.
+        </div>
+      );
+    }
+
+    const admissionsCollection = collection(
+      db,
+      "doctor",
+      authInstance.orgId,
+      "beds"
+    );
     const admissionsQuery = query(
       admissionsCollection,
       orderBy("admission_at", "desc")

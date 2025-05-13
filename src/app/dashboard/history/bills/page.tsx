@@ -8,16 +8,36 @@ import { PharmacyTypes } from "@/types/FormTypes";
 import { error } from "console";
 import { DataTableToolbar } from "@/components/History/bills/data-table-toolbar";
 import { Bill } from "@/components/History/dataSchema/schema";
+import { checkPageAccess } from "@/app/dashboard/history/(history)/_actions";
 
 export default async function Page() {
   let bills: Bill[] = [];
 
   try {
-    const orgId = (await auth()).orgId;
-    if (!orgId) {
-      throw error("OrgId does not exist");
+    const authInstance = await auth();
+    if (!authInstance.orgId || !authInstance.orgRole) {
+      throw error("User is not authorized for this organization.");
     }
-    const billsCollection = collection(db, "doctor", orgId, "bills");
+
+    if (!checkPageAccess(authInstance.orgRole, "Bills")) {
+      return (
+        <div className="w-full h-full text-muted-foreground text-sm md:text-base p-4 overflow-hidden flex items-center justify-center gap-4 flex-col">
+          <img
+            className="w-full max-w-40 lg:mx-auto"
+            src="/NoAccess.svg"
+            alt="No Access"
+          />
+          You do not have access to view Bills.
+        </div>
+      );
+    }
+
+    const billsCollection = collection(
+      db,
+      "doctor",
+      authInstance.orgId,
+      "bills"
+    );
     const billsQuery = query(billsCollection, orderBy("generated_at", "desc"));
 
     const querySnapshot = await getDocs(billsQuery);
@@ -40,6 +60,7 @@ export default async function Page() {
       };
     });
   } catch (error) {
+    console.log(error);
     return (
       <div className="w-full h-full text-red-600 text-sm md:text-base p-4 overflow-hidden flex items-center justify-center gap-4 flex-col">
         <img

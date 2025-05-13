@@ -135,3 +135,20 @@ export const historyPages = [
     ],
   },
 ];
+
+/**
+ * Function to check if a user has access to a specific page.
+ * @param {string} role - The role of the user.
+ * @param {string} pageName - The name of the page to check.
+ * @returns {boolean} - Returns true if the user has access, otherwise false.
+ */
+export const checkPageAccess = (role: string, pageName: string): boolean => {
+  // Find the page object by name
+  const page = historyPages.find((p) => p.name === pageName);
+
+  // If page not found, return false
+  if (!page) return false;
+
+  // Check if the user's role is in the page's roles list
+  return page.roles.includes(role);
+};

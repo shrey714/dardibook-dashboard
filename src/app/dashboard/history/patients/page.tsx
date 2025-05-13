@@ -4,22 +4,40 @@ import { DataTable } from "@/components/History/common/data-table";
 import { db } from "@/firebase/firebaseConfig";
 import { collection, getDocs, query } from "firebase/firestore";
 import { auth } from "@clerk/nextjs/server";
-import {
-  RegisterPatientFormTypes,
-} from "@/types/FormTypes";
+import { RegisterPatientFormTypes } from "@/types/FormTypes";
 import { error } from "console";
 import { DataTableToolbar } from "@/components/History/patients/data-table-toolbar";
 import { Patient } from "@/components/History/dataSchema/schema";
+import { checkPageAccess } from "@/app/dashboard/history/(history)/_actions";
 
 export default async function Page() {
   let patients: Patient[] = [];
 
   try {
-    const orgId = (await auth()).orgId;
-    if (!orgId) {
-      throw error("OrgId does not exist");
+    const authInstance = await auth();
+    if (!authInstance.orgId || !authInstance.orgRole) {
+      throw error("User is not authorized for this organization.");
     }
-    const patientsCollection = collection(db, "doctor", orgId, "patients");
+
+    if (!checkPageAccess(authInstance.orgRole, "Patients")) {
+      return (
+        <div className="w-full h-full text-muted-foreground text-sm md:text-base p-4 overflow-hidden flex items-center justify-center gap-4 flex-col">
+          <img
+            className="w-full max-w-40 lg:mx-auto"
+            src="/NoAccess.svg"
+            alt="No Access"
+          />
+          You do not have access to view Patients.
+        </div>
+      );
+    }
+
+    const patientsCollection = collection(
+      db,
+      "doctor",
+      authInstance.orgId,
+      "patients"
+    );
     const patientsQuery = query(patientsCollection);
 
     const querySnapshot = await getDocs(patientsQuery);
@@ -38,6 +56,7 @@ export default async function Page() {
       };
     });
   } catch (error) {
+    console.log(error);
     return (
       <div className="w-full h-full text-red-600 text-sm md:text-base p-4 overflow-hidden flex items-center justify-center gap-4 flex-col">
         <img

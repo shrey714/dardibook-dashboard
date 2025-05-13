@@ -9,16 +9,35 @@ import { error } from "console";
 import { DataTableToolbar } from "@/components/History/registrations/data-table-toolbar";
 import { Registration } from "@/components/History/dataSchema/schema";
 import { isSameDay } from "date-fns";
+import { checkPageAccess } from "@/app/dashboard/history/(history)/_actions";
 
 export default async function Page() {
   let registrations: Registration[] = [];
 
   try {
-    const orgId = (await auth()).orgId;
-    if (!orgId) {
-      throw error("OrgId does not exist");
+    const authInstance = await auth();
+    if (!authInstance.orgId || !authInstance.orgRole) {
+      throw error("User is not authorized for this organization.");
     }
-    const registrationsCollection = collection(db, "doctor", orgId, "patients");
+
+    if (!checkPageAccess(authInstance.orgRole, "Registrations")) {
+      return (
+        <div className="w-full h-full text-muted-foreground text-sm md:text-base p-4 overflow-hidden flex items-center justify-center gap-4 flex-col">
+          <img
+            className="w-full max-w-40 lg:mx-auto"
+            src="/NoAccess.svg"
+            alt="No Access"
+          />
+          You do not have access to view Registrations.
+        </div>
+      );
+    }
+    const registrationsCollection = collection(
+      db,
+      "doctor",
+      authInstance.orgId,
+      "patients"
+    );
     const registrationsQuery = query(registrationsCollection);
 
     const querySnapshot = await getDocs(registrationsQuery);

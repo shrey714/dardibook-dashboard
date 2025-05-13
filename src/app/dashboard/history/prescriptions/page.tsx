@@ -8,14 +8,28 @@ import { PrescriptionFormTypes } from "@/types/FormTypes";
 import { error } from "console";
 import { DataTableToolbar } from "@/components/History/prescriptions/data-table-toolbar";
 import { Prescription } from "@/components/History/dataSchema/schema";
+import { checkPageAccess } from "@/app/dashboard/history/(history)/_actions";
 
 export default async function Page() {
   let prescriptions: Prescription[] = [];
 
   try {
-    const orgId = (await auth()).orgId;
-    if (!orgId) {
-      throw error("OrgId does not exist");
+    const authInstance = await auth();
+    if (!authInstance.orgId || !authInstance.orgRole) {
+      throw error("User is not authorized for this organization.");
+    }
+
+    if (!checkPageAccess(authInstance.orgRole, "Prescriptions")) {
+      return (
+        <div className="w-full h-full text-muted-foreground text-sm md:text-base p-4 overflow-hidden flex items-center justify-center gap-4 flex-col">
+          <img
+            className="w-full max-w-40 lg:mx-auto"
+            src="/NoAccess.svg"
+            alt="No Access"
+          />
+          You do not have access to view Prescriptions.
+        </div>
+      );
     }
     const prescriptionsCollection = collectionGroup(db, "prescriptions");
     const prescriptionsQuery = query(
