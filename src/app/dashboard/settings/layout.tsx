@@ -1,7 +1,6 @@
 import { Metadata } from "next";
 import { SettingSidebarNav } from "@/components/Settings/settings-sidebar-nav";
-import FooterLine from "@/components/Settings/FooterLine";
-import Links from "@/components/Settings/Links";
+import Footer from "@/components/Settings/Footer";
 
 export const metadata: Metadata = {
   title: "DardiBook | Settings",
@@ -56,8 +55,7 @@ export default function SettingsLayout({ children }: SettingsLayoutProps) {
       </div>
       <SettingSidebarNav items={sidebarNavItems} />
       {children}
-      <Links />
-      <FooterLine />
+      <Footer />
     </>
   );
 }
