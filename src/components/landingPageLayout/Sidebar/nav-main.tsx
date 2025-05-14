@@ -42,7 +42,7 @@ export function NavMain({
   const { orgRole, isLoaded } = useAuth();
 
   return (
-    <SidebarGroup>
+    <SidebarGroup className="py-0">
       <SidebarGroupLabel>Links</SidebarGroupLabel>
       <SidebarMenu>
         {isLoaded &&

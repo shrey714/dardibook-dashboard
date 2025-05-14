@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import useToken from "@/firebase/useToken";
 import Link from "next/link";
 import Loader from "../common/Loader";
-import { useAuth, useOrganization } from "@clerk/nextjs";
+import { useOrganization } from "@clerk/nextjs";
 import { AnimatePresence, Reorder } from "framer-motion";
 import { format, getTime, startOfDay } from "date-fns";
 import { UserReOrderMenu } from "@/components/Appointment/UserReOrderMenu";
@@ -85,8 +85,7 @@ const filterOptions = [
 
 const QueueList: React.FC = () => {
   const { openModal } = usePatientHistoryModalStore();
-  const { orgId } = useAuth();
-  const { CurrentToken } = useToken(orgId || "");
+  const { CurrentToken } = useToken();
   const { todayPatients, loading } = useTodayPatientStore((state) => state);
   const [filters, setFilters] = useState<TodayPatientsFilter>();
   const isDesktop = useMediaQuery("(min-width: 1280px)");
