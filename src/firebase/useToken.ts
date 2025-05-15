@@ -1,8 +1,55 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { realtimeDb } from "@/firebase/firebaseConfig";
 import { ref, get, set, update, onValue } from "firebase/database";
+import { useAuth, useOrganization } from "@clerk/nextjs";
 
-const useToken = (doctorID: string) => {
+interface Option {
+    value: string;
+    label: string;
+    role: string;
+}
+
+const useToken = () => {
+
+    const { memberships } = useOrganization({
+        memberships: {
+            infinite: true,
+            keepPreviousData: true,
+            role: ["org:doctor", "org:clinic_head"],
+        },
+    });
+
+    const options: Option[] = useMemo(() => {
+        return (
+            memberships?.data
+                ?.filter((member) => !!member.publicUserData.userId)
+                .map((member) => ({
+                    value: member.publicUserData.userId!,
+                    label: [
+                        member.publicUserData.firstName,
+                        member.publicUserData.lastName,
+                    ]
+                        .filter(Boolean)
+                        .join(" "),
+                    role: member.role,
+                })) ?? []
+        );
+    }, [memberships]);
+
+    const [doctorId, setDoctorId] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (typeof window !== "undefined" && options.length > 0) {
+            const cookieValue = document.cookie
+                .split("; ")
+                .find((row) => row.startsWith("TOKEN_ACTIVE_DOCTOR"))
+                ?.split("=")[1];
+
+            setDoctorId(options.find((option) => option.value === cookieValue)?.value ?? null);
+        }
+    }, [options]);
+
+    const { orgId, isLoaded } = useAuth();
     const [CurrentToken, setCurrentToken] = useState(0);
     const [loading, setLoading] = useState(true);
     const [allowNotification, setAllowNotification] = useState(false);
@@ -23,10 +70,12 @@ const useToken = (doctorID: string) => {
     };
 
     useEffect(() => {
-        if (doctorID) {
-            const dbRef = ref(realtimeDb, doctorID);
+        if (orgId && isLoaded && doctorId) {
+            const dbRef = ref(realtimeDb, orgId + "/" + doctorId);
 
             const checkAndUpdateToken = async () => {
+                setLoading(true);
+                initialLoad.current = true;
                 const snapshot = await get(dbRef);
                 if (snapshot.exists()) {
                     const data = snapshot.val();
@@ -39,6 +88,7 @@ const useToken = (doctorID: string) => {
                             paused: false, // Initialize paused state
                         });
                         setCurrentToken(0);
+                        setIsPaused(false);
                     } else {
                         setCurrentToken(data.token_number);
                         setIsPaused(data.paused); // Set the paused state
@@ -56,12 +106,14 @@ const useToken = (doctorID: string) => {
             };
 
             checkAndUpdateToken();
+        } else {
+            setIsPaused(true)
         }
-    }, [doctorID]);
+    }, [doctorId, isLoaded, orgId]);
 
     useEffect(() => {
-        if (doctorID) {
-            const dbRef = ref(realtimeDb, doctorID);
+        if (orgId && isLoaded && doctorId) {
+            const dbRef = ref(realtimeDb, orgId + "/" + doctorId);
             const debouncePlayNotification = () => {
                 if (debounceTimeout.current !== null) {
                     clearTimeout(debounceTimeout.current);
@@ -89,14 +141,16 @@ const useToken = (doctorID: string) => {
 
             // Cleanup listener on component unmount
             return () => unsubscribe();
+        } else {
+            setIsPaused(true);
         }
-    }, [CurrentToken, allowNotification, doctorID, isPaused]);
+    }, [CurrentToken, allowNotification, doctorId, isLoaded, isPaused, orgId]);
 
     const updateToken = (increment: number) => {
-        if (isPaused || CurrentToken + increment < 0) {
+        if (isPaused || CurrentToken + increment < 0 || !orgId || !isLoaded || !doctorId) {
             return; // Prevent token number from being negative or updated if paused
         }
-        const dbRef = ref(realtimeDb, doctorID);
+        const dbRef = ref(realtimeDb, orgId + "/" + doctorId);
         const newTokenNumber = CurrentToken + increment;
         setCurrentToken(newTokenNumber);
         isClientUpdate.current = true;
@@ -107,7 +161,10 @@ const useToken = (doctorID: string) => {
     };
 
     const togglePause = () => {
-        const dbRef = ref(realtimeDb, doctorID);
+        if (!orgId || !isLoaded || !doctorId) {
+            return;
+        }
+        const dbRef = ref(realtimeDb, orgId + "/" + doctorId);
         const newPauseState = !isPaused;
         setIsPaused(newPauseState);
         isClientUpdate.current = true;
@@ -116,7 +173,12 @@ const useToken = (doctorID: string) => {
         });
     };
 
-    return { CurrentToken, loading, updateToken, allowNotification, toggleNotification, isPaused, togglePause };
+    const updateDoctorId = (id: string) => {
+        setDoctorId(id);
+        document.cookie = `TOKEN_ACTIVE_DOCTOR=${encodeURIComponent(id)}; path=/; Secure; SameSite=Strict;`;
+    };
+
+    return { options, doctorId, updateDoctorId, CurrentToken, loading, updateToken, allowNotification, toggleNotification, isPaused, togglePause };
 };
 
 export default useToken;
