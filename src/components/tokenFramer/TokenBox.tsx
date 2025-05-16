@@ -1,11 +1,12 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import BoxContainer from "./BoxContainer";
-import useToken from "@/firebase/useToken"; // Adjust the path accordingly
+import useToken from "@/firebase/useToken";
 import {
   ClipboardPlusIcon,
   GhostIcon,
   InfoIcon,
+  Maximize,
   Minus,
   Pause,
   Play,
@@ -35,6 +36,7 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogClose,
   DialogDescription,
   DialogFooter,
   DialogHeader,
@@ -201,29 +203,229 @@ export default function TokenBox() {
             </Command>
           </PopoverContent>
         </Popover>
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button variant="secondary" className="p-1 size-auto">
-              <InfoIcon className="text-muted-foreground" size={16} />
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Edit profile</DialogTitle>
-              <DialogDescription>
-                Make changes to your profile here. Click save when youre done.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4"></div>
-              <div className="grid grid-cols-4 items-center gap-4"></div>
-            </div>
-            <DialogFooter>
-              <Button type="submit">Save changes</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <TokenManagerInfoModalStructured />
       </span>
     </div>
+  );
+}
+
+interface FeatureDetail {
+  id: string;
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+  color: string;
+}
+
+const featureDetails: FeatureDetail[] = [
+  {
+    id: "nextToken",
+    title: "Sync Play/Pause",
+    description:
+      "Controls the synchronized play and pause of the token box across all users linked to the same doctor, ensuring real-time updates.",
+    icon: <Play className="h-6 w-6" />,
+    color: "indigo",
+  },
+  {
+    id: "soundToggle",
+    title: "Notification Sound Toggle",
+    description:
+      "Enables or disables sound notifications for token changes. When enabled, a sound alert is played every time the token updates.",
+    icon: <Volume2 className="h-6 w-6" />,
+    color: "pink",
+  },
+  {
+    id: "decreaseToken",
+    title: "Decrease Token",
+    description:
+      "Decreases the current token number. The minimum possible value is 0, ensuring the count never goes negative.",
+    icon: <Minus className="h-6 w-6" />,
+    color: "red",
+  },
+  {
+    id: "tokenNumber",
+    title: "Current Token Display",
+    description:
+      "Shows the currently active token number, allowing patients to easily identify when they are being called.",
+    icon: <span className="text-2xl font-bold">3</span>,
+    color: "amber",
+  },
+  {
+    id: "fullscreen",
+    title: "Fullscreen View",
+    description:
+      "Expands the token display to fullscreen mode, enhancing visibility for larger screens and shared viewing areas.",
+    icon: <Maximize className="h-6 w-6" />,
+    color: "emerald",
+  },
+  {
+    id: "increaseToken",
+    title: "Increase Token",
+    description:
+      "Increases the current token number, allowing you to move forward in the queue manually.",
+    icon: <Plus className="h-6 w-6" />,
+    color: "blue",
+  },
+  {
+    id: "assignPatient",
+    title: "Doctor Assignment",
+    description:
+      "Displays or updates the doctor associated with the current token. All token-related operations are synchronized with the selected doctor.",
+    icon: <ClipboardPlusIcon className="h-6 w-6" />,
+    color: "green",
+  },
+];
+
+function TokenManagerInfoModalStructured() {
+  const [activeFeature, setActiveFeature] = useState<string | null>(null);
+
+  const handleFeatureClick = (featureId: string) => {
+    setActiveFeature(featureId);
+  };
+
+  const getFeatureById = (id: string | null) => {
+    if (!id) return null;
+    return featureDetails.find((f) => f.id === id) || null;
+  };
+
+  const currentFeature = getFeatureById(activeFeature);
+
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button
+          variant="secondary"
+          className="p-1 size-auto"
+          aria-label="Show token manager information"
+        >
+          <InfoIcon className="text-muted-foreground" size={16} />
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-2xl p-3 sm:p-6">
+        <DialogHeader className="relative">
+          <DialogTitle className="text-xl font-bold bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+            Token Manager Guide
+          </DialogTitle>
+          <DialogDescription className="text-sm">
+            Explore the features of your clinics token management system
+          </DialogDescription>
+        </DialogHeader>
+
+        <div
+          className={`px-2 py-1 sm:px-3 sm:py-2 bg-slate-900 rounded-lg transition-all duration-300`}
+        >
+          <p className="text-sm text-gray-300">
+            Select a category above to explore the different features of your
+            token management system.
+          </p>
+        </div>
+
+        <div
+          className={`relative max-w-lg w-full justify-self-center overflow-hidden rounded-lg bg-gradient-to-br from-slate-900 to-slate-800 shadow-xl transition-all duration-500`}
+        >
+          <div className="grid grid-cols-6 grid-rows-4 gap-2 sm:gap-3 p-2 sm:p-3 h-full w-full">
+            <div className="col-span-3">
+              <div
+                className={`h-14 bg-indigo-600/40 hover:bg-indigo-600/90 rounded-lg flex items-center justify-center cursor-pointer shadow-md transition-all duration-300 hover:ring-2 ring-indigo-500/40`}
+                onClick={() => handleFeatureClick("nextToken")}
+              >
+                <Play size={24} className="text-white mr-2" /> {"/"}
+                <Pause size={24} className="text-white ml-2" />
+              </div>
+            </div>
+            <div className="col-span-3 col-start-4">
+              <div
+                className={`h-14 bg-pink-600/40 hover:bg-pink-600/90 rounded-lg flex items-center justify-center cursor-pointer shadow-md transition-all duration-300 hover:ring-2 ring-pink-500/40`}
+                onClick={() => handleFeatureClick("soundToggle")}
+              >
+                <Volume2 size={24} className="text-white mr-2" /> {"/"}
+                <VolumeOff size={24} className="text-white ml-2" />
+              </div>
+            </div>
+            <div className="row-start-2 row-span-2">
+              <div
+                className={`h-full bg-red-600/40 hover:bg-red-600/90 rounded-lg flex items-center justify-center cursor-pointer shadow-md transition-all duration-300 hover:ring-2 ring-red-500/40`}
+                onClick={() => handleFeatureClick("decreaseToken")}
+              >
+                <Minus size={28} className="text-white" />
+              </div>
+            </div>
+            <div className="col-span-4 row-span-2 row-start-2">
+              <div
+                onClick={() => handleFeatureClick("tokenNumber")}
+                className={`size-full bg-black/40 hover:bg-black/90 flex flex-col items-center justify-center shadow-[0_0_20px_rgba(0,0,0,0.5)] cursor-pointer relative rounded-lg transition-all duration-300 ease-out`}
+              >
+                <span className="text-5xl font-bold text-white/90">3</span>
+                <div
+                  className={`absolute top-2 right-2 p-1 text-gray-400 cursor-pointer hover:text-emerald-400 transition-colors ${
+                    activeFeature === "fullscreen" ? "text-emerald-400" : ""
+                  }`}
+                  onClick={() => handleFeatureClick("fullscreen")}
+                >
+                  <Maximize size={20} />
+                </div>
+              </div>
+            </div>
+            <div className="col-start-6 row-span-2 row-start-2">
+              <div
+                className={`h-full bg-blue-600/40 hover:bg-blue-600/90 rounded-lg flex items-center justify-center cursor-pointer shadow-md transition-all duration-300 hover:ring-2 ring-blue-500/40`}
+                onClick={() => handleFeatureClick("increaseToken")}
+              >
+                <Plus size={28} className="text-white" />
+              </div>
+            </div>
+            <div className="col-span-6 row-start-4">
+              <div
+                className={`h-14 bg-green-600/40 hover:bg-green-600/90 rounded-lg flex items-center justify-center px-3 cursor-pointer shadow-md transition-all duration-300 hover:ring-2 ring-green-500/40`}
+                onClick={() => handleFeatureClick("assignPatient")}
+              >
+                <ClipboardPlusIcon size={20} className="text-white mr-2" />
+                <span className="text-white text-sm font-medium">
+                  Shrey Patel
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {currentFeature && (
+            <div
+              className={`absolute inset-0 bg-black/80 backdrop-blur-sm flex flex-col items-center justify-center p-6 z-30 transition-opacity duration-300 ${
+                activeFeature ? "opacity-100" : "opacity-0"
+              }`}
+            >
+              <div
+                className={`size-12 rounded-full bg-${currentFeature.color}-600 flex items-center justify-center mb-3`}
+              >
+                {currentFeature.icon}
+              </div>
+              <h3 className="text-xl font-bold text-white mb-2">
+                {currentFeature.title}
+              </h3>
+              <p className="text-sm text-gray-300 text-center max-w-xs">
+                {currentFeature.description}
+              </p>
+              <button
+                onClick={() => setActiveFeature(null)}
+                className="mt-4 px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-md text-sm text-white"
+              >
+                Back
+              </button>
+            </div>
+          )}
+        </div>
+
+        <DialogFooter className="items-center sm:justify-center">
+          <DialogClose asChild>
+            <Button
+              type="button"
+              variant="outline"
+              className="w-min rounded-full"
+            >
+              Got it!
+            </Button>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
