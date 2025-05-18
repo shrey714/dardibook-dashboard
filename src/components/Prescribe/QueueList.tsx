@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import useToken from "@/firebase/useToken";
+import { useToken } from "@/firebase/TokenStore";
 import Link from "next/link";
 import Loader from "../common/Loader";
 import { useOrganization } from "@clerk/nextjs";
@@ -85,9 +85,11 @@ const filterOptions = [
 
 const QueueList: React.FC = () => {
   const { openModal } = usePatientHistoryModalStore();
-  const { CurrentToken } = useToken();
+  const { CurrentToken, doctorId } = useToken();
   const { todayPatients, loading } = useTodayPatientStore((state) => state);
-  const [filters, setFilters] = useState<TodayPatientsFilter>();
+  const [filters, setFilters] = useState<TodayPatientsFilter>({
+    registerd_for: doctorId ? doctorId : undefined,
+  });
   const isDesktop = useMediaQuery("(min-width: 1280px)");
 
   const { memberships } = useOrganization({
@@ -278,10 +280,7 @@ const QueueList: React.FC = () => {
               <div className="px-2 pb-2 min-w-64 h-min flex flex-wrap gap-2 items-stretch flex-col">
                 <div className="flex flex-1 flex-row gap-x-1">
                   <span className="bg-green-500/10 flex h-auto px-2 rounded-md aspect-square items-center justify-center">
-                    <ClipboardPlusIcon
-                      size={20}
-                      className="text-green-500"
-                    />
+                    <ClipboardPlusIcon size={20} className="text-green-500" />
                   </span>
                   <Select
                     value={filters?.registerd_for}

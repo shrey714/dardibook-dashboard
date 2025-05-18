@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import BoxContainer from "./BoxContainer";
-import useToken from "@/firebase/useToken";
+import {useTokenWithOrganization} from "@/firebase/TokenStore";
 import {
   ChevronLeft,
   ClipboardPlusIcon,
@@ -62,7 +62,7 @@ export default function TokenBox() {
     toggleNotification,
     isPaused,
     togglePause,
-  } = useToken();
+  } = useTokenWithOrganization();
 
   const [open, setOpen] = React.useState(false);
 
