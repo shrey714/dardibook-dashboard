@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import BoxContainer from "./BoxContainer";
 import useToken from "@/firebase/useToken";
 import {
+  ChevronLeft,
   ClipboardPlusIcon,
   GhostIcon,
   InfoIcon,
@@ -11,6 +12,7 @@ import {
   Pause,
   Play,
   Plus,
+  Sparkles,
   UserCogIcon,
   Volume2,
   VolumeOff,
@@ -43,6 +45,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { AnimatePresence, motion } from "framer-motion";
 
 export default function TokenBox() {
   const { orgRole } = useAuth();
@@ -289,7 +292,6 @@ function TokenManagerInfoModalStructured() {
   };
 
   const currentFeature = getFeatureById(activeFeature);
-
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -312,9 +314,10 @@ function TokenManagerInfoModalStructured() {
         </DialogHeader>
 
         <div
-          className={`px-2 py-1 sm:px-3 sm:py-2 bg-slate-900 rounded-lg transition-all duration-300`}
+          className={`px-2 py-1 sm:px-3 sm:py-2 bg-slate-900 rounded-lg transition-all duration-300 flex flex-row gap-3 items-center`}
         >
-          <p className="text-sm text-gray-300">
+          <Sparkles className="h-5 w-5 text-indigo-300" />
+          <p className="text-xs text-gray-400">
             Select a category above to explore the different features of your
             token management system.
           </p>
@@ -357,10 +360,11 @@ function TokenManagerInfoModalStructured() {
               >
                 <span className="text-5xl font-bold text-white/90">3</span>
                 <div
-                  className={`absolute top-2 right-2 p-1 text-gray-400 cursor-pointer hover:text-emerald-400 transition-colors ${
-                    activeFeature === "fullscreen" ? "text-emerald-400" : ""
-                  }`}
-                  onClick={() => handleFeatureClick("fullscreen")}
+                  className={`absolute top-2 right-2 p-1 text-gray-400 cursor-pointer hover:text-emerald-400 transition-colors z-10`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleFeatureClick("fullscreen");
+                  }}
                 >
                   <Maximize size={20} />
                 </div>
@@ -387,31 +391,56 @@ function TokenManagerInfoModalStructured() {
             </div>
           </div>
 
-          {currentFeature && (
-            <div
-              className={`absolute inset-0 bg-black/80 backdrop-blur-sm flex flex-col items-center justify-center p-6 z-30 transition-opacity duration-300 ${
-                activeFeature ? "opacity-100" : "opacity-0"
-              }`}
-            >
-              <div
-                className={`size-12 rounded-full bg-${currentFeature.color}-600 flex items-center justify-center mb-3`}
+          <AnimatePresence>
+            {currentFeature && (
+              <motion.div
+                className="absolute inset-0 bg-black/80 backdrop-blur-sm flex flex-col items-center justify-center p-6 z-30"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
               >
-                {currentFeature.icon}
-              </div>
-              <h3 className="text-xl font-bold text-white mb-2">
-                {currentFeature.title}
-              </h3>
-              <p className="text-sm text-gray-300 text-center max-w-xs">
-                {currentFeature.description}
-              </p>
-              <button
-                onClick={() => setActiveFeature(null)}
-                className="mt-4 px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-md text-sm text-white"
-              >
-                Back
-              </button>
-            </div>
-          )}
+                <motion.div
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  className={`size-14 rounded-full bg-${currentFeature.color}-600 flex items-center justify-center mb-4`}
+                  transition={{ delay: 0.1, stiffness: 400, damping: 10 }}
+                >
+                  {currentFeature.icon}
+                </motion.div>
+                <motion.h3
+                  className="text-xl font-bold text-white mb-2"
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.1 }}
+                >
+                  {currentFeature.title}
+                </motion.h3>
+                <motion.p
+                  className="text-sm text-gray-300 text-center max-w-xs"
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  {currentFeature.description}
+                </motion.p>
+                <motion.button
+                  onClick={() => {
+                    setActiveFeature(null);
+                  }}
+                  className="mt-6 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-md text-sm text-white flex items-center"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.2, type: "spring" }}
+                >
+                  <ChevronLeft className="mr-2 h-4 w-4" />
+                  Back to Overview
+                </motion.button>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         <DialogFooter className="items-center sm:justify-center">
