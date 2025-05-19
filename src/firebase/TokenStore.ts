@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { realtimeDb } from "@/firebase/firebaseConfig";
-import { ref, get as getS, set as setS, update, onValue } from "firebase/database";
-import { useEffect, useMemo } from "react";
+import { ref, get as getS, set as setS, update, onValue, DatabaseReference } from "firebase/database";
+import { useEffect, useMemo, useRef } from "react";
 import { useAuth, useOrganization } from "@clerk/nextjs";
 
 interface Option {
@@ -23,7 +23,6 @@ interface TokenState {
   // Internal refs (not part of state but needed for functionality)
   _isClientUpdate: boolean;
   _initialLoad: boolean;
-  _unsubscribe: (() => void) | null;
   _debounceTimeout: number | null;
   
   // Actions
@@ -32,8 +31,6 @@ interface TokenState {
   initializeDoctorId: () => void;
   updateDoctorId: (id: string) => void;
   initializeTokenData: () => Promise<void>;
-  setupRealtimeListener: () => void;
-  cleanup: () => void;
   updateToken: (increment: number) => void;
   togglePause: () => void;
   toggleNotification: (allow: boolean) => void;
@@ -41,6 +38,7 @@ interface TokenState {
   debouncePlayNotification: () => void;
 }
 
+// Create the Zustand store
 export const useTokenStore = create<TokenState>((set, get) => ({
   // State
   doctorId: null,
@@ -49,12 +47,11 @@ export const useTokenStore = create<TokenState>((set, get) => ({
   currentToken: 0,
   loading: true,
   allowNotification: false,
-  isPaused: false,
+  isPaused: true,
   
   // Internal refs
   _isClientUpdate: false,
   _initialLoad: true,
-  _unsubscribe: null,
   _debounceTimeout: null,
   
   // Set organization ID
@@ -108,12 +105,6 @@ export const useTokenStore = create<TokenState>((set, get) => ({
     if (get().doctorId !== id) {
       set({ doctorId: id });
       document.cookie = `TOKEN_ACTIVE_DOCTOR=${encodeURIComponent(id)}; path=/; Secure; SameSite=Strict;`;
-      
-      // Clean up previous listener if exists
-      const { _unsubscribe } = get();
-      if (_unsubscribe) {
-        _unsubscribe();
-      }
       
       // Initialize token data with new doctorId if we have orgId
       if (get().orgId) {
@@ -170,60 +161,6 @@ export const useTokenStore = create<TokenState>((set, get) => ({
     }
     
     set({ loading: false, _initialLoad: false });
-    
-    // Set up real-time listener
-    get().setupRealtimeListener();
-  },
-  
-  // Set up real-time listener for token updates
-  setupRealtimeListener: () => {
-    const { doctorId, orgId } = get();
-    
-    if (!orgId || !doctorId) {
-      return;
-    }
-    
-    const dbRef = ref(realtimeDb, orgId + "/" + doctorId);
-    
-    // Clean up previous listener if exists
-    const { _unsubscribe } = get();
-    if (_unsubscribe) {
-      _unsubscribe();
-    }
-    
-    // Create new listener
-    const unsubscribe = onValue(dbRef, (snapshot) => {
-      if (snapshot.exists()) {
-        const data = snapshot.val();
-        const { _isClientUpdate, allowNotification, _initialLoad, currentToken, isPaused } = get();
-        
-        // Play notification if token changed and not from client update
-        if (!_isClientUpdate && allowNotification && !_initialLoad && 
-            (data.token_number !== currentToken || data.paused !== isPaused)) {
-          get().debouncePlayNotification();
-        }
-        
-        set({ 
-          currentToken: data.token_number,
-          isPaused: data.paused || false,
-          _isClientUpdate: false
-        });
-      }
-    });
-    
-    // Store unsubscribe function
-    set({ _unsubscribe: unsubscribe });
-  },
-  
-  // Clean up listener on unmount
-  cleanup: () => {
-    const { _unsubscribe, _debounceTimeout } = get();
-    if (_unsubscribe) {
-      _unsubscribe();
-    }
-    if (_debounceTimeout !== null) {
-      clearTimeout(_debounceTimeout);
-    }
   },
   
   // Update token number
@@ -237,6 +174,7 @@ export const useTokenStore = create<TokenState>((set, get) => ({
     const dbRef = ref(realtimeDb, orgId + "/" + doctorId);
     const newTokenNumber = currentToken + increment;
     
+    
     set({ 
       currentToken: newTokenNumber,
       _isClientUpdate: true
@@ -244,7 +182,7 @@ export const useTokenStore = create<TokenState>((set, get) => ({
     
     update(dbRef, {
       token_number: newTokenNumber,
-      last_time: new Date().getTime(),
+      last_time: Date.now().toString(),
     });
   },
   
@@ -299,6 +237,59 @@ export const useTokenStore = create<TokenState>((set, get) => ({
   }
 }));
 
+// Custom hook to manage Firebase listeners
+const useFirebaseListener = (path: string | null, callback: (data: any) => void) => {
+  const listenerRef = useRef<{ dbRef: DatabaseReference | null, unsubscribe: (() => void) | null }>({
+    dbRef: null,
+    unsubscribe: null
+  });
+  
+  // Set up and clean up the listener
+  useEffect(() => {
+    // Clean up previous listener
+    if (listenerRef.current.unsubscribe) {
+      listenerRef.current.unsubscribe();
+      listenerRef.current = { dbRef: null, unsubscribe: null };
+    }
+    
+    // Set up new listener if path is provided
+    if (path) {
+      try {
+        const dbRef = ref(realtimeDb, path);
+        listenerRef.current.dbRef = dbRef;
+        
+        const unsubscribe = onValue(dbRef, 
+          (snapshot) => {
+            if (snapshot.exists()) {
+              callback(snapshot.val());
+            }
+          },
+          (error) => {
+            console.error("Firebase listener error:", error);
+          }
+        );
+        
+        listenerRef.current.unsubscribe = unsubscribe;
+        
+        update(dbRef, {
+          last_time: Date.now().toString()
+        });
+      } catch (error) {
+        console.error("Error setting up Firebase listener:", error);
+      }
+    }
+    
+    // Clean up on unmount
+    return () => {
+      if (listenerRef.current.unsubscribe) {
+        listenerRef.current.unsubscribe();
+      }
+    };
+  }, [path, callback]);
+  
+  return listenerRef.current;
+};
+
 // Create a hook wrapper for compatibility with existing code
 export const useToken = () => {
   const { orgId, isLoaded } = useAuth();
@@ -314,7 +305,10 @@ export const useToken = () => {
     updateToken,
     toggleNotification,
     togglePause,
-    setOrgId
+    setOrgId,
+    _isClientUpdate,
+    _initialLoad,
+    debouncePlayNotification
   } = useTokenStore();
   
   // Set orgId in the store when it changes
@@ -324,19 +318,47 @@ export const useToken = () => {
     }
   }, [orgId, isLoaded, setOrgId]);
   
-  // This simulates the original hook's behavior
-  // by initializing on mount and cleaning up on unmount
+  // Create the Firebase path
+  const firebasePath = useMemo(() => {
+    if (orgId && doctorId) {
+      return `${orgId}/${doctorId}`;
+    }
+    return null;
+  }, [orgId, doctorId]);
+  
+  // Create a stable callback for the Firebase listener
+  const handleDataUpdate = useCallback((data: { token_number: number; paused: boolean; }) => {
+    if (!_isClientUpdate && allowNotification && !_initialLoad && 
+        (data.token_number !== currentToken || data.paused !== isPaused)) {
+      debouncePlayNotification();
+    }
+    
+    useTokenStore.setState({ 
+      currentToken: data.token_number,
+      isPaused: data.paused || false,
+      _isClientUpdate: false
+    });
+  }, [_isClientUpdate, allowNotification, _initialLoad, currentToken, isPaused, debouncePlayNotification]);
+  
+  // Set up the Firebase listener
+  useFirebaseListener(firebasePath, handleDataUpdate);
+  
+  // Initialize doctorId from cookie when options are available
   useEffect(() => {
-    // Initialize doctorId from cookie when options are available
     if (options.length > 0) {
       useTokenStore.getState().initializeDoctorId();
     }
-    
-    // Clean up on unmount
-    return () => {
-      useTokenStore.getState().cleanup();
-    };
   }, [options]);
+  
+  // Clean up on unmount
+  useEffect(() => {
+    return () => {
+      if (useTokenStore.getState()._debounceTimeout !== null) {
+        clearTimeout(useTokenStore.getState()._debounceTimeout ?? undefined);
+        useTokenStore.setState({ _debounceTimeout: null });
+      }
+    };
+  }, []);
   
   return {
     options,
@@ -352,7 +374,7 @@ export const useToken = () => {
   };
 };
 
-// Hook to use with Clerk's useOrganization - FIXED to prevent infinite loop
+// Hook to use with Clerk's useOrganization
 export const useTokenWithOrganization = () => {
   const { orgId, isLoaded } = useAuth();
   const { memberships } = useOrganization({
@@ -363,26 +385,12 @@ export const useTokenWithOrganization = () => {
     },
   });
   
-  // Get the token store state
-  const {
-    doctorId,
-    currentToken,
-    loading,
-    allowNotification,
-    isPaused,
-    updateDoctorId,
-    updateToken,
-    toggleNotification,
-    togglePause,
-    setOrgId
-  } = useTokenStore();
-  
   // Set orgId in the store when it changes
   useEffect(() => {
     if (isLoaded && orgId) {
-      setOrgId(orgId);
+      useTokenStore.getState().setOrgId(orgId);
     }
-  }, [orgId, isLoaded, setOrgId]);
+  }, [orgId, isLoaded]);
   
   // Calculate options from memberships
   const options = useMemo(() => {
@@ -402,8 +410,7 @@ export const useTokenWithOrganization = () => {
     );
   }, [memberships]);
   
-  // Update options in the store when they change, but with a deep equality check
-  // to prevent unnecessary updates that could cause infinite loops
+  // Update options in the store when they change
   useEffect(() => {
     const currentOptions = useTokenStore.getState().options;
     // Only update if options have actually changed to prevent infinite loops
@@ -412,28 +419,9 @@ export const useTokenWithOrganization = () => {
     }
   }, [options]);
   
-  // Initialize doctorId when options change
-  useEffect(() => {
-    if (options.length > 0) {
-      useTokenStore.getState().initializeDoctorId();
-    }
-    
-    // Clean up on unmount
-    return () => {
-      useTokenStore.getState().cleanup();
-    };
-  }, [options]);
-  
-  return {
-    options,
-    doctorId,
-    updateDoctorId,
-    CurrentToken: currentToken, // Keep the original property name for compatibility
-    loading,
-    updateToken,
-    allowNotification,
-    toggleNotification,
-    isPaused,
-    togglePause
-  };
+  // Use the regular hook for everything else
+  return useToken();
 };
+
+// Add missing imports
+import { useCallback } from 'react';

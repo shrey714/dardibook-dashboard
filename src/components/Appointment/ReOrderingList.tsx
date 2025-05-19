@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useToken } from "@/firebase/TokenStore";
 import Link from "next/link";
 import Loader from "../common/Loader";
@@ -72,10 +72,16 @@ const ReOrderingList: React.FC = () => {
   const { openModal } = usePatientHistoryModalStore();
   const { CurrentToken, doctorId } = useToken();
   const { todayPatients, loading } = useTodayPatientStore((state) => state);
-  const [filters, setFilters] = useState<TodayPatientsFilter>({
-    registerd_for: doctorId ? doctorId : undefined,
-  });
+  const [filters, setFilters] = useState<TodayPatientsFilter>();
   const isDesktop = useMediaQuery("(min-width: 1280px)");
+  useEffect(() => {
+    if (doctorId) {
+      setFilters((prevFilter) => ({
+        ...prevFilter,
+        registerd_for: doctorId,
+      }));
+    }
+  }, [doctorId]);
 
   const { memberships } = useOrganization({
     memberships: {
