@@ -452,7 +452,11 @@ const QueueList: React.FC = () => {
                         {/* [...filteredPatients, ...Array(20).fill(filteredPatients[0])] */}
                         {filteredPatients.map((item, key: number) => {
                           const select =
-                            CurrentToken === filteredPatients?.length - key
+                            CurrentToken === filteredPatients?.length - key &&
+                            (!filters?.registerd_for ||
+                              filters?.registerd_for === doctorId) &&
+                            !filters?.registerd_by &&
+                            !filters?.selectedFilter
                               ? true
                               : false;
                           const patient_matching_reg_date_time =
