@@ -136,7 +136,7 @@ export default function TokenBox() {
               aria-expanded={open}
               className={`w-full ${
                 doctorId
-                  ? "bg-green-600/20 hover:bg-green-600/20"
+                  ? "bg-green-600/20 hover:bg-green-600/40"
                   : "bg-secondary"
               } border-0 pl-2 pr-1.5 gap-1.5 py-1 h-auto`}
             >
@@ -169,10 +169,6 @@ export default function TokenBox() {
           >
             <Command className="bg-sidebar">
               <CommandList>
-                <CommandEmpty>
-                  <GhostIcon className="mb-1" />
-                  No doctor found.
-                </CommandEmpty>
                 <CommandGroup heading="Doctors">
                   {options.map((option) => (
                     <CommandItem
@@ -202,6 +198,10 @@ export default function TokenBox() {
                     </CommandItem>
                   ))}
                 </CommandGroup>
+                <CommandEmpty>
+                  <GhostIcon className="mb-1" />
+                  No doctor found.
+                </CommandEmpty>
               </CommandList>
             </Command>
           </PopoverContent>

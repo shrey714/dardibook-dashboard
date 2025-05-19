@@ -187,6 +187,7 @@ export const UserReOrderMenu: React.FC<UserReOrderMenuProps> = ({
         </DropdownMenuLabel>
         <div className="sm:flex my-1 border rounded-md">
           <Calendar
+            className="justify-self-center"
             mode="single"
             selected={date}
             onSelect={handleDateSelect}

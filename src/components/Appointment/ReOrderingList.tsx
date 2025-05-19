@@ -75,12 +75,10 @@ const ReOrderingList: React.FC = () => {
   const [filters, setFilters] = useState<TodayPatientsFilter>();
   const isDesktop = useMediaQuery("(min-width: 1280px)");
   useEffect(() => {
-    if (doctorId) {
-      setFilters((prevFilter) => ({
-        ...prevFilter,
-        registerd_for: doctorId,
-      }));
-    }
+    setFilters((prevFilter) => ({
+      ...prevFilter,
+      registerd_for: doctorId ?? undefined,
+    }));
   }, [doctorId]);
 
   const { memberships } = useOrganization({
@@ -128,7 +126,7 @@ const ReOrderingList: React.FC = () => {
       } w-full h-full overflow-x-hidden overflow-y-hidden gap-x-4 gap-y-2 flex flex-col 2xl:flex-row flex-wrap`}
     >
       {isDesktop ? (
-        <div className="px-2 pb-2 min-w-64 h-min flex flex-wrap gap-2 border-b 2xl:border-b-0 2xl:border-r items-center 2xl:items-stretch flex-row 2xl:flex-col">
+        <div className="px-2 pb-2 pt-0.5 min-w-64 h-min flex flex-wrap gap-2 border-b 2xl:border-b-0 2xl:border-r items-center 2xl:items-stretch flex-row 2xl:flex-col">
           <div className="flex flex-1 flex-row gap-x-1">
             <span className="bg-green-500/10 flex h-auto px-2 rounded-md aspect-square items-center justify-center">
               <ClipboardPlusIcon size={20} className="text-green-500" />
@@ -142,7 +140,9 @@ const ReOrderingList: React.FC = () => {
             >
               <SelectTrigger
                 id="registerd_for"
-                className="w-full md:max-w-md lg:col-span-2 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input py-1 pl-2 sm:text-sm sm:leading-6"
+                className={`w-full md:max-w-md lg:col-span-2 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input py-1 pl-2 sm:text-sm sm:leading-6 ${
+                  filters?.registerd_for === doctorId && "text-green-500"
+                }`}
               >
                 <SelectValue placeholder="Registerd for" />
               </SelectTrigger>
@@ -255,7 +255,14 @@ const ReOrderingList: React.FC = () => {
       ) : (
         <Drawer autoFocus>
           <DrawerTrigger asChild>
-            <Button variant="outline" className="self-end py-2 px-3">
+            <Button
+              variant="outline"
+              className={`self-end py-2 px-3 ${
+                filters &&
+                Object.values(filters).some(Boolean) &&
+                "border-green-600 text-green-400 shadow-[inset_0px_-3.5px_0px_0px_#16a34a]"
+              }`}
+            >
               <ListFilter />
             </Button>
           </DrawerTrigger>
@@ -282,7 +289,9 @@ const ReOrderingList: React.FC = () => {
                   >
                     <SelectTrigger
                       id="registerd_for"
-                      className="w-full md:max-w-md lg:col-span-2 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input py-1 pl-2 sm:text-sm sm:leading-6"
+                      className={`w-full md:max-w-md lg:col-span-2 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input py-1 pl-2 sm:text-sm sm:leading-6 ${
+                        filters?.registerd_for === doctorId && "text-green-500"
+                      }`}
                     >
                       <SelectValue placeholder="Registerd for" />
                     </SelectTrigger>
