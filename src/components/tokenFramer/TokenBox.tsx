@@ -69,7 +69,7 @@ export default function TokenBox() {
 
   return (
     <div
-      className={`flex z-50 flex-col mx-2 mt-2 rounded-lg bg-background transition-all border border-border shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px] ${
+      className={`flex z-50 flex-col mx-2 rounded-lg bg-background transition-all border border-border shadow-[rgba(0,_0,_0,_0.24)_0px_3px_8px] ${
         state === "collapsed" && !isMobile
           ? "w-60 opacity-60 hover:opacity-100"
           : ""

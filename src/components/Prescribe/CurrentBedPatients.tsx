@@ -65,12 +65,14 @@ import {
 } from "@/components/ui/drawer";
 
 import { useOrganization } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 
 interface CurrentBedPatientsFilter {
   admission_for?: string;
 }
 
 const CurrentBedPatients = () => {
+  const router = useRouter();
   const { beds, bedPatients, loading } = useBedsStore((state) => state);
   const isDesktop = useMediaQuery("(min-width: 1536px)");
   const [alerts] = useState<string[]>([]);
@@ -217,22 +219,15 @@ const CurrentBedPatients = () => {
 
                                 <div className="px-2 h-auto flex flex-col justify-start items-start">
                                   <p className="text-sm font-normal">
-                                    <Link
-                                      href={"#"}
-                                      role="button"
+                                    <button
+                                      type="button"
                                       onClick={() =>
-                                        openModal({
-                                          patientId: bed.patient_id,
-                                        })
+                                        openModal({ patientId: bed.patient_id })
                                       }
-                                      className={`py-1 text-sm h-full`}
+                                      className="text-sm h-full underline text-muted-foreground cursor-pointer bg-transparent border-0 p-0"
                                     >
-                                      <p
-                                        className={`underline text-muted-foreground text-sm`}
-                                      >
-                                        {bed.patient_id}
-                                      </p>
-                                    </Link>
+                                      {bed.patient_id}
+                                    </button>
                                   </p>
                                   <p className="text-sm">
                                     {matchingPatient.name}
@@ -248,35 +243,24 @@ const CurrentBedPatients = () => {
                                 <Button
                                   variant="default"
                                   className="p-0 border-0 rounded-md h-full aspect-square"
-                                  asChild
+                                  onClick={() =>
+                                    openModal({
+                                      patientId: bed.patient_id,
+                                    })
+                                  }
                                 >
-                                  <Link
-                                    href={"#"}
-                                    role="button"
-                                    onClick={() =>
-                                      openModal({
-                                        patientId: bed.patient_id,
-                                      })
-                                    }
-                                  >
-                                    <History />
-                                  </Link>
+                                  <History />
                                 </Button>
                                 <Button
                                   variant="outline"
                                   className="bg-blue-700 hover:bg-blue-900 text-white hover:text-white flex flex-1 rounded-md h-full p-0 border-0 disabled:invisible"
-                                  asChild
+                                  onClick={() => {
+                                    router.push(
+                                      `prescribe/prescribeForm?patientId=${bed.patient_id}`
+                                    );
+                                  }}
                                 >
-                                  <Link
-                                    href={{
-                                      pathname: "prescribe/prescribeForm",
-                                      query: {
-                                        patientId: bed.patient_id,
-                                      },
-                                    }}
-                                  >
-                                    <ClipboardPlusIcon className="size-4 sm:size-5" />
-                                  </Link>
+                                  <ClipboardPlusIcon className="size-4 sm:size-5" />
                                 </Button>
                               </div>
                             </div>
@@ -525,11 +509,11 @@ const CurrentBedPatients = () => {
                                       }
                                       className={`py-1 text-sm h-full`}
                                     >
-                                      <p
+                                      <span
                                         className={`underline text-muted-foreground text-sm`}
                                       >
                                         {bed.patient_id}
-                                      </p>
+                                      </span>
                                     </Link>
                                   </p>
                                   <p className="text-sm line-clamp-1">
@@ -546,35 +530,26 @@ const CurrentBedPatients = () => {
                                 <Button
                                   variant="default"
                                   className="p-0 border-0 rounded-md h-full aspect-square"
-                                  asChild
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    openModal({
+                                      patientId: bed.patient_id,
+                                    });
+                                  }}
                                 >
-                                  <Link
-                                    href={"#"}
-                                    role="button"
-                                    onClick={() =>
-                                      openModal({
-                                        patientId: bed.patient_id,
-                                      })
-                                    }
-                                  >
-                                    <History />
-                                  </Link>
+                                  <History />
                                 </Button>
                                 <Button
                                   variant="outline"
                                   className="bg-blue-700 hover:bg-blue-900 text-white hover:text-white flex flex-1 rounded-md h-full p-0 px-2 border-0 disabled:invisible"
-                                  asChild
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    router.push(
+                                      `prescribe/prescribeForm?patientId=${bed.patient_id}`
+                                    );
+                                  }}
                                 >
-                                  <Link
-                                    href={{
-                                      pathname: "prescribe/prescribeForm",
-                                      query: {
-                                        patientId: bed.patient_id,
-                                      },
-                                    }}
-                                  >
-                                    <ClipboardPlusIcon className="size-4 sm:size-5" />
-                                  </Link>
+                                  <ClipboardPlusIcon className="size-4 sm:size-5" />
                                 </Button>
                               </div>
                             </div>

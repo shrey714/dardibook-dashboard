@@ -260,7 +260,7 @@ const ReOrderingList: React.FC = () => {
               className={`self-end py-2 px-3 ${
                 filters &&
                 Object.values(filters).some(Boolean) &&
-                "border-green-600 text-green-400 shadow-[inset_0px_-3.5px_0px_0px_#16a34a]"
+                "border-green-600 text-green-600 shadow-[inset_0px_-3.5px_0px_0px_#16a34a]"
               }`}
             >
               <ListFilter />

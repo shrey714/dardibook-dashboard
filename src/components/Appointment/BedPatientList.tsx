@@ -91,20 +91,15 @@ export const BedPatientList: React.FC<bedPatientProps> = ({
                           {bed.bedId}
                         </span>
 
-                        <Link
-                          href={"#"}
-                          role="button"
+                        <button
+                          type="button"
                           onClick={() =>
-                            openModal({
-                              patientId: bed.patient_id,
-                            })
+                            openModal({ patientId: bed.patient_id })
                           }
-                          className={`py-1 text-sm h-full`}
+                          className="py-1 text-sm h-full underline px-2 cursor-pointer"
                         >
-                          <p className={`underline px-2 text-sm`}>
-                            {bed.patient_id}
-                          </p>
-                        </Link>
+                          {bed.patient_id}
+                        </button>
                       </div>
 
                       {startOfDay(bed.discharge_at).toDateString() ===
