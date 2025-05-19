@@ -35,17 +35,14 @@ import {
   endOfDay,
   getTime,
   startOfDay,
+  addWeeks,
+  subWeeks,
 } from "date-fns";
 import { enUS } from "date-fns/locale";
 import { useAuth } from "@clerk/nextjs";
 import { db } from "@/firebase/firebaseConfig";
 import { Reorder } from "framer-motion";
-import {
-  Week,
-  WeekProps,
-  NextMonthButton,
-  PreviousMonthButton,
-} from "react-day-picker";
+import { Week, WeekProps } from "react-day-picker";
 import { BedPatientList } from "./BedPatientList";
 // import { useBedsStore } from "@/lib/stores/useBedsStore";
 import { BedPatientTypes, OrgBed } from "@/types/FormTypes";
@@ -79,39 +76,43 @@ export function BedSidebar({
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [currentWeek, setCurrentWeek] = useState<Array<Date>>([]);
 
+  // Consistent weekStartsOn value (0 for Sunday)
+  const weekStartsOn = 0;
+
   const getCurrentWeek = () => {
     const today = new Date();
-    const start = startOfWeek(today, { weekStartsOn: 0 });
-    const end = endOfWeek(today, { weekStartsOn: 0 });
-    setCurrentWeek(eachDayOfInterval({ start: start, end: end }));
+    const start = startOfWeek(today, { weekStartsOn });
+    const end = endOfWeek(today, { weekStartsOn });
+    setCurrentWeek(eachDayOfInterval({ start, end }));
+    setCurrentDate(today);
   };
 
   const getNextWeek = () => {
-    const end = endOfWeek(currentDate, { weekStartsOn: 1 });
-    const nextWeekStart = startOfWeek(new Date(end.getTime() + 1), {
-      weekStartsOn: 0,
-    });
-    const nextWeekEnd = endOfWeek(new Date(end.getTime() + 7), {
-      weekStartsOn: 0,
-    });
+    // Use addWeeks for cleaner date manipulation
+    const nextWeekStart = addWeeks(
+      startOfWeek(currentDate, { weekStartsOn }),
+      1
+    );
+    const nextWeekEnd = endOfWeek(nextWeekStart, { weekStartsOn });
+
     setCurrentWeek(
       eachDayOfInterval({ start: nextWeekStart, end: nextWeekEnd })
     );
-    setCurrentDate(new Date(end.getTime() + 1));
+    setCurrentDate(nextWeekStart);
   };
 
   const getPreviousWeek = () => {
-    const start = startOfWeek(currentDate, { weekStartsOn: 1 });
-    const previousWeekStart = startOfWeek(new Date(start.getTime() - 1), {
-      weekStartsOn: 0,
-    });
-    const previousWeekEnd = endOfWeek(new Date(start.getTime() - 7), {
-      weekStartsOn: 0,
-    });
-    setCurrentWeek(
-      eachDayOfInterval({ start: previousWeekStart, end: previousWeekEnd })
+    // Use subWeeks for cleaner date manipulation
+    const prevWeekStart = subWeeks(
+      startOfWeek(currentDate, { weekStartsOn }),
+      1
     );
-    setCurrentDate(new Date(start.getTime() - 1));
+    const prevWeekEnd = endOfWeek(prevWeekStart, { weekStartsOn });
+
+    setCurrentWeek(
+      eachDayOfInterval({ start: prevWeekStart, end: prevWeekEnd })
+    );
+    setCurrentDate(prevWeekStart);
   };
 
   useEffect(() => {
@@ -120,14 +121,16 @@ export function BedSidebar({
 
   function CurrentWeekRow(props: WeekProps) {
     const isDateInCurrentWeek = (dateToCheck: Date) => {
-      const today = currentDate;
-      const start = startOfWeek(today);
-      const end = endOfWeek(today);
+      // Use the same weekStartsOn value for consistency
+      const start = startOfWeek(currentDate, { weekStartsOn });
+      const end = endOfWeek(currentDate, { weekStartsOn });
       return isWithinInterval(dateToCheck, { start, end });
     };
+
     const isNotCurrentWeek = props.week.days.every(
       (date) => !isDateInCurrentWeek(date.date)
     );
+
     if (isNotCurrentWeek) return <></>;
     return <Week {...props} />;
   }
@@ -249,14 +252,10 @@ export function BedSidebar({
                 before: currentWeek[0],
                 after: currentWeek[currentWeek.length - 1],
               }}
+              onNextClick={getNextWeek}
+              onPrevClick={getPreviousWeek}
               components={{
                 Week: CurrentWeekRow,
-                NextMonthButton: (props) => (
-                  <NextMonthButton {...props} onClick={getNextWeek} />
-                ),
-                PreviousMonthButton: (props) => (
-                  <PreviousMonthButton {...props} onClick={getPreviousWeek} />
-                ),
               }}
             />
           </SidebarGroupContent3>
