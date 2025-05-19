@@ -16,6 +16,7 @@ import {
   UserCogIcon,
   Volume2,
   VolumeOff,
+  WrapText,
 } from "lucide-react";
 import { useSidebar } from "../ui/sidebar";
 import { useAuth } from "@clerk/nextjs";
@@ -441,6 +442,17 @@ function TokenManagerInfoModalStructured() {
               </motion.div>
             )}
           </AnimatePresence>
+        </div>
+
+        <div
+          className={`px-2 py-1 sm:px-3 sm:py-2 bg-border rounded-lg transition-all duration-300 flex flex-row gap-3 items-center`}
+        >
+          <WrapText className="size-6 text-primary/90" />
+          <p className="text-xs text-muted-foreground">
+            Ensure the selected doctor matches the doctor in the filter, with no
+            other filters applied, on both the appointment and prescription
+            pages.
+          </p>
         </div>
 
         <DialogFooter className="items-center sm:justify-center">

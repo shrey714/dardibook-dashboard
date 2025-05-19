@@ -453,8 +453,7 @@ const QueueList: React.FC = () => {
                         {filteredPatients.map((item, key: number) => {
                           const select =
                             CurrentToken === filteredPatients?.length - key &&
-                            (!filters?.registerd_for ||
-                              filters?.registerd_for === doctorId) &&
+                            filters?.registerd_for === doctorId &&
                             !filters?.registerd_by &&
                             !filters?.selectedFilter
                               ? true
