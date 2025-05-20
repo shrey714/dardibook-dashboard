@@ -270,9 +270,9 @@ const useFirebaseListener = (path: string | null, callback: (data: any) => void)
 
         listenerRef.current.unsubscribe = unsubscribe;
 
-        update(dbRef, {
-          last_time: Date.now().toString()
-        });
+        // update(dbRef, {
+        //   last_time: Date.now().toString()
+        // });
       } catch (error) {
         console.error("Error setting up Firebase listener:", error);
       }
