@@ -41,7 +41,9 @@ const BillsForPatient = ({
             billsData.push(bill);
           });
 
-          setBillsData(billsData);
+          setBillsData(
+            billsData.sort((a, b) => b.generated_at - a.generated_at)
+          );
         } catch (error) {
           console.error("Error fetching bills for patient:", error);
           setBillsData([]);
@@ -58,7 +60,7 @@ const BillsForPatient = ({
   }, [isLoaded, orgId, selectedPatient]);
 
   return (
-    <div className="pr-1 pl-1">
+    <div>
       <AnimatePresence mode="wait">
         {billsLoading ? (
           <motion.div

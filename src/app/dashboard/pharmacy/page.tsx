@@ -160,8 +160,11 @@ const Medical = () => {
 
           {/* Bill History Section */}
           {selectedPatient && (
-            <ScrollArea className="col-span-1 overflow-hidden flex flex-col !sticky top-3 h-[calc(100svh-73px)]">
-              <div className="pr-1 pl-1 bg-background rounded-none sticky top-0 pb-3">
+            <ScrollArea
+              showScrollbar={false}
+              className="col-span-1 overflow-hidden flex flex-col !sticky top-3 h-[calc(100svh-73px)]"
+            >
+              <div className="bg-background rounded-none sticky top-0 pb-3">
                 <Button
                   disabled={!selectedPatient}
                   variant={"outline"}
@@ -287,7 +290,10 @@ const Medical = () => {
                   <SheetTitle hidden>Bills</SheetTitle>
                   <SheetDescription hidden></SheetDescription>
                 </SheetHeader>
-                <ScrollArea className="col-span-1 overflow-hidden flex flex-col !sticky top-3 h-[calc(100svh-73px)]">
+                <ScrollArea
+                  showScrollbar={false}
+                  className="col-span-1 overflow-hidden flex flex-col !sticky top-3 h-[calc(100svh-64px)]"
+                >
                   <BillsForPatient
                     selectedPatient={selectedPatient}
                     onViewBill={handleViewBill}

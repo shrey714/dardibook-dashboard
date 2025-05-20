@@ -58,7 +58,9 @@ const PrescriptionsForPatient = ({
             const bill = doc.data() as PrescriptionFormTypes;
             billsData.push(bill);
           });
-          setPrescriptions(billsData);
+          setPrescriptions(
+            billsData.sort((a, b) => b.created_at - a.created_at)
+          );
         } catch (error) {
           console.error("Error fetching prescriptions for patient:", error);
           setPrescriptions([]);

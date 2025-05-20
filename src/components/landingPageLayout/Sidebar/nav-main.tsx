@@ -43,7 +43,7 @@ export function NavMain({
 
   return (
     <SidebarGroup className="py-0">
-      <SidebarGroupLabel className="h-6">Links</SidebarGroupLabel>
+      <SidebarGroupLabel className="h-6 group-data-[collapsible=icon]:hidden">Links</SidebarGroupLabel>
       <SidebarMenu>
         {isLoaded &&
           orgRole &&
