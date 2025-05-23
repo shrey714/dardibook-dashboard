@@ -1,9 +1,51 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Info, TableCellsMergeIcon, TrendingUpIcon } from "lucide-react";
-import { Line, LineChart } from "recharts";
-import { ChartContainer } from "@/components/ui/chart";
+import { useMediaQuery } from "@/hooks/use-media-query";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardFooter,
+} from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import {
+  CalendarIcon,
+  ClipboardIcon,
+  UserPlusIcon,
+  AlertCircleIcon,
+  ArrowRightIcon,
+  ActivityIcon,
+  PillIcon,
+  BarChartIcon,
+  BellIcon,
+  Info,
+  TableCellsMergeIcon,
+  TrendingUpIcon,
+} from "lucide-react";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+} from "@/components/ui/carousel";
+import { Bar, BarChart, CartesianGrid, XAxis, Line, LineChart } from "recharts";
+import {
+  ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
+import { addDays, format, startOfWeek, endOfWeek } from "date-fns";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 // import Temp from "./temp";
 const IconMapping = [
   UserPlusIcon,
@@ -22,9 +64,15 @@ const ColorMapping = [
   "bg-gradient-to-t from-amber-500/20 to-amber-500/10",
 ];
 const Home = () => {
+  const [selectedWeek, setSelectedWeek] = useState<{
+    startDate: Date;
+    endDate: Date;
+  } | null>(null);
+  console.log(selectedWeek);
   return (
-    <div className=" bg- p-2 flex flex-col sm:p-3 gap-2 sm:gap-3">
-      <div className="w-full flex flex-col gap-2 sm:gap-3 items-end justify-center">
+    <div className="p-1 pt-2 sm:p-2 flex flex-col md:p-3 sm:pt-3 gap-2 sm:gap-3">
+      <div className="w-full flex flex-row gap-2 sm:gap-3 items-center justify-end">
+        <WeekSelector onWeekChange={(weekInfo) => setSelectedWeek(weekInfo)} />
         <Button variant="outline" size="icon" className="relative">
           <BellIcon className="h-4 w-4" />
           <span className="sr-only">Notifications</span>
@@ -37,185 +85,188 @@ const Home = () => {
     </div>
   );
 };
-
 export default Home;
 
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-} from "@/components/ui/carousel";
 const NewStatusGrid = () => {
+  const isDesktop = useMediaQuery("(min-width: 768px)");
+
   return (
     <div className="grid auto-rows-auto grid-cols-3 gap-2 sm:gap-3 md:grid-cols-6 lg:grid-cols-9">
       {/* small--charts--start */}
-      {[1, 2, 3].map((ele) => (
-        <div
-          key={ele}
-          className="text-card-foreground hidden md:block rounded-lg shadow-sm border dark:border-0 col-span-3 h-full lg:col-span-2 xl:col-span-2 bg-gradient-to-b from-muted to-muted/50"
-        >
-          <div className="p-6 flex flex-row items-center justify-between gap-5 space-y-0 pt-4 pb-2">
-            <div className="tracking-tight flex items-center gap-2 truncate text-sm font-medium">
-              <TableCellsMergeIcon /> New Subscriptions
-            </div>
-            <Button variant="ghost" size="icon" className="p-0 size-auto">
-              <Info />
-            </Button>
-          </div>
-          <div className="p-6 flex h-[calc(100%-48px)] flex-col justify-between py-4">
-            <div className="flex flex-col">
-              <div className="flex flex-wrap items-center justify-between gap-6">
-                <div className="text-3xl font-bold">4,682</div>
-                <LineChartExample />
+      {isDesktop ? (
+        <>
+          {[1, 2, 3].map((ele) => (
+            <div
+              key={ele}
+              className="text-card-foreground rounded-lg shadow-sm border dark:border-0 col-span-3 h-full lg:col-span-2 xl:col-span-2 bg-gradient-to-b from-muted to-muted/50"
+            >
+              <div className="p-6 flex flex-row items-center justify-between gap-5 space-y-0 pt-4 pb-2">
+                <div className="tracking-tight flex items-center gap-2 truncate text-sm font-medium">
+                  <TableCellsMergeIcon /> New Subscriptions
+                </div>
+                <Button variant="ghost" size="icon" className="p-0 size-auto">
+                  <Info />
+                </Button>
               </div>
-              <p className="text-muted-foreground text-xs">Since Last week</p>
-            </div>
-            <div className="flex flex-wrap items-center justify-between gap-5">
-              <div className="text-sm font-semibold">Details</div>
-              <div className="flex items-center gap-1 text-emerald-500 dark:text-emerald-400">
-                <p className="text-[13px] leading-none font-medium">15.54%</p>
-                <TrendingUpIcon />
-              </div>
-            </div>
-          </div>
-        </div>
-      ))}
-
-      <div className="col-span-3 hidden md:block">
-        <div className="text-card-foreground rounded-lg shadow-sm border dark:border-0 h-full bg-gradient-to-b from-muted to-muted/50">
-          <div className="p-6 flex flex-row items-center justify-between space-y-0 pb-2">
-            <div className="tracking-tight text-sm font-normal">
-              Total Revenue
-            </div>
-          </div>
-          <div className="p-6 pt-0 h-[calc(100%-52px)] pb-0">
-            <div className="text-2xl font-bold">$15,231.89</div>
-            <p className="text-muted-foreground text-xs">
-              +20.1% from last month
-            </p>
-            <LineChartWithDotsExample />
-          </div>
-        </div>
-      </div>
-
-      <div className="col-span-3 flex md:hidden items-center justify-center">
-        <Carousel
-          className="w-full"
-          opts={{
-            loop: true,
-            slidesToScroll: 1,
-          }}
-        >
-          <CarouselContent className="m-0">
-            {[1, 2, 3].map((ele) => (
-              <CarouselItem
-                key={ele}
-                className={`basis-[90%] sm:basis-[80%] px-1 sm:px-1.5`}
-              >
-                <div className="text-card-foreground rounded-lg shadow-sm border dark:border-0 col-span-3 h-full lg:col-span-2 xl:col-span-2 bg-gradient-to-b from-muted to-muted/50">
-                  <div className="p-6 flex flex-row items-center justify-between gap-5 space-y-0 pt-4 pb-2">
-                    <div className="tracking-tight flex items-center gap-2 truncate text-sm font-medium">
-                      <TableCellsMergeIcon /> New Subscriptions
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="p-0 size-auto"
-                    >
-                      <Info />
-                    </Button>
+              <div className="p-6 flex h-[calc(100%-48px)] flex-col justify-between py-4">
+                <div className="flex flex-col">
+                  <div className="flex flex-wrap items-center justify-between gap-6">
+                    <div className="text-3xl font-bold">4,682</div>
+                    <LineChartExample />
                   </div>
-                  <div className="p-6 flex h-[calc(100%-48px)] flex-col justify-between py-4">
-                    <div className="flex flex-col">
-                      <div className="flex flex-wrap items-center justify-between gap-6">
-                        <div className="text-3xl font-bold">4,682</div>
-                        <LineChartExample />
+                  <p className="text-muted-foreground text-xs">
+                    Since Last week
+                  </p>
+                </div>
+                <div className="flex flex-wrap items-center justify-between gap-5">
+                  <div className="text-sm font-semibold">Details</div>
+                  <div className="flex items-center gap-1 text-emerald-500 dark:text-emerald-400">
+                    <p className="text-[13px] leading-none font-medium">
+                      15.54%
+                    </p>
+                    <TrendingUpIcon />
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+
+          <div className="col-span-3">
+            <div className="text-card-foreground rounded-lg shadow-sm border dark:border-0 h-full bg-gradient-to-b from-muted to-muted/50">
+              <div className="p-6 flex flex-row items-center justify-between space-y-0 pb-2">
+                <div className="tracking-tight text-sm font-normal">
+                  Total Revenue
+                </div>
+              </div>
+              <div className="p-6 pt-0 h-[calc(100%-52px)] pb-0">
+                <div className="text-2xl font-bold">$15,231.89</div>
+                <p className="text-muted-foreground text-xs">
+                  +20.1% from last month
+                </p>
+                <LineChartWithDotsExample />
+              </div>
+            </div>
+          </div>
+        </>
+      ) : (
+        <div className="col-span-3 flex items-center justify-center">
+          <Carousel
+            className="w-full"
+            opts={{
+              loop: true,
+              slidesToScroll: 1,
+            }}
+          >
+            <CarouselContent className="m-0">
+              {[1, 2, 3].map((ele) => (
+                <CarouselItem
+                  key={ele}
+                  className={`basis-[90%] sm:basis-[80%] px-1 sm:px-1.5`}
+                >
+                  <div className="text-card-foreground rounded-lg shadow-sm border dark:border-0 col-span-3 h-full lg:col-span-2 xl:col-span-2 bg-gradient-to-b from-muted to-muted/50">
+                    <div className="p-6 flex flex-row items-center justify-between gap-5 space-y-0 pt-4 pb-2">
+                      <div className="tracking-tight flex items-center gap-2 truncate text-sm font-medium">
+                        <TableCellsMergeIcon /> New Subscriptions
                       </div>
-                      <p className="text-muted-foreground text-xs">
-                        Since Last week
-                      </p>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="p-0 size-auto"
+                      >
+                        <Info />
+                      </Button>
                     </div>
-                    <div className="flex flex-wrap items-center justify-between gap-5">
-                      <div className="text-sm font-semibold">Details</div>
-                      <div className="flex items-center gap-1 text-emerald-500 dark:text-emerald-400">
-                        <p className="text-[13px] leading-none font-medium">
-                          15.54%
+                    <div className="p-6 flex h-[calc(100%-48px)] flex-col justify-between py-4">
+                      <div className="flex flex-col">
+                        <div className="flex flex-wrap items-center justify-between gap-6">
+                          <div className="text-3xl font-bold">4,682</div>
+                          <LineChartExample />
+                        </div>
+                        <p className="text-muted-foreground text-xs">
+                          Since Last week
                         </p>
-                        <TrendingUpIcon />
+                      </div>
+                      <div className="flex flex-wrap items-center justify-between gap-5">
+                        <div className="text-sm font-semibold">Details</div>
+                        <div className="flex items-center gap-1 text-emerald-500 dark:text-emerald-400">
+                          <p className="text-[13px] leading-none font-medium">
+                            15.54%
+                          </p>
+                          <TrendingUpIcon />
+                        </div>
                       </div>
                     </div>
+                  </div>
+                </CarouselItem>
+              ))}
+
+              <CarouselItem className={`basis-[80%] px-1 sm:px-1.5`}>
+                <div className="text-card-foreground rounded-lg shadow-sm border dark:border-0 h-full bg-gradient-to-b from-muted to-muted/50">
+                  <div className="p-6 flex flex-row items-center justify-between space-y-0 pb-2">
+                    <div className="tracking-tight text-sm font-normal">
+                      Total Revenue
+                    </div>
+                  </div>
+                  <div className="p-6 pt-0 h-[calc(100%-52px)] pb-0">
+                    <div className="text-2xl font-bold">$15,231.89</div>
+                    <p className="text-muted-foreground text-xs">
+                      +20.1% from last month
+                    </p>
+                    <LineChartWithDotsExample />
                   </div>
                 </div>
               </CarouselItem>
-            ))}
-
-            <CarouselItem
-              className={`basis-[80%] px-1 sm:px-1.5`}
-            >
-              <div className="text-card-foreground rounded-lg shadow-sm border dark:border-0 h-full bg-gradient-to-b from-muted to-muted/50">
-                <div className="p-6 flex flex-row items-center justify-between space-y-0 pb-2">
-                  <div className="tracking-tight text-sm font-normal">
-                    Total Revenue
-                  </div>
-                </div>
-                <div className="p-6 pt-0 h-[calc(100%-52px)] pb-0">
-                  <div className="text-2xl font-bold">$15,231.89</div>
-                  <p className="text-muted-foreground text-xs">
-                    +20.1% from last month
-                  </p>
-                  <LineChartWithDotsExample />
-                </div>
-              </div>
-            </CarouselItem>
-          </CarouselContent>
-        </Carousel>
-      </div>
-
+            </CarouselContent>
+          </Carousel>
+        </div>
+      )}
       {/* small--charts--end */}
 
       {/* coursel--start */}
-      <div className="col-span-3 flex md:hidden items-center justify-center">
-        <Carousel
-          className="w-full"
-          opts={{
-            loop: true,
-            slidesToScroll: 2,
-          }}
-        >
-          <CarouselContent className="m-0">
-            {[
-              "Register Patient",
-              "Appointments",
-              "Prescriptions",
-              "Lab Results",
-              "Pharmacy",
-              "Reports",
-            ].map((item, index) => {
-              return (
-                <CarouselItem
-                  key={index}
-                  className={`basis-[40%] sm:basis-[32%] px-1 sm:px-1.5`}
-                >
-                  <PageSlider index={index} item={item} />
-                </CarouselItem>
-              );
-            })}
-          </CarouselContent>
-        </Carousel>
-      </div>
-
-      <div className="hidden md:grid col-span-3 md:col-span-6 lg:col-span-3 grid-cols-3 lg:grid-cols-2 gap-2 sm:gap-3">
-        {[
-          "Register Patient",
-          "Appointments",
-          "Prescriptions",
-          "Lab Results",
-          "Pharmacy",
-          "Reports",
-        ].map((item, index) => {
-          return <PageSlider key={index} index={index} item={item} />;
-        })}
-      </div>
+      {isDesktop ? (
+        <div className="grid col-span-3 md:col-span-6 lg:col-span-3 grid-cols-3 lg:grid-cols-2 gap-2 sm:gap-3">
+          {[
+            "Register Patient",
+            "Appointments",
+            "Prescriptions",
+            "Lab Results",
+            "Pharmacy",
+            "Reports",
+          ].map((item, index) => {
+            return <PageSlider key={index} index={index} item={item} />;
+          })}
+        </div>
+      ) : (
+        <div className="col-span-3 flex items-center justify-center">
+          <Carousel
+            className="w-full"
+            opts={{
+              loop: true,
+              slidesToScroll: 2,
+            }}
+          >
+            <CarouselContent className="m-0">
+              {[
+                "Register Patient",
+                "Appointments",
+                "Prescriptions",
+                "Lab Results",
+                "Pharmacy",
+                "Reports",
+              ].map((item, index) => {
+                return (
+                  <CarouselItem
+                    key={index}
+                    className={`basis-[40%] sm:basis-[32%] px-1 sm:px-1.5`}
+                  >
+                    <PageSlider index={index} item={item} />
+                  </CarouselItem>
+                );
+              })}
+            </CarouselContent>
+          </Carousel>
+        </div>
+      )}
       {/* coursel--end */}
 
       <div className="col-span-3 md:col-span-6">
@@ -305,27 +356,6 @@ const PageSlider = ({ index, item }: { index: number; item: string }) => {
   );
 };
 
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardFooter,
-} from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import {
-  CalendarIcon,
-  ClipboardIcon,
-  UserPlusIcon,
-  AlertCircleIcon,
-  ArrowRightIcon,
-  ActivityIcon,
-  PillIcon,
-  BarChartIcon,
-  BellIcon,
-} from "lucide-react";
-
 const mockNotifications = [
   {
     id: "notif-001",
@@ -378,7 +408,6 @@ function LineChartExample() {
       className="w-[70px]"
       config={{
         month: {
-          // Using the color variable from the original chart
           theme: {
             light: "hsl(var(--chart-1))",
             dark: "hsl(var(--chart-1))",
@@ -418,7 +447,6 @@ function LineChartWithDotsExample() {
       className="h-[80px] w-full"
       config={{
         revenue: {
-          // Using the color variable from the original chart
           theme: {
             light: "hsl(var(--primary))",
             dark: "hsl(var(--primary))",
@@ -454,15 +482,6 @@ function LineChartWithDotsExample() {
   );
 }
 
-import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
-
-import {
-  ChartConfig,
-  ChartLegend,
-  ChartLegendContent,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
 const chartData = [
   { month: "January", desktop: 186, mobile: 80 },
   { month: "February", desktop: 305, mobile: 200 },
@@ -472,20 +491,21 @@ const chartData = [
   { month: "June", desktop: 214, mobile: 140 },
 ];
 
-const chartConfig = {
-  desktop: {
-    label: "Desktop",
-    color: "hsl(var(--chart-1))",
-  },
-  mobile: {
-    label: "Mobile",
-    color: "hsl(var(--chart-2))",
-  },
-} satisfies ChartConfig;
-
 function LineCharStackedExample() {
   return (
-    <ChartContainer className="h-60 md:h-96 w-full" config={chartConfig}>
+    <ChartContainer
+      className="h-60 md:h-96 w-full"
+      config={{
+        desktop: {
+          label: "Desktop",
+          color: "hsl(var(--chart-1))",
+        },
+        mobile: {
+          label: "Mobile",
+          color: "hsl(var(--chart-2))",
+        },
+      }}
+    >
       <BarChart accessibilityLayer data={chartData}>
         <CartesianGrid vertical={false} />
         <XAxis
@@ -511,5 +531,93 @@ function LineCharStackedExample() {
         />
       </BarChart>
     </ChartContainer>
+  );
+}
+
+interface WeekSelectorProps {
+  onWeekChange: (weekInfo: { startDate: Date; endDate: Date }) => void;
+}
+
+function WeekSelector({ onWeekChange }: WeekSelectorProps) {
+  const [date, setDate] = React.useState<Date>(new Date());
+  const [currentWeekStart, setCurrentWeekStart] = React.useState<Date>(
+    startOfWeek(new Date())
+  );
+  const weekEnd = endOfWeek(currentWeekStart);
+  React.useEffect(() => {
+    const weekStart = startOfWeek(date);
+    setCurrentWeekStart(weekStart);
+    onWeekChange({
+      startDate: weekStart,
+      endDate: endOfWeek(weekStart),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [date]);
+
+  const previousWeek = () => {
+    setDate(addDays(date, -7));
+  };
+
+  const nextWeek = () => {
+    setDate(addDays(date, 7));
+  };
+
+  const modifiers = {
+    inSelectedWeek: {
+      from: startOfWeek(date),
+      to: endOfWeek(date),
+    },
+    today: new Date(),
+  };
+
+  const modifiersStyles = {
+    inSelectedWeek: {
+      backgroundColor: "hsl(var(--muted-foreground))",
+      color: "hsl(var(--primary-foreground))",
+    },
+    // today: {
+    // color: "hsl(var(--primary-foreground))",
+    // },
+  };
+
+  return (
+    <Popover>
+      <div className="flex flex-row h-full w-full sm:w-auto">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={previousWeek}
+          className="size-9 rounded-r-none bg-border"
+        >
+          <ChevronLeft className="h-4 w-4" />
+          <span className="sr-only">Previous week</span>
+        </Button>
+        <PopoverTrigger className="border-y px-2 w-full sm:w-auto">
+          <div className="text-sm font-medium text-muted-foreground min-w-44 w-full sm:w-min">
+            {format(currentWeekStart, "MMM d")} -{" "}
+            {format(weekEnd, "MMM d, yyyy")}
+          </div>
+        </PopoverTrigger>
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={nextWeek}
+          className="size-9 rounded-l-none bg-border"
+        >
+          <ChevronRight className="h-4 w-4" />
+          <span className="sr-only">Next week</span>
+        </Button>
+      </div>
+      <PopoverContent className="w-auto p-0" align="center">
+        <Calendar
+          mode="single"
+          // selected={date}
+          onSelect={(newDate) => newDate && setDate(newDate)}
+          className="rounded-md border"
+          modifiers={modifiers}
+          modifiersStyles={modifiersStyles}
+        />
+      </PopoverContent>
+    </Popover>
   );
 }
