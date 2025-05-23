@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronRight, HistoryIcon, type LucideIcon } from "lucide-react";
+import { ChevronRight, type LucideIcon } from "lucide-react";
 // import { ChevronRight, type LucideIcon } from "lucide-react"
 import {
   SidebarGroup,
@@ -43,7 +43,9 @@ export function NavMain({
 
   return (
     <SidebarGroup className="py-0">
-      <SidebarGroupLabel className="h-6 group-data-[collapsible=icon]:hidden">Links</SidebarGroupLabel>
+      <SidebarGroupLabel className="h-6 group-data-[collapsible=icon]:hidden">
+        Links
+      </SidebarGroupLabel>
       <SidebarMenu>
         {isLoaded &&
           orgRole &&
