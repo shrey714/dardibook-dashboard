@@ -372,7 +372,7 @@ const data = [
   { value: 14.606 },
 ];
 
-export function LineChartExample() {
+function LineChartExample() {
   return (
     <ChartContainer
       className="w-[70px]"
@@ -412,7 +412,7 @@ const data2 = [
   { value: 9.085 },
 ];
 
-export function LineChartWithDotsExample() {
+function LineChartWithDotsExample() {
   return (
     <ChartContainer
       className="h-[80px] w-full"
