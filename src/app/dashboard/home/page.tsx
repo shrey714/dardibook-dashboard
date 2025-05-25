@@ -8,6 +8,7 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
+  CardFooter,
 } from "@/components/ui/card";
 import {
   CalendarIcon,
@@ -57,6 +58,7 @@ import {
 } from "@/components/ui/popover";
 import Link from "next/link";
 import { Calendar } from "@/components/ui/calendar";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 // import Temp from "./temp";
 const IconMapping = [
   UserPlusIcon,
@@ -81,7 +83,7 @@ const Home = () => {
     endDate: Date;
   } | null>(null);
   return (
-    <div className="p-1 pt-2 sm:p-2 flex flex-col md:p-3 sm:pt-3 gap-2 sm:gap-3">
+    <div className="p-1 py-2 gap-2 sm:p-2 sm:py-3 sm:gap-3 md:p-3 flex flex-col ">
       <div className="w-full flex flex-row gap-2 sm:gap-3 items-center justify-end">
         <WeekSelector onWeekChange={(weekInfo) => setSelectedWeek(weekInfo)} />
         <Button variant="outline" size="icon" className="relative">
@@ -268,6 +270,7 @@ const dummyBeds = [
 
 const NewStatusGrid = () => {
   const isDesktop = useMediaQuery("(min-width: 768px)");
+  const isMiddleDesktop = useMediaQuery("(min-width: 1024px)");
 
   return (
     <div className="grid auto-rows-auto grid-cols-3 gap-2 sm:gap-3 md:grid-cols-6 lg:grid-cols-9">
@@ -448,6 +451,7 @@ const NewStatusGrid = () => {
       )}
       {/* coursel--end */}
 
+      {/* doctors--performance--chart--start */}
       <div className="col-span-3 md:col-span-6">
         <div className="border dark:border-0 shadow bg-muted/50 text-card-foreground rounded-lg h-full">
           <div className="flex flex-col space-y-1.5 p-6">
@@ -463,171 +467,177 @@ const NewStatusGrid = () => {
           </div>
         </div>
       </div>
+      {/* doctors--performance--chart--end */}
 
-      <Card className="relative border dark:border-0 bg-muted/50 rounded-lg col-span-3 md:col-span-6 lg:col-span-3 overflow-hidden">
-        <CardHeader className="px-3 pt-3 pb-2 space-y-0.5 items-center border-b">
-          <CardTitle className="font-medium text-ring flex items-center gap-2 leading-normal">
-            <BedIcon className="h-5 w-5" />
-            Patients in Bed
-          </CardTitle>
-          <CardDescription className="text-xs">
-            Currently admitted patients
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="bg-gradient-to-t from-muted via-muted/0 to-muted/0 overflow-y-auto h-60 md:h-72 lg:h-[370px] px-0 divide-y divide-border">
-          {dummyBeds.length > 0 ? (
-            dummyBeds.map((bed) => {
-              const admittedAt = new Date(bed.admission_at);
-              const admittedAgo = formatDistanceToNow(admittedAt, {
-                addSuffix: true,
-              });
-              const timeDisplay = format(admittedAt, "h:mm a, MMM d");
+      {/* bed--appointments--activity--start */}
+      {isMiddleDesktop ? (
+        <>
+          <Card className="relative border dark:border-0 bg-muted/50 rounded-lg col-span-3 md:col-span-6 lg:col-span-3 overflow-hidden">
+            <CardHeader className="px-3 pt-3 pb-2 space-y-0.5 items-center border-b">
+              <CardTitle className="font-medium text-ring flex items-center gap-2 leading-normal">
+                <BedIcon className="h-5 w-5" />
+                Patients in Bed
+              </CardTitle>
+              <CardDescription className="text-xs">
+                Currently admitted patients
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="bg-gradient-to-t from-muted via-muted/0 to-muted/0 overflow-y-auto min-h-96 h-[calc(100svh-140px)] lg:h-[550px] px-0 divide-y divide-border">
+              {dummyBeds.length > 0 ? (
+                dummyBeds.map((bed) => {
+                  const admittedAt = new Date(bed.admission_at);
+                  const admittedAgo = formatDistanceToNow(admittedAt, {
+                    addSuffix: true,
+                  });
+                  const timeDisplay = format(admittedAt, "h:mm a, MMM d");
 
-              return (
+                  return (
+                    <div
+                      key={bed.bedBookingId}
+                      className="flex items-start gap-2 px-2 py-2"
+                    >
+                      <div className="bg-green-500/10 text-green-500 rounded-md p-2.5">
+                        <Bed className="h-4 w-4" />
+                      </div>
+                      <div className="w-full">
+                        <h1 className="w-full text-sm font-medium leading-none flex justify-between items-center">
+                          <span className="line-clamp-1">Aarav Shah</span>
+                          <span className="text-xs font-medium bg-green-200 text-green-700 dark:bg-green-900/50 dark:text-green-500 px-2 py-0.5 rounded-full">
+                            Bed #{bed.bedId}
+                          </span>
+                        </h1>
+                        <div className="flex items-center gap-2 mt-1">
+                          <div className="flex items-center text-xs text-muted-foreground">
+                            <Clock className="h-3 w-3 mr-1" />
+                            {timeDisplay}
+                          </div>
+                          <div className="flex items-center text-xs text-muted-foreground">
+                            <User className="h-3 w-3 mr-1" />
+                            {bed.admission_for?.name}
+                          </div>
+                        </div>
+                        <p className="text-xs text-green-600 mt-1">
+                          Discharge in {admittedAgo}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="text-sm text-muted-foreground p-4 text-center">
+                  No patients are currently admitted.
+                </div>
+              )}
+            </CardContent>
+            <div className="flex items-center justify-center py-1 absolute bg-clip-padding backdrop-filter backdrop-blur-sm bottom-0 left-0 right-0">
+              <a
+                href={"/beds"}
+                className="text-muted-foreground hover:underline flex items-center gap-1 text-xs"
+              >
+                <Link2 size={12} />
+                View Bed Status
+              </a>
+            </div>
+          </Card>
+
+          <Card className="relative border dark:border-0 bg-muted/50 rounded-lg col-span-3 md:col-span-6 lg:col-span-3 overflow-hidden">
+            <CardHeader className="px-3 pt-3 pb-2 space-y-0.5 items-center border-b">
+              <CardTitle className="font-medium text-ring flex items-center gap-2 leading-normal">
+                <CalendarIcon className="h-5 w-5" />
+                Upcoming Appointments
+              </CardTitle>
+              <CardDescription className="text-xs">
+                Scheduled patient visits.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="bg-gradient-to-t from-muted via-muted/0 to-muted/0 overflow-y-auto min-h-96 h-[calc(100svh-140px)] lg:h-[550px] px-0 divide-border divide-y">
+              {mockAppointments.map((appointment) => {
+                const appointmentDate = new Date(appointment.date_time);
+
+                // Format the date display
+                let dateDisplay = "";
+                if (isToday(appointmentDate)) {
+                  dateDisplay = "Today";
+                } else if (isTomorrow(appointmentDate)) {
+                  dateDisplay = "Tomorrow";
+                } else {
+                  dateDisplay = format(appointmentDate, "MMM d, yyyy");
+                }
+
+                // Time display
+                const timeDisplay = format(appointmentDate, "h:mm a");
+
+                // How soon is the appointment
+                const timeFromNow = formatDistanceToNow(appointmentDate, {
+                  addSuffix: true,
+                });
+
+                return (
+                  <div
+                    key={appointment.patient_id}
+                    className="flex items-start gap-2 px-2 py-2"
+                  >
+                    <div className="bg-blue-500/10 text-blue-500 rounded-md p-2.5">
+                      <CalendarIcon className="h-4 w-4" />
+                    </div>
+                    <div className="w-full">
+                      <h1 className="w-full text-sm font-medium leading-none flex flex-row items-center gap-1 justify-between">
+                        <p className="line-clamp-1 w-fit">{appointment.name}</p>
+                        <span className="text-xs font-medium bg-blue-200 text-blue-700 dark:bg-blue-900/50 dark:text-blue-500 px-2 py-0.5 rounded-full">
+                          {dateDisplay}
+                        </span>
+                      </h1>
+                      <div className="flex items-center gap-2 mt-1">
+                        <div className="flex items-center text-xs text-muted-foreground">
+                          <Clock className="h-3 w-3 mr-1" />
+                          {timeDisplay}
+                        </div>
+                        <div className="flex items-center text-xs text-muted-foreground">
+                          <User className="h-3 w-3 mr-1" />
+                          {appointment.registerd_for}
+                        </div>
+                      </div>
+                      <p className="text-xs text-blue-500 mt-1">
+                        {timeFromNow}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </CardContent>
+            <div className="flex items-center justify-center py-1 absolute bg-clip-padding backdrop-filter backdrop-blur-sm bottom-0 left-0 right-0">
+              <a
+                href={"/appointments"}
+                className="text-muted-foreground hover:underline flex flex-row gap-1 items-center text-xs"
+                style={{
+                  fontSize: "12px",
+                  lineHeight: "normal",
+                }}
+              >
+                <Link2 size={12} />
+                View All Appointments
+              </a>
+            </div>
+          </Card>
+
+          <Card className="relative border dark:border-0 bg-muted/50 rounded-lg col-span-3 md:col-span-6 lg:col-span-3 overflow-hidden">
+            <CardHeader className="px-3 pt-3 pb-2 space-y-0.5 items-center border-b">
+              <CardTitle className="font-medium text-ring flex items-center gap-2 leading-normal">
+                <ActivityIcon className="h-5 w-5" />
+                Recent Activity
+              </CardTitle>
+              <CardDescription className="text-xs">
+                Latest updates from your clinic.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="bg-gradient-to-t from-muted via-muted/0 to-muted/0 overflow-y-auto min-h-96 h-[calc(100svh-140px)] lg:h-[550px] px-0 divide-border divide-y">
+              {mockNotifications.map((notification) => (
                 <div
-                  key={bed.bedBookingId}
+                  key={notification.id}
                   className="flex items-start gap-2 px-2 py-2"
                 >
-                  <div className="bg-green-500/10 text-green-500 rounded-md p-2.5">
-                    <Bed className="h-4 w-4" />
-                  </div>
-                  <div className="w-full">
-                    <h1 className="w-full text-sm font-medium leading-none flex justify-between items-center">
-                      <span className="line-clamp-1">Aarav Shah</span>
-                      <span className="text-xs font-medium bg-green-200 text-green-700 dark:bg-green-900/50 dark:text-green-500 px-2 py-0.5 rounded-full">
-                        Bed #{bed.bedId}
-                      </span>
-                    </h1>
-                    <div className="flex items-center gap-2 mt-1">
-                      <div className="flex items-center text-xs text-muted-foreground">
-                        <Clock className="h-3 w-3 mr-1" />
-                        {timeDisplay}
-                      </div>
-                      <div className="flex items-center text-xs text-muted-foreground">
-                        <User className="h-3 w-3 mr-1" />
-                        {bed.admission_for?.name}
-                      </div>
-                    </div>
-                    <p className="text-xs text-green-600 mt-1">
-                      Discharge in {admittedAgo}
-                    </p>
-                  </div>
-                </div>
-              );
-            })
-          ) : (
-            <div className="text-sm text-muted-foreground p-4 text-center">
-              No patients are currently admitted.
-            </div>
-          )}
-        </CardContent>
-        <div className="flex items-center justify-center py-1 absolute bg-clip-padding backdrop-filter backdrop-blur-sm bottom-0 left-0 right-0">
-          <a
-            href={"/beds"}
-            className="text-muted-foreground hover:underline flex items-center gap-1 text-xs"
-          >
-            <Link2 size={12} />
-            View Bed Status
-          </a>
-        </div>
-      </Card>
-
-      <Card className="relative border dark:border-0 bg-muted/50 rounded-lg col-span-3 md:col-span-6 lg:col-span-3 overflow-hidden">
-        <CardHeader className="px-3 pt-3 pb-2 space-y-0.5 items-center border-b">
-          <CardTitle className="font-medium text-ring flex items-center gap-2 leading-normal">
-            <CalendarIcon className="h-5 w-5" />
-            Upcoming Appointments
-          </CardTitle>
-          <CardDescription className="text-xs">
-            Scheduled patient visits.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="bg-gradient-to-t from-muted via-muted/0 to-muted/0 overflow-y-auto h-60 md:h-72 lg:h-[370px] px-0 divide-border divide-y">
-          {mockAppointments.map((appointment) => {
-            const appointmentDate = new Date(appointment.date_time);
-
-            // Format the date display
-            let dateDisplay = "";
-            if (isToday(appointmentDate)) {
-              dateDisplay = "Today";
-            } else if (isTomorrow(appointmentDate)) {
-              dateDisplay = "Tomorrow";
-            } else {
-              dateDisplay = format(appointmentDate, "MMM d, yyyy");
-            }
-
-            // Time display
-            const timeDisplay = format(appointmentDate, "h:mm a");
-
-            // How soon is the appointment
-            const timeFromNow = formatDistanceToNow(appointmentDate, {
-              addSuffix: true,
-            });
-
-            return (
-              <div
-                key={appointment.patient_id}
-                className="flex items-start gap-2 px-2 py-2"
-              >
-                <div className="bg-blue-500/10 text-blue-500 rounded-md p-2.5">
-                  <CalendarIcon className="h-4 w-4" />
-                </div>
-                <div className="w-full">
-                  <h1 className="w-full text-sm font-medium leading-none flex flex-row items-center gap-1 justify-between">
-                    <p className="line-clamp-1 w-fit">{appointment.name}</p>
-                    <span className="text-xs font-medium bg-blue-200 text-blue-700 dark:bg-blue-900/50 dark:text-blue-500 px-2 py-0.5 rounded-full">
-                      {dateDisplay}
-                    </span>
-                  </h1>
-                  <div className="flex items-center gap-2 mt-1">
-                    <div className="flex items-center text-xs text-muted-foreground">
-                      <Clock className="h-3 w-3 mr-1" />
-                      {timeDisplay}
-                    </div>
-                    <div className="flex items-center text-xs text-muted-foreground">
-                      <User className="h-3 w-3 mr-1" />
-                      {appointment.registerd_for}
-                    </div>
-                  </div>
-                  <p className="text-xs text-blue-500 mt-1">{timeFromNow}</p>
-                </div>
-              </div>
-            );
-          })}
-        </CardContent>
-        <div className="flex items-center justify-center py-1 absolute bg-clip-padding backdrop-filter backdrop-blur-sm bottom-0 left-0 right-0">
-          <a
-            href={"/appointments"}
-            className="text-muted-foreground hover:underline flex flex-row gap-1 items-center text-xs"
-            style={{
-              fontSize: "12px",
-              lineHeight: "normal",
-            }}
-          >
-            <Link2 size={12} />
-            View All Appointments
-          </a>
-        </div>
-      </Card>
-
-      <Card className="relative border dark:border-0 bg-muted/50 rounded-lg col-span-3 md:col-span-6 lg:col-span-3 overflow-hidden">
-        <CardHeader className="px-3 pt-3 pb-2 space-y-0.5 items-center border-b">
-          <CardTitle className="font-medium text-ring flex items-center gap-2 leading-normal">
-            <ActivityIcon className="h-5 w-5" />
-            Recent Activity
-          </CardTitle>
-          <CardDescription className="text-xs">
-            Latest updates from your clinic.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="bg-gradient-to-t from-muted via-muted/0 to-muted/0 overflow-y-auto h-60 md:h-72 lg:h-[370px] px-0 divide-border divide-y">
-          {mockNotifications.map((notification) => (
-            <div
-              key={notification.id}
-              className="flex items-start gap-2 px-2 py-2"
-            >
-              <div
-                className={`rounded-md p-2.5
+                  <div
+                    className={`rounded-md p-2.5
                           ${
                             notification.type === "Alert"
                               ? "bg-red-500/10 text-red-500"
@@ -637,42 +647,312 @@ const NewStatusGrid = () => {
                               ? "bg-green-500/10 text-green-500"
                               : "bg-amber-500/10 text-amber-500"
                           }`}
+                  >
+                    <AlertCircleIcon className="h-4 w-4" />
+                  </div>
+                  <div className="w-full">
+                    <h1 className="w-full text-sm font-medium leading-none flex flex-row items-center gap-1 justify-between">
+                      <p className="line-clamp-1 w-fit text-muted-foreground">
+                        {notification.title}
+                      </p>
+                      <p className="text-xs text-ring text-nowrap">
+                        {new Date(notification.timestamp).toLocaleTimeString(
+                          [],
+                          {
+                            hour: "numeric",
+                            minute: "2-digit",
+                          }
+                        )}
+                      </p>
+                    </h1>
+                    <p className="text-xs text-muted-foreground line-clamp-2">
+                      {notification.message}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+            <div className="flex items-center justify-center py-1 absolute bg-clip-padding backdrop-filter backdrop-blur-sm bottom-0 left-0 right-0">
+              <Link
+                href={"/"}
+                className="text-muted-foreground hover:underline flex flex-row gap-1 items-center"
+                style={{
+                  fontSize: "12px",
+                  lineHeight: "normal",
+                }}
               >
-                <AlertCircleIcon className="h-4 w-4" />
-              </div>
-              <div className="w-full">
-                <h1 className="w-full text-sm font-medium leading-none flex flex-row items-center gap-1 justify-between">
-                  <p className="line-clamp-1 w-fit text-muted-foreground">
-                    {notification.title}
-                  </p>
-                  <p className="text-xs text-ring text-nowrap">
-                    {new Date(notification.timestamp).toLocaleTimeString([], {
-                      hour: "numeric",
-                      minute: "2-digit",
-                    })}
-                  </p>
-                </h1>
-                <p className="text-xs text-muted-foreground line-clamp-2">
-                  {notification.message}
-                </p>
-              </div>
+                <Link2 size={12} />
+                View Logs
+              </Link>
             </div>
-          ))}
-        </CardContent>
-        <div className="flex items-center justify-center py-1 absolute bg-clip-padding backdrop-filter backdrop-blur-sm bottom-0 left-0 right-0">
-          <Link
-            href={"/"}
-            className="text-muted-foreground hover:underline flex flex-row gap-1 items-center"
-            style={{
-              fontSize: "12px",
-              lineHeight: "normal",
-            }}
-          >
-            <Link2 size={12} />
-            View Logs
-          </Link>
-        </div>
-      </Card>
+          </Card>
+        </>
+      ) : (
+        <Tabs defaultValue="bed" className="col-span-full">
+          <TabsList className="w-full h-auto">
+            <TabsTrigger value="bed" asChild>
+              <CardHeader className="data-[state=active]:flex-[0.5] data-[state=inactive]:flex-[0.25] group px-3 pt-3 pb-2 space-y-0.5 items-center border-b">
+                <CardTitle className="font-medium text-ring flex items-center gap-2 leading-normal group-data-[state=active]:flex-col">
+                  <BedIcon className="h-5 w-5 shrink-0" />
+                  <span className="hidden group-data-[state=active]:inline">
+                    Patients in Bed
+                  </span>
+                </CardTitle>
+                <CardDescription className="text-xs hidden md:group-data-[state=active]:inline">
+                  Currently admitted patients
+                </CardDescription>
+              </CardHeader>
+            </TabsTrigger>
+            <TabsTrigger value="appointments" asChild>
+              <CardHeader className="data-[state=active]:flex-[0.5] data-[state=inactive]:flex-[0.25] group px-3 pt-3 pb-2 space-y-0.5 items-center border-b">
+                <CardTitle className="font-medium text-ring flex items-center gap-2 leading-normal group-data-[state=active]:flex-col">
+                  <CalendarIcon className="h-5 w-5 shrink-0" />
+                  <span className="hidden group-data-[state=active]:inline">
+                    Upcoming Appointments
+                  </span>
+                </CardTitle>
+                <CardDescription className="text-xs hidden md:group-data-[state=active]:inline">
+                  Scheduled patient visits.
+                </CardDescription>
+              </CardHeader>
+            </TabsTrigger>
+            <TabsTrigger value="activity" asChild>
+              <CardHeader className="data-[state=active]:flex-[0.5] data-[state=inactive]:flex-[0.25] group px-3 pt-3 pb-2 space-y-0.5 items-center border-b">
+                <CardTitle className="font-medium text-ring flex items-center gap-2 leading-normal group-data-[state=active]:flex-col">
+                  <ActivityIcon className="h-5 w-5 shrink-0" />
+                  <span className="hidden group-data-[state=active]:inline">
+                    Recent Activity
+                  </span>
+                </CardTitle>
+                <CardDescription className="text-xs hidden md:group-data-[state=active]:inline">
+                  Latest updates from your clinic.
+                </CardDescription>
+              </CardHeader>
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="bed">
+            <Card className="relative border dark:border-0 bg-muted/50 rounded-lg col-span-3 md:col-span-6 lg:col-span-3 overflow-hidden">
+              <CardHeader className="px-3 pt-3 pb-2 space-y-0.5 items-center border-b">
+                <CardTitle className="font-medium text-ring flex items-center gap-2 leading-normal">
+                  <BedIcon className="h-5 w-5" />
+                  Patients in Bed
+                </CardTitle>
+                <CardDescription className="text-xs">
+                  Currently admitted patients
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="bg-gradient-to-t from-muted via-muted/0 to-muted/0 overflow-y-auto min-h-96 h-[calc(100svh-216px)] md:h-[calc(100svh-240px)] lg:h-[550px] px-0 divide-y divide-border">
+                {dummyBeds.length > 0 ? (
+                  dummyBeds.map((bed) => {
+                    const admittedAt = new Date(bed.admission_at);
+                    const admittedAgo = formatDistanceToNow(admittedAt, {
+                      addSuffix: true,
+                    });
+                    const timeDisplay = format(admittedAt, "h:mm a, MMM d");
+
+                    return (
+                      <div
+                        key={bed.bedBookingId}
+                        className="flex items-start gap-2 px-2 py-2"
+                      >
+                        <div className="bg-green-500/10 text-green-500 rounded-md p-2.5">
+                          <Bed className="h-4 w-4" />
+                        </div>
+                        <div className="w-full">
+                          <h1 className="w-full text-sm font-medium leading-none flex justify-between items-center">
+                            <span className="line-clamp-1">Aarav Shah</span>
+                            <span className="text-xs font-medium bg-green-200 text-green-700 dark:bg-green-900/50 dark:text-green-500 px-2 py-0.5 rounded-full">
+                              Bed #{bed.bedId}
+                            </span>
+                          </h1>
+                          <div className="flex items-center gap-2 mt-1">
+                            <div className="flex items-center text-xs text-muted-foreground">
+                              <Clock className="h-3 w-3 mr-1" />
+                              {timeDisplay}
+                            </div>
+                            <div className="flex items-center text-xs text-muted-foreground">
+                              <User className="h-3 w-3 mr-1" />
+                              {bed.admission_for?.name}
+                            </div>
+                          </div>
+                          <p className="text-xs text-green-600 mt-1">
+                            Discharge in {admittedAgo}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <div className="text-sm text-muted-foreground p-4 text-center">
+                    No patients are currently admitted.
+                  </div>
+                )}
+              </CardContent>
+              <div className="flex items-center justify-center py-1 absolute bg-clip-padding backdrop-filter backdrop-blur-sm bottom-0 left-0 right-0">
+                <a
+                  href={"/beds"}
+                  className="text-muted-foreground hover:underline flex items-center gap-1 text-xs"
+                >
+                  <Link2 size={12} />
+                  View Bed Status
+                </a>
+              </div>
+            </Card>
+          </TabsContent>
+          <TabsContent value="appointments">
+            <Card className="relative border dark:border-0 bg-muted/50 rounded-lg col-span-3 md:col-span-6 lg:col-span-3 overflow-hidden">
+              <CardHeader className="px-3 pt-3 pb-2 space-y-0.5 items-center border-b">
+                <CardTitle className="font-medium text-ring flex items-center gap-2 leading-normal">
+                  <CalendarIcon className="h-5 w-5" />
+                  Upcoming Appointments
+                </CardTitle>
+                <CardDescription className="text-xs">
+                  Scheduled patient visits.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="bg-gradient-to-t from-muted via-muted/0 to-muted/0 overflow-y-auto min-h-96 h-[calc(100svh-216px)] md:h-[calc(100svh-240px)] lg:h-[550px] px-0 divide-border divide-y">
+                {mockAppointments.map((appointment) => {
+                  const appointmentDate = new Date(appointment.date_time);
+
+                  // Format the date display
+                  let dateDisplay = "";
+                  if (isToday(appointmentDate)) {
+                    dateDisplay = "Today";
+                  } else if (isTomorrow(appointmentDate)) {
+                    dateDisplay = "Tomorrow";
+                  } else {
+                    dateDisplay = format(appointmentDate, "MMM d, yyyy");
+                  }
+
+                  // Time display
+                  const timeDisplay = format(appointmentDate, "h:mm a");
+
+                  // How soon is the appointment
+                  const timeFromNow = formatDistanceToNow(appointmentDate, {
+                    addSuffix: true,
+                  });
+
+                  return (
+                    <div
+                      key={appointment.patient_id}
+                      className="flex items-start gap-2 px-2 py-2"
+                    >
+                      <div className="bg-blue-500/10 text-blue-500 rounded-md p-2.5">
+                        <CalendarIcon className="h-4 w-4" />
+                      </div>
+                      <div className="w-full">
+                        <h1 className="w-full text-sm font-medium leading-none flex flex-row items-center gap-1 justify-between">
+                          <p className="line-clamp-1 w-fit">
+                            {appointment.name}
+                          </p>
+                          <span className="text-xs font-medium bg-blue-200 text-blue-700 dark:bg-blue-900/50 dark:text-blue-500 px-2 py-0.5 rounded-full">
+                            {dateDisplay}
+                          </span>
+                        </h1>
+                        <div className="flex items-center gap-2 mt-1">
+                          <div className="flex items-center text-xs text-muted-foreground">
+                            <Clock className="h-3 w-3 mr-1" />
+                            {timeDisplay}
+                          </div>
+                          <div className="flex items-center text-xs text-muted-foreground">
+                            <User className="h-3 w-3 mr-1" />
+                            {appointment.registerd_for}
+                          </div>
+                        </div>
+                        <p className="text-xs text-blue-500 mt-1">
+                          {timeFromNow}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </CardContent>
+              <div className="flex items-center justify-center py-1 absolute bg-clip-padding backdrop-filter backdrop-blur-sm bottom-0 left-0 right-0">
+                <a
+                  href={"/appointments"}
+                  className="text-muted-foreground hover:underline flex flex-row gap-1 items-center text-xs"
+                  style={{
+                    fontSize: "12px",
+                    lineHeight: "normal",
+                  }}
+                >
+                  <Link2 size={12} />
+                  View All Appointments
+                </a>
+              </div>
+            </Card>
+          </TabsContent>
+          <TabsContent value="activity">
+            <Card className="relative border dark:border-0 bg-muted/50 rounded-lg col-span-3 md:col-span-6 lg:col-span-3 overflow-hidden">
+              <CardHeader className="px-3 pt-3 pb-2 space-y-0.5 items-center border-b">
+                <CardTitle className="font-medium text-ring flex items-center gap-2 leading-normal">
+                  <ActivityIcon className="h-5 w-5" />
+                  Recent Activity
+                </CardTitle>
+                <CardDescription className="text-xs">
+                  Latest updates from your clinic.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="bg-gradient-to-t from-muted via-muted/0 to-muted/0 overflow-y-auto min-h-96 h-[calc(100svh-216px)] md:h-[calc(100svh-240px)] lg:h-[550px] px-0 divide-border divide-y">
+                {mockNotifications.map((notification) => (
+                  <div
+                    key={notification.id}
+                    className="flex items-start gap-2 px-2 py-2"
+                  >
+                    <div
+                      className={`rounded-md p-2.5
+                          ${
+                            notification.type === "Alert"
+                              ? "bg-red-500/10 text-red-500"
+                              : notification.type === "Info"
+                              ? "bg-blue-500/10 text-blue-500"
+                              : notification.type === "Success"
+                              ? "bg-green-500/10 text-green-500"
+                              : "bg-amber-500/10 text-amber-500"
+                          }`}
+                    >
+                      <AlertCircleIcon className="h-4 w-4" />
+                    </div>
+                    <div className="w-full">
+                      <h1 className="w-full text-sm font-medium leading-none flex flex-row items-center gap-1 justify-between">
+                        <p className="line-clamp-1 w-fit text-muted-foreground">
+                          {notification.title}
+                        </p>
+                        <p className="text-xs text-ring text-nowrap">
+                          {new Date(notification.timestamp).toLocaleTimeString(
+                            [],
+                            {
+                              hour: "numeric",
+                              minute: "2-digit",
+                            }
+                          )}
+                        </p>
+                      </h1>
+                      <p className="text-xs text-muted-foreground line-clamp-2">
+                        {notification.message}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </CardContent>
+              <div className="flex items-center justify-center py-1 absolute bg-clip-padding backdrop-filter backdrop-blur-sm bottom-0 left-0 right-0">
+                <Link
+                  href={"/"}
+                  className="text-muted-foreground hover:underline flex flex-row gap-1 items-center"
+                  style={{
+                    fontSize: "12px",
+                    lineHeight: "normal",
+                  }}
+                >
+                  <Link2 size={12} />
+                  View Logs
+                </Link>
+              </div>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      )}
+      {/* bed--appointments--activity--end */}
     </div>
   );
 };
