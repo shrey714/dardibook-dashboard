@@ -691,7 +691,7 @@ const NewStatusGrid = () => {
         <Tabs defaultValue="bed" className="col-span-full">
           <TabsList className="w-full h-auto">
             <TabsTrigger value="bed" asChild>
-              <CardHeader className="data-[state=active]:flex-[0.5] data-[state=inactive]:flex-[0.25] group px-3 pt-3 pb-2 space-y-0.5 items-center border-b">
+              <CardHeader className="data-[state=active]:flex-[0.5] data-[state=inactive]:flex-[0.25] group px-3 pt-3 pb-2 space-y-0.5 items-center">
                 <CardTitle className="font-medium text-ring flex items-center gap-2 leading-normal group-data-[state=active]:flex-col">
                   <BedIcon className="h-5 w-5 shrink-0" />
                   <span className="hidden group-data-[state=active]:inline">
@@ -704,7 +704,7 @@ const NewStatusGrid = () => {
               </CardHeader>
             </TabsTrigger>
             <TabsTrigger value="appointments" asChild>
-              <CardHeader className="data-[state=active]:flex-[0.5] data-[state=inactive]:flex-[0.25] group px-3 pt-3 pb-2 space-y-0.5 items-center border-b">
+              <CardHeader className="data-[state=active]:flex-[0.5] data-[state=inactive]:flex-[0.25] group px-3 pt-3 pb-2 space-y-0.5 items-center">
                 <CardTitle className="font-medium text-ring flex items-center gap-2 leading-normal group-data-[state=active]:flex-col">
                   <CalendarIcon className="h-5 w-5 shrink-0" />
                   <span className="hidden group-data-[state=active]:inline">
@@ -717,7 +717,7 @@ const NewStatusGrid = () => {
               </CardHeader>
             </TabsTrigger>
             <TabsTrigger value="activity" asChild>
-              <CardHeader className="data-[state=active]:flex-[0.5] data-[state=inactive]:flex-[0.25] group px-3 pt-3 pb-2 space-y-0.5 items-center border-b">
+              <CardHeader className="data-[state=active]:flex-[0.5] data-[state=inactive]:flex-[0.25] group px-3 pt-3 pb-2 space-y-0.5 items-center">
                 <CardTitle className="font-medium text-ring flex items-center gap-2 leading-normal group-data-[state=active]:flex-col">
                   <ActivityIcon className="h-5 w-5 shrink-0" />
                   <span className="hidden group-data-[state=active]:inline">
