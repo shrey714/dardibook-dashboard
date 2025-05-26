@@ -14,37 +14,30 @@ type PageProps = {
 export default async function Home({ searchParams }: PageProps) {
   const { weekDate } = await searchParams;
   const weekTimestamp = weekDate ? parseInt(weekDate, 10) : Date.now();
+  const headersList = await headers();
+  const protocol = headersList.get("x-forwarded-proto") || "http";
+  const host = headersList.get("host") || "";
+  const baseUrl = `${protocol}://${host}`;
 
   if (isNaN(weekTimestamp)) {
     notFound();
   }
 
-  async function getDashboardData() {
-    const headersList = await headers();
-    const protocol = headersList.get("x-forwarded-proto") || "http";
-    const host = headersList.get("host") || "";
-    const baseUrl = `${protocol}://${host}`;
-
+  let dashboardData: DashboardDataTypes;
+  try {
     const res = await fetch(
       `${baseUrl}/api/dashboard-data?weekDate=${weekTimestamp}`,
       {
         method: "GET",
-        // headers: headersList,
+        headers: headersList,
         cache: "no-store",
       }
     );
-
     if (!res.ok) {
       throw new Error("Failed to fetch dashboard data");
     }
-
     const data = await res.json();
-    return data.data;
-  }
-
-  let dashboardData: DashboardDataTypes;
-  try {
-    dashboardData = await getDashboardData();
+    dashboardData = data.data;
     console.log("dashboardData==", dashboardData);
   } catch (error) {
     console.error("Error loading dashboard:", error);
