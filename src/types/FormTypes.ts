@@ -187,3 +187,65 @@ export type CalendarEventTypes =
         };
         appointment_details?: never;
     });
+
+
+
+
+// Dashboard Types
+
+export interface StatComparison {
+    icon: string;
+    title: string;
+    info: string;
+    count: number;
+    percentage: number;
+    status: "increase" | "decrease";
+    dayCount: number[];
+}
+
+export interface WeeklyDoctorComparison {
+    title: string;
+    desc: string;
+    dayCount: {
+        doctor: string;
+        lastWeek: number;
+        currentWeek: number;
+    }[];
+}
+
+export interface BedPatient {
+    bedBookingId: string;
+    bedId: string;
+    patientId: string;
+    admissionAt: number;
+    dischargeAt: number;
+    admissionFor: string;
+}
+
+export interface Appointment {
+    patientId: string;
+    name: string;
+    dateTime: number;
+    registeredFor: string;
+}
+
+export interface ActivityLog {
+    id: string;
+    type: string;
+    title: string;
+    message: string;
+    timestamp: number;
+}
+
+export interface DashboardDataTypes {
+    compareStats: {
+        newPatients: StatComparison;
+        totalAppointments: StatComparison;
+        totalBills: StatComparison;
+        totalRevenue: StatComparison;
+    };
+    doctorWeeklyComparison: WeeklyDoctorComparison;
+    patientsInBed: BedPatient[];
+    upcomingAppointments: Appointment[];
+    recentActivities: ActivityLog[];
+}

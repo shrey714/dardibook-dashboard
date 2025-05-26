@@ -2,7 +2,13 @@
 import { columns } from "@/components/History/prescriptions/columns";
 import { DataTable } from "@/components/History/common/data-table";
 import { db } from "@/firebase/firebaseConfig";
-import { collectionGroup, getDocs, orderBy, query } from "firebase/firestore";
+import {
+  collectionGroup,
+  getDocs,
+  orderBy,
+  query,
+  where,
+} from "firebase/firestore";
 import { auth } from "@clerk/nextjs/server";
 import { PrescriptionFormTypes } from "@/types/FormTypes";
 import { error } from "console";
@@ -34,7 +40,8 @@ export default async function Page() {
     const prescriptionsCollection = collectionGroup(db, "prescriptions");
     const prescriptionsQuery = query(
       prescriptionsCollection,
-      orderBy("created_at", "desc")
+      orderBy("created_at", "desc"),
+      where("orgId", "==", authInstance.orgId)
     );
 
     const querySnapshot = await getDocs(prescriptionsQuery);
