@@ -52,7 +52,6 @@ const WeekSelector = () => {
       from: startOfWeek(date),
       to: endOfWeek(date),
     },
-    today: new Date(),
   };
 
   const modifiersStyles = {
@@ -60,24 +59,21 @@ const WeekSelector = () => {
       backgroundColor: "hsl(var(--muted-foreground))",
       color: "hsl(var(--primary-foreground))",
     },
-    // today: {
-    // color: "hsl(var(--primary-foreground))",
-    // },
   };
   return (
     <Popover>
-      <div className="flex flex-row h-full w-full sm:w-auto">
+      <div className="flex flex-row h-full w-full sm:w-auto shadow-sm rounded-md overflow-hidden">
         <Button
           variant="outline"
           size="icon"
           onClick={previousWeek}
-          className="size-9 rounded-r-none bg-border"
+          className="size-9 rounded-r-none bg-border shadow-none"
         >
           <ChevronLeft className="h-4 w-4" />
           <span className="sr-only">Previous week</span>
         </Button>
-        <PopoverTrigger className="border-y px-2 w-full sm:w-auto">
-          <div className="text-sm font-medium text-muted-foreground min-w-44 w-full sm:w-min">
+        <PopoverTrigger className="border-y px-2 w-full sm:w-auto bg-border hover:bg-accent transition-colors ">
+          <div className="text-sm font-medium text-muted-foreground min-w-44 w-full sm:w-min leading-normal">
             {format(weekStart, "MMM d")} - {format(weekEnd, "MMM d, yyyy")}
           </div>
         </PopoverTrigger>
@@ -85,7 +81,7 @@ const WeekSelector = () => {
           variant="outline"
           size="icon"
           onClick={nextWeek}
-          className="size-9 rounded-l-none bg-border"
+          className="size-9 rounded-l-none bg-border shadow-none"
         >
           <ChevronRight className="h-4 w-4" />
           <span className="sr-only">Next week</span>
