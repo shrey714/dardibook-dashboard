@@ -8,7 +8,6 @@ import { DashboardDataTypes } from "@/types/FormTypes";
 import { headers } from "next/headers";
 
 type PageProps = {
-  params: Promise<{}>;
   searchParams: Promise<{ weekDate?: string }>;
 };
 
