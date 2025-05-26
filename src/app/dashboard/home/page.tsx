@@ -40,7 +40,6 @@ export default async function Home({ searchParams }: PageProps) {
     }
     const data = await res.json();
     dashboardData = data.data;
-    console.log("dashboardData==", dashboardData);
   } catch (error) {
     console.error("Error loading dashboard:", error);
     return (

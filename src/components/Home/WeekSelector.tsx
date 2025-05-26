@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { useRouter, useSearchParams } from "next/navigation";
-import Link from "next/link";
 
 const WeekSelector = () => {
   const router = useRouter();
@@ -68,8 +67,6 @@ const WeekSelector = () => {
   return (
     <Popover>
       <div className="flex flex-row h-full w-full sm:w-auto">
-        <Link href={"/dashboard/home?weekDate=1746901800000"}>hello</Link>
-
         <Button
           variant="outline"
           size="icon"
