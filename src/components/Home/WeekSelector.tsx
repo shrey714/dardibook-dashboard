@@ -1,5 +1,5 @@
 "use client";
-import React, { startTransition } from "react";
+import React, { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { addDays, format, startOfWeek, endOfWeek, getTime } from "date-fns";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -10,35 +10,42 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 
 const WeekSelector = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [date, setDate] = React.useState<Date>(new Date());
-  const [currentWeekStart, setCurrentWeekStart] = React.useState<Date>(
-    startOfWeek(new Date())
-  );
-  const weekEnd = endOfWeek(currentWeekStart);
-  React.useEffect(() => {
-    const weekStart = startOfWeek(date);
-    setCurrentWeekStart(weekStart);
-    const newSearchParams = new URLSearchParams(searchParams.toString());
-    newSearchParams.set("weekDate", getTime(weekStart).toString());
-    startTransition(() => {
-      router.replace(`?${newSearchParams.toString()}`, {
-        scroll: false,
-      });
-    });
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [date]);
+  const initialDate = React.useMemo(() => {
+    return new Date(Number(searchParams.get("weekDate")) || Date.now());
+  }, [searchParams]);
+
+  const [date, setDate] = React.useState(initialDate);
+  const weekStart = startOfWeek(date);
+  const weekEnd = endOfWeek(weekStart);
+
+  useEffect(() => {
+    setDate(initialDate);
+  }, [initialDate]);
+
+  const updateURL = (newDate: Date) => {
+    setDate(newDate);
+    const newWeekStart = startOfWeek(newDate);
+    const newSearchParams = new URLSearchParams(searchParams.toString());
+    newSearchParams.set("weekDate", getTime(newWeekStart).toString());
+    router.push(`?${newSearchParams.toString()}`); // triggers SSR + loading.tsx
+  };
 
   const previousWeek = () => {
-    setDate(addDays(date, -7));
+    const newDate = addDays(date, -7);
+    setDate(newDate);
+    updateURL(newDate);
   };
 
   const nextWeek = () => {
-    setDate(addDays(date, 7));
+    const newDate = addDays(date, 7);
+    setDate(newDate);
+    updateURL(newDate);
   };
 
   const modifiers = {
@@ -58,10 +65,11 @@ const WeekSelector = () => {
     // color: "hsl(var(--primary-foreground))",
     // },
   };
-
   return (
     <Popover>
       <div className="flex flex-row h-full w-full sm:w-auto">
+        <Link href={"/dashboard/home?weekDate=1746901800000"}>hello</Link>
+
         <Button
           variant="outline"
           size="icon"
@@ -73,8 +81,7 @@ const WeekSelector = () => {
         </Button>
         <PopoverTrigger className="border-y px-2 w-full sm:w-auto">
           <div className="text-sm font-medium text-muted-foreground min-w-44 w-full sm:w-min">
-            {format(currentWeekStart, "MMM d")} -{" "}
-            {format(weekEnd, "MMM d, yyyy")}
+            {format(weekStart, "MMM d")} - {format(weekEnd, "MMM d, yyyy")}
           </div>
         </PopoverTrigger>
         <Button
@@ -89,9 +96,9 @@ const WeekSelector = () => {
       </div>
       <PopoverContent className="w-auto p-0" align="center">
         <Calendar
+          defaultMonth={date}
           mode="single"
-          // selected={date}
-          onSelect={(newDate) => newDate && setDate(newDate)}
+          onSelect={(newDate) => newDate && updateURL(newDate)}
           className="rounded-md border"
           modifiers={modifiers}
           modifiersStyles={modifiersStyles}
