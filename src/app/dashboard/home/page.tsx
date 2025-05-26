@@ -29,7 +29,7 @@ export default async function Home({ searchParams }: PageProps) {
       `${baseUrl}/api/dashboard-data?weekDate=${weekTimestamp}`,
       {
         method: "GET",
-        headers: await headers(),
+        headers: headersList,
         cache: "no-store",
       }
     );
