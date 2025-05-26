@@ -20,8 +20,13 @@ export default async function Home({ searchParams }: PageProps) {
   }
 
   async function getDashboardData() {
+    const headersList = await headers();
+    const protocol = headersList.get("x-forwarded-proto") || "http";
+    const host = headersList.get("host") || "";
+    const baseUrl = `${protocol}://${host}`;
+
     const res = await fetch(
-      `${process.env.VERCEL_URL}/api/dashboard-data?weekDate=${weekTimestamp}`,
+      `${baseUrl}/api/dashboard-data?weekDate=${weekTimestamp}`,
       {
         method: "GET",
         headers: await headers(),
