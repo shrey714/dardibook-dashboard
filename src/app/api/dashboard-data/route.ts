@@ -286,9 +286,10 @@ export const GET = async (request: NextRequest) => {
           ).map((_, i) =>
             currentWeekBillsSnap.docs
               .filter((doc: any) => {
-                const day = startOfDay(
-                  new Date(doc.data().generated_at)
-                ).getTime();
+                const day = zonedTimeToUtc(startOfDay(
+                  utcToZonedTime(
+                    new Date(doc.data().generated_at), timezone)
+                ), timezone).getTime();
                 return (
                   day ===
                   getStartOfDaysBetween(currentWeekStart, currentWeekEnd, timezone)[i]
