@@ -13,7 +13,6 @@ import {
   addDays,
   endOfDay,
   endOfWeek,
-  isSameDay,
   isWithinInterval,
   startOfDay,
   startOfWeek,
@@ -25,8 +24,8 @@ import {
   extractTotalAppointmentsDayCounts,
   extractTotalBillsDayCounts,
   getStartOfDaysBetween,
+  getUpcomingDatesRange,
   sumAmounts,
-  TZC,
 } from "@/lib/helpers";
 import {
   PharmacyTypes,
@@ -114,7 +113,7 @@ export const GET = async (request: NextRequest) => {
       where(
         "registered_date",
         "array-contains-any",
-        getStartOfDaysBetween(currentWeekStart, currentWeekEnd)
+        getStartOfDaysBetween(currentWeekStart, currentWeekEnd, timezone)
       )
     );
     const lastWeekBillsQuery = query(
@@ -134,7 +133,7 @@ export const GET = async (request: NextRequest) => {
       where(
         "registered_date",
         "array-contains-any",
-        getStartOfDaysBetween(lastWeekStart, lastWeekEnd)
+        getStartOfDaysBetween(lastWeekStart, lastWeekEnd, timezone)
       )
     );
     const patientsInBedQuery = query(
@@ -146,7 +145,7 @@ export const GET = async (request: NextRequest) => {
       where(
         "registered_date",
         "array-contains-any",
-        getStartOfDaysBetween(startOfDay(addDays(new Date(), 1)).getTime(), endOfDay(addDays(new Date(), 14)).getTime())
+        getUpcomingDatesRange(1, 14, timezone)
       )
     );
 
@@ -237,7 +236,8 @@ export const GET = async (request: NextRequest) => {
                 })
             ),
             currentWeekStart,
-            currentWeekEnd
+            currentWeekEnd,
+            timezone
           ),
           ...compare(currentPatientsSize, lastPatientsSize),
         },
@@ -249,7 +249,8 @@ export const GET = async (request: NextRequest) => {
             currentPrescriptions,
             "created_at",
             currentWeekStart,
-            currentWeekEnd
+            currentWeekEnd,
+            timezone
           ),
           ...compare(currentPrescriptionsSize, lastPrescriptionsSize),
         },
@@ -261,7 +262,8 @@ export const GET = async (request: NextRequest) => {
             currentBills,
             "generated_at",
             currentWeekStart,
-            currentWeekEnd
+            currentWeekEnd,
+            timezone
           ),
           ...compare(currentBillsSize, lastBillsSize),
         },
@@ -273,7 +275,8 @@ export const GET = async (request: NextRequest) => {
             currentBills,
             "generated_at",
             currentWeekStart,
-            currentWeekEnd
+            currentWeekEnd,
+            timezone
           ).map((_, i) =>
             currentWeekBillsSnap.docs
               .filter((doc: any) => {
@@ -282,7 +285,7 @@ export const GET = async (request: NextRequest) => {
                 ).getTime();
                 return (
                   day ===
-                  getStartOfDaysBetween(currentWeekStart, currentWeekEnd)[i]
+                  getStartOfDaysBetween(currentWeekStart, currentWeekEnd, timezone)[i]
                 );
               })
               .reduce((sum, doc) => sum + (doc.data().total_amount || 0), 0)
