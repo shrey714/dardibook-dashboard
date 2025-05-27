@@ -60,7 +60,7 @@ export const GET = async (request: NextRequest) => {
   const currentWeekStart = TZC(startOfWeek(referenceDate, {
     weekStartsOn: 1,
   }), timezone);
-  const currentWeekEnd = isSameDay(TZC(startOfWeek(new Date(), { weekStartsOn: 1 }), timezone), referenceDate) ? TZC(endOfDay(new Date()), timezone) : TZC(endOfWeek(referenceDate, {
+  const currentWeekEnd = TZC(endOfWeek(referenceDate, {
     weekStartsOn: 1,
   }), timezone);
   const lastWeekStart = TZC(startOfWeek(subWeeks(referenceDate, 1), {
@@ -72,11 +72,10 @@ export const GET = async (request: NextRequest) => {
 
   console.log(
     referenceDate,
-    currentWeekStart
-    // currentWeekStart,
-    // currentWeekEnd,
-    // lastWeekStart,
-    // lastWeekEnd,
+    currentWeekStart,
+    currentWeekEnd,
+    lastWeekStart,
+    lastWeekEnd,
   )
 
   const doctors = members.data
