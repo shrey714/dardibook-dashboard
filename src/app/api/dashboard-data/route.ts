@@ -36,6 +36,7 @@ import {
   BedPatient,
   Appointment,
 } from "@/types/FormTypes";
+import { zonedTimeToUtc } from 'date-fns-tz'
 
 export const GET = async (request: NextRequest) => {
   const { searchParams } = new URL(request.url);
@@ -71,10 +72,8 @@ export const GET = async (request: NextRequest) => {
 
   console.log("data----",
     currentWeekStart,
-    currentWeekEnd,
-    lastWeekStart,
-    lastWeekEnd,
-    request.headers.get('x-vercel-ip-timezone')
+    request.headers.get('x-vercel-ip-timezone'),
+    zonedTimeToUtc(currentWeekStart, request.headers.get('x-vercel-ip-timezone') || "Asia/Kolkata")
   )
 
   const doctors = members.data
