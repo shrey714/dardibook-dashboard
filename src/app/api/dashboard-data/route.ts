@@ -11,7 +11,6 @@ import { NextResponse, NextRequest } from "next/server";
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import {
   addDays,
-  endOfDay,
   endOfWeek,
   isWithinInterval,
   startOfDay,
@@ -73,14 +72,6 @@ export const GET = async (request: NextRequest) => {
     endOfWeek(subWeeks(referenceDate, 1), { weekStartsOn: 1 }),
     timezone
   ).getTime();
-
-  console.log(
-    referenceDate,
-    currentWeekStart,
-    currentWeekEnd,
-    lastWeekStart,
-    lastWeekEnd,
-  )
 
   const doctors = members.data
     .filter(
