@@ -7,6 +7,7 @@ import WeekSelector from "@/components/Home/WeekSelector";
 import { DashboardDataTypes } from "@/types/FormTypes";
 import { headers } from "next/headers";
 import { auth } from "@clerk/nextjs/server";
+import { startOfWeek } from "date-fns";
 
 type PageProps = {
   searchParams: Promise<{ weekDate?: string }>;
@@ -14,7 +15,9 @@ type PageProps = {
 
 export default async function Home({ searchParams }: PageProps) {
   const { weekDate } = await searchParams;
-  const weekTimestamp = weekDate ? parseInt(weekDate, 10) : Date.now();
+  const weekTimestamp = weekDate
+    ? parseInt(weekDate, 10)
+    : startOfWeek(Date.now()).getTime();
   const headersList = await headers();
   const protocol = headersList.get("x-forwarded-proto") || "http";
   const host = headersList.get("host") || "";
