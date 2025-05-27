@@ -74,6 +74,7 @@ export const GET = async (request: NextRequest) => {
     currentWeekEnd,
     lastWeekStart,
     lastWeekEnd,
+    request.headers.get('x-vercel-ip-timezone')
   )
 
   const doctors = members.data
