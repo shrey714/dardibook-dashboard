@@ -73,7 +73,7 @@ export const GET = async (request: NextRequest) => {
   console.log("data----",
     currentWeekStart,
     request.headers.get('x-vercel-ip-timezone'),
-    zonedTimeToUtc(currentWeekStart, request.headers.get('x-vercel-ip-timezone') || "Asia/Kolkata")
+    zonedTimeToUtc(currentWeekStart, request.headers.get('x-vercel-ip-timezone') || "Asia/Kolkata").getTime()
   )
 
   const doctors = members.data
