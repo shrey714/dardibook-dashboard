@@ -71,7 +71,8 @@ export const GET = async (request: NextRequest) => {
   }), timezone);
 
   console.log(
-    referenceDate
+    referenceDate,
+    currentWeekStart
     // currentWeekStart,
     // currentWeekEnd,
     // lastWeekStart,
