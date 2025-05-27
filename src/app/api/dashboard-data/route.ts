@@ -148,7 +148,6 @@ export const GET = async (request: NextRequest) => {
         getUpcomingDatesRange(1, 14, timezone)
       )
     );
-
     const [
       currentWeekBillsSnap,
       lastWeekBillsSnap,
@@ -168,6 +167,8 @@ export const GET = async (request: NextRequest) => {
       getDocs(patientsInBedQuery),
       getDocs(upcomingAppointmentsQuery)
     ]);
+
+
     const currentPatients = currentWeekPatientsSnap.docs.map(
       (doc) => doc.data() as RegisterPatientFormTypes
     );
