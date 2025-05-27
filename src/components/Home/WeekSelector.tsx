@@ -10,8 +10,28 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { useRouter, useSearchParams } from "next/navigation";
+import { AnimatePresence, motion } from "framer-motion";
 
 const WeekSelector = () => {
+  const slideVariants = {
+    enter: (direction: "next" | "prev") => ({
+      x: direction === "next" ? 100 : -100,
+      opacity: 0,
+    }),
+    center: {
+      x: 0,
+      opacity: 1,
+      transition: { duration: 0.2 },
+    },
+    exit: (direction: "next" | "prev") => ({
+      x: direction === "next" ? -100 : 100,
+      opacity: 0,
+      transition: { duration: 0.2 },
+    }),
+  };
+  const [direction, setDirection] = React.useState<"next" | "prev">("next");
+
+  // actual from here
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -32,6 +52,7 @@ const WeekSelector = () => {
   }, [initialDate]);
 
   const updateURL = (newDate: Date) => {
+    setDirection(newDate >= date ? "next" : "prev");
     setDate(newDate);
     const newWeekStart = startOfWeek(newDate, {
       weekStartsOn: 1,
@@ -83,8 +104,20 @@ const WeekSelector = () => {
           <span className="sr-only">Previous week</span>
         </Button>
         <PopoverTrigger className="border-y px-2 w-full sm:w-auto bg-border hover:bg-accent transition-colors ">
-          <div className="text-sm font-medium text-muted-foreground min-w-44 w-full sm:w-min leading-normal">
-            {format(weekStart, "MMM d")} - {format(weekEnd, "MMM d, yyyy")}
+          <div className="text-sm font-medium text-muted-foreground min-w-44 w-full sm:w-min leading-normal h-full flex items-center justify-center relative overflow-hidden">
+            <AnimatePresence mode="wait" custom={direction}>
+              <motion.div
+                key={weekStart.getTime()}
+                custom={direction}
+                variants={slideVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                className="absolute w-full text-center"
+              >
+                {format(weekStart, "MMM d")} - {format(weekEnd, "MMM d, yyyy")}
+              </motion.div>
+            </AnimatePresence>
           </div>
         </PopoverTrigger>
         <Button

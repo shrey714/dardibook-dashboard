@@ -14,12 +14,14 @@ import {
   endOfDay,
   endOfWeek,
   isSameDay,
-  isToday,
   isWithinInterval,
   startOfDay,
   startOfWeek,
   subWeeks,
 } from "date-fns";
+import {
+  utcToZonedTime,
+} from "date-fns-tz";
 import {
   compare,
   extractNewPatientsDayCounts,
@@ -41,6 +43,7 @@ import {
 export const GET = async (request: NextRequest) => {
   const { searchParams } = new URL(request.url);
   const weekDate = searchParams.get("weekDate");
+  const timezone = request.headers.get("x-user-timezone") || "UTC";
   const client = await clerkClient();
   const { orgId } = await auth();
   if (!orgId || !weekDate) {
@@ -49,25 +52,37 @@ export const GET = async (request: NextRequest) => {
       { status: 400 }
     );
   }
+  if (!timezone) {
+    return NextResponse.json(
+      { error: "Missing client timezone header" },
+      { status: 400 }
+    );
+  }
   const members = await client.organizations.getOrganizationMembershipList({
     organizationId: orgId,
     limit: 501,
   });
 
+
+  const DBC = (date: Date | number) => {
+    return utcToZonedTime(date, timezone).getTime()
+  }
+
+
   const referenceDate = parseInt(weekDate);
 
-  const currentWeekStart = startOfWeek(referenceDate, {
+  const currentWeekStart = DBC(startOfWeek(referenceDate, {
     weekStartsOn: 1,
-  }).getTime();
-  const currentWeekEnd = isSameDay(startOfWeek(new Date(), { weekStartsOn: 1 }), referenceDate) ? endOfDay(new Date()).getTime() : endOfWeek(referenceDate, {
+  }));
+  const currentWeekEnd = isSameDay(DBC(startOfWeek(new Date(), { weekStartsOn: 1 })), referenceDate) ? DBC(endOfDay(new Date())) : DBC(endOfWeek(referenceDate, {
     weekStartsOn: 1,
-  }).getTime();
-  const lastWeekStart = startOfWeek(subWeeks(referenceDate, 1), {
+  }));
+  const lastWeekStart = DBC(startOfWeek(subWeeks(referenceDate, 1), {
     weekStartsOn: 1,
-  }).getTime();
-  const lastWeekEnd = endOfWeek(subWeeks(referenceDate, 1), {
+  }));
+  const lastWeekEnd = DBC(endOfWeek(subWeeks(referenceDate, 1), {
     weekStartsOn: 1,
-  }).getTime();
+  }));
 
 
   console.log("data----",
@@ -136,7 +151,6 @@ export const GET = async (request: NextRequest) => {
       collection(db, "doctor", orgId, "beds"),
       where("dischargeMarked", "==", false)
     );
-
     const upcomingAppointmentsQuery = query(
       collection(db, "doctor", orgId, "patients"),
       where(
@@ -145,8 +159,6 @@ export const GET = async (request: NextRequest) => {
         getStartOfDaysBetween(startOfDay(addDays(new Date(), 1)).getTime(), endOfDay(addDays(new Date(), 14)).getTime())
       )
     );
-
-
 
     const [
       currentWeekBillsSnap,
