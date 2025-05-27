@@ -205,14 +205,19 @@ export const GET = async (request: NextRequest) => {
       } as BedPatient
     })
     const upcomingAppointments = upcomingAppointmentsSnap.docs.map((doc) => {
-      const data = doc.data() as RegisterPatientFormTypes
+      const data = doc.data() as RegisterPatientFormTypes;
       return {
         patientId: data.patient_id,
         name: data.name,
-        dateTime: data.registered_date_time.find((date_time) => date_time >= startOfDay(addDays(new Date(), 1)).getTime()),
+        dateTime: data.registered_date_time.find(
+          (date_time) => date_time >= zonedTimeToUtc(
+            startOfDay(utcToZonedTime(addDays(new Date(), 1), timezone)),
+            timezone
+          ).getTime()
+        ),
         registeredFor: data.registerd_for.name,
-      } as Appointment
-    })
+      } as Appointment;
+    });
 
     const DashboardData: DashboardDataTypes = {
       compareStats: {

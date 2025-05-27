@@ -39,7 +39,7 @@ export const extractNewPatientsDayCounts = (snapData: RegisterPatientFormTypes[]
     const counts: Record<number, number> = {};
     for (const doc of snapData) {
         const value = doc.registered_date[0];
-        const day = startOfDay(new Date(value)).getTime();
+        const day = zonedTimeToUtc(startOfDay(utcToZonedTime(new Date(value), timezone)), timezone).getTime();
         counts[day] = (counts[day] || 0) + 1;
     }
     const allDays = getStartOfDaysBetween(lastWeekStart, currentWeekEnd, timezone);
@@ -51,7 +51,7 @@ export const extractTotalAppointmentsDayCounts = (snapData: PrescriptionFormType
     const counts: Record<number, number> = {};
     for (const doc of snapData) {
         const value = doc[field] as number;
-        const day = startOfDay(new Date(value)).getTime();
+        const day = zonedTimeToUtc(startOfDay(utcToZonedTime(new Date(value), timezone)), timezone).getTime();
         counts[day] = (counts[day] || 0) + 1;
     }
     const allDays = getStartOfDaysBetween(lastWeekStart, currentWeekEnd, timezone);
@@ -62,7 +62,7 @@ export const extractTotalBillsDayCounts = (snapData: PharmacyTypes[], field: key
     const counts: Record<number, number> = {};
     for (const doc of snapData) {
         const value = doc[field] as number;
-        const day = startOfDay(new Date(value)).getTime();
+        const day = zonedTimeToUtc(startOfDay(utcToZonedTime(new Date(value), timezone)), timezone).getTime();
         counts[day] = (counts[day] || 0) + 1;
     }
     const allDays = getStartOfDaysBetween(lastWeekStart, currentWeekEnd, timezone);
