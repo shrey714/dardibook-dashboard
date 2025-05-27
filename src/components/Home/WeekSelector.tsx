@@ -54,11 +54,8 @@ const WeekSelector = () => {
   const updateURL = (newDate: Date) => {
     setDirection(newDate >= date ? "next" : "prev");
     setDate(newDate);
-    const newWeekStart = startOfWeek(newDate, {
-      weekStartsOn: 1,
-    });
     const newSearchParams = new URLSearchParams(searchParams.toString());
-    newSearchParams.set("weekDate", getTime(newWeekStart).toString());
+    newSearchParams.set("weekDate", getTime(newDate).toString());
     router.push(`?${newSearchParams.toString()}`); // triggers SSR + loading.tsx
   };
 

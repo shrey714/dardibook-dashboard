@@ -71,11 +71,16 @@ export const GET = async (request: NextRequest) => {
   }), timezone);
 
   console.log(
+    parseInt(weekDate),
     referenceDate,
-    currentWeekStart,
-    currentWeekEnd,
-    lastWeekStart,
-    lastWeekEnd,
+    startOfWeek(referenceDate, {
+      weekStartsOn: 1,
+    }),
+    currentWeekStart
+    // currentWeekStart,
+    // currentWeekEnd,
+    // lastWeekStart,
+    // lastWeekEnd,
   )
 
   const doctors = members.data
