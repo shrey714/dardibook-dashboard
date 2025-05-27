@@ -26,7 +26,8 @@ import {
   extractTotalBillsDayCounts,
   getStartOfDaysBetween,
   sumAmounts,
-} from "../../../lib/helpers";
+  TZC,
+} from "@/lib/helpers";
 import {
   PharmacyTypes,
   PrescriptionFormTypes,
@@ -36,11 +37,11 @@ import {
   BedPatient,
   Appointment,
 } from "@/types/FormTypes";
-import { zonedTimeToUtc } from 'date-fns-tz'
 
 export const GET = async (request: NextRequest) => {
   const { searchParams } = new URL(request.url);
   const weekDate = searchParams.get("weekDate");
+  const timezone = request.headers.get('x-vercel-ip-timezone') || "Asia/Kolkata"
   const client = await clerkClient();
   const { orgId } = await auth();
   if (!orgId || !weekDate) {
@@ -54,26 +55,27 @@ export const GET = async (request: NextRequest) => {
     limit: 501,
   });
 
-  const referenceDate = parseInt(weekDate);
+  const referenceDate = TZC(parseInt(weekDate), timezone);
 
-  const currentWeekStart = startOfWeek(referenceDate, {
+  const currentWeekStart = TZC(startOfWeek(referenceDate, {
     weekStartsOn: 1,
-  }).getTime();
-  const currentWeekEnd = isSameDay(startOfWeek(new Date(), { weekStartsOn: 1 }), referenceDate) ? endOfDay(new Date()).getTime() : endOfWeek(referenceDate, {
+  }), timezone);
+  const currentWeekEnd = isSameDay(TZC(startOfWeek(new Date(), { weekStartsOn: 1 }), timezone), referenceDate) ? TZC(endOfDay(new Date()), timezone) : TZC(endOfWeek(referenceDate, {
     weekStartsOn: 1,
-  }).getTime();
-  const lastWeekStart = startOfWeek(subWeeks(referenceDate, 1), {
+  }), timezone);
+  const lastWeekStart = TZC(startOfWeek(subWeeks(referenceDate, 1), {
     weekStartsOn: 1,
-  }).getTime();
-  const lastWeekEnd = endOfWeek(subWeeks(referenceDate, 1), {
+  }), timezone);
+  const lastWeekEnd = TZC(endOfWeek(subWeeks(referenceDate, 1), {
     weekStartsOn: 1,
-  }).getTime();
+  }), timezone);
 
-
-  console.log("data----",
+  console.log(
+    referenceDate,
     currentWeekStart,
-    request.headers.get('x-vercel-ip-timezone'),
-    zonedTimeToUtc(currentWeekStart, request.headers.get('x-vercel-ip-timezone') || "Asia/Kolkata").getTime()
+    currentWeekEnd,
+    lastWeekStart,
+    lastWeekEnd,
   )
 
   const doctors = members.data
@@ -130,7 +132,6 @@ export const GET = async (request: NextRequest) => {
         getStartOfDaysBetween(lastWeekStart, lastWeekEnd)
       )
     );
-
     const patientsInBedQuery = query(
       collection(db, "doctor", orgId, "beds"),
       where("dischargeMarked", "==", false)

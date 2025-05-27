@@ -1,5 +1,6 @@
 import { PharmacyTypes, PrescriptionFormTypes, RegisterPatientFormTypes } from '@/types/FormTypes';
 import { startOfDay, addDays, isAfter } from 'date-fns';
+import { zonedTimeToUtc } from 'date-fns-tz';
 
 /**
  * Returns an array of start-of-day timestamps (in milliseconds)
@@ -66,3 +67,7 @@ export const extractTotalBillsDayCounts = (snapData: PharmacyTypes[], field: key
 
 export const sumAmounts = (snapData: PharmacyTypes[]) =>
     snapData.reduce((acc: number, doc: PharmacyTypes) => acc + (doc.total_amount || 0), 0);
+
+
+export const TZC = (time: Date | number, tz: string) =>
+    zonedTimeToUtc(time, tz).getTime()
