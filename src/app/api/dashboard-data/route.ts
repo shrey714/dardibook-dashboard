@@ -69,7 +69,7 @@ export const GET = async (request: NextRequest) => {
   }
 
 
-  const referenceDate = parseInt(weekDate);
+  const referenceDate = new Date(parseInt(weekDate));
 
   const currentWeekStart = DBC(startOfWeek(referenceDate, {
     weekStartsOn: 1,
