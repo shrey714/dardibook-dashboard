@@ -6,6 +6,7 @@ import BedAppointmentsActivity from "@/components/Home/BedAppointmentsActivity";
 import WeekSelector from "@/components/Home/WeekSelector";
 import { DashboardDataTypes } from "@/types/FormTypes";
 import { headers } from "next/headers";
+import { auth } from "@clerk/nextjs/server";
 
 type PageProps = {
   searchParams: Promise<{ weekDate?: string }>;
@@ -18,6 +19,15 @@ export default async function Home({ searchParams }: PageProps) {
   const protocol = headersList.get("x-forwarded-proto") || "http";
   const host = headersList.get("host") || "";
   const baseUrl = `${protocol}://${host}`;
+
+  const authInstance = await auth();
+  if (!authInstance.orgRole) {
+    return (
+      <div className="p-4 text-center text-red-500">
+        You are not authorized for this organization..
+      </div>
+    );
+  }
 
   if (isNaN(weekTimestamp)) {
     notFound();
@@ -56,7 +66,7 @@ export default async function Home({ searchParams }: PageProps) {
       </div>
       <div className="grid auto-rows-auto grid-cols-3 gap-2 sm:gap-3 md:grid-cols-6 lg:grid-cols-9">
         <StatusCharts StatusChartsData={dashboardData.compareStats} />
-        <QuickLinks />
+        <QuickLinks role={authInstance.orgRole} />
         <DoctorsPerformanceChart
           DoctorsPerformanceChartData={dashboardData.doctorWeeklyComparison}
         />

@@ -20,8 +20,12 @@ const WeekSelector = () => {
   }, [searchParams]);
 
   const [date, setDate] = React.useState(initialDate);
-  const weekStart = startOfWeek(date);
-  const weekEnd = endOfWeek(weekStart);
+  const weekStart = startOfWeek(date, {
+    weekStartsOn: 1,
+  });
+  const weekEnd = endOfWeek(weekStart, {
+    weekStartsOn: 1,
+  });
 
   useEffect(() => {
     setDate(initialDate);
@@ -29,7 +33,9 @@ const WeekSelector = () => {
 
   const updateURL = (newDate: Date) => {
     setDate(newDate);
-    const newWeekStart = startOfWeek(newDate);
+    const newWeekStart = startOfWeek(newDate, {
+      weekStartsOn: 1,
+    });
     const newSearchParams = new URLSearchParams(searchParams.toString());
     newSearchParams.set("weekDate", getTime(newWeekStart).toString());
     router.push(`?${newSearchParams.toString()}`); // triggers SSR + loading.tsx
@@ -49,8 +55,12 @@ const WeekSelector = () => {
 
   const modifiers = {
     inSelectedWeek: {
-      from: startOfWeek(date),
-      to: endOfWeek(date),
+      from: startOfWeek(date, {
+        weekStartsOn: 1,
+      }),
+      to: endOfWeek(date, {
+        weekStartsOn: 1,
+      }),
     },
   };
 
@@ -62,12 +72,12 @@ const WeekSelector = () => {
   };
   return (
     <Popover>
-      <div className="flex flex-row h-full w-full sm:w-auto shadow-sm rounded-md overflow-hidden">
+      <div className="flex flex-row h-full w-[90%] mx-auto sm:mx-0 sm:w-auto shadow-sm rounded-md overflow-hidden">
         <Button
           variant="outline"
-          size="icon"
+          size="default"
           onClick={previousWeek}
-          className="size-9 rounded-r-none bg-border shadow-none"
+          className="h-9 rounded-r-none bg-border shadow-none text-muted-foreground"
         >
           <ChevronLeft className="h-4 w-4" />
           <span className="sr-only">Previous week</span>
@@ -79,9 +89,9 @@ const WeekSelector = () => {
         </PopoverTrigger>
         <Button
           variant="outline"
-          size="icon"
+          size="default"
           onClick={nextWeek}
-          className="size-9 rounded-l-none bg-border shadow-none"
+          className="h-9 rounded-l-none bg-border shadow-none text-muted-foreground"
         >
           <ChevronRight className="h-4 w-4" />
           <span className="sr-only">Next week</span>
@@ -89,6 +99,7 @@ const WeekSelector = () => {
       </div>
       <PopoverContent className="w-auto p-0" align="center">
         <Calendar
+          weekStartsOn={1}
           defaultMonth={date}
           mode="single"
           onSelect={(newDate) => newDate && updateURL(newDate)}

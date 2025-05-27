@@ -194,7 +194,6 @@ export type CalendarEventTypes =
 // Dashboard Types
 
 export interface StatComparison {
-    icon: string;
     title: string;
     info: string;
     count: number;

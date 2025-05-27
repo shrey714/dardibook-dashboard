@@ -10,7 +10,11 @@ import { NextResponse, NextRequest } from "next/server";
 
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import {
+  addDays,
+  endOfDay,
   endOfWeek,
+  isSameDay,
+  isToday,
   isWithinInterval,
   startOfDay,
   startOfWeek,
@@ -29,12 +33,12 @@ import {
   PrescriptionFormTypes,
   RegisterPatientFormTypes,
   DashboardDataTypes,
+  OrgBed,
+  BedPatient,
+  Appointment,
 } from "@/types/FormTypes";
 
 export const GET = async (request: NextRequest) => {
-  console.log("=============================================================");
-  console.log("=============================================================");
-  console.log("=============================================================");
   const { searchParams } = new URL(request.url);
   const weekDate = searchParams.get("weekDate");
   const client = await clerkClient();
@@ -55,7 +59,7 @@ export const GET = async (request: NextRequest) => {
   const currentWeekStart = startOfWeek(referenceDate, {
     weekStartsOn: 1,
   }).getTime();
-  const currentWeekEnd = endOfWeek(referenceDate, {
+  const currentWeekEnd = isSameDay(startOfWeek(new Date(), { weekStartsOn: 1 }), referenceDate) ? endOfDay(new Date()).getTime() : endOfWeek(referenceDate, {
     weekStartsOn: 1,
   }).getTime();
   const lastWeekStart = startOfWeek(subWeeks(referenceDate, 1), {
@@ -64,6 +68,15 @@ export const GET = async (request: NextRequest) => {
   const lastWeekEnd = endOfWeek(subWeeks(referenceDate, 1), {
     weekStartsOn: 1,
   }).getTime();
+
+
+  console.log("data----",
+    currentWeekStart,
+    currentWeekEnd,
+    lastWeekStart,
+    lastWeekEnd,
+  )
+
   const doctors = members.data
     .filter(
       (member) =>
@@ -118,6 +131,23 @@ export const GET = async (request: NextRequest) => {
         getStartOfDaysBetween(lastWeekStart, lastWeekEnd)
       )
     );
+
+    const patientsInBedQuery = query(
+      collection(db, "doctor", orgId, "beds"),
+      where("dischargeMarked", "==", false)
+    );
+
+    const upcomingAppointmentsQuery = query(
+      collection(db, "doctor", orgId, "patients"),
+      where(
+        "registered_date",
+        "array-contains-any",
+        getStartOfDaysBetween(startOfDay(addDays(new Date(), 1)).getTime(), endOfDay(addDays(new Date(), 14)).getTime())
+      )
+    );
+
+
+
     const [
       currentWeekBillsSnap,
       lastWeekBillsSnap,
@@ -125,6 +155,8 @@ export const GET = async (request: NextRequest) => {
       lastWeekPrescriptionsSnap,
       currentWeekPatientsSnap,
       lastWeekPatientsSnap,
+      patientsInBedSnap,
+      upcomingAppointmentsSnap
     ] = await Promise.all([
       getDocs(currentWeekBillsQuery),
       getDocs(lastWeekBillsQuery),
@@ -132,14 +164,16 @@ export const GET = async (request: NextRequest) => {
       getDocs(lastWeekPrescriptionsQuery),
       getDocs(currentWeekPatientsQuery),
       getDocs(lastWeekPatientsQuery),
+      getDocs(patientsInBedQuery),
+      getDocs(upcomingAppointmentsQuery)
     ]);
     const currentPatients = currentWeekPatientsSnap.docs.map(
       (doc) => doc.data() as RegisterPatientFormTypes
     );
     const currentPatientsSize = currentWeekPatientsSnap.size;
-    const lastPatients = lastWeekPatientsSnap.docs.map(
-      (doc) => doc.data() as RegisterPatientFormTypes
-    );
+    // const lastPatients = lastWeekPatientsSnap.docs.map(
+    //   (doc) => doc.data() as RegisterPatientFormTypes
+    // );
     const lastPatientsSize = lastWeekPatientsSnap.size;
     const currentPrescriptions = currentWeekPrescriptionsSnap.docs.map(
       (doc) => doc.data() as PrescriptionFormTypes
@@ -157,11 +191,30 @@ export const GET = async (request: NextRequest) => {
       (doc) => doc.data() as PharmacyTypes
     );
     const lastBillsSize = lastWeekBillsSnap.size;
+    const patientsInBed = patientsInBedSnap.docs.map((doc) => {
+      const data = doc.data() as OrgBed
+      return {
+        bedBookingId: data.bedBookingId,
+        bedId: data.bedId,
+        patientId: data.patient_id,
+        admissionAt: data.admission_at,
+        dischargeAt: data.discharge_at,
+        admissionFor: data.admission_for.name,
+      } as BedPatient
+    })
+    const upcomingAppointments = upcomingAppointmentsSnap.docs.map((doc) => {
+      const data = doc.data() as RegisterPatientFormTypes
+      return {
+        patientId: data.patient_id,
+        name: data.name,
+        dateTime: data.registered_date_time.find((date_time) => date_time >= startOfDay(addDays(new Date(), 1)).getTime()),
+        registeredFor: data.registerd_for.name,
+      } as Appointment
+    })
 
     const DashboardData: DashboardDataTypes = {
       compareStats: {
         newPatients: {
-          icon: "user-plus",
           title: "New Patients",
           info: "Patients registered this week",
           count: currentPatients.filter(
@@ -187,7 +240,6 @@ export const GET = async (request: NextRequest) => {
           ...compare(currentPatientsSize, lastPatientsSize),
         },
         totalAppointments: {
-          icon: "calendar-check",
           title: "Appointments",
           info: "Prescriptions made this week",
           count: currentPrescriptionsSize,
@@ -200,7 +252,6 @@ export const GET = async (request: NextRequest) => {
           ...compare(currentPrescriptionsSize, lastPrescriptionsSize),
         },
         totalBills: {
-          icon: "file-text",
           title: "Bills Generated",
           info: "Bills created this week",
           count: currentBillsSize,
@@ -213,7 +264,6 @@ export const GET = async (request: NextRequest) => {
           ...compare(currentBillsSize, lastBillsSize),
         },
         totalRevenue: {
-          icon: "dollar-sign",
           title: "Total Revenue",
           info: "Revenue from bills",
           count: sumAmounts(currentBills),
@@ -251,8 +301,8 @@ export const GET = async (request: NextRequest) => {
           ).length,
         })),
       },
-      patientsInBed: [],
-      upcomingAppointments: [],
+      patientsInBed: patientsInBed,
+      upcomingAppointments: upcomingAppointments,
       recentActivities: [],
     };
 
