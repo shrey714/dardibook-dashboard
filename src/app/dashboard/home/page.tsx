@@ -40,7 +40,6 @@ export default async function Home({ searchParams }: PageProps) {
       {
         method: "GET",
         headers: {
-          "x-user-timezone": "Asia/Calcutta",
           cookie: headersList.get("cookie") || "",
         },
         cache: "no-store",
