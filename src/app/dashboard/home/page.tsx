@@ -40,13 +40,12 @@ export default async function Home({ searchParams }: PageProps) {
       {
         method: "GET",
         headers: {
-          "x-user-timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+          "x-user-timezone": "Asia/Calcutta",
           cookie: headersList.get("cookie") || "",
         },
         cache: "no-store",
       }
     );
-    console.log("client-time-zone==", Intl.DateTimeFormat().resolvedOptions().timeZone);
     if (!res.ok) {
       throw new Error("Failed to fetch dashboard data");
     }
