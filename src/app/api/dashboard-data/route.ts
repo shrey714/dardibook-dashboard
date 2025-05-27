@@ -55,7 +55,7 @@ export const GET = async (request: NextRequest) => {
     limit: 501,
   });
 
-  const referenceDate = TZC(parseInt(weekDate), timezone);
+  const referenceDate = parseInt(weekDate);
 
   const currentWeekStart = TZC(startOfWeek(referenceDate, {
     weekStartsOn: 1,
@@ -71,12 +71,7 @@ export const GET = async (request: NextRequest) => {
   }), timezone);
 
   console.log(
-    parseInt(weekDate),
-    referenceDate,
-    startOfWeek(referenceDate, {
-      weekStartsOn: 1,
-    }),
-    currentWeekStart
+    referenceDate
     // currentWeekStart,
     // currentWeekEnd,
     // lastWeekStart,
