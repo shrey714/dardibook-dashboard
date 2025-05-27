@@ -37,6 +37,7 @@ import {
   BedPatient,
   Appointment,
 } from "@/types/FormTypes";
+import { utcToZonedTime, zonedTimeToUtc } from "date-fns-tz";
 
 export const GET = async (request: NextRequest) => {
   const { searchParams } = new URL(request.url);
@@ -55,20 +56,24 @@ export const GET = async (request: NextRequest) => {
     limit: 501,
   });
 
-  const referenceDate = parseInt(weekDate);
+  const referenceDate = utcToZonedTime(Number(weekDate), timezone);
 
-  const currentWeekStart = TZC(startOfWeek(TZC(referenceDate, timezone), {
-    weekStartsOn: 1,
-  }), timezone);
-  const currentWeekEnd = TZC(endOfWeek(referenceDate, {
-    weekStartsOn: 1,
-  }), timezone);
-  const lastWeekStart = TZC(startOfWeek(subWeeks(referenceDate, 1), {
-    weekStartsOn: 1,
-  }), timezone);
-  const lastWeekEnd = TZC(endOfWeek(subWeeks(referenceDate, 1), {
-    weekStartsOn: 1,
-  }), timezone);
+  const currentWeekStart = zonedTimeToUtc(
+    startOfWeek(referenceDate, { weekStartsOn: 1 }),
+    timezone
+  ).getTime();
+  const currentWeekEnd = zonedTimeToUtc(
+    endOfWeek(referenceDate, { weekStartsOn: 1 }),
+    timezone
+  ).getTime();
+  const lastWeekStart = zonedTimeToUtc(
+    startOfWeek(subWeeks(referenceDate, 1), { weekStartsOn: 1 }),
+    timezone
+  ).getTime();
+  const lastWeekEnd = zonedTimeToUtc(
+    endOfWeek(subWeeks(referenceDate, 1), { weekStartsOn: 1 }),
+    timezone
+  ).getTime();
 
   console.log(
     referenceDate,
