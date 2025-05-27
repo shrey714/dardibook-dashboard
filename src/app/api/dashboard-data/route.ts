@@ -57,7 +57,7 @@ export const GET = async (request: NextRequest) => {
 
   const referenceDate = parseInt(weekDate);
 
-  const currentWeekStart = TZC(startOfWeek(referenceDate, {
+  const currentWeekStart = TZC(startOfWeek(TZC(referenceDate, timezone), {
     weekStartsOn: 1,
   }), timezone);
   const currentWeekEnd = TZC(endOfWeek(referenceDate, {
