@@ -15,7 +15,6 @@ import {
   CalendarMinusIcon,
   CalendarPlusIcon,
   ClipboardX,
-  LogOut,
   PencilLineIcon,
   BedSingle,
   PhoneIcon,
@@ -24,11 +23,11 @@ import {
   X,
   Inbox,
   Bed,
+  ClockAlertIcon,
 } from "lucide-react";
 import { Link2 } from "lucide-react";
 import Link from "next/link";
-import { AlertCircle } from "lucide-react";
-import { format, startOfDay } from "date-fns";
+import { format, getTime, isSameDay } from "date-fns";
 import {
   Accordion,
   AccordionContent,
@@ -40,7 +39,6 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { SidebarMenuSkeleton } from "../ui/sidebar";
 import { usePatientHistoryModalStore } from "@/lib/stores/patientHistoryModalStore";
@@ -75,7 +73,6 @@ const CurrentBedPatients = () => {
   const router = useRouter();
   const { beds, bedPatients, loading } = useBedsStore((state) => state);
   const isDesktop = useMediaQuery("(min-width: 1536px)");
-  const [alerts] = useState<string[]>([]);
   const { openModal } = usePatientHistoryModalStore();
   const [filters, setFilters] = useState<CurrentBedPatientsFilter>();
   const { memberships } = useOrganization({
@@ -163,17 +160,6 @@ const CurrentBedPatients = () => {
                 <X className="text-red-500" />
               </Button>
             </div>
-
-            <Alert hidden={alerts.length === 0}>
-              <AlertCircle className="h-4 w-4 !top-auto" />
-              <AlertTitle hidden></AlertTitle>
-              {alerts.map((alert, index) => (
-                <AlertDescription key={index} className="text-xs">
-                  {alert}
-                </AlertDescription>
-              ))}
-            </Alert>
-
             <ScrollArea type="always" className="w-full border-0 rounded-none">
               {loading ? (
                 <div className="flex flex-col space-y-1">
@@ -189,14 +175,15 @@ const CurrentBedPatients = () => {
                 <div className="pr-4 space-y-1.5">
                   {filteredPatients.map((bed, index) => {
                     const matchingPatient = bedPatients[bed.patient_id];
+                    const IsDischargeOverdue =
+                      bed.discharge_at < getTime(new Date());
                     return (
                       <HoverCard key={index} openDelay={80} closeDelay={80}>
                         <div
                           className={`flex flex-1 w-full items-center flex-row gap-x-2`}
                         >
                           <HoverCardTrigger className="flex w-full flex-1 flex-row rounded-md bg-border h-24 overflow-hidden">
-                            {startOfDay(bed.admission_at).toDateString() ===
-                            startOfDay(new Date()).toDateString() ? (
+                            {isSameDay(bed.admission_at, new Date()) ? (
                               <div className="bg-green-400 w-[4px] h-full"></div>
                             ) : (
                               <div className="bg-yellow-500/90 w-[4px] h-full"></div>
@@ -216,8 +203,7 @@ const CurrentBedPatients = () => {
                                   )}
                                   {bed.bedId}
                                 </span>
-
-                                <div className="px-2 h-auto flex flex-col justify-start items-start">
+                                <div className="px-2 h-auto flex flex-1 flex-col justify-start items-start">
                                   <p className="text-sm font-normal">
                                     <button
                                       type="button"
@@ -233,6 +219,15 @@ const CurrentBedPatients = () => {
                                     {matchingPatient.name}
                                   </p>
                                 </div>
+                                {IsDischargeOverdue && (
+                                  <div className="h-full flex items-center justify-end max-w-28 pr-2 rounded-r-md flex-1 bg-gradient-to-l from-red-500/30 to-red-500/0">
+                                    <ClockAlertIcon
+                                      size={24}
+                                      strokeWidth={1.6}
+                                      className="text-red-500"
+                                    />
+                                  </div>
+                                )}
                               </div>
                               <div className="relative flex flex-1 h-1/2 items-center gap-x-2 p-2">
                                 <BedManagementMenu
@@ -265,8 +260,7 @@ const CurrentBedPatients = () => {
                               </div>
                             </div>
 
-                            {startOfDay(bed.discharge_at).toDateString() ===
-                            startOfDay(new Date()).toDateString() ? (
+                            {isSameDay(bed.discharge_at, new Date()) ? (
                               <div className="bg-red-500 w-[4px] h-full"></div>
                             ) : (
                               <div className="bg-yellow-500/90 w-[4px] h-full"></div>
@@ -325,13 +319,11 @@ const CurrentBedPatients = () => {
                               </p>
                             </div>
                           </div>
-                          {bed.dischargeMarked ? (
-                            <div className="bg-red-500/10 mt-2 w-full rounded-md text-red-600 flex flex-row gap-4 px-3 py-1 items-center">
-                              <LogOut className="w-5 h-5" /> Discharged by{" "}
-                              {bed?.discharged_by?.name}
+                          {IsDischargeOverdue && (
+                            <div className="bg-red-500/10 mt-2 flex-1 rounded-md text-wrap font-medium text-red-600 flex flex-row gap-4 px-3 py-1 items-center">
+                              <ClockAlertIcon className="w-5 h-5 shrink-0" />{" "}
+                              Discharge overdue.
                             </div>
-                          ) : (
-                            <></>
                           )}
                         </HoverCardContent>
                       </HoverCard>
@@ -432,20 +424,6 @@ const CurrentBedPatients = () => {
                   <X className="text-red-500" />
                 </Button>
               </div>
-
-              <Alert
-                className={`${
-                  alerts.length === 0 ? "hidden" : "flex flex-1"
-                } w-auto`}
-              >
-                <AlertCircle className="h-4 w-4 !top-auto" />
-                <AlertTitle hidden></AlertTitle>
-                {alerts.map((alert, index) => (
-                  <AlertDescription key={index} className="text-xs">
-                    {alert}{" "}
-                  </AlertDescription>
-                ))}
-              </Alert>
             </div>
 
             <ScrollArea className="w-full border-0 rounded-none">
@@ -467,6 +445,8 @@ const CurrentBedPatients = () => {
                 >
                   {filteredPatients.map((bed, index) => {
                     const matchingPatient = bedPatients[bed.patient_id];
+                    const IsDischargeOverdue =
+                      bed.discharge_at < getTime(new Date());
                     return (
                       <AccordionItem
                         key={index}
@@ -475,14 +455,13 @@ const CurrentBedPatients = () => {
                       >
                         <AccordionTrigger className="py-0 border-0 hover:no-underline gap-x-2 pr-2">
                           <div className="flex w-full flex-1 flex-row rounded-md bg-border h-24 sm:h-12 overflow-hidden">
-                            {startOfDay(bed.admission_at).toDateString() ===
-                            startOfDay(new Date()).toDateString() ? (
+                            {isSameDay(bed.admission_at, new Date()) ? (
                               <div className="bg-green-400 w-[4px] h-full"></div>
                             ) : (
                               <div className="bg-yellow-500/90 w-[4px] h-full"></div>
                             )}
 
-                            <div className="flex flex-1 flex-col sm:flex-row flex-wrap h-full">
+                            <div className="flex flex-1 flex-col sm:flex-row flex-nowrap h-full">
                               <div className="relative flex flex-1 h-1/2 sm:h-full items-center gap-2 p-2">
                                 <span
                                   className={`text-lg flex flex-row gap-2 items-center bg-background justify-center font-bold rounded-md px-2 py-1 ${
@@ -496,8 +475,7 @@ const CurrentBedPatients = () => {
                                   )}
                                   {bed.bedId}
                                 </span>
-
-                                <div className="px-2 h-auto flex flex-col justify-start items-start">
+                                <div className="px-2 h-auto flex flex-1 flex-col justify-start items-start">
                                   <p className="text-sm font-normal">
                                     <Link
                                       href={"#"}
@@ -520,6 +498,15 @@ const CurrentBedPatients = () => {
                                     {matchingPatient.name}
                                   </p>
                                 </div>
+                                {IsDischargeOverdue && (
+                                  <div className="h-full flex items-center justify-end max-w-28 pr-2 rounded-r-md flex-1 bg-gradient-to-l from-red-500/30 to-red-500/0">
+                                    <ClockAlertIcon
+                                      size={24}
+                                      strokeWidth={1.6}
+                                      className="text-red-500"
+                                    />
+                                  </div>
+                                )}
                               </div>
                               <div className="relative flex flex-1 h-1/2 sm:h-full items-center gap-x-2 p-2">
                                 <BedManagementMenu
@@ -554,8 +541,7 @@ const CurrentBedPatients = () => {
                               </div>
                             </div>
 
-                            {startOfDay(bed.discharge_at).toDateString() ===
-                            startOfDay(new Date()).toDateString() ? (
+                            {isSameDay(bed.discharge_at, new Date()) ? (
                               <div className="bg-red-500 w-[4px] h-full"></div>
                             ) : (
                               <div className="bg-yellow-500/90 w-[4px] h-full"></div>
@@ -609,13 +595,11 @@ const CurrentBedPatients = () => {
                               </p>
                             </div>
                           </div>
-                          {bed.dischargeMarked ? (
-                            <div className="bg-red-500/10 mt-2 w-full rounded-md text-red-600 flex flex-row gap-4 px-3 py-1 items-center">
-                              <LogOut className="w-5 h-5" /> Discharged by{" "}
-                              {bed?.discharged_by?.name}
+                          {IsDischargeOverdue && (
+                            <div className="bg-red-500/10 mt-2 w-full font-medium text-base rounded-md text-red-600 flex flex-row gap-4 px-3 py-1 items-center">
+                              <ClockAlertIcon className="w-5 h-5 shrink-0" />{" "}
+                              Discharge overdue.
                             </div>
-                          ) : (
-                            <></>
                           )}
                         </AccordionContent>
                       </AccordionItem>
