@@ -21,17 +21,17 @@ import { ChevronDown } from "lucide-react";
 
 const tabs = [
   {
-    name: "Registration Defaults",
+    name: "Registration Settings",
     value: "Registration",
     component: RegistrationOptions,
   },
   {
-    name: "Prescription Defaults",
+    name: "Prescription Preferences",
     value: "Prescription",
     component: PrescriptionOptions,
   },
   {
-    name: "Pharmacy Defaults",
+    name: "Pharmacy Settings",
     value: "Pharmacy",
     component: PharmacyOptions,
   },
@@ -51,6 +51,7 @@ export default function SettingsMedicineInfoPage() {
           <Button
             variant="secondary"
             className="sticky top-[60px] z-10 flex w-full md:hidden"
+            aria-label={`Open tab selector, current tab is ${tabValue}`}
           >
             {tabValue} <ChevronDown />
           </Button>
@@ -58,8 +59,10 @@ export default function SettingsMedicineInfoPage() {
         <DrawerContent className="md:hidden">
           <div className="mx-auto w-full max-w-md">
             <DrawerHeader>
-              <DrawerTitle hidden></DrawerTitle>
-              <DrawerDescription hidden></DrawerDescription>
+              <DrawerTitle>Select a Default Type</DrawerTitle>
+              <DrawerDescription>
+                Choose the section you want to configure.
+              </DrawerDescription>
             </DrawerHeader>
             <div className="p-4 py-0">
               <TabsList className="flex md:hidden bg-transparent p-0 rounded-none flex-col items-center justify-start gap-1 h-auto mx-0">

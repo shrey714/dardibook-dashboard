@@ -8,15 +8,15 @@ export const updatePrescriptionReceiptDefaults = async (formdata: ReceiptDetails
   const { orgId } = await auth()
 
   if (!orgId) {
-    return { message: 'No Org ID available' }
+    return { message: 'Organization ID is missing.' }
   }
 
   try {
     await client.organizations.updateOrganizationMetadata(orgId, {
       publicMetadata: { receipt_types: formdata },
     })
-    return { message: 'Org metadata Updated' }
+    return { message: 'Organization metadata updated successfully.' }
   } catch (e) {
-    return { message: `Error Updating User Metadata ${e}` }
+    return { message: `Failed to update organization metadata: ${e}` }
   }
 }

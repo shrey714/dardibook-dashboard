@@ -75,15 +75,15 @@ export const PrescriptionOptions = () => {
             form.reset();
           },
           (error) => {
-            console.error("Error adding receipt :", error);
+            console.error("Operation failed. Please try again : ", error);
             setAddLoader(false);
           }
         );
       },
       {
-        loading: "Adding...",
-        success: "Added successfully",
-        error: "Error when adding",
+        loading: "Adding receipt type...",
+        success: "Receipt type added successfully",
+        error: "Error adding receipt type",
       },
       {
         position: "bottom-right",
@@ -114,15 +114,15 @@ export const PrescriptionOptions = () => {
             setReceiptEditModel(false);
           },
           (error) => {
-            console.error("Error updating receipt :", error);
+            console.error("Operation failed. Please try again : ", error);
             setAddLoader(false);
           }
         );
       },
       {
-        loading: "Updating...",
-        success: "Updated successfully",
-        error: "Error when updating",
+        loading: "Updating receipt type...",
+        success: "Receipt type updated successfully",
+        error: "Error updating receipt type",
       },
       {
         position: "bottom-right",
@@ -144,15 +144,15 @@ export const PrescriptionOptions = () => {
             setReceiptEditModel(false);
           },
           (error) => {
-            console.error("Error deleting receipt :", error);
+            console.error("Operation failed. Please try again : ", error);
             setAddLoader(false);
           }
         );
       },
       {
-        loading: "Deleting...",
-        success: "Delete successfully",
-        error: "Error when deleting",
+        loading: "Deleting receipt type...",
+        success: "Receipt type deleted successfully",
+        error: "Error deleting receipt type",
       },
       {
         position: "bottom-right",
@@ -182,13 +182,14 @@ export const PrescriptionOptions = () => {
       <Dialog open={receiptEditModel} onOpenChange={setReceiptEditModel}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>
+            <DialogTitle>Edit Receipt Type</DialogTitle>
+            <DialogDescription>
+              Modify details for{" "}
               {
                 receipts?.find((receipt) => receipt.id === editForReceiptId)
                   ?.title
               }
-            </DialogTitle>
-            <DialogDescription>Update receipt type or amount</DialogDescription>
+            </DialogDescription>
           </DialogHeader>
           <form onSubmit={UpdateType} autoComplete="off">
             <fieldset
@@ -206,7 +207,7 @@ export const PrescriptionOptions = () => {
                   className="h-min mt-1 form-input w-full block bg-background rounded-md border-border py-1.5 shadow-sm placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                   name="receiptType"
                   id="receiptType"
-                  placeholder="Receipt Type.."
+                  placeholder="e.g., Consultation Fee"
                   required
                   defaultValue={
                     receipts?.find((receipt) => receipt.id === editForReceiptId)
@@ -219,13 +220,13 @@ export const PrescriptionOptions = () => {
                   htmlFor="amount"
                   className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
                 >
-                  Amount
+                  Amount (₹)
                 </label>
                 <input
                   className="h-min mt-1 form-input w-full block bg-background rounded-md border-border py-1.5 shadow-sm placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                   name="amount"
                   id="amount"
-                  placeholder="Amount.."
+                  placeholder="e.g., 500"
                   required
                   type="number"
                   defaultValue={
@@ -264,7 +265,7 @@ export const PrescriptionOptions = () => {
       <Card className="bg-sidebar/70 w-full shadow-none border h-min mx-auto">
         <CardHeader className="border-b p-4">
           <CardTitle className="font-normal text-muted-foreground">
-            Add new prescription receipt type
+            Add New Receipt Type
           </CardTitle>
           <CardDescription hidden></CardDescription>
         </CardHeader>
@@ -285,7 +286,7 @@ export const PrescriptionOptions = () => {
                   className="h-min mt-1 form-input w-full block bg-background rounded-md border-border py-1.5 shadow-sm placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                   name="receiptType"
                   id="receiptType"
-                  placeholder="Receipt Type.."
+                  placeholder="e.g., Consultation Fee"
                   required
                 />
               </div>
@@ -301,7 +302,7 @@ export const PrescriptionOptions = () => {
                   className="h-min mt-1 form-input w-full block bg-background rounded-md border-border py-1.5 shadow-sm placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                   name="amount"
                   id="amount"
-                  placeholder="Amount.."
+                  placeholder="e.g., 500"
                   required
                   type="number"
                 />
