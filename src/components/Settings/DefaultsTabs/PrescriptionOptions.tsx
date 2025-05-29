@@ -296,7 +296,7 @@ export const PrescriptionOptions = () => {
                   htmlFor="amount"
                   className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
                 >
-                  Amount
+                  Amount (₹)
                 </label>
                 <input
                   className="h-min mt-1 form-input w-full block bg-background rounded-md border-border py-1.5 shadow-sm placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
@@ -339,7 +339,7 @@ export const PrescriptionOptions = () => {
               <TableRow className="bg-muted/50">
                 <TableHead className="h-12 pl-6">Id</TableHead>
                 <TableHead className="h-12">Type</TableHead>
-                <TableHead className="h-12">Amount</TableHead>
+                <TableHead className="h-12">Amount (₹)</TableHead>
                 <TableHead className="h-12"></TableHead>
               </TableRow>
             </TableHeader>
