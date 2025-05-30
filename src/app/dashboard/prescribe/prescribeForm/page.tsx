@@ -139,8 +139,8 @@ const Page = () => {
       email: "",
     },
     receipt_details:
-      isLoaded && organization && organization.publicMetadata.receipt_types
-        ? (organization.publicMetadata.receipt_types as ReceiptDetails[])
+      isLoaded && organization && organization.publicMetadata.prescription_receipt_types
+        ? (organization.publicMetadata.prescription_receipt_types as ReceiptDetails[])
         : [],
   });
   const [patientBarData, setpatientBarData] = useState<patientBarDataTypes>({

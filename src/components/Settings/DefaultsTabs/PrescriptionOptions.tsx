@@ -1,7 +1,7 @@
 "use client";
 
 import React, { FormEvent, useEffect, useState } from "react";
-import { CirclePlus, Pencil } from "lucide-react";
+import { CirclePlus, InboxIcon, Pencil } from "lucide-react";
 import uniqid from "uniqid";
 import Loader from "@/components/common/Loader";
 import toast from "react-hot-toast";
@@ -23,7 +23,6 @@ import { Button } from "@/components/ui/button";
 
 import { useAuth, useOrganization } from "@clerk/nextjs";
 import { Separator } from "@/components/ui/separator";
-import { motion } from "framer-motion";
 import { ReceiptDetails } from "@/types/FormTypes";
 import {
   Table,
@@ -44,9 +43,14 @@ export const PrescriptionOptions = () => {
   const [editForReceiptId, setEditForReceiptId] = useState<string>("");
 
   useEffect(() => {
-    if (isLoaded && organization && organization.publicMetadata.receipt_types) {
+    if (
+      isLoaded &&
+      organization &&
+      organization.publicMetadata.prescription_receipt_types
+    ) {
       setReceipts(
-        organization.publicMetadata.receipt_types as ReceiptDetails[]
+        organization.publicMetadata
+          .prescription_receipt_types as ReceiptDetails[]
       );
     } else {
       setReceipts([]);
@@ -160,25 +164,7 @@ export const PrescriptionOptions = () => {
     );
   };
   return (
-    <motion.div
-      key={"prescription"}
-      className="flex flex-col mx-0 w-full gap-2"
-      initial="hidden"
-      animate="visible"
-      exit="hidden"
-      variants={{
-        hidden: {
-          opacity: 0,
-          y: 50,
-          transition: { type: "tween", ease: "anticipate" },
-        },
-        visible: {
-          opacity: 1,
-          y: 0,
-          transition: { type: "tween", ease: "anticipate" },
-        },
-      }}
-    >
+    <>
       <Dialog open={receiptEditModel} onOpenChange={setReceiptEditModel}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
@@ -265,7 +251,7 @@ export const PrescriptionOptions = () => {
       <Card className="bg-sidebar/70 w-full shadow-none border h-min mx-auto">
         <CardHeader className="border-b p-4">
           <CardTitle className="font-normal text-muted-foreground">
-            Add New Receipt Type
+            Add Prescription Receipt Type
           </CardTitle>
           <CardDescription hidden></CardDescription>
         </CardHeader>
@@ -331,7 +317,7 @@ export const PrescriptionOptions = () => {
           </div>
         ) : receipts.length === 0 ? (
           <div className="flex flex-1 items-center justify-center text-muted-foreground min-h-72">
-            No receipt data available
+            <InboxIcon />
           </div>
         ) : (
           <Table>
@@ -367,6 +353,6 @@ export const PrescriptionOptions = () => {
           </Table>
         )}
       </div>
-    </motion.div>
+    </>
   );
 };

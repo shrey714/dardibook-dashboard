@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { RegistrationOptions } from "@/components/Settings/DefaultsTabs/RegistrationOptions";
 import { PrescriptionOptions } from "@/components/Settings/DefaultsTabs/PrescriptionOptions";
 import { PharmacyOptions } from "@/components/Settings/DefaultsTabs/PharmacyOptions";
@@ -18,8 +18,14 @@ import {
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { ChevronDown } from "lucide-react";
+import GeneralOptions from "@/components/Settings/DefaultsTabs/GeneralOptions";
 
 const tabs = [
+  {
+    name: "General",
+    value: "General",
+    component: GeneralOptions,
+  },
   {
     name: "Registration Settings",
     value: "Registration",
@@ -105,7 +111,27 @@ export default function SettingsMedicineInfoPage() {
             value={tab.value}
             className="mt-0 focus-visible:ring-0 max-w-4xl w-full"
           >
-            <tab.component />
+            <motion.div
+              key={tab.value}
+              className="flex flex-col mx-0 w-full gap-2"
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              variants={{
+                hidden: {
+                  opacity: 0,
+                  y: 50,
+                  transition: { type: "tween", ease: "anticipate" },
+                },
+                visible: {
+                  opacity: 1,
+                  y: 0,
+                  transition: { type: "tween", ease: "anticipate" },
+                },
+              }}
+            >
+              <tab.component />
+            </motion.div>
           </TabsContent>
         ))}
       </AnimatePresence>
