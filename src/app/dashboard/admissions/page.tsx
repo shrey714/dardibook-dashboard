@@ -11,6 +11,7 @@ import { useOrganization } from "@clerk/nextjs";
 import uniqid from "uniqid";
 import { BedInfo } from "@/types/FormTypes";
 import { updateOrgMetadata } from "../settings/clinic/_actions";
+import { AnimatePresence, motion } from "framer-motion";
 
 function Admissions() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -21,14 +22,14 @@ function Admissions() {
   const [bedAddLoader, setBedAddLoader] = useState(false);
   const [refresh, setRefresh] = useState(false);
   const [wasEdited, setWasEdited] = useState(false);
+  const [nameAsking, setNameAsking] = useState(false);
 
   const openAddModal = (bedId: string) => {
     setIsModalOpen(true);
     setbedId(bedId);
   };
 
-  const openEditModal = (bookingId: string,bedId: string) => {
-    console.log("bedId : ",bedId);
+  const openEditModal = (bookingId: string, bedId: string) => {
     setIsEditModalOpen(true);
     setbookingId(bookingId);
     setbedId(bedId);
@@ -40,14 +41,11 @@ function Admissions() {
     try {
       const currentBeds = (organization.publicMetadata?.bedMetaData ||
         []) as BedInfo[];
-      const updatedBeds = [...currentBeds, { id: uniqid.time() }];;
-      console.log(updatedBeds)
+      const updatedBeds = [...currentBeds, { id: uniqid.time() }];
       const data = await updateOrgMetadata({ bedMetaData: updatedBeds });
       organization.reload();
-      setRefresh((prev)=>!prev);
-      console.log(data);
+      setRefresh((prev) => !prev);
     } catch (error) {
-      console.log(error);
       toast.error("Error in adding Bed");
     } finally {
       setBedAddLoader(false);
@@ -79,7 +77,7 @@ function Admissions() {
       </Dialog>
       <div className="w-full mb-16 mt-4 pl-4 min-h-[calc(100%-5rem)] flex flex-col">
         <KanbanBoard
-        isEditModalOpen={isEditModalOpen}
+          isEditModalOpen={isEditModalOpen}
           bedId={bedId}
           setbedId={setbedId}
           openAddModal={openAddModal}

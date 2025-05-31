@@ -57,7 +57,7 @@ const BedAdmissionModal: React.FC<BedAdmissionModalProps> = ({
     },
   });
 
-  const [registeredFor, setRegisteredFor] = useState<orgUserType>({
+  const [admissionFor, setAdmissionFor] = useState<orgUserType>({
     id:"",
     name:"",
     email:""
@@ -117,7 +117,7 @@ const BedAdmissionModal: React.FC<BedAdmissionModalProps> = ({
       batch.set(
         bedRef,
         {
-          register_for: registeredFor,
+          admission_for: admissionFor,
           patient_id: patientId,
           bedBookingId: bedBookingId,
           bedId: bedId,
@@ -137,7 +137,7 @@ const BedAdmissionModal: React.FC<BedAdmissionModalProps> = ({
         patientRef,
         {
           bed_info: arrayUnion({
-            register_for: registeredFor,
+            admission_for: admissionFor,
             bedBookingId: bedBookingId,
             bedId: bedId,
             admission_at: getTime(fromDate),
@@ -248,7 +248,7 @@ const BedAdmissionModal: React.FC<BedAdmissionModalProps> = ({
       <Availability beds={beds} bedPatients={bedPatients} />
       <div className=" py-1 md:grid md:grid-cols-3 sm:gap-4 md:px-8">
         <label
-          htmlFor="registerd_for"
+          htmlFor="admission_for"
           className="text-sm font-medium leading-6  flex items-center gap-1"
         >
           Appointed Doctor<p className="text-red-500">*</p>
@@ -256,7 +256,7 @@ const BedAdmissionModal: React.FC<BedAdmissionModalProps> = ({
         <Select
           aria-hidden={false}
           required
-          name="registerd_for"
+          name="admission_for"
           onValueChange={(val) => {
             const member = memberships?.data?.find(
               (mem) => mem.publicUserData.userId === val
@@ -276,7 +276,7 @@ const BedAdmissionModal: React.FC<BedAdmissionModalProps> = ({
                 email: identifier,
               };
 
-              setRegisteredFor(selectedMember);
+              setAdmissionFor(selectedMember);
             }
           }}
         >
@@ -308,7 +308,7 @@ const BedAdmissionModal: React.FC<BedAdmissionModalProps> = ({
             registered_date={[]}
             date={fromDate}
             setDate={setFromDate}
-            icon={<CalendarPlusIcon mr-2 h-4 w-4 />}
+            icon={<CalendarPlusIcon className="mr-2 h-4 w-4" />}
           />
         </div>
         <div className="flex-1">
@@ -316,7 +316,7 @@ const BedAdmissionModal: React.FC<BedAdmissionModalProps> = ({
             registered_date={[]}
             date={toDate}
             setDate={setToDate}
-            icon={<CalendarMinusIcon mr-2 h-4 w-4 />}
+            icon={<CalendarMinusIcon className="mr-2 h-4 w-4" />}
           />
         </div>
       </div>

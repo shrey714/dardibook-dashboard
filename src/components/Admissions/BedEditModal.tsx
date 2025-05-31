@@ -53,19 +53,7 @@ const BedEditModal: React.FC<BedEditModalProps> = ({
       keepPreviousData: true,
       role: ["org:doctor", "org:clinic_head"],
     },
-  });
-  
-  // bedBookingId: string;
-  //     bedId: string;
-  //     patient_id: string;
-  //     admission_at: number;
-  //     admission_by: orgUserType;
-  //     admission_for: orgUserType;
-  //     discharge_at: number;
-  //     dischargeMarked: boolean;
-  //     discharged_by: orgUserType;
-
-      
+  });      
 
   const dischargePatient = async () => {
     setDischargeLoader(true);
@@ -74,12 +62,12 @@ const BedEditModal: React.FC<BedEditModalProps> = ({
     try {
       const batch = writeBatch(db);
       const currentBedData = beds.find((bed) => bed.bedBookingId == bookingId);
-      console.log(bookingId, currentBedData);
       if (!currentBedData) return;
 
       const bedPatientData = bedPatients[currentBedData?.patient_id];
 
       const bedRef = doc(db, "doctor", orgId, "beds", bookingId);
+      console.log(`deleting ${currentBedData?.patient_id} ${bookingId}`)
       batch.update(bedRef, {
         dischargeMarked: true,
         discharge_at:
@@ -117,6 +105,7 @@ const BedEditModal: React.FC<BedEditModalProps> = ({
             }
           : patient_bed
       );
+      console.log("updatedBedInfo : ",updatedBedInfo)
 
       batch.update(patientRef, { bed_info: updatedBedInfo });
       setWasEdited(true);
@@ -133,6 +122,7 @@ const BedEditModal: React.FC<BedEditModalProps> = ({
   };
 
   const updateHandler = async (e: { preventDefault: () => void }) => {
+    console.log("calling submit handker")
       e.preventDefault();
       if (!orgId || !bedId || !user) return;
 
@@ -207,8 +197,6 @@ const BedEditModal: React.FC<BedEditModalProps> = ({
         setIsEditModalOpen(false);
       }
     };
-
-    console.log("admissionInfo : ",admissionInfo)
 
   return (
     <form className="flex flex-col" onSubmit={updateHandler}>
@@ -296,7 +284,7 @@ const BedEditModal: React.FC<BedEditModalProps> = ({
         <p className="text-center text-red-600 font-normal pb-4">{warning}</p>
       )}
       <div className="flex gap-2">
-      <Button onClick={dischargePatient} className="flex-1">
+      <Button onClick={dischargePatient} className="flex-1" type="button">
         {dischargeLoader ? <Loader /> : "discharge"}
       </Button>
       <Button type="submit" className="flex-1"> {loader ? "loading" : "Update Booking"} </Button>

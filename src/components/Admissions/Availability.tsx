@@ -38,8 +38,6 @@ for (let i = -15; i <= 15; i++) {
 const totalHoursInDay = 24;
 
 const Availability: React.FC<AvailabilityProps> = ({ beds, bedPatients }) => {
-  console.log(beds);
-  console.log(bedPatients);
 
   return (
     <Carousel className="py-3">
@@ -164,7 +162,7 @@ const Availability: React.FC<AvailabilityProps> = ({ beds, bedPatients }) => {
                         {bed.dischargeMarked ? (
                           <div className="bg-red-500/10 mt-2 w-full rounded-md text-red-600 flex flex-row gap-4 px-3 py-1 items-center">
                             <LogOut className="w-5 h-5" /> Discharged by{" "}
-                            {bed.discharged_by.name}
+                            {bed?.discharged_by?.name ?? ""}
                           </div>
                         ) : (
                           <></>
