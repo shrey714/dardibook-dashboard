@@ -1,81 +1,168 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
-import Loader from "@/components/common/Loader";
-import { startOfMonth, endOfMonth, getTime } from "date-fns";
-import { getAllPatients } from "@/app/services/getAllPatients";
-import { DateRange } from "react-day-picker";
+import {
+  getTime,
+  startOfMonth,
+  endOfMonth,
+  isSameMonth,
+  addDays,
+  isSameDay,
+} from "date-fns";
 import DataCalendar from "@/components/Calendar/DataCalendar";
+import { query, collection, where, and, or, getDocs } from "firebase/firestore";
+import { db } from "@/firebase/firebaseConfig";
+import { DatesSetArg } from "@fullcalendar/core/index.js";
+import {
+  CalendarEventTypes,
+  OrgBed,
+  RegisterPatientFormTypes,
+} from "@/types/FormTypes";
 
-interface PatientData {
-  id: string;
-  first_name: string;
-  last_name: string;
-  mobile_number: string;
-  age: string;
-  gender: string;
-  appointed: boolean;
-  last_visited: number;
-  visitedDates: number[]; //array of timestamps in milliseconds
+function getAllStartOfDaysInMonth(date: Date) {
+  const start = startOfMonth(date);
+  const end = endOfMonth(date);
+
+  const days: number[] = [];
+  let current = start;
+
+  while (current <= end) {
+    days.push(getTime(current));
+    current = addDays(current, 1);
+  }
+
+  return days;
+}
+
+// Helper to chunk an array into pieces of chunkSize
+function chunkArray<T>(array: T[], chunkSize: number): T[][] {
+  const chunks: T[][] = [];
+  for (let i = 0; i < array.length; i += chunkSize) {
+    chunks.push(array.slice(i, i + chunkSize));
+  }
+  return chunks;
 }
 
 export default function TaskPage() {
   const { isLoaded, orgId } = useAuth();
-  const [loader, setLoader] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [patients, setPatients] = useState<PatientData[]>([]);
-  const [dateRange] = useState<DateRange | undefined>({
-    from: startOfMonth(new Date()),
-    to: endOfMonth(new Date()),
-  });
+  const [loader, setLoader] = useState(false);
+  const [monthDate, setMonthDate] = useState<Date>();
+  const [calendarData, setCalendarData] = useState<CalendarEventTypes[]>([]);
 
   useEffect(() => {
-    const fetchPatients = async () => {
-      if (isLoaded && orgId) {
+    const getBillsGenerated = async () => {
+      if (isLoaded && orgId && monthDate) {
         try {
           setLoader(true);
-          const data = await getAllPatients(
-            orgId,
-            getTime(dateRange?.from || 0),
-            getTime(dateRange?.to || 0)
+
+          // Beds Query (same as yours)
+          const bedsQuery = query(
+            collection(db, "doctor", orgId, "beds"),
+            or(
+              and(
+                where("admission_at", ">=", getTime(startOfMonth(monthDate))),
+                where("admission_at", "<=", getTime(endOfMonth(monthDate)))
+              ),
+              and(
+                where("discharge_at", ">=", getTime(startOfMonth(monthDate))),
+                where("discharge_at", "<=", getTime(endOfMonth(monthDate)))
+              )
+            )
           );
-          if (data.data) {
-            setPatients(data.data);
-          } else {
-            setError("Error fetching patients");
-          }
+
+          // Prepare Patients Queries
+          const allStartOfDays = getAllStartOfDaysInMonth(monthDate);
+          const dayChunks = chunkArray(allStartOfDays, 30);
+
+          const patientQueryPromises = dayChunks.map((chunk) => {
+            const patientsQuery = query(
+              collection(db, "doctor", orgId, "patients"),
+              where("registered_date", "array-contains-any", chunk)
+            );
+            return getDocs(patientsQuery);
+          });
+
+          // Fetch beds and patients in parallel
+          const [bedsSnap, ...patientsSnaps] = await Promise.all([
+            getDocs(bedsQuery),
+            ...patientQueryPromises,
+          ]);
+
+          const calendarEvents: CalendarEventTypes[] = [];
+
+          // Collect beds
+          bedsSnap.forEach((doc) => {
+            const bed = doc.data() as OrgBed;
+            calendarEvents.push({
+              patient_id: bed.patient_id,
+              event_type: "bed",
+              bed_details: {
+                bedId: bed.bedId,
+                admission_at: bed.admission_at,
+                discharge_at: bed.discharge_at,
+                dischargeMarked: bed.dischargeMarked,
+              },
+            });
+          });
+
+          // Collect all patients
+          patientsSnaps.forEach((snap) => {
+            snap.forEach((doc) => {
+              const patient = doc.data() as RegisterPatientFormTypes;
+
+              patient.registered_date_time.forEach((r_date_time) => {
+                if (isSameMonth(r_date_time, monthDate)) {
+                  calendarEvents.push({
+                    patient_id: patient.patient_id,
+                    event_type: "appointment",
+                    appointment_details: {
+                      registered_at: r_date_time,
+                      prescribed: patient.prescribed_date_time.some(
+                        (p_date_time) => isSameDay(p_date_time, r_date_time)
+                      ),
+                      prescribed_at: patient.prescribed_date_time.find(
+                        (p_date_time) => isSameDay(p_date_time, r_date_time)
+                      ),
+                    },
+                  });
+                }
+              });
+            });
+          });
+
+          // Set final calendar data
+          setCalendarData(calendarEvents);
+
           setLoader(false);
         } catch (error) {
-          setError(`Error fetching patients : ${error}`);
+          console.log(error);
           setLoader(false);
         }
       }
     };
 
-    fetchPatients();
-  }, [orgId, isLoaded, dateRange]);
+    getBillsGenerated();
+  }, [isLoaded, monthDate, orgId]);
+
+  const handleDatesSet = (arg: DatesSetArg) => {
+    const newDate = arg.view.calendar.getDate();
+    if (!monthDate || !isSameMonth(monthDate, newDate)) {
+      setMonthDate(newDate);
+    }
+  };
 
   return (
     <>
-      {loader ? (
-        <div className="w-full h-full overflow-hidden flex items-center justify-center">
-          <Loader size="medium" />
-        </div>
-      ) : error ? (
-        <div className="w-full h-full overflow-hidden flex items-center justify-center">
-          {error}
-        </div>
-      ) : (
-        <div className="w-full py-2 px-2 h-full">
-          {/* <DataTable
-            data={patients}
-            columns={columns}
-            setDateRange={setDateRange}
-            dateRange={dateRange}
-          /> */}
-          <DataCalendar data={patients} />
-        </div>
-      )}
+      <div className="w-full py-2 px-2 h-full">
+        {loader && (
+          <div className="h-full w-full bg-background/80 absolute z-[2]"></div>
+        )}
+
+        <DataCalendar
+          calendarData={calendarData}
+          handleDatesSet={handleDatesSet}
+        />
+      </div>
     </>
   );
 }

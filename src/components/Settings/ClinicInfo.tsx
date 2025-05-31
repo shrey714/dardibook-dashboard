@@ -55,6 +55,7 @@ const ClinicInfo = () => {
       async () => {
         await updateOrgMetadata(formdata).then(
           () => {
+            organization.reload();
             setloader(false);
           },
           (error) => {

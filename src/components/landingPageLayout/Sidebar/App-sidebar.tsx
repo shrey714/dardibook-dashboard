@@ -5,11 +5,16 @@ import {
   Home,
   ClipboardPlusIcon,
   HistoryIcon,
-  BriefcaseMedicalIcon,
   SettingsIcon,
   SquarePenIcon,
   CalendarDaysIcon,
-  Bed
+  Bed,
+  PillIcon,
+  UserSearchIcon,
+  CalendarClockIcon,
+  ClipboardPenIcon,
+  BedDoubleIcon,
+  ReceiptTextIcon,
 } from "lucide-react";
 
 import { NavMain } from "./nav-main";
@@ -44,11 +49,7 @@ const pages = [
     title: "Calendar",
     url: "/dashboard/calendar",
     icon: CalendarDaysIcon,
-    roles: [
-      "org:clinic_head",
-      "org:doctor",
-      "org:assistant_doctor",
-    ],
+    roles: ["org:clinic_head", "org:doctor", "org:assistant_doctor"],
   },
   {
     title: "Register",
@@ -78,11 +79,58 @@ const pages = [
       "org:assistant_doctor",
       "org:medical_staff",
     ],
+    items: [
+      {
+        title: "Patients",
+        url: "/dashboard/history/patients",
+        icon: UserSearchIcon,
+        roles: [
+          "org:clinic_head",
+          "org:doctor",
+          "org:assistant_doctor",
+          "org:medical_staff",
+        ],
+      },
+      {
+        title: "Registrations",
+        url: "/dashboard/history/registrations",
+        icon: CalendarClockIcon,
+        roles: ["org:clinic_head", "org:doctor", "org:assistant_doctor"],
+      },
+      {
+        title: "Prescriptions",
+        url: "/dashboard/history/prescriptions",
+        icon: ClipboardPenIcon,
+        roles: ["org:clinic_head", "org:doctor", "org:assistant_doctor"],
+      },
+      {
+        title: "Admissions",
+        url: "/dashboard/history/admissions",
+        icon: BedDoubleIcon,
+        roles: [
+          "org:clinic_head",
+          "org:doctor",
+          "org:assistant_doctor",
+          "org:medical_staff",
+        ],
+      },
+      {
+        title: "Bills",
+        url: "/dashboard/history/bills",
+        icon: ReceiptTextIcon,
+        roles: [
+          "org:clinic_head",
+          "org:doctor",
+          "org:assistant_doctor",
+          "org:medical_staff",
+        ],
+      },
+    ],
   },
   {
-    title: "Medical",
-    url: "/dashboard/medical",
-    icon: BriefcaseMedicalIcon,
+    title: "Pharmacy",
+    url: "/dashboard/pharmacy",
+    icon: PillIcon,
     roles: ["org:clinic_head", "org:medical_staff"],
   },
   {

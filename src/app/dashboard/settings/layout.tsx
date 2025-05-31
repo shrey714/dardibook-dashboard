@@ -1,7 +1,6 @@
 import { Metadata } from "next";
 import { SettingSidebarNav } from "@/components/Settings/settings-sidebar-nav";
-import FooterLine from "@/components/Settings/FooterLine";
-import Links from "@/components/Settings/Links";
+import Footer from "@/components/Settings/Footer";
 
 export const metadata: Metadata = {
   title: "DardiBook | Settings",
@@ -22,6 +21,11 @@ const sidebarNavItems = [
   {
     title: "Clinic",
     href: "/dashboard/settings/clinic",
+    roles: ["org:clinic_head", "org:doctor"],
+  },
+    {
+    title: "Defaults",
+    href: "/dashboard/settings/defaults",
     roles: ["org:clinic_head", "org:doctor"],
   },
   {
@@ -56,8 +60,7 @@ export default function SettingsLayout({ children }: SettingsLayoutProps) {
       </div>
       <SettingSidebarNav items={sidebarNavItems} />
       {children}
-      <Links />
-      <FooterLine />
+      <Footer />
     </>
   );
 }

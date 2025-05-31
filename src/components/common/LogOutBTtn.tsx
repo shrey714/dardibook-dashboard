@@ -2,7 +2,7 @@
 import React from "react";
 import { Button } from "../ui/button";
 import { LogOut } from "lucide-react";
-import * as animationData from "@/lottieFiles/SignOut.json";
+import animationData from "@/lottieFiles/SignOut.json";
 import {
   Dialog,
   DialogClose,

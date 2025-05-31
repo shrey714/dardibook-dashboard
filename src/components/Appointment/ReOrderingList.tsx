@@ -1,8 +1,8 @@
-import React, { useState } from "react";
-import useToken from "@/firebase/useToken";
+import React, { useEffect, useState } from "react";
+import { useToken } from "@/firebase/TokenStore";
 import Link from "next/link";
 import Loader from "../common/Loader";
-import { useAuth, useOrganization } from "@clerk/nextjs";
+import { useOrganization } from "@clerk/nextjs";
 import { AnimatePresence, Reorder } from "framer-motion";
 import { format, getTime, startOfDay } from "date-fns";
 import { UserReOrderMenu } from "./UserReOrderMenu";
@@ -12,9 +12,9 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   BedSingle,
   BedSingleIcon,
-  BriefcaseMedicalIcon,
   ClipboardCheck,
   ClipboardCheckIcon,
+  ClipboardPlusIcon,
   ListFilter,
   PencilLineIcon,
   UserRoundPlus,
@@ -70,11 +70,16 @@ const filterOptions = [
 
 const ReOrderingList: React.FC = () => {
   const { openModal } = usePatientHistoryModalStore();
-  const { orgId } = useAuth();
-  const { CurrentToken } = useToken(orgId || "");
+  const { CurrentToken, doctorId } = useToken();
   const { todayPatients, loading } = useTodayPatientStore((state) => state);
   const [filters, setFilters] = useState<TodayPatientsFilter>();
   const isDesktop = useMediaQuery("(min-width: 1280px)");
+  useEffect(() => {
+    setFilters((prevFilter) => ({
+      ...prevFilter,
+      registerd_for: doctorId ?? undefined,
+    }));
+  }, [doctorId]);
 
   const { memberships } = useOrganization({
     memberships: {
@@ -88,7 +93,7 @@ const ReOrderingList: React.FC = () => {
     if (filters?.selectedFilter) {
       const filterConditions: Record<string, boolean> = {
         Registered: !patient.inBed && !patient.prescribed,
-        Prescribed: patient.prescribed,
+        Prescribed: patient.prescribed && !patient.inBed,
         Bed: patient.inBed,
       };
 
@@ -116,13 +121,15 @@ const ReOrderingList: React.FC = () => {
   const t = (d: number) => d * base;
   return (
     <div
-      className={`max-w-6xl ${isDesktop ? "!mt-2" : "!mt-0"} w-full h-full overflow-x-hidden overflow-y-hidden gap-x-4 gap-y-2 flex flex-col 2xl:flex-row flex-wrap`}
+      className={`max-w-6xl ${
+        isDesktop ? "!mt-2" : "!mt-0"
+      } w-full h-full overflow-x-hidden overflow-y-hidden gap-x-4 gap-y-2 flex flex-col 2xl:flex-row flex-wrap`}
     >
       {isDesktop ? (
-        <div className="px-2 pb-2 min-w-64 h-min flex flex-wrap gap-2 border-b 2xl:border-b-0 2xl:border-r items-center 2xl:items-stretch flex-row 2xl:flex-col">
+        <div className="px-2 pb-2 pt-0.5 min-w-64 h-min flex flex-wrap gap-2 border-b 2xl:border-b-0 2xl:border-r items-center 2xl:items-stretch flex-row 2xl:flex-col">
           <div className="flex flex-1 flex-row gap-x-1">
             <span className="bg-green-500/10 flex h-auto px-2 rounded-md aspect-square items-center justify-center">
-              <BriefcaseMedicalIcon size={20} className="text-green-500" />
+              <ClipboardPlusIcon size={20} className="text-green-500" />
             </span>
             <Select
               value={filters?.registerd_for}
@@ -133,7 +140,9 @@ const ReOrderingList: React.FC = () => {
             >
               <SelectTrigger
                 id="registerd_for"
-                className="w-full md:max-w-md lg:col-span-2 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input py-1 pl-2 sm:text-sm sm:leading-6"
+                className={`w-full md:max-w-md lg:col-span-2 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input py-1 pl-2 sm:text-sm sm:leading-6 ${
+                  filters?.registerd_for === doctorId && "text-green-500"
+                }`}
               >
                 <SelectValue placeholder="Registerd for" />
               </SelectTrigger>
@@ -149,8 +158,12 @@ const ReOrderingList: React.FC = () => {
                           value={member.publicUserData.userId}
                           key={index}
                         >
-                          {member.publicUserData.firstName}{" "}
-                          {member.publicUserData.lastName}
+                          {[
+                            member.publicUserData.firstName,
+                            member.publicUserData.lastName,
+                          ]
+                            .filter(Boolean)
+                            .join(" ")}
                         </SelectItem>
                       ) : (
                         <></>
@@ -185,8 +198,12 @@ const ReOrderingList: React.FC = () => {
                         value={member.publicUserData.userId}
                         key={index}
                       >
-                        {member.publicUserData.firstName}{" "}
-                        {member.publicUserData.lastName}
+                        {[
+                          member.publicUserData.firstName,
+                          member.publicUserData.lastName,
+                        ]
+                          .filter(Boolean)
+                          .join(" ")}
                       </SelectItem>
                     ) : (
                       <></>
@@ -238,7 +255,14 @@ const ReOrderingList: React.FC = () => {
       ) : (
         <Drawer autoFocus>
           <DrawerTrigger asChild>
-            <Button variant="outline" className="self-end py-2 px-3">
+            <Button
+              variant="outline"
+              className={`self-end py-2 px-3 ${
+                filters &&
+                Object.values(filters).some(Boolean) &&
+                "border-green-600 text-green-600 shadow-[inset_0px_-3.5px_0px_0px_#16a34a]"
+              }`}
+            >
               <ListFilter />
             </Button>
           </DrawerTrigger>
@@ -254,10 +278,7 @@ const ReOrderingList: React.FC = () => {
               <div className="px-2 pb-2 min-w-64 h-min flex flex-wrap gap-2 items-stretch flex-col">
                 <div className="flex flex-1 flex-row gap-x-1">
                   <span className="bg-green-500/10 flex h-auto px-2 rounded-md aspect-square items-center justify-center">
-                    <BriefcaseMedicalIcon
-                      size={20}
-                      className="text-green-500"
-                    />
+                    <ClipboardPlusIcon size={20} className="text-green-500" />
                   </span>
                   <Select
                     value={filters?.registerd_for}
@@ -268,7 +289,9 @@ const ReOrderingList: React.FC = () => {
                   >
                     <SelectTrigger
                       id="registerd_for"
-                      className="w-full md:max-w-md lg:col-span-2 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input py-1 pl-2 sm:text-sm sm:leading-6"
+                      className={`w-full md:max-w-md lg:col-span-2 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input py-1 pl-2 sm:text-sm sm:leading-6 ${
+                        filters?.registerd_for === doctorId && "text-green-500"
+                      }`}
                     >
                       <SelectValue placeholder="Registerd for" />
                     </SelectTrigger>
@@ -286,8 +309,12 @@ const ReOrderingList: React.FC = () => {
                                 value={member.publicUserData.userId}
                                 key={index}
                               >
-                                {member.publicUserData.firstName}{" "}
-                                {member.publicUserData.lastName}
+                                {[
+                                  member.publicUserData.firstName,
+                                  member.publicUserData.lastName,
+                                ]
+                                  .filter(Boolean)
+                                  .join(" ")}
                               </SelectItem>
                             ) : (
                               <></>
@@ -322,8 +349,12 @@ const ReOrderingList: React.FC = () => {
                               value={member.publicUserData.userId}
                               key={index}
                             >
-                              {member.publicUserData.firstName}{" "}
-                              {member.publicUserData.lastName}
+                              {[
+                                member.publicUserData.firstName,
+                                member.publicUserData.lastName,
+                              ]
+                                .filter(Boolean)
+                                .join(" ")}
                             </SelectItem>
                           ) : (
                             <></>
@@ -405,7 +436,10 @@ const ReOrderingList: React.FC = () => {
                     <tbody className="rounded-lg">
                       {filteredPatients.map((item, key: number) => {
                         const select =
-                          CurrentToken === filteredPatients?.length - key
+                          CurrentToken === filteredPatients?.length - key &&
+                          filters?.registerd_for === doctorId &&
+                          !filters?.registerd_by &&
+                          !filters?.selectedFilter
                             ? true
                             : false;
                         const patient_matching_reg_date_time =
@@ -502,17 +536,17 @@ const ReOrderingList: React.FC = () => {
                             <td className="font-medium text-center text-sm sm:text-base">
                               <p
                                 className={`my-1 border-2 mr-1 py-1 px-4 rounded-full text-center flex items-center justify-center ${
-                                  item.prescribed
-                                    ? "bg-green-500/10 border-green-500 text-green-500"
-                                    : item.inBed
+                                  item.inBed
                                     ? "border-primary"
+                                    : item.prescribed
+                                    ? "bg-green-500/10 border-green-500 text-green-500"
                                     : "bg-blue-500/10 border-blue-500 text-blue-500"
                                 }`}
                               >
-                                {item.prescribed ? (
-                                  <ClipboardCheckIcon className="size-4 sm:size-5" />
-                                ) : item.inBed ? (
+                                {item.inBed ? (
                                   <BedSingleIcon className="size-4 sm:size-5" />
+                                ) : item.prescribed ? (
+                                  <ClipboardCheckIcon className="size-4 sm:size-5" />
                                 ) : (
                                   <UserRoundPlusIcon className="size-4 sm:size-5" />
                                 )}

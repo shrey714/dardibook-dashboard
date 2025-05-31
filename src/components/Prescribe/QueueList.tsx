@@ -1,9 +1,9 @@
 "use client";
-import React, { useState } from "react";
-import useToken from "@/firebase/useToken";
+import React, { useEffect, useState } from "react";
+import { useToken } from "@/firebase/TokenStore";
 import Link from "next/link";
 import Loader from "../common/Loader";
-import { useAuth, useOrganization } from "@clerk/nextjs";
+import { useOrganization } from "@clerk/nextjs";
 import { AnimatePresence, Reorder } from "framer-motion";
 import { format, getTime, startOfDay } from "date-fns";
 import { UserReOrderMenu } from "@/components/Appointment/UserReOrderMenu";
@@ -13,10 +13,10 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   BedSingle,
   BedSingleIcon,
-  BriefcaseMedicalIcon,
   ClipboardCheck,
   ClipboardCheckIcon,
   ClipboardPlusIcon,
+  EllipsisVertical,
   History,
   ListFilter,
   PencilLineIcon,
@@ -50,6 +50,12 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface TodayPatientsFilter {
   registerd_for?: string;
@@ -79,12 +85,17 @@ const filterOptions = [
 
 const QueueList: React.FC = () => {
   const { openModal } = usePatientHistoryModalStore();
-  const { orgId } = useAuth();
-  const { CurrentToken } = useToken(orgId || "");
+  const { CurrentToken, doctorId } = useToken();
   const { todayPatients, loading } = useTodayPatientStore((state) => state);
   const [filters, setFilters] = useState<TodayPatientsFilter>();
   const isDesktop = useMediaQuery("(min-width: 1280px)");
 
+  useEffect(() => {
+    setFilters((prevFilter) => ({
+      ...prevFilter,
+      registerd_for: doctorId ?? undefined,
+    }));
+  }, [doctorId]);
   const { memberships } = useOrganization({
     memberships: {
       infinite: true,
@@ -97,7 +108,7 @@ const QueueList: React.FC = () => {
     if (filters?.selectedFilter) {
       const filterConditions: Record<string, boolean> = {
         Registered: !patient.inBed && !patient.prescribed,
-        Prescribed: patient.prescribed,
+        Prescribed: patient.prescribed && !patient.inBed,
         Bed: patient.inBed,
       };
 
@@ -130,10 +141,10 @@ const QueueList: React.FC = () => {
       } w-full h-full overflow-x-hidden overflow-y-hidden gap-x-4 gap-y-2 flex flex-col 2xl:flex-row flex-wrap`}
     >
       {isDesktop ? (
-        <div className="px-2 pb-2 min-w-64 h-min flex flex-wrap gap-2 border-b 2xl:border-b-0 2xl:border-r items-center 2xl:items-stretch flex-row 2xl:flex-col">
+        <div className="px-2 pb-2 pt-0.5 min-w-64 h-min flex flex-wrap gap-2 border-b 2xl:border-b-0 2xl:border-r items-center 2xl:items-stretch flex-row 2xl:flex-col">
           <div className="flex flex-1 flex-row gap-x-1">
             <span className="bg-green-500/10 flex h-auto px-2 rounded-md aspect-square items-center justify-center">
-              <BriefcaseMedicalIcon size={20} className="text-green-500" />
+              <ClipboardPlusIcon size={20} className="text-green-500" />
             </span>
             <Select
               value={filters?.registerd_for}
@@ -144,7 +155,8 @@ const QueueList: React.FC = () => {
             >
               <SelectTrigger
                 id="registerd_for"
-                className="w-full md:max-w-md lg:col-span-2 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input py-1 pl-2 sm:text-sm sm:leading-6"
+                className={`w-full md:max-w-md lg:col-span-2 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input py-1 pl-2 sm:text-sm sm:leading-6
+                  ${filters?.registerd_for === doctorId && "text-green-500"}`}
               >
                 <SelectValue placeholder="Registerd for" />
               </SelectTrigger>
@@ -160,8 +172,12 @@ const QueueList: React.FC = () => {
                           value={member.publicUserData.userId}
                           key={index}
                         >
-                          {member.publicUserData.firstName}{" "}
-                          {member.publicUserData.lastName}
+                          {[
+                            member.publicUserData.firstName,
+                            member.publicUserData.lastName,
+                          ]
+                            .filter(Boolean)
+                            .join(" ")}
                         </SelectItem>
                       ) : (
                         <></>
@@ -196,8 +212,12 @@ const QueueList: React.FC = () => {
                         value={member.publicUserData.userId}
                         key={index}
                       >
-                        {member.publicUserData.firstName}{" "}
-                        {member.publicUserData.lastName}
+                        {[
+                          member.publicUserData.firstName,
+                          member.publicUserData.lastName,
+                        ]
+                          .filter(Boolean)
+                          .join(" ")}
                       </SelectItem>
                     ) : (
                       <></>
@@ -249,7 +269,14 @@ const QueueList: React.FC = () => {
       ) : (
         <Drawer autoFocus>
           <DrawerTrigger asChild>
-            <Button variant="outline" className="self-end py-2 px-3">
+            <Button
+              variant="outline"
+              className={`self-end py-2 px-3 ${
+                filters &&
+                Object.values(filters).some(Boolean) &&
+                "border-green-600 text-green-600 shadow-[inset_0px_-3.5px_0px_0px_#16a34a]"
+              }`}
+            >
               <ListFilter />
             </Button>
           </DrawerTrigger>
@@ -265,10 +292,7 @@ const QueueList: React.FC = () => {
               <div className="px-2 pb-2 min-w-64 h-min flex flex-wrap gap-2 items-stretch flex-col">
                 <div className="flex flex-1 flex-row gap-x-1">
                   <span className="bg-green-500/10 flex h-auto px-2 rounded-md aspect-square items-center justify-center">
-                    <BriefcaseMedicalIcon
-                      size={20}
-                      className="text-green-500"
-                    />
+                    <ClipboardPlusIcon size={20} className="text-green-500" />
                   </span>
                   <Select
                     value={filters?.registerd_for}
@@ -279,7 +303,9 @@ const QueueList: React.FC = () => {
                   >
                     <SelectTrigger
                       id="registerd_for"
-                      className="w-full md:max-w-md lg:col-span-2 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input py-1 pl-2 sm:text-sm sm:leading-6"
+                      className={`w-full md:max-w-md lg:col-span-2 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input py-1 pl-2 sm:text-sm sm:leading-6 ${
+                        filters?.registerd_for === doctorId && "text-green-500"
+                      }`}
                     >
                       <SelectValue placeholder="Registerd for" />
                     </SelectTrigger>
@@ -297,8 +323,12 @@ const QueueList: React.FC = () => {
                                 value={member.publicUserData.userId}
                                 key={index}
                               >
-                                {member.publicUserData.firstName}{" "}
-                                {member.publicUserData.lastName}
+                                {[
+                                  member.publicUserData.firstName,
+                                  member.publicUserData.lastName,
+                                ]
+                                  .filter(Boolean)
+                                  .join(" ")}
                               </SelectItem>
                             ) : (
                               <></>
@@ -333,8 +363,12 @@ const QueueList: React.FC = () => {
                               value={member.publicUserData.userId}
                               key={index}
                             >
-                              {member.publicUserData.firstName}{" "}
-                              {member.publicUserData.lastName}
+                              {[
+                                member.publicUserData.firstName,
+                                member.publicUserData.lastName,
+                              ]
+                                .filter(Boolean)
+                                .join(" ")}
                             </SelectItem>
                           ) : (
                             <></>
@@ -415,9 +449,13 @@ const QueueList: React.FC = () => {
                   <AnimatePresence initial={false}>
                     <table className="w-full">
                       <tbody className="rounded-lg">
+                        {/* [...filteredPatients, ...Array(20).fill(filteredPatients[0])] */}
                         {filteredPatients.map((item, key: number) => {
                           const select =
-                            CurrentToken === filteredPatients?.length - key
+                            CurrentToken === filteredPatients?.length - key &&
+                            filters?.registerd_for === doctorId &&
+                            !filters?.registerd_by &&
+                            !filters?.selectedFilter
                               ? true
                               : false;
                           const patient_matching_reg_date_time =
@@ -514,17 +552,17 @@ const QueueList: React.FC = () => {
                               <td className="font-medium text-center text-sm sm:text-base">
                                 <p
                                   className={`my-1 border-2 mr-1 py-1 px-4 rounded-full text-center flex items-center justify-center ${
-                                    item.prescribed
-                                      ? "bg-green-500/10 border-green-500 text-green-500"
-                                      : item.inBed
+                                    item.inBed
                                       ? "border-primary"
+                                      : item.prescribed
+                                      ? "bg-green-500/10 border-green-500 text-green-500"
                                       : "bg-blue-500/10 border-blue-500 text-blue-500"
                                   }`}
                                 >
-                                  {item.prescribed ? (
-                                    <ClipboardCheckIcon className="size-4 sm:size-5" />
-                                  ) : item.inBed ? (
+                                  {item.inBed ? (
                                     <BedSingleIcon className="size-4 sm:size-5" />
+                                  ) : item.prescribed ? (
+                                    <ClipboardCheckIcon className="size-4 sm:size-5" />
                                   ) : (
                                     <UserRoundPlusIcon className="size-4 sm:size-5" />
                                   )}
@@ -532,61 +570,133 @@ const QueueList: React.FC = () => {
                               </td>
                               <td className="text-center table-cell">
                                 <div className="flex flex-row gap-x-1">
-                                  <UserReOrderMenu
-                                    patient={item}
-                                    matchingDate={new Date()}
-                                    disabled={item.prescribed || item.inBed}
-                                  />
-
-                                  <Tooltip delayDuration={100}>
-                                    <TooltipTrigger asChild>
-                                      <Button
-                                        variant="ghost"
-                                        className="flex h-8 w-8 p-0 data-[state=open]:bg-muted border rounded-full"
-                                        asChild
-                                      >
-                                        <Link
-                                          href={"#"}
-                                          role="button"
-                                          onClick={() =>
-                                            openModal({
-                                              patientId: item.patient_id,
-                                            })
-                                          }
-                                        >
-                                          <History />
-                                        </Link>
-                                      </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent side="left">
-                                      <p>History</p>
-                                    </TooltipContent>
-                                  </Tooltip>
-
-                                  <Tooltip delayDuration={100}>
-                                    <TooltipTrigger asChild>
-                                      <Button
-                                        variant="outline"
+                                  {isDesktop ? (
+                                    <>
+                                      <UserReOrderMenu
+                                        customClassName="disabled:invisible"
+                                        patient={item}
+                                        matchingDate={new Date()}
                                         disabled={item.prescribed || item.inBed}
-                                        className="bg-blue-700 hover:bg-blue-900 text-white hover:text-white flex h-8 w-8 p-0 border-0 rounded-full disabled:invisible"
-                                        asChild={!item.prescribed}
-                                      >
-                                        <Link
-                                          href={{
-                                            pathname: "prescribe/prescribeForm",
-                                            query: {
-                                              patientId: item.patient_id,
-                                            },
-                                          }}
-                                        >
-                                          <ClipboardPlusIcon className="size-4 sm:size-5" />
-                                        </Link>
-                                      </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent side="right">
-                                      <p>Prescribe</p>
-                                    </TooltipContent>
-                                  </Tooltip>
+                                      />
+
+                                      <Tooltip delayDuration={100}>
+                                        <TooltipTrigger asChild>
+                                          <Button
+                                            variant="ghost"
+                                            className="flex h-8 w-8 p-0 data-[state=open]:bg-muted border rounded-full"
+                                            asChild
+                                          >
+                                            <Link
+                                              href={"#"}
+                                              role="button"
+                                              onClick={() =>
+                                                openModal({
+                                                  patientId: item.patient_id,
+                                                })
+                                              }
+                                            >
+                                              <History />
+                                            </Link>
+                                          </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent side="left">
+                                          <p>History</p>
+                                        </TooltipContent>
+                                      </Tooltip>
+
+                                      <Tooltip delayDuration={100}>
+                                        <TooltipTrigger asChild>
+                                          <Button
+                                            variant="outline"
+                                            disabled={
+                                              item.prescribed || item.inBed
+                                            }
+                                            className="bg-blue-700 hover:bg-blue-900 text-white hover:text-white flex h-8 w-8 p-0 border-0 rounded-full disabled:invisible"
+                                            asChild={!item.prescribed}
+                                          >
+                                            <Link
+                                              href={{
+                                                pathname:
+                                                  "prescribe/prescribeForm",
+                                                query: {
+                                                  patientId: item.patient_id,
+                                                },
+                                              }}
+                                            >
+                                              <ClipboardPlusIcon className="size-4 sm:size-5" />
+                                            </Link>
+                                          </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent side="right">
+                                          <p>Prescribe</p>
+                                        </TooltipContent>
+                                      </Tooltip>
+                                    </>
+                                  ) : (
+                                    <DropdownMenu>
+                                      <DropdownMenuTrigger className="h-8 w-8 flex items-center justify-center rounded-full">
+                                        <EllipsisVertical className="size-4 sm:size-5" />
+                                      </DropdownMenuTrigger>
+                                      <DropdownMenuContent className="w-56 space-y-1">
+                                        <DropdownMenuItem asChild>
+                                          <UserReOrderMenu
+                                            customClassName="w-full rounded-md border-0 justify-start pl-3"
+                                            patient={item}
+                                            matchingDate={new Date()}
+                                            disabled={
+                                              item.prescribed || item.inBed
+                                            }
+                                            insideText="Schedule"
+                                          />
+                                        </DropdownMenuItem>
+
+                                        <DropdownMenuItem asChild>
+                                          <Button
+                                            variant="ghost"
+                                            className="flex h-8 w-full p-0 data-[state=open]:bg-muted justify-start pl-3 rounded-md"
+                                            asChild
+                                          >
+                                            <Link
+                                              href={"#"}
+                                              role="button"
+                                              onClick={() =>
+                                                openModal({
+                                                  patientId: item.patient_id,
+                                                })
+                                              }
+                                            >
+                                              <History /> History
+                                            </Link>
+                                          </Button>
+                                        </DropdownMenuItem>
+
+                                        <DropdownMenuItem asChild>
+                                          <Button
+                                            variant="ghost"
+                                            disabled={
+                                              item.prescribed || item.inBed
+                                            }
+                                            className="bg-blue-700 hover:bg-blue-900 text-white hover:text-white h-8 w-full p-0 pl-3 justify-start rounded-md"
+                                            asChild={!item.prescribed}
+                                          >
+                                            <Link
+                                              className="flex flex-1 flex-row gap-x-2"
+                                              href={{
+                                                pathname:
+                                                  "prescribe/prescribeForm",
+                                                query: {
+                                                  patientId: item.patient_id,
+                                                },
+                                              }}
+                                            >
+                                              <ClipboardPlusIcon className="size-4 sm:size-5" />{" "}
+                                              Prescribe
+                                            </Link>
+                                          </Button>
+                                        </DropdownMenuItem>
+                                      </DropdownMenuContent>
+                                    </DropdownMenu>
+                                  )}
                                 </div>
                               </td>
                             </Reorder.Item>

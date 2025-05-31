@@ -2,8 +2,8 @@
 
 import {
   BedSingle,
-  BriefcaseMedicalIcon,
   CircleX,
+  ClipboardPlusIcon,
   LogOut,
   MoreHorizontal,
 } from "lucide-react";
@@ -172,7 +172,7 @@ export const BedManagementMenu: React.FC<BedManagementMenuProps> = ({
         </DropdownMenuLabel>
         <div className="w-full pt-2 pb-1 flex flex-row gap-x-1">
           <span className="bg-green-500/10 flex h-auto px-2 rounded-md aspect-square items-center justify-center">
-            <BriefcaseMedicalIcon size={20} className="text-green-500" />
+            <ClipboardPlusIcon size={20} className="text-green-500" />
           </span>
           <Select
             disabled={menuLoader}
@@ -193,10 +193,12 @@ export const BedManagementMenu: React.FC<BedManagementMenuProps> = ({
                   lastName = "",
                   identifier,
                 } = member.publicUserData;
-
+                const fullName = [firstName, lastName]
+                  .filter(Boolean)
+                  .join(" ");
                 const selectedMember = {
                   id: userId,
-                  name: `${firstName} ${lastName}`.trim(),
+                  name: fullName,
                   email: identifier,
                 };
                 handleDoctorChange(selectedMember);
@@ -217,8 +219,12 @@ export const BedManagementMenu: React.FC<BedManagementMenuProps> = ({
                       value={member.publicUserData.userId}
                       key={index}
                     >
-                      {member.publicUserData.firstName}{" "}
-                      {member.publicUserData.lastName}
+                      {[
+                        member.publicUserData.firstName,
+                        member.publicUserData.lastName,
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
                     </SelectItem>
                   ) : (
                     <></>

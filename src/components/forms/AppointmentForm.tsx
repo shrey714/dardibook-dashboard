@@ -31,7 +31,7 @@ interface AppointmentFormProps {
   setPatientFormData: React.Dispatch<
     React.SetStateAction<RegisterPatientFormTypes>
   >;
-  handleSubmit: any;
+  handleSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
   submissionLoader: boolean;
   registerForDate: Date;
   setRegisterForDate: React.Dispatch<React.SetStateAction<Date>>;
@@ -215,9 +215,12 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
                     identifier,
                   } = member.publicUserData;
 
+                  const fullName = [firstName, lastName]
+                    .filter(Boolean)
+                    .join(" ");
                   const selectedMember = {
                     id: userId,
-                    name: `${firstName} ${lastName}`.trim(),
+                    name: fullName,
                     email: identifier,
                   };
 
@@ -242,8 +245,12 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
                         value={member.publicUserData.userId}
                         key={index}
                       >
-                        {member.publicUserData.firstName}{" "}
-                        {member.publicUserData.lastName}
+                        {[
+                          member.publicUserData.firstName,
+                          member.publicUserData.lastName,
+                        ]
+                          .filter(Boolean)
+                          .join(" ")}
                       </SelectItem>
                     ) : (
                       <></>

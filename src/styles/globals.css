@@ -377,3 +377,11 @@ body {
   font-size: 20px;
   margin: 0px;
 }
+
+.fc-day-other {
+  background-color: var(--fc-other-day-background-color);
+}
+
+.fc .fc-more-popover {
+  background: hsl(var(--background)) ;
+}

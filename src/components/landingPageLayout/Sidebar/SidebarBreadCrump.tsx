@@ -57,7 +57,7 @@ const SidebarBreadCrump = () => {
             {/* Render the last item as plain text */}
             {pathItems.length > 0 && (
               <BreadcrumbItem>
-                <BreadcrumbPage>
+                <BreadcrumbPage className="break-all line-clamp-1">
                   {pathItems[pathItems.length - 1].name}
                 </BreadcrumbPage>
               </BreadcrumbItem>

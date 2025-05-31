@@ -4,9 +4,9 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import {
-  BriefcaseMedicalIcon,
   CalendarMinusIcon,
   CalendarPlusIcon,
+  ClipboardPlusIcon,
   ClipboardX,
   LogOut,
   PencilLineIcon,
@@ -91,20 +91,15 @@ export const BedPatientList: React.FC<bedPatientProps> = ({
                           {bed.bedId}
                         </span>
 
-                        <Link
-                          href={"#"}
-                          role="button"
+                        <button
+                          type="button"
                           onClick={() =>
-                            openModal({
-                              patientId: bed.patient_id,
-                            })
+                            openModal({ patientId: bed.patient_id })
                           }
-                          className={`py-1 text-sm h-full`}
+                          className="py-1 text-sm h-full underline px-2 cursor-pointer"
                         >
-                          <p className={`underline px-2 text-sm`}>
-                            {bed.patient_id}
-                          </p>
-                        </Link>
+                          {bed.patient_id}
+                        </button>
                       </div>
 
                       {startOfDay(bed.discharge_at).toDateString() ===
@@ -150,7 +145,7 @@ export const BedPatientList: React.FC<bedPatientProps> = ({
                           <PencilLineIcon size={16} /> {bed.admission_by.name}
                         </p>
                         <p className="!mt-0 flex bg-green-500/10 text-green-600 text-sm items-center gap-2 px-2 py-1 w-full rounded-b-sm">
-                          <BriefcaseMedicalIcon size={16} />{" "}
+                          <ClipboardPlusIcon size={16} />{" "}
                           {bed.admission_for.name}
                         </p>
                         <p className="flex bg-green-500/10 text-green-600 text-sm items-center gap-2 px-2 py-1 w-full rounded-t-sm">
@@ -168,7 +163,7 @@ export const BedPatientList: React.FC<bedPatientProps> = ({
                     {bed.dischargeMarked ? (
                       <div className="bg-red-500/10 mt-2 w-full rounded-md text-red-600 flex flex-row gap-4 px-3 py-1 items-center">
                         <LogOut className="w-5 h-5" /> Discharged by{" "}
-                        {bed.discharged_by.name}
+                        {bed?.discharged_by?.name}
                       </div>
                     ) : (
                       <></>

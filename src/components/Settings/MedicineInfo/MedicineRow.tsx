@@ -23,7 +23,7 @@ const MedicineRow: React.FC<DisplayMedicineProps> = ({
 }) => {
   return (
     <div
-      className={`grid grid-cols-12 gap-1 w-full p-4 ${
+      className={`grid grid-cols-12 gap-1 w-full p-2 sm:p-4 ${
         index !== 0 ? "border-t" : "border-0"
       }`}
     >
@@ -41,10 +41,10 @@ const MedicineRow: React.FC<DisplayMedicineProps> = ({
         </p>
       </div>
 
-      <div className="col-span-3 [&:empty]:invisible border rounded-md flex items-center h-min py-[0px] sm:py-[5.5px] px-2 text-muted-foreground bg-background border-border text-sm leading-6 w-full">
+      <div className="col-span-3 [&:empty]:invisible border rounded-md flex items-center h-min py-[0px] sm:py-[5.5px] px-2 text-muted-foreground bg-background border-border text-sm w-full">
         {medicine.type}
       </div>
-      <div className="col-span-5 [&:empty]:invisible border rounded-md flex items-center h-min py-[0px] sm:py-[5.5px] px-2 text-muted-foreground bg-background border-border text-sm leading-6 w-full">
+      <div className="col-span-5 [&:empty]:invisible border rounded-md flex items-center h-min py-[0px] sm:py-[5.5px] px-2 text-muted-foreground bg-background border-border text-sm w-full">
         {medicine.instruction}
       </div>
 

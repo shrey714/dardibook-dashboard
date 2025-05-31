@@ -7,7 +7,7 @@ const isHomeRoute = createRouteMatcher(['/dashboard/home(.*)'])
 const isAppointmentRoute = createRouteMatcher(['/dashboard/appointment(.*)'])
 const isPrescribeRoute = createRouteMatcher(['/dashboard/prescribe(.*)'])
 const isHistoryRoute = createRouteMatcher(['/dashboard/history(.*)'])
-const isMedicalRoute = createRouteMatcher(['/dashboard/medical(.*)'])
+const isPharmacyRoute = createRouteMatcher(['/dashboard/pharmacy(.*)'])
 const isSettingsRoute = createRouteMatcher(['/dashboard/settings(.*)'])
 
 
@@ -72,7 +72,7 @@ export default clerkMiddleware(async (auth, req) => {
             )
         })
     }
-    if (isMedicalRoute(req)) {
+    if (isPharmacyRoute(req)) {
         await auth.protect((has) => {
             return (
                 has({ role: 'org:clinic_head' }) ||
