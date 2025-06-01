@@ -7,7 +7,11 @@ const page = async () => {
   const orgRole = (await auth()).orgRole;
 
   if (!orgRole) {
-    return <div>User does not exist with an appropriate role..</div>;
+    return (
+      <div className="flex h-full items-center justify-center">
+        User does not exist with an appropriate role..
+      </div>
+    );
   }
 
   return (
