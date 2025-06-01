@@ -47,12 +47,16 @@ import {
   MedicineItems,
   MedicinesDetails,
   PharmacySelectedPatientType,
+  PharmacyTypes,
   PrescriptionFormTypes,
   ServiceItems,
 } from "@/types/FormTypes";
+import { doc, setDoc } from "firebase/firestore";
+import { db } from "@/firebase/firebaseConfig";
+import toast from "react-hot-toast";
 import { Badge } from "@/components/ui/badge";
 import { AnimatePresence, motion } from "framer-motion";
-import { useAuth, useOrganization } from "@clerk/nextjs";
+import { useAuth, useOrganization, useUser } from "@clerk/nextjs";
 import { getMedicines } from "@/app/services/crudMedicine";
 
 const calculateTotalAmount = (
@@ -99,6 +103,7 @@ interface BillFormTypes {
 
 const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
   const { orgId } = useAuth();
+  const { user } = useUser();
   const { organization, isLoaded } = useOrganization();
   const [selectedMedicines, setSelectedMedicines] = useState<MedicineItems[]>(
     []
@@ -113,7 +118,9 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
   const [paymentMethod, setPaymentMethod] = useState<
     "Cash" | "Card" | "UPI" | "Online"
   >("Card");
-  const [paymentStatus, setPaymentStatus] = useState<string>("Unpaid");
+  const [paymentStatus, setPaymentStatus] = useState<
+    "Paid" | "Unpaid" | "Not Required" | "Refunded"
+  >("Unpaid");
 
   const [medicines, setMedicines] = useState<MedicinesDetails[]>([]);
   const [services, setServices] = useState<ServiceType[]>([]);
@@ -167,7 +174,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
       form.reset({
         name: "",
         mobile: "",
-        gender: "",
+        gender: "Male",
       });
     }
   }, [selectedPatient]);
@@ -175,12 +182,12 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
   const form = useForm<{
     name: string;
     mobile: string;
-    gender: "Male" | "Female" | "Other" | "";
+    gender: "Male" | "Female" | "Other";
   }>({
     defaultValues: {
       name: selectedPatient?.name || "",
       mobile: selectedPatient?.mobile || "",
-      gender: selectedPatient?.gender || "",
+      gender: selectedPatient?.gender || "Male",
     },
   });
 
@@ -295,7 +302,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
   };
 
   const totalAmount = calculateTotalAmount(
-    selectedMedicines,
+    selectedPrescription ? prescribedMedicines : selectedMedicines,
     selectedServices,
     discount,
     taxPercentage
@@ -304,34 +311,84 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
   const handleSaveBill = () => {
     const formValues = form.getValues();
 
-    const newBill = {
-      bill_id: generateBillId(),
-      name: formValues.name,
-      patient_id: selectedPatient?.patient_id,
-      mobile: formValues.mobile,
-      gender: formValues.gender,
-      medicines: selectedPrescription ? prescribedMedicines : selectedMedicines,
-      services: selectedPrescription ? [] : selectedServices,
-      generated_at: Date.now(),
-      payment_status: paymentStatus,
-      total_amount: totalAmount,
-      discount: discount,
-      payment_method: paymentMethod,
-      tax_percentage: taxPercentage,
-      notes: notes,
-    };
+    if (user && orgId) {
+      const newBill = {
+        bill_id: generateBillId(),
+        name: formValues.name,
+        mobile: formValues.mobile,
+        gender: formValues.gender,
+        generated_at: Date.now(),
+        generated_by: {
+          id: user.id,
+          name: user.fullName || "",
+          email: user.primaryEmailAddress?.emailAddress || "",
+        },
+        payment_status: paymentStatus,
+        total_amount: totalAmount,
+        discount: discount,
+        tax_percentage: taxPercentage,
+        notes: notes,
+        payment_method: paymentMethod,
+      };
+      const generatdBill: PharmacyTypes = selectedPatient
+        ? selectedPrescription
+          ? {
+              ...newBill,
+              prescription_id: selectedPrescription.prescription_id,
+              patient_id: selectedPatient.patient_id,
+              medicines: prescribedMedicines,
+              prescribed_by: {
+                id: selectedPrescription.prescribed_by.id,
+                name: selectedPrescription.prescribed_by.name,
+                email: selectedPrescription.prescribed_by.email,
+              },
+              services: [],
+            }
+          : {
+              ...newBill,
+              patient_id: selectedPatient.patient_id,
+              medicines: selectedMedicines,
+              services: selectedServices,
+            }
+        : {
+            ...newBill,
+            medicines: selectedMedicines,
+            services: selectedServices,
+          };
 
-    console.log(newBill);
-
-    // Reset form
-    form.reset();
-    setSelectedMedicines([]);
-    setSelectedServices([]);
-    setDiscount(0);
-    setTaxPercentage(0);
-    setNotes("");
-    setPaymentMethod("Cash");
-    setPaymentStatus("Unpaid");
+      toast.promise(
+        async () => {
+          // setSubmissionLoader(true);
+          await setDoc(
+            doc(db, "doctor", orgId, "bills", newBill.bill_id),
+            generatdBill
+          ).then(
+            () => {
+              // setSubmissionLoader(false);
+              form.reset();
+              setSelectedMedicines([]);
+              setSelectedServices([]);
+              setDiscount(0);
+              setTaxPercentage(0);
+              setNotes("");
+              setPaymentMethod("Cash");
+              setPaymentStatus("Unpaid");
+            },
+            () => {
+              // setSubmissionLoader(false);
+            }
+          );
+        },
+        {
+          loading: "Loading...",
+          success: "Bill generated successfully",
+          error: "Failed to generate bill",
+        },
+        {
+          position: "bottom-left",
+        }
+      );
+    }
   };
 
   return (
@@ -603,7 +660,15 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                       <FormLabel>Payment Status</FormLabel>
                       <Select
                         value={paymentStatus}
-                        onValueChange={(value) => setPaymentStatus(value)}
+                        onValueChange={(value) =>
+                          setPaymentStatus(
+                            value as
+                              | "Paid"
+                              | "Unpaid"
+                              | "Not Required"
+                              | "Refunded"
+                          )
+                        }
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="Select status" />
@@ -665,7 +730,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                       <span>Medicines Total:</span>
                       <span>
                         ₹
-                        {selectedMedicines
+                        {prescribedMedicines
                           .reduce(
                             (sum, med) => sum + med.price * med.quantity,
                             0
@@ -675,16 +740,6 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                     </div>
                     <div className="flex justify-between">
                       <span>Services Total:</span>
-                      <span>
-                        ₹
-                        {selectedServices
-                          .reduce(
-                            (sum, service) =>
-                              sum + service.price * (service.quantity || 1),
-                            0
-                          )
-                          .toFixed(2)}
-                      </span>
                     </div>
                     {discount > 0 && (
                       <div className="flex justify-between text-muted-foreground">
@@ -692,15 +747,10 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                         <span>
                           -₹
                           {(
-                            (selectedMedicines.reduce(
+                            prescribedMedicines.reduce(
                               (sum, med) => sum + med.price * med.quantity,
                               0
-                            ) +
-                              selectedServices.reduce(
-                                (sum, service) =>
-                                  sum + service.price * (service.quantity || 1),
-                                0
-                              )) *
+                            ) *
                             (discount / 100)
                           ).toFixed(2)}
                         </span>
@@ -712,15 +762,10 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                         <span>
                           +₹
                           {(
-                            (selectedMedicines.reduce(
+                            prescribedMedicines.reduce(
                               (sum, med) => sum + med.price * med.quantity,
                               0
-                            ) +
-                              selectedServices.reduce(
-                                (sum, service) =>
-                                  sum + service.price * (service.quantity || 1),
-                                0
-                              )) *
+                            ) *
                             (1 - discount / 100) *
                             (taxPercentage / 100)
                           ).toFixed(2)}
@@ -1014,7 +1059,15 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                       <FormLabel>Payment Status</FormLabel>
                       <Select
                         value={paymentStatus}
-                        onValueChange={(value) => setPaymentStatus(value)}
+                        onValueChange={(value) =>
+                          setPaymentStatus(
+                            value as
+                              | "Paid"
+                              | "Unpaid"
+                              | "Not Required"
+                              | "Refunded"
+                          )
+                        }
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="Select status" />
@@ -1477,7 +1530,15 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                     <FormLabel>Payment Status</FormLabel>
                     <Select
                       value={paymentStatus}
-                      onValueChange={(value) => setPaymentStatus(value)}
+                      onValueChange={(value) =>
+                        setPaymentStatus(
+                          value as
+                            | "Paid"
+                            | "Unpaid"
+                            | "Not Required"
+                            | "Refunded"
+                        )
+                      }
                     >
                       <SelectTrigger className="focus:ring-[#2563eb]">
                         <SelectValue placeholder="Select status" />
