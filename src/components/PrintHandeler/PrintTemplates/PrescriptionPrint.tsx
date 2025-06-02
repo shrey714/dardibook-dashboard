@@ -110,7 +110,7 @@ const PrescriptionPrint = ({ data }: { data: PrescriptionData }) => {
 
       {data.advice && (
         <div>
-          <h4 className="font-medium mb-1">Doctor's Advice:</h4>
+          <h4 className="font-medium mb-1">Doctor`&apos;`s Advice:</h4>
           <p className="text-sm border border-gray-300 p-2 bg-gray-50 rounded">
             {data.advice}
           </p>
