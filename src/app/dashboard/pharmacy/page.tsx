@@ -41,6 +41,7 @@ import { cn } from "@/lib/utils";
 const Medical = () => {
   const isDesktop = useMediaQuery("(min-width: 1536px)");
   const [billModal, setbillModal] = useState(false);
+  const [needsToReFetchBills, setNeedsToReFetchBills] = useState(0);
   const [selectedPatient, setSelectedPatient] =
     useState<PharmacySelectedPatientType>();
   const [selectedBillData, setselectedBillData] = useState<PharmacyTypes>();
@@ -72,6 +73,7 @@ const Medical = () => {
         setbillModal={setbillModal}
         selectedBillData={selectedBillData}
         setselectedBillData={setselectedBillData}
+        setNeedsToReFetchBills={setNeedsToReFetchBills}
       />
       <div
         className={cn(
@@ -272,6 +274,7 @@ const Medical = () => {
             <BillsForPatient
               selectedPatient={selectedPatient}
               onViewBill={handleViewBill}
+              needsToReFetchBills={needsToReFetchBills}
             />
           </ScrollArea>
         )}
@@ -295,6 +298,7 @@ const Medical = () => {
                 <BillsForPatient
                   selectedPatient={selectedPatient}
                   onViewBill={handleViewBill}
+                  needsToReFetchBills={needsToReFetchBills}
                 />
               </ScrollArea>
             </SheetContent>

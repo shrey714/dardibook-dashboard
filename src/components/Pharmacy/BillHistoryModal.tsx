@@ -58,6 +58,7 @@ interface BillHistoryModaltypes {
   setselectedBillData: React.Dispatch<
     React.SetStateAction<PharmacyTypes | undefined>
   >;
+  setNeedsToReFetchBills: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const BillHistoryModal = ({
@@ -65,6 +66,7 @@ const BillHistoryModal = ({
   setbillModal,
   selectedBillData,
   setselectedBillData,
+  setNeedsToReFetchBills,
 }: BillHistoryModaltypes) => {
   const { orgId } = useAuth();
   const [updateLoader, setUpdateLoader] = useState(false);
@@ -84,8 +86,10 @@ const BillHistoryModal = ({
                 ...selectedBillData,
                 payment_method: method as "Cash" | "Card" | "UPI" | "Online",
               });
+              setNeedsToReFetchBills((prev) => prev + 1);
             },
-            () => {
+            (e) => {
+              console.log("error==", e);
               setUpdateLoader(false);
             }
           );
@@ -121,8 +125,10 @@ const BillHistoryModal = ({
                   | "Not Required"
                   | "Refunded",
               });
+              setNeedsToReFetchBills((prev) => prev + 1);
             },
-            () => {
+            (e) => {
+              console.log("error==", e);
               setUpdateLoader(false);
             }
           );

@@ -21,7 +21,14 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { query, collection, onSnapshot, where, and } from "firebase/firestore";
+import {
+  query,
+  collection,
+  onSnapshot,
+  where,
+  and,
+  orderBy,
+} from "firebase/firestore";
 import { db } from "@/firebase/firebaseConfig";
 
 import { SidebarMenuSkeleton } from "@/components/ui/sidebar";
@@ -44,10 +51,9 @@ const BillsGenerated = ({
       if (isLoaded && orgId && date) {
         const billsQuery = query(
           collection(db, "doctor", orgId, "bills"),
-          and(
-            where("generated_at", ">=", getTime(startOfDay(date))),
-            where("generated_at", "<=", getTime(endOfDay(date)))
-          )
+          where("generated_at", ">=", getTime(startOfDay(date))),
+          where("generated_at", "<=", getTime(endOfDay(date))),
+          orderBy("generated_at", "desc")
         );
 
         setBillsLoader(true);

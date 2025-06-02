@@ -18,6 +18,7 @@ const Page = () => {
         width={208}
         alt="Flowbite Logo"
         className="h-52"
+        priority={true}
       />
     </div>
   );

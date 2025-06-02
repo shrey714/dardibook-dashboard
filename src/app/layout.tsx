@@ -59,6 +59,7 @@ export default async function RootLayout({
                   <Image
                     src="/Logo.svg"
                     height={208}
+                    priority={true}
                     width={208}
                     alt="Flowbite Logo"
                     className="h-52"
