@@ -586,7 +586,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                                       parseInt(e.target.value) || 1
                                     )
                                   }
-                                  className="w-20 h-8"
+                                  className="w-20 h-8 focus-visible:ring-[#2563eb]"
                                 />
                                 <span className="text-sm">{med.type}</span>
                               </div>
@@ -601,7 +601,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                                     parseInt(e.target.value) || 1
                                   )
                                 }
-                                className="w-28 h-8"
+                                className="w-28 h-8 focus-visible:ring-[#2563eb]"
                               />
                             </TableCell>
                             <TableCell>
@@ -633,6 +633,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                       <div>
                         <FormLabel>Discount (%)</FormLabel>
                         <Input
+                          className="focus-visible:ring-[#2563eb]"
                           type="number"
                           min="0"
                           max="100"
@@ -646,6 +647,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                       <div>
                         <FormLabel>Tax (%)</FormLabel>
                         <Input
+                          className="focus-visible:ring-[#2563eb]"
                           type="number"
                           min="0"
                           value={taxPercentage}
@@ -670,7 +672,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                           )
                         }
                       >
-                        <SelectTrigger>
+                        <SelectTrigger className="focus:ring-[#2563eb]">
                           <SelectValue placeholder="Select status" />
                         </SelectTrigger>
                         <SelectContent>
@@ -695,7 +697,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                             )
                           }
                         >
-                          <SelectTrigger>
+                          <SelectTrigger className="focus:ring-[#2563eb]">
                             <SelectValue placeholder="Select method" />
                           </SelectTrigger>
                           <SelectContent>
@@ -711,6 +713,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                     <div>
                       <FormLabel>Notes</FormLabel>
                       <Input
+                        className="focus-visible:ring-[#2563eb]"
                         value={notes}
                         onChange={(e) => setNotes(e.target.value)}
                       />
@@ -791,7 +794,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                     value={medicineToAdd}
                     onValueChange={setMedicineToAdd}
                   >
-                    <SelectTrigger className="flex-grow">
+                    <SelectTrigger className="flex-grow focus:ring-[#2563eb]">
                       <SelectValue placeholder="Select medicine" />
                     </SelectTrigger>
                     <SelectContent>
@@ -808,7 +811,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                     min="1"
                     value={quantity}
                     onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
-                    className="w-24"
+                    className="w-24 focus-visible:ring-[#2563eb]"
                     placeholder="Qty"
                   />
 
@@ -857,7 +860,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                                     parseInt(e.target.value) || 1
                                   )
                                 }
-                                className="w-16 h-8"
+                                className="w-16 h-8 focus-visible:ring-[#2563eb]"
                               />
                             </TableCell>
                             <TableCell>
@@ -871,7 +874,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                                     parseInt(e.target.value) || 1
                                   )
                                 }
-                                className="w-28 h-8"
+                                className="w-28 h-8 focus-visible:ring-[#2563eb]"
                               />
                             </TableCell>
                             <TableCell>
@@ -917,7 +920,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                       );
                     }}
                   >
-                    <SelectTrigger className="flex-grow">
+                    <SelectTrigger className="flex-grow focus:ring-[#2563eb]">
                       <SelectValue placeholder="Select service" />
                     </SelectTrigger>
                     <SelectContent>
@@ -972,7 +975,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                                     parseInt(e.target.value) || 1
                                   )
                                 }
-                                className="w-16 h-8"
+                                className="w-20 h-8 focus-visible:ring-[#2563eb]"
                               />
                             </TableCell>
                             <TableCell>
@@ -986,7 +989,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                                     parseInt(e.target.value) || 1
                                   )
                                 }
-                                className="w-28 h-8"
+                                className="w-28 h-8 focus-visible:ring-[#2563eb]"
                               />
                             </TableCell>
                             <TableCell>
@@ -1032,6 +1035,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                       <div>
                         <FormLabel>Discount (%)</FormLabel>
                         <Input
+                          className="focus-visible:ring-[#2563eb]"
                           type="number"
                           min="0"
                           max="100"
@@ -1045,6 +1049,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                       <div>
                         <FormLabel>Tax (%)</FormLabel>
                         <Input
+                          className="focus-visible:ring-[#2563eb]"
                           type="number"
                           min="0"
                           value={taxPercentage}
@@ -1069,7 +1074,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                           )
                         }
                       >
-                        <SelectTrigger>
+                        <SelectTrigger className="focus:ring-[#2563eb]">
                           <SelectValue placeholder="Select status" />
                         </SelectTrigger>
                         <SelectContent>
@@ -1094,7 +1099,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                             )
                           }
                         >
-                          <SelectTrigger>
+                          <SelectTrigger className="focus:ring-[#2563eb]">
                             <SelectValue placeholder="Select method" />
                           </SelectTrigger>
                           <SelectContent>
@@ -1110,6 +1115,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                     <div>
                       <FormLabel>Notes</FormLabel>
                       <Input
+                        className="focus-visible:ring-[#2563eb]"
                         value={notes}
                         onChange={(e) => setNotes(e.target.value)}
                       />
@@ -1214,6 +1220,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                     <FormControl>
                       <Input
                         placeholder="Patient Name..."
+                        className="focus-visible:ring-[#2563eb]"
                         {...field}
                         required
                       />
@@ -1231,6 +1238,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                     <FormControl>
                       <Input
                         placeholder="Mobile Number..."
+                        className="focus-visible:ring-[#2563eb]"
                         {...field}
                         required
                       />
@@ -1247,7 +1255,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                     <FormLabel>Gender</FormLabel>
                     <Select value={field.value} onValueChange={field.onChange}>
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger className="focus:ring-[#2563eb]">
                           <SelectValue placeholder="Select gender" />
                         </SelectTrigger>
                       </FormControl>
@@ -1268,7 +1276,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
 
               <div className="flex gap-2 mb-2 mt-3">
                 <Select value={medicineToAdd} onValueChange={setMedicineToAdd}>
-                  <SelectTrigger className="flex-grow">
+                  <SelectTrigger className="flex-grow focus:ring-[#2563eb]">
                     <SelectValue placeholder="Select medicine" />
                   </SelectTrigger>
                   <SelectContent>
@@ -1285,7 +1293,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                   min="1"
                   value={quantity}
                   onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
-                  className="w-24"
+                  className="w-24 focus-visible:ring-[#2563eb]"
                   placeholder="Qty"
                 />
 
@@ -1331,7 +1339,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                                   parseInt(e.target.value) || 1
                                 )
                               }
-                              className="w-16 h-8"
+                              className="w-20 h-8 focus-visible:ring-[#2563eb]"
                             />
                           </TableCell>
                           <TableCell>
@@ -1345,7 +1353,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                                   parseInt(e.target.value) || 1
                                 )
                               }
-                              className="w-28 h-8"
+                              className="w-28 h-8 focus-visible:ring-[#2563eb]"
                             />
                           </TableCell>
                           <TableCell>
@@ -1391,7 +1399,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                     );
                   }}
                 >
-                  <SelectTrigger className="flex-grow">
+                  <SelectTrigger className="flex-grow focus:ring-[#2563eb]">
                     <SelectValue placeholder="Select service" />
                   </SelectTrigger>
                   <SelectContent>
@@ -1443,7 +1451,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                                   parseInt(e.target.value) || 1
                                 )
                               }
-                              className="w-16 h-8"
+                              className="w-20 h-8 focus-visible:ring-[#2563eb]"
                             />
                           </TableCell>
                           <TableCell>
@@ -1457,7 +1465,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                                   parseInt(e.target.value) || 1
                                 )
                               }
-                              className="w-28 h-8"
+                              className="w-28 h-8 focus-visible:ring-[#2563eb]"
                             />
                           </TableCell>
                           <TableCell>
@@ -1503,6 +1511,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                     <div>
                       <FormLabel>Discount (%)</FormLabel>
                       <Input
+                        className="focus-visible:ring-[#2563eb]"
                         type="number"
                         min="0"
                         max="100"
@@ -1516,6 +1525,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                     <div>
                       <FormLabel>Tax (%)</FormLabel>
                       <Input
+                        className="focus-visible:ring-[#2563eb]"
                         type="number"
                         min="0"
                         value={taxPercentage}
@@ -1565,7 +1575,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                           )
                         }
                       >
-                        <SelectTrigger>
+                        <SelectTrigger className="focus:ring-[#2563eb]">
                           <SelectValue placeholder="Select method" />
                         </SelectTrigger>
                         <SelectContent>
