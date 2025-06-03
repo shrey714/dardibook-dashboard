@@ -99,7 +99,6 @@ interface TimelineInstanceType {
 const PatientHistoryGlobalModal = () => {
   const { isOpen, modalProps, closeModal } = usePatientHistoryModalStore();
   const { isLoaded, orgId, orgRole } = useAuth();
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isBillDrawerOpen, setIsBillDrawerOpen] = useState(false);
   const [billsData, setBillsData] = useState<PharmacyTypes[]>([]);
   const [selectedBillId, setSelectedBillId] = useState<string>();
@@ -943,24 +942,6 @@ const PatientHistoryGlobalModal = () => {
           </DialogHeader>
           <div className="flex flex-1 flex-col overflow-y-auto w-full">
             <div className="relative">
-              <Dialog
-                open={isModalOpen}
-                onOpenChange={(state) => setIsModalOpen(state)}
-              >
-                <DialogContent className="md:max-w-screen-md">
-                  <DialogHeader>
-                    <DialogTitle hidden>PRINT</DialogTitle>
-                    <DialogDescription hidden>DESC</DialogDescription>
-                  </DialogHeader>
-                  {/* <PrintModal
-                    setIsModalOpen={setIsModalOpen}
-                    patientData={patientData}
-                    prescriptionsData={prescriptionsData}
-                    doctorData={doctorData}
-                  /> */}
-                </DialogContent>
-              </Dialog>
-
               {loader ? (
                 <ScrollArea className="mx-auto border rounded-lg m-2 h-min overflow-x-auto">
                   <div className="py-4 px-6 flex flex-row">

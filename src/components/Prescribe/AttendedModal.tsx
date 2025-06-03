@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import animationData from "@/lottieFiles/Registered.json";
 import Lottie from "react-lottie";
 import Link from "next/link";
-// import PrintHandeler from "@/components/PrintForms/PrintHandeler";
 import { Button } from "../ui/button";
 import Loader from "../common/Loader";
 import { PrescriptionFormTypes } from "@/types/FormTypes";
