@@ -163,17 +163,17 @@ const BillReceiptPrint = ({ data }: { data: BillData }) => {
 
       <div className="flex justify-end">
         <div className="w-1/2 text-sm">
-          <div className="flex justify-between py-1 border-b">
+          <div className="flex justify-between py-1 border-b border-gray-300">
             <span>Discount:</span>
             <span>{data.discount.toFixed(2)}%</span>
           </div>
 
-          <div className="flex justify-between py-1 border-b">
+          <div className="flex justify-between py-1 border-b border-gray-300">
             <span>Tax:</span>
             <span>{data.tax_percentage.toFixed(2)}%</span>
           </div>
 
-          <div className="flex justify-between py-1 border-b">
+          <div className="flex justify-between py-1 border-b border-gray-300">
             <span>Total Amount:</span>
             <span>₹{data.total_amount.toFixed(2)}</span>
           </div>
