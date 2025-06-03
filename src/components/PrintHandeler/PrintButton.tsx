@@ -89,7 +89,7 @@ export default function PrintButton({
         {children}
       </Button>
       {/* This is the printable component */}
-      <div className="print:block">
+      <div className="hidden print:block">
         <div ref={printComponentRef}>
           <div className="print-container p-8 bg-white text-black font-sans text-sm w-[210mm] min-h-[297mm] mx-auto shadow-lg my-4 print:shadow-none print:my-0 print:mx-0 print:w-full print:min-h-screen">
             <Header />
