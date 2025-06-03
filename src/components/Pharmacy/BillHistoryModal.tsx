@@ -8,6 +8,7 @@ import {
   X,
   CalendarClockIcon,
   CreditCard,
+  PrinterIcon,
 } from "lucide-react";
 import {
   Dialog,
@@ -50,6 +51,13 @@ import { useAuth } from "@clerk/nextjs";
 import toast from "react-hot-toast";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/firebase/firebaseConfig";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import PrintButton from "../PrintHandeler/PrintButton";
 
 interface BillHistoryModaltypes {
   billModal: boolean;
@@ -476,6 +484,49 @@ const BillHistoryModal = ({
               </div>
             </div>
             <DialogFooter className="bg-slate-50 dark:bg-gray-900 w-full gap-1 border-t px-4 py-2 flex flex-row justify-end items-center">
+              <PrintButton
+                printType="bill"
+                data={{
+                  patient_id: selectedBillData.patient_id,
+                  name: selectedBillData.name,
+                  bill_id: selectedBillData.bill_id,
+                  prescription_id: selectedBillData.prescription_id,
+                  mobile: selectedBillData.mobile,
+                  gender: selectedBillData.gender,
+                  medicines: selectedBillData.medicines.map((medicine) => ({
+                    medicineName: medicine.medicineName,
+                    instruction: medicine.instruction,
+                    dosages: medicine.dosages,
+                    type: medicine.type,
+                    quantity: medicine.quantity,
+                    price: medicine.price,
+                    duration: medicine.duration,
+                    durationType: medicine.durationType,
+                  })),
+                  services: selectedBillData.services.map((service) => ({
+                    price: service.price,
+                    quantity: service.quantity,
+                    service_name: service.service_name,
+                  })),
+                  generated_at: selectedBillData.generated_at,
+                  prescribed_by: selectedBillData.prescribed_by?.name,
+                  generated_by: selectedBillData.generated_by.name,
+                  payment_status: selectedBillData.payment_status,
+                  total_amount: selectedBillData.total_amount,
+                  discount: selectedBillData.discount,
+                  payment_method: selectedBillData.payment_method,
+                  tax_percentage: selectedBillData.tax_percentage,
+                  notes: selectedBillData.notes,
+                }}
+                buttonProps={{
+                  size: "icon",
+                  className:
+                    "w-auto px-6 bg-gray-200 hover:bg-gray-300 text-gray-800 transition-colors",
+                }}
+              >
+                <PrinterIcon />
+              </PrintButton>
+
               {selectedBillData.payment_status === "Paid" && (
                 <Select
                   disabled={updateLoader}

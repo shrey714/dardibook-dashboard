@@ -1,7 +1,11 @@
 import React from "react";
 import PatientHistoryData from "./PatientHistoryData";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PharmacyTypes, PrescriptionFormTypes } from "@/types/FormTypes";
+import {
+  PharmacyTypes,
+  PrescriptionFormTypes,
+  RegisterPatientFormTypes,
+} from "@/types/FormTypes";
 import { format } from "date-fns";
 import { Button } from "../ui/button";
 import { PrinterIcon, ReceiptTextIcon } from "lucide-react";
@@ -11,14 +15,17 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import PrintButton from "../PrintHandeler/PrintButton";
 
 interface PatientHistoryTabsTypes {
+  patientData?: RegisterPatientFormTypes;
   prescriptionsData: PrescriptionFormTypes[];
   handleBillIdSelection: (id: string) => void;
   billsData: PharmacyTypes[];
 }
 
 const PatientHistoryTabs: React.FC<PatientHistoryTabsTypes> = ({
+  patientData,
   prescriptionsData,
   handleBillIdSelection,
   billsData,
@@ -64,12 +71,49 @@ const PatientHistoryTabs: React.FC<PatientHistoryTabsTypes> = ({
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <Button
-                          size="icon"
-                          className="w-auto px-6 bg-gray-200 hover:bg-gray-300 text-gray-800 transition-colors"
+                        <PrintButton
+                          printType="prescription"
+                          data={{
+                            patient_id: patientData?.patient_id || "",
+                            name: patientData?.name || "",
+                            advice: history.advice,
+                            created_at: history.created_at,
+                            diseaseDetail: history.diseaseDetail,
+                            medicines: history.medicines.map((medicine) => ({
+                              dosages: medicine.dosages,
+                              duration: medicine.duration,
+                              durationType: medicine.durationType,
+                              instruction: medicine.instruction,
+                              medicineName: medicine.medicineName,
+                              type: medicine.type,
+                            })),
+                            nextVisit: history.nextVisit,
+                            prescribed_by: history.prescribed_by.name,
+                            prescriber_assigned:
+                              history.prescriber_assigned.name,
+                            prescription_for_bed: history.prescription_for_bed,
+                            prescription_id: history.prescription_id,
+                            receipt_details: history.receipt_details.map(
+                              (receipt) => ({
+                                amount: receipt.amount,
+                                title: receipt.title,
+                              })
+                            ),
+                            refer: {
+                              doctorName: history.refer.doctorName,
+                              hospitalName: history.refer.hospitalName,
+                              referMessage: history.refer.referMessage,
+                            },
+                            registerd_by: history.registerd_by.name,
+                          }}
+                          buttonProps={{
+                            size: "icon",
+                            className:
+                              "w-auto px-6 bg-gray-200 hover:bg-gray-300 text-gray-800 transition-colors",
+                          }}
                         >
                           <PrinterIcon />
-                        </Button>
+                        </PrintButton>
                       </TooltipTrigger>
                       <TooltipContent>
                         <p>Print</p>

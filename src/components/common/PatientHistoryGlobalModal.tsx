@@ -90,6 +90,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import PrintButton from "../PrintHandeler/PrintButton";
 
 interface TimelineInstanceType {
   time: number;
@@ -823,12 +824,48 @@ const PatientHistoryGlobalModal = () => {
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button
-                      size="icon"
-                      className="w-auto px-6 bg-gray-200 hover:bg-gray-300 text-gray-800 transition-colors"
+                    <PrintButton
+                      printType="bill"
+                      data={{
+                        patient_id: bill.patient_id,
+                        name: bill.name,
+                        bill_id: bill.bill_id,
+                        prescription_id: bill.prescription_id,
+                        mobile: bill.mobile,
+                        gender: bill.gender,
+                        medicines: bill.medicines.map((medicine) => ({
+                          medicineName: medicine.medicineName,
+                          instruction: medicine.instruction,
+                          dosages: medicine.dosages,
+                          type: medicine.type,
+                          quantity: medicine.quantity,
+                          price: medicine.price,
+                          duration: medicine.duration,
+                          durationType: medicine.durationType,
+                        })),
+                        services: bill.services.map((service) => ({
+                          price: service.price,
+                          quantity: service.quantity,
+                          service_name: service.service_name,
+                        })),
+                        generated_at: bill.generated_at,
+                        prescribed_by: bill.prescribed_by?.name,
+                        generated_by: bill.generated_by.name,
+                        payment_status: bill.payment_status,
+                        total_amount: bill.total_amount,
+                        discount: bill.discount,
+                        payment_method: bill.payment_method,
+                        tax_percentage: bill.tax_percentage,
+                        notes: bill.notes,
+                      }}
+                      buttonProps={{
+                        size: "icon",
+                        className:
+                          "w-auto px-6 bg-gray-200 hover:bg-gray-300 text-gray-800 transition-colors",
+                      }}
                     >
                       <PrinterIcon />
-                    </Button>
+                    </PrintButton>
                   </TooltipTrigger>
                   <TooltipContent>
                     <p>Print</p>
@@ -1087,6 +1124,7 @@ const PatientHistoryGlobalModal = () => {
                 </>
               ) : (
                 <PatientHistoryTabs
+                  patientData={patientData}
                   handleBillIdSelection={handleBillIdSelection}
                   prescriptionsData={prescriptionsData}
                   billsData={billsData}
