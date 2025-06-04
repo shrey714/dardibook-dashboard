@@ -331,14 +331,14 @@ const PatientHistoryGlobalModal = () => {
                   <div className="space-y-3 mt-3 px-3">
                     <div className="space-y-1">
                       <p className="text-sm font-medium">Admission Id</p>
-                      <div className="flex items-center h-9 text-muted-foreground w-full rounded-md border px-3 text-base md:text-sm !leading-9 shadow-sm">
+                      <div className="flex items-center min-h-9 text-muted-foreground w-full rounded-md border px-3 text-sm shadow-sm">
                         {adm.bedBookingId}
                       </div>
                     </div>
 
                     <div className="space-y-1">
                       <p className="text-sm font-medium">Bed Id</p>
-                      <div className="flex items-center h-9 text-muted-foreground w-full rounded-md border px-3 text-base md:text-sm !leading-9 shadow-sm">
+                      <div className="flex items-center min-h-9 text-muted-foreground w-full rounded-md border px-3 text-sm shadow-sm">
                         {adm.bedId}
                       </div>
                     </div>
@@ -565,14 +565,14 @@ const PatientHistoryGlobalModal = () => {
                     <div className="grid grid-cols-2 gap-2">
                       <div className="space-y-1">
                         <p className="text-sm font-medium">Bill Id</p>
-                        <div className="flex items-center h-9 text-muted-foreground w-full rounded-md border px-3 text-base md:text-sm !leading-9 shadow-sm">
+                        <div className="flex items-center min-h-9 text-muted-foreground w-full rounded-md border px-3 text-sm shadow-sm">
                           {bill.bill_id}
                         </div>
                       </div>
 
                       <div className="space-y-1">
                         <p className="text-sm font-medium">Prescription Id</p>
-                        <div className="flex items-center h-9 text-muted-foreground w-full rounded-md border px-3 text-base md:text-sm !leading-9 shadow-sm">
+                        <div className="flex items-center min-h-9 text-muted-foreground w-full rounded-md border px-3 text-sm shadow-sm">
                           {bill.prescription_id ?? "-"}
                         </div>
                       </div>
@@ -581,14 +581,14 @@ const PatientHistoryGlobalModal = () => {
                     <div className="grid grid-cols-2 gap-2">
                       <div className="space-y-1">
                         <p className="text-sm font-medium">Payment Status</p>
-                        <div className="flex items-center h-9 text-muted-foreground w-full rounded-md border px-3 text-base md:text-sm !leading-9 shadow-sm">
+                        <div className="flex items-center min-h-9 text-muted-foreground w-full rounded-md border px-3 text-sm shadow-sm">
                           {bill.payment_status}
                         </div>
                       </div>
 
                       <div className="space-y-1">
                         <p className="text-sm font-medium">Payment Method</p>
-                        <div className="flex items-center h-9 text-muted-foreground w-full rounded-md border px-3 text-base md:text-sm !leading-9 shadow-sm">
+                        <div className="flex items-center min-h-9 text-muted-foreground w-full rounded-md border px-3 text-sm shadow-sm">
                           {bill.payment_method ?? "-"}
                         </div>
                       </div>
@@ -596,7 +596,7 @@ const PatientHistoryGlobalModal = () => {
 
                     <div className="space-y-1">
                       <p className="text-sm font-medium">Notes</p>
-                      <div className="flex items-center h-9 text-muted-foreground w-full rounded-md border px-3 text-base md:text-sm !leading-9 shadow-sm">
+                      <div className="flex items-center min-h-9 text-muted-foreground w-full rounded-md border px-3 py-2 text-sm shadow-sm">
                         {bill.notes ?? "-"}
                       </div>
                     </div>
@@ -885,7 +885,7 @@ const PatientHistoryGlobalModal = () => {
           <DialogHeader className="shadow-sm">
             <DialogTitle hidden></DialogTitle>
             <DialogDescription hidden></DialogDescription>
-            <div className="w-full gap-y-1 bg-slate-50 dark:bg-gray-900 border-b px-4 py-2 flex flex-wrap items-center justify-between ">
+            <div className="w-full gap-y-1 bg-slate-50 dark:bg-gray-900 border-b px-4 py-2 flex items-center justify-between flex-col sm:flex-row">
               {loader ? (
                 <div className="flex flex-1 items-center space-x-2 sm:space-x-4">
                   <Skeleton className="size-9 md:size-11 rounded-full" />
@@ -896,7 +896,7 @@ const PatientHistoryGlobalModal = () => {
                 </div>
               ) : patientData ? (
                 <div className="flex flex-1 items-center space-x-2 sm:space-x-4">
-                  <User className="size-9 md:size-11 border border-muted-foreground rounded-full p-2 text-muted-foreground" />
+                  <User className="size-9 md:size-11 shrink-0 border border-muted-foreground rounded-full p-2 text-muted-foreground" />
                   <div>
                     <div className="flex items-center gap-2">
                       <h3 className="text-sm md:text-base font-medium line-clamp-1">
@@ -924,7 +924,7 @@ const PatientHistoryGlobalModal = () => {
                       </div>
                       <div className="flex items-center gap-1">
                         <MapPinHouse className="h-3 w-3" />
-                        <span className="line-clamp-1">
+                        <span className="text-start line-clamp-1">
                           {[
                             patientData.street_address,
                             patientData.city,

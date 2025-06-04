@@ -266,14 +266,14 @@ const BillHistoryModal = ({
                     <div className="grid grid-cols-2 gap-2">
                       <div className="space-y-1">
                         <p className="text-sm font-medium">Bill Id</p>
-                        <div className="flex items-center h-9 text-muted-foreground w-full rounded-md border px-3 text-base md:text-sm !leading-9 shadow-sm">
+                        <div className="flex items-center min-h-9 text-muted-foreground w-full rounded-md border px-3 text-sm shadow-sm">
                           {selectedBillData.bill_id}
                         </div>
                       </div>
 
                       <div className="space-y-1">
                         <p className="text-sm font-medium">Prescription Id</p>
-                        <div className="flex items-center h-9 text-muted-foreground w-full rounded-md border px-3 text-base md:text-sm !leading-9 shadow-sm">
+                        <div className="flex items-center min-h-9 text-muted-foreground w-full rounded-md border px-3 text-sm shadow-sm">
                           {selectedBillData.prescription_id ?? "-"}
                         </div>
                       </div>
@@ -281,7 +281,7 @@ const BillHistoryModal = ({
 
                     <div className="space-y-1">
                       <p className="text-sm font-medium">Notes</p>
-                      <div className="flex items-center h-9 text-muted-foreground w-full rounded-md border px-3 text-base md:text-sm !leading-9 shadow-sm">
+                      <div className="flex items-center min-h-9 text-muted-foreground w-full rounded-md border px-3 py-1 text-sm shadow-sm">
                         {selectedBillData.notes ?? "-"}
                       </div>
                     </div>
@@ -483,7 +483,7 @@ const BillHistoryModal = ({
                 </div>
               </div>
             </div>
-            <DialogFooter className="bg-slate-50 dark:bg-gray-900 w-full gap-1 border-t px-4 py-2 flex flex-row justify-end items-center">
+            <DialogFooter className="bg-slate-50 dark:bg-gray-900 w-full gap-2 border-t px-4 py-2 flex flex-wrap-reverse flex-row justify-end items-center sm:space-x-0">
               <PrintButton
                 printType="bill"
                 data={{
@@ -521,10 +521,10 @@ const BillHistoryModal = ({
                 buttonProps={{
                   size: "icon",
                   className:
-                    "w-auto px-6 bg-gray-200 hover:bg-gray-300 text-gray-800 transition-colors",
+                    "w-full sm:w-auto px-6 bg-gray-200 hover:bg-gray-300 text-gray-800 transition-colors",
                 }}
               >
-                <PrinterIcon />
+                <PrinterIcon /> Print
               </PrintButton>
 
               {selectedBillData.payment_status === "Paid" && (
