@@ -1,20 +1,22 @@
 "use client";
-import { SignIn } from "@clerk/nextjs";
+import { SignUp } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
 import { useTheme } from "next-themes";
 import React from "react";
 
-const LoginBox = () => {
+const SignUpBox = () => {
   const { resolvedTheme } = useTheme();
 
   return (
-    <SignIn
+    <SignUp
       appearance={{
         elements: {
           logoBox: "hidden",
           rootBox: "flex justify-center items-center w-full",
           cardBox: "shadow-none w-full rounded-md",
-          card: "px-1 py-0 bg-transparent gap-5",
+          card: "px-1 pt-0 pb-6 bg-transparent gap-5",
+          dividerRow: "hidden",
+          form: "hidden",
           button: "h-11 rounded-md",
           footer: {
             display: "none",
@@ -26,4 +28,4 @@ const LoginBox = () => {
   );
 };
 
-export default LoginBox;
+export default SignUpBox;
