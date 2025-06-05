@@ -14,6 +14,7 @@ const LoginBox = () => {
           logoBox: "hidden",
           rootBox: "flex justify-center items-center w-full",
           cardBox: "shadow-none w-full rounded-md",
+          headerTitle :"text-base sm:text-xl",
           card: "px-1 py-0 bg-transparent gap-5",
           button: "h-11 rounded-md",
           footer: {

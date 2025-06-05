@@ -14,6 +14,7 @@ const SignUpBox = () => {
           logoBox: "hidden",
           rootBox: "flex justify-center items-center w-full",
           cardBox: "shadow-none w-full rounded-md",
+          headerTitle: "text-base sm:text-xl",
           card: "px-1 pt-0 pb-6 bg-transparent gap-5",
           dividerRow: "hidden",
           form: "hidden",
