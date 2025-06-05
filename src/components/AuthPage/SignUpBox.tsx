@@ -1,13 +1,10 @@
 "use client";
 import { SignUp } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
-import { useTheme } from "next-themes";
 import React from "react";
 import { Skeleton } from "../ui/skeleton";
 
 const SignUpBox = () => {
-  const { resolvedTheme } = useTheme();
-
   return (
     <SignUp
       fallback={
@@ -33,7 +30,7 @@ const SignUpBox = () => {
             display: "none",
           },
         },
-        baseTheme: resolvedTheme === "dark" ? dark : undefined,
+        baseTheme: dark,
       }}
     />
   );

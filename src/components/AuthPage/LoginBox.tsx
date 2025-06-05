@@ -1,12 +1,10 @@
 "use client";
 import { SignIn } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
-import { useTheme } from "next-themes";
 import React from "react";
 import { Skeleton } from "../ui/skeleton";
 
 const LoginBox = () => {
-  const { resolvedTheme } = useTheme();
 
   return (
     <SignIn
@@ -31,7 +29,7 @@ const LoginBox = () => {
             display: "none",
           },
         },
-        baseTheme: resolvedTheme === "dark" ? dark : undefined,
+        baseTheme: dark,
       }}
     />
   );
