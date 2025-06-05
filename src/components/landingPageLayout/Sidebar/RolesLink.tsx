@@ -17,9 +17,12 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { OrganizationList, useAuth } from "@clerk/nextjs";
+import { useTheme } from "next-themes";
+import { dark } from "@clerk/themes";
 
 const RolesLink = () => {
   const { orgRole, isLoaded } = useAuth();
+  const { resolvedTheme } = useTheme();
 
   return (
     <>
@@ -54,7 +57,8 @@ const RolesLink = () => {
                   rootBox: "w-full",
                   cardBox:
                     "max-w-full shadow-none w-full border-2 border-border rounded-md",
-                  card: "w-full shadow-none bg-muted/50 rounded-none pt-0",
+                  organizationListPreviewItems: "border-t-0",
+                  card: "w-full shadow-none bg-muted/50 rounded-none",
                   organizationPreviewMainIdentifier: "text-foreground",
                   footer: {
                     display: "none",
@@ -63,6 +67,7 @@ const RolesLink = () => {
                     display: "none",
                   },
                 },
+                baseTheme: resolvedTheme === "dark" ? dark : undefined,
               }}
             />
             <DialogFooter className="sm:justify-center">

@@ -1,9 +1,11 @@
 import FlickeringGrid from "@/components/AuthPage/FlickeringGrid";
 import Image from "next/image";
 import { Typewriter } from "@/components/common/Text-Typing";
-import { SignIn } from "@clerk/nextjs";
+import LoginBox from "@/components/AuthPage/LoginBox";
+import Link from "next/link";
 
 const Page = () => {
+
   return (
     <>
       <section className="relative h-svh w-full overflow-hidden flex justify-center">
@@ -28,25 +30,31 @@ const Page = () => {
             </div>
           </div>
 
-          <div className="z-50 max-h-min py-8 px-[12.5%] bg-background w-full flex flex-1 flex-col items-center rounded- justify-between rounded-t-3xl overflow-hidden transition-all shadow-[0_0_20px_2px_rgba(8,_112,_184,_0.7)]">
-            <div className="h-11 flex items-center justify-center md:w-3/5">
-              <SignIn
-                appearance={{
-                  elements: {
-                    header: "hidden",
-                    rootBox: "flex justify-center items-center w-full",
-                    cardBox: "shadow-none w-full rounded-md",
-                    card: "w-full shadow-none p-0",
-                    main: "gap-0",
-                    button:
-                      "bg-primary text-primary-foreground hover:text-primary hover:bg-secondary h-11 !border border-border rounded-md",
-                    footer: {
-                      display: "none",
-                    },
-                  },
-                }}
-              />
+          <div className="z-50 max-h-fit py-8 px-[12.5%] bg-background w-full flex flex-1 flex-col items-center rounded- justify-between rounded-t-3xl overflow-hidden transition-all shadow-[0_0_20px_2px_rgba(8,_112,_184,_0.7)]">
+            <div className="flex items-center justify-center md:w-3/5">
+              <LoginBox />
             </div>
+
+
+          <p className='text-muted-foreground px-8 text-center text-sm mt-5'>
+            By clicking continue, you agree to our{' '}
+            <Link
+              href='/terms'
+              className='hover:text-primary underline underline-offset-4'
+            >
+              Terms of Service
+            </Link>{' '}
+            and{' '}
+            <Link
+              href='/privacy'
+              className='hover:text-primary underline underline-offset-4'
+            >
+              Privacy Policy
+            </Link>
+            .
+          </p>
+
+
             <Image
               alt="Logo"
               src="/Logo.svg"
