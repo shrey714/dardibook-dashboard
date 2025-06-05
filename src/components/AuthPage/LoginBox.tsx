@@ -11,12 +11,11 @@ const LoginBox = () => {
     <SignIn
       appearance={{
         elements: {
-        //   header: "hidden",
+          logoBox: "hidden",
           rootBox: "flex justify-center items-center w-full",
           cardBox: "shadow-none w-full rounded-md",
           card: "p-6 pb-0",
-          button:
-            "h-11 rounded-md",
+          button: "h-11 rounded-md",
           footer: {
             display: "none",
           },
