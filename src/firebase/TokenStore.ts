@@ -395,12 +395,12 @@ export const useTokenWithOrganization = () => {
   const options = useMemo(() => {
     return (
       memberships?.data
-        ?.filter((member) => !!member.publicUserData.userId)
+        ?.filter((member) => !!member.publicUserData?.userId)
         .map((member) => ({
-          value: member.publicUserData.userId!,
+          value: member.publicUserData?.userId || "",
           label: [
-            member.publicUserData.firstName,
-            member.publicUserData.lastName,
+            member.publicUserData?.firstName,
+            member.publicUserData?.lastName,
           ]
             .filter(Boolean)
             .join(" "),

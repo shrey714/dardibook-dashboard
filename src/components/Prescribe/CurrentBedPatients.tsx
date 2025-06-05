@@ -130,7 +130,7 @@ const CurrentBedPatients = () => {
                         ["org:doctor", "org:clinic_head"].includes(member.role)
                       )
                       ?.map((member, index) =>
-                        member.publicUserData.userId ? (
+                        member.publicUserData?.userId ? (
                           <SelectItem
                             value={member.publicUserData.userId}
                             key={index}
@@ -395,7 +395,7 @@ const CurrentBedPatients = () => {
                           )
                         )
                         ?.map((member, index) =>
-                          member.publicUserData.userId ? (
+                          member.publicUserData?.userId ? (
                             <SelectItem
                               value={member.publicUserData.userId}
                               key={index}
