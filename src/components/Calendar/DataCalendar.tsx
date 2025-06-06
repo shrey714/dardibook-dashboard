@@ -239,9 +239,9 @@ export default function DataCalendar({
         plugins={[dayGridPlugin, interactionPlugin]} //timeGridPlugin
         dayMaxEventRows={true}
         headerToolbar={{
-          right: "prev,next today",
-          center: "title",
-          left: "", //dayGridMonth,timeGridWeek
+          right: "",
+          center: "",
+          left: "title prev,next today", //dayGridMonth,timeGridWeek
         }}
         nowIndicator={true}
         // moreLinkClick={(events) => {
@@ -269,7 +269,7 @@ export default function DataCalendar({
         events={calendarData.map((event) => {
           if (event.event_type === "bed") {
             return {
-              title: `${event.bed_details.bedId} (${event.patient_id})`,
+              title: `${event.bed_details.bedId} - ${event.patient_name}`,
               start: format(
                 new Date(event.bed_details.admission_at),
                 "yyyy-MM-dd'T'HH:mm:ss"
@@ -292,7 +292,7 @@ export default function DataCalendar({
             };
           } else if (event.event_type === "appointment") {
             return {
-              title: `${event.patient_id}`,
+              title: `${event.patient_name}`,
               date: format(
                 new Date(event.appointment_details.registered_at),
                 "yyyy-MM-dd"
@@ -314,11 +314,11 @@ export default function DataCalendar({
           }
         })}
         eventContent={(eventInfo) => (
-          <span className="flex flex-row gap-1 items-center px-2">
+          <span className="flex flex-row gap-0.5 sm:gap-1 items-center px-1 sm:px-2 text-[8px] sm:text-sm overflow-hidden text-clip">
             {eventInfo.event.extendedProps?.Data.event_type === "bed" ? (
-              <BedSingle size={15} />
+              <BedSingle className="size-2.5 sm:size-3.5 shrink-0" />
             ) : (
-              <UserPlus size={15} />
+              <UserPlus className="size-2.5 sm:size-3.5 shrink-0" />
             )}
             {eventInfo.event.title}
           </span>

@@ -8,9 +8,20 @@ import {
   isSameMonth,
   addDays,
   isSameDay,
+  format,
 } from "date-fns";
 import DataCalendar from "@/components/Calendar/DataCalendar";
-import { query, collection, where, and, or, getDocs } from "firebase/firestore";
+import {
+  query,
+  collection,
+  where,
+  and,
+  or,
+  doc as dbDoc,
+  getDocs,
+  getDoc,
+} from "firebase/firestore";
+
 import { db } from "@/firebase/firebaseConfig";
 import { DatesSetArg } from "@fullcalendar/core/index.js";
 import {
@@ -43,6 +54,12 @@ function chunkArray<T>(array: T[], chunkSize: number): T[][] {
   return chunks;
 }
 
+const memoryCache = new Map<
+  string,
+  { data: CalendarEventTypes[]; timestamp: number }
+>();
+const CACHE_DURATION_MS = 1 * 60 * 1000; // 1 hour
+
 export default function TaskPage() {
   const { isLoaded, orgId } = useAuth();
   const [loader, setLoader] = useState(false);
@@ -52,6 +69,39 @@ export default function TaskPage() {
   useEffect(() => {
     const getBillsGenerated = async () => {
       if (isLoaded && orgId && monthDate) {
+        const cacheKey = `calendarData_${orgId}_${format(
+          monthDate,
+          "yyyy-MM"
+        )}`;
+        const now = Date.now();
+
+        // 1. Check memory cache
+        const memoryEntry = memoryCache.get(cacheKey);
+        if (memoryEntry && now - memoryEntry.timestamp < CACHE_DURATION_MS) {
+          setCalendarData(memoryEntry.data);
+          return;
+        }
+
+        // 2. Check localStorage cache
+        const localEntry = localStorage.getItem(cacheKey);
+        if (localEntry) {
+          try {
+            const parsed = JSON.parse(localEntry) as {
+              data: CalendarEventTypes[];
+              timestamp: number;
+            };
+            if (now - parsed.timestamp < CACHE_DURATION_MS) {
+              memoryCache.set(cacheKey, parsed); // hydrate memory
+              setCalendarData(parsed.data);
+              return;
+            } else {
+              localStorage.removeItem(cacheKey); // expired
+            }
+          } catch (err) {
+            console.warn("Invalid cache format", err);
+          }
+        }
+
         try {
           setLoader(true);
 
@@ -90,11 +140,48 @@ export default function TaskPage() {
 
           const calendarEvents: CalendarEventTypes[] = [];
 
+          const patientMap = new Map<string, RegisterPatientFormTypes>();
+
+          patientsSnaps.forEach((snap) => {
+            snap.forEach((doc) => {
+              const patient = doc.data() as RegisterPatientFormTypes;
+              patientMap.set(patient.patient_id, patient); // cache by patient_id
+            });
+          });
           // Collect beds
-          bedsSnap.forEach((doc) => {
+          for (const doc of bedsSnap.docs) {
             const bed = doc.data() as OrgBed;
+
+            // Try to get patient name from cache
+            let patientName: string | undefined = patientMap.get(
+              bed.patient_id
+            )?.name;
+
+            // If not found, fetch from Firestore
+            if (!patientName) {
+              try {
+                const patientDoc = await getDoc(
+                  dbDoc(db, "doctor", orgId, "patients", bed.patient_id)
+                );
+                if (patientDoc.exists()) {
+                  const patientData =
+                    patientDoc.data() as RegisterPatientFormTypes;
+                  patientName = patientData.name;
+                  console.log("patientName==", patientName);
+                  patientMap.set(patientData.patient_id, patientData); // cache it
+                }
+              } catch (err) {
+                console.error(
+                  "Failed to fetch patient for bed",
+                  bed.patient_id,
+                  err
+                );
+              }
+            }
+
             calendarEvents.push({
               patient_id: bed.patient_id,
+              patient_name: patientName,
               event_type: "bed",
               bed_details: {
                 bedId: bed.bedId,
@@ -103,7 +190,7 @@ export default function TaskPage() {
                 dischargeMarked: bed.dischargeMarked,
               },
             });
-          });
+          }
 
           // Collect all patients
           patientsSnaps.forEach((snap) => {
@@ -114,6 +201,7 @@ export default function TaskPage() {
                 if (isSameMonth(r_date_time, monthDate)) {
                   calendarEvents.push({
                     patient_id: patient.patient_id,
+                    patient_name: patient.name,
                     event_type: "appointment",
                     appointment_details: {
                       registered_at: r_date_time,
@@ -132,6 +220,10 @@ export default function TaskPage() {
 
           // Set final calendar data
           setCalendarData(calendarEvents);
+
+          const cacheEntry = { data: calendarEvents, timestamp: now };
+          memoryCache.set(cacheKey, cacheEntry);
+          localStorage.setItem(cacheKey, JSON.stringify(cacheEntry));
 
           setLoader(false);
         } catch (error) {
@@ -153,11 +245,11 @@ export default function TaskPage() {
 
   return (
     <>
-      <div className="w-full py-2 px-2 h-full">
-        {loader && (
-          <div className="h-full w-full bg-background/80 absolute z-[2]"></div>
-        )}
+      {loader && (
+        <div className="h-full w-full bg-background/80 absolute z-[2]"></div>
+      )}
 
+      <div className="w-full p-0 pt-1 sm:p-1 h-full">
         <DataCalendar
           calendarData={calendarData}
           handleDatesSet={handleDatesSet}

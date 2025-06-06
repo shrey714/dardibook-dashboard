@@ -165,6 +165,7 @@ export interface PharmacySelectedPatientType {
 
 type BasePatientInfo = {
     patient_id: string;
+    patient_name?: string;
 };
 
 export type CalendarEventTypes =

@@ -368,6 +368,17 @@ body {
 }
 
 /* calendar style */
+@layer base {
+  :root {
+    --fc-border-color: hsl(var(--border));
+    --fc-other-day-background-color: #eaecee;
+  }
+
+  .dark {
+    --fc-border-color: hsl(var(--border));
+    --fc-other-day-background-color: #000000;
+  }
+}
 
 .fc .fc-toolbar.fc-header-toolbar {
   margin-bottom: 8px;
@@ -383,5 +394,83 @@ body {
 }
 
 .fc .fc-more-popover {
-  background: hsl(var(--background)) ;
+  background: hsl(var(--background));
+}
+
+.fc .fc-col-header-cell-cushion {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  text-transform: uppercase;
+}
+
+.fc .fc-daygrid-day-number {
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: .3px;
+  white-space: nowrap;
+  color: hsl(var(--muted-foreground));
+  line-height: 16px;
+  pointer-events: auto;
+}
+
+.fc .fc-daygrid-day-top {
+  justify-content: center;
+}
+
+.fc .fc-day-today .fc-daygrid-day-number {
+  color: #062e6f;
+  margin-top: 4px;
+  background-color: #a8c7fa;
+  width: max-content;
+  min-width: 24px;
+  border-radius: 50%;
+  text-align: center;
+  aspect-ratio: 1 / 1;
+  pointer-events: auto;
+}
+
+.fc .fc-toolbar.fc-header-toolbar {
+  margin-bottom: 4px;
+}
+
+.fc .fc-toolbar.fc-header-toolbar .fc-toolbar-chunk {
+  display: flex;
+  align-items: center;
+  padding-inline: 8px;
+}
+
+.fc .fc-toolbar.fc-header-toolbar .fc-button-primary.fc-button {
+  background-color: transparent;
+  border: none;
+  font-size: small;
+}
+
+.fc .fc-toolbar.fc-header-toolbar .fc-button-primary:focus {
+  box-shadow: none;
+}
+
+.fc .fc-toolbar.fc-header-toolbar .fc-toolbar-title {
+  border: 1px solid hsl(var(--muted-foreground));
+  color: hsl(var(--muted-foreground));
+  border-radius: 999px;
+  padding-inline: 6px 24px;
+  font-size: 16px;
+  line-height: normal;
+  min-width: 150px;
+  text-align: center;
+}
+
+.fc .fc-toolbar.fc-header-toolbar .fc-button-primary.fc-today-button {
+  padding: 0px;
+  font-size: 14px;
+  line-height: normal;
+}
+
+.fc .fc-toolbar.fc-header-toolbar .fc-button-primary.fc-today-button:hover {
+  text-decoration: underline;
+}
+
+.fc .fc-toolbar.fc-header-toolbar .fc-button-primary.fc-today-button:disabled {
+  display: none;
 }
