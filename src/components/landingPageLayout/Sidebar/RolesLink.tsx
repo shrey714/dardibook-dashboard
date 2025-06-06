@@ -58,7 +58,7 @@ const RolesLink = () => {
                   cardBox:
                     "max-w-full shadow-none w-full border-2 border-border rounded-md",
                   organizationListPreviewItems: "border-t-0",
-                  card: "w-full shadow-none bg-muted/50 rounded-none",
+                  card: "w-full shadow-none bg-muted/50 rounded-none p-0",
                   organizationPreviewMainIdentifier: "text-foreground",
                   footer: {
                     display: "none",
