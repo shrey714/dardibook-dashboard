@@ -8,7 +8,7 @@ const Page = () => {
       className="relative h-svh w-full overflow-hidden flex justify-center items-center"
       style={{
         background:
-          "linear-gradient(155deg, rgb(0, 0, 0) 0%, rgb(11, 0, 74) 38%, rgb(0, 73, 184) 75%, rgb(48, 131, 236) 100%)",
+          "linear-gradient(160deg, #020617 0%, #081C4F 35%, #0B3B7B 70%, #2A7FD0 100%)",
       }}
     >
       <main className="z-[1] flex flex-col justify-center p-4 sm:p-9 box-border flex-[1_1_0%] max-w-[90%] sm:max-w-[500px] bg-black/25 backdrop-blur-[20px] rounded-[20px] md:min-w-[330px]">
