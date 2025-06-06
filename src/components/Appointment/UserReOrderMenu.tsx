@@ -378,10 +378,10 @@ export const UserReOrderMenu: React.FC<UserReOrderMenuProps> = ({
             name="registerd_for"
             onValueChange={(val) => {
               const member = memberships?.data?.find(
-                (mem) => mem.publicUserData.userId === val
+                (mem) => mem.publicUserData?.userId === val
               );
 
-              if (member && member.publicUserData.userId) {
+              if (member && member.publicUserData?.userId) {
                 const {
                   userId,
                   firstName = "",
@@ -410,7 +410,7 @@ export const UserReOrderMenu: React.FC<UserReOrderMenuProps> = ({
             <SelectContent>
               {memberships &&
                 memberships.data?.map((member, index) =>
-                  member.publicUserData.userId ? (
+                  member.publicUserData?.userId ? (
                     <SelectItem
                       value={member.publicUserData.userId}
                       key={index}

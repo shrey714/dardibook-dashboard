@@ -167,7 +167,7 @@ const QueueList: React.FC = () => {
                       ["org:doctor", "org:clinic_head"].includes(member.role)
                     )
                     ?.map((member, index) =>
-                      member.publicUserData.userId ? (
+                      member.publicUserData?.userId ? (
                         <SelectItem
                           value={member.publicUserData.userId}
                           key={index}
@@ -207,7 +207,7 @@ const QueueList: React.FC = () => {
               <SelectContent>
                 {memberships &&
                   memberships.data?.map((member, index) =>
-                    member.publicUserData.userId ? (
+                    member.publicUserData?.userId ? (
                       <SelectItem
                         value={member.publicUserData.userId}
                         key={index}
@@ -318,7 +318,7 @@ const QueueList: React.FC = () => {
                             )
                           )
                           ?.map((member, index) =>
-                            member.publicUserData.userId ? (
+                            member.publicUserData?.userId ? (
                               <SelectItem
                                 value={member.publicUserData.userId}
                                 key={index}
@@ -358,7 +358,7 @@ const QueueList: React.FC = () => {
                     <SelectContent>
                       {memberships &&
                         memberships.data?.map((member, index) =>
-                          member.publicUserData.userId ? (
+                          member.publicUserData?.userId ? (
                             <SelectItem
                               value={member.publicUserData.userId}
                               key={index}

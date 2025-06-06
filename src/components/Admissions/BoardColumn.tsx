@@ -7,12 +7,11 @@ import { cva } from "class-variance-authority";
 import {
   Card,
   CardContent,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "../ui/card";
 import { Button } from "@/components/ui/button";
-import { BadgePlusIcon, GripVertical, Trash } from "lucide-react";
+import {Trash, UserPlus, Users } from "lucide-react";
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 import { BedInfo, BedPatientTypes, OrgBed } from "@/types/FormTypes";
 import Loader from "../common/Loader";
@@ -123,19 +122,38 @@ export function BoardColumn({
               <p className="flex flex-1 justify-center">${column.id}</p>
             </CardTitle>
             <CardContent className="p-2">
-              <p className="flex justify-around items-center">
-                Admit Patient
+              <div className="flex flex-row justify-around items-center gap-2">
                 <Button
-                  className=""
+                  className="bg-blue-500"
                   variant="outline"
-                  size="sm"
+                  // size="sm"
                   onClick={() => {
                     openAddModal(column.id);
                   }}
                 >
-                  <BadgePlusIcon />
+                  <UserPlus />
                 </Button>
-              </p>
+                <div className="flex-1 h-9 flex border-gray-400 rounded-lg bg-green-300 justify-center items-center gap-2">
+                  <Users />
+                  <p className="text-center text-md">{tasks.length}</p>
+                </div>
+                <Button
+                  className={`${
+                    !!tasks.length || loading ? "cursor-not-allowed opacity-50" : ""
+                  }`}
+                  variant={"destructive"}
+                  onClick={deleteHandler}
+                  aria-disabled={!!tasks.length || loading}
+                >
+                  {deleteLoader ? (
+                    <Loader />
+                  ) : (
+                    <>
+                      <Trash />
+                    </>
+                  )}
+                </Button>
+              </div>
             </CardContent>
           </CardHeader>
         </Card>
@@ -171,7 +189,7 @@ export function BoardColumn({
           </SortableContext>
         )}
       </CardContent>
-      {!tasks.length && !loading && (
+      {/* {!tasks.length && !loading && (
         <CardFooter className="p-0">
           <Button
             className="w-full mx-4"
@@ -187,7 +205,7 @@ export function BoardColumn({
             )}
           </Button>
         </CardFooter>
-      )}
+      )} */}
     </Card>
   );
 }

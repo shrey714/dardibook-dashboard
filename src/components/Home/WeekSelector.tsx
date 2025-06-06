@@ -40,6 +40,7 @@ const WeekSelector = () => {
   }, [searchParams]);
 
   const [date, setDate] = React.useState(initialDate);
+  const [disableBtns, setDisableBtns] = React.useState(false);
   const weekStart = startOfWeek(date, {
     weekStartsOn: 1,
   });
@@ -49,6 +50,7 @@ const WeekSelector = () => {
 
   useEffect(() => {
     setDate(initialDate);
+    setDisableBtns(false);
   }, [initialDate]);
 
   const updateURL = (newDate: Date) => {
@@ -57,6 +59,7 @@ const WeekSelector = () => {
     const newSearchParams = new URLSearchParams(searchParams.toString());
     newSearchParams.set("weekDate", getTime(newDate).toString());
     router.push(`?${newSearchParams.toString()}`); // triggers SSR + loading.tsx
+    setDisableBtns(true);
   };
 
   const previousWeek = () => {
@@ -92,6 +95,7 @@ const WeekSelector = () => {
     <Popover>
       <div className="flex flex-row h-full w-[90%] mx-auto sm:mx-0 sm:w-auto shadow-sm rounded-md overflow-hidden">
         <Button
+          disabled={disableBtns}
           variant="outline"
           size="default"
           onClick={previousWeek}
@@ -100,7 +104,10 @@ const WeekSelector = () => {
           <ChevronLeft className="h-4 w-4" />
           <span className="sr-only">Previous week</span>
         </Button>
-        <PopoverTrigger className="border-y px-2 w-full sm:w-auto bg-border hover:bg-accent transition-colors ">
+        <PopoverTrigger
+          disabled={disableBtns}
+          className="border-y px-2 w-full sm:w-auto bg-border hover:bg-accent transition-colors disabled:pointer-events-none disabled:opacity-50"
+        >
           <div className="text-sm font-medium text-muted-foreground min-w-44 w-full sm:w-min leading-normal h-full flex items-center justify-center relative overflow-hidden">
             <AnimatePresence mode="wait" custom={direction}>
               <motion.div
@@ -118,6 +125,7 @@ const WeekSelector = () => {
           </div>
         </PopoverTrigger>
         <Button
+          disabled={disableBtns}
           variant="outline"
           size="default"
           onClick={nextWeek}

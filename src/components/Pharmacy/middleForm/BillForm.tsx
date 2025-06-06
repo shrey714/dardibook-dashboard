@@ -44,15 +44,24 @@ import {
 import { Trash, Plus, Save } from "lucide-react";
 import { useForm } from "react-hook-form";
 import {
+  MedicineItems,
+  MedicinesDetails,
   PharmacySelectedPatientType,
+  PharmacyTypes,
   PrescriptionFormTypes,
+  ServiceItems,
 } from "@/types/FormTypes";
+import { doc, setDoc } from "firebase/firestore";
+import { db } from "@/firebase/firebaseConfig";
+import toast from "react-hot-toast";
 import { Badge } from "@/components/ui/badge";
 import { AnimatePresence, motion } from "framer-motion";
+import { useAuth, useOrganization, useUser } from "@clerk/nextjs";
+import { getMedicines } from "@/app/services/crudMedicine";
 
 const calculateTotalAmount = (
-  medicines: any[],
-  services: any[],
+  medicines: MedicineItems[],
+  services: ServiceItems[],
   discount: number = 0,
   taxPercentage: number = 0
 ): number => {
@@ -81,208 +90,123 @@ const generateBillId = (): string => {
     .padStart(3, "0")}`;
 };
 
+interface ServiceType {
+  price: number;
+  service_id: string;
+  service_name: string;
+}
+
 interface BillFormTypes {
   selectedPatient?: PharmacySelectedPatientType;
   selectedPrescription?: PrescriptionFormTypes;
 }
 
 const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
-  const [selectedMedicines, setSelectedMedicines] = useState<any[]>([]);
-  const [selectedServices, setSelectedServices] = useState<any[]>([]);
+  const { orgId } = useAuth();
+  const { user } = useUser();
+  const { organization, isLoaded } = useOrganization();
+  const [selectedMedicines, setSelectedMedicines] = useState<MedicineItems[]>(
+    []
+  );
+  const [selectedServices, setSelectedServices] = useState<ServiceItems[]>([]);
   const [medicineToAdd, setMedicineToAdd] = useState<string>("");
-  const [serviceToAdd, setServiceToAdd] = useState<string>("");
+  const [serviceToAdd, setServiceToAdd] = useState<ServiceType>();
   const [quantity, setQuantity] = useState<number>(1);
   const [discount, setDiscount] = useState<number>(0);
   const [taxPercentage, setTaxPercentage] = useState<number>(0);
   const [notes, setNotes] = useState<string>("");
   const [paymentMethod, setPaymentMethod] = useState<
-    "Cash" | "Card" | "UPI" | "Online" | ""
-  >("");
-  const [paymentStatus, setPaymentStatus] = useState<any>("Unpaid");
+    "Cash" | "Card" | "UPI" | "Online"
+  >("Card");
+  const [paymentStatus, setPaymentStatus] = useState<
+    "Paid" | "Unpaid" | "Not Required" | "Refunded"
+  >("Unpaid");
 
-  const [bills, setBills] = useState<any[]>([]);
-  const [medicines, setMedicines] = useState<any[]>([]);
-  const [services, setServices] = useState<any[]>([]);
+  const [medicines, setMedicines] = useState<MedicinesDetails[]>([]);
+  const [services, setServices] = useState<ServiceType[]>([]);
+
+  const [prescribedMedicines, setprescribedMedicines] = useState<
+    MedicineItems[]
+  >([]);
+
   useEffect(() => {
-    const fetchData = async () => {
-      setBills([
-        {
-          bill_id: "BILL-20250413-001",
-          name: "James Anderson",
-          mobile: "9876543210",
-          gender: "Male",
-          medicines: [],
-          services: [],
-          generated_at: Date.now() - 7200000, // 2 hours ago
-          payment_status: "Paid",
-          total_amount: 750.5,
-          payment_method: "Card",
-        },
-        {
-          bill_id: "BILL-20250413-002",
-          name: "Sophia Martinez",
-          mobile: "8765432109",
-          gender: "Female",
-          medicines: [],
-          services: [],
-          generated_at: Date.now() - 3600000, // 1 hour ago
-          payment_status: "Unpaid",
-          total_amount: 1250.75,
-        },
-        {
-          bill_id: "BILL-20250413-003",
-          name: "William Taylor",
-          mobile: "7654321098",
-          gender: "Male",
-          medicines: [],
-          services: [],
-          generated_at: Date.now() - 1800000, // 30 minutes ago
-          payment_status: "Paid",
-          total_amount: 500.25,
-          payment_method: "Cash",
-        },
-      ]);
+    if (selectedPrescription) {
+      setprescribedMedicines(
+        selectedPrescription.medicines.map((medicine) => ({
+          ...medicine,
+          quantity: 0,
+          price: 0,
+        }))
+      );
+    }
+  }, [selectedPrescription]);
 
-      setMedicines([
-        {
-          id: "med1",
-          medicineName: "Paracetamol",
-          instruction: "Take as needed for pain",
-          dosages: "After Meal",
-          type: "Tablet",
-          duration: 5,
-          durationType: "days",
-          quantity: 10,
-          price: 5.5,
-        },
-        {
-          id: "med2",
-          medicineName: "Amoxicillin",
-          instruction: "Take regularly as prescribed",
-          dosages: "After Meal",
-          type: "Capsule",
-          duration: 7,
-          durationType: "days",
-          quantity: 21,
-          price: 12.75,
-        },
-        {
-          id: "med3",
-          medicineName: "Cetirizine",
-          instruction: "Take once daily",
-          dosages: "Before Meal",
-          type: "Tablet",
-          duration: 10,
-          durationType: "days",
-          quantity: 10,
-          price: 8.25,
-        },
-        {
-          id: "med4",
-          medicineName: "Omeprazole",
-          instruction: "Take before breakfast",
-          dosages: "Before Meal",
-          type: "Capsule",
-          duration: 14,
-          durationType: "days",
-          quantity: 14,
-          price: 15.5,
-        },
-        {
-          id: "med5",
-          medicineName: "Azithromycin",
-          instruction: "Take once daily",
-          dosages: "After Meal",
-          type: "Tablet",
-          duration: 5,
-          durationType: "days",
-          quantity: 5,
-          price: 45.0,
-        },
-      ]);
-
-      setServices([
-        {
-          service_id: "srv1",
-          service_name: "Blood Test - Complete CBC",
-          price: 250.0,
-        },
-        {
-          service_id: "srv2",
-          service_name: "X-Ray - Chest",
-          price: 500.0,
-        },
-        {
-          service_id: "srv3",
-          service_name: "ECG",
-          price: 350.0,
-        },
-        {
-          service_id: "srv4",
-          service_name: "Consultation - General",
-          price: 300.0,
-        },
-        {
-          service_id: "srv5",
-          service_name: "Consultation - Specialist",
-          price: 600.0,
-        },
-        {
-          service_id: "srv6",
-          service_name: "Wound Dressing",
-          price: 200.0,
-        },
-      ]);
+  useEffect(() => {
+    const fetchmedicine = async () => {
+      if (orgId) {
+        const data = await getMedicines(orgId);
+        if (data?.data) {
+          setMedicines(data?.data);
+        } else {
+          setMedicines([]);
+        }
+      }
     };
-
-    fetchData();
+    fetchmedicine();
   }, []);
 
-  useEffect(() => {}, [selectedPatient?.patient_id]);
+  useEffect(() => {
+    if (isLoaded && organization && organization.publicMetadata.services) {
+      setServices(organization.publicMetadata.services as ServiceType[]);
+    } else {
+      setServices([]);
+    }
+  }, [isLoaded, orgId, organization]);
+
+  useEffect(() => {
+    if (selectedPatient) {
+      form.reset({
+        name: selectedPatient.name,
+        mobile: selectedPatient.mobile,
+        gender: selectedPatient.gender,
+      });
+    } else {
+      form.reset({
+        name: "",
+        mobile: "",
+        gender: "Male",
+      });
+    }
+  }, [selectedPatient]);
 
   const form = useForm<{
     name: string;
     mobile: string;
-    gender: "Male" | "Female" | "Other" | "";
-    age: string;
-    address: string;
+    gender: "Male" | "Female" | "Other";
   }>({
     defaultValues: {
       name: selectedPatient?.name || "",
       mobile: selectedPatient?.mobile || "",
-      gender: selectedPatient?.gender || "",
-      age: "",
-      address: "",
+      gender: selectedPatient?.gender || "Male",
     },
-  });
-
-  // Update form when selected patient changes
-  useState(() => {
-    if (selectedPatient) {
-      form.reset({
-        name: selectedPatient.name || "",
-        mobile: selectedPatient.mobile || "",
-        gender: selectedPatient.gender || "",
-        age: "",
-        address: "",
-      });
-    }
   });
 
   const handleAddMedicine = () => {
     if (!medicineToAdd) return;
-
-    const medicineDetails = medicines.find(
-      (med: any) => med.id === medicineToAdd
-    );
-
+    const medicineDetails = medicines.find((med) => med.id === medicineToAdd);
     if (medicineDetails) {
       setSelectedMedicines([
         ...selectedMedicines,
         {
           ...medicineDetails,
           quantity: quantity,
-          price: medicineDetails.price,
+          price: 0,
+          dosages: {
+            morning: "",
+            evening: "",
+            afternoon: "",
+            night: "",
+          },
         },
       ]);
       setMedicineToAdd("");
@@ -293,19 +217,15 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
   const handleAddService = () => {
     if (!serviceToAdd) return;
 
-    const serviceDetails = services.find(
-      (service: any) => service.service_id === serviceToAdd
-    );
-
-    if (serviceDetails) {
+    if (serviceToAdd) {
       setSelectedServices([
         ...selectedServices,
         {
-          ...serviceDetails,
+          ...serviceToAdd,
           quantity: 1,
         },
       ]);
-      setServiceToAdd("");
+      setServiceToAdd(undefined);
     }
   };
 
@@ -330,6 +250,15 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
     setSelectedMedicines(newMedicines);
   };
 
+  const handleUpdateMedicinePrice = (index: number, price: number) => {
+    const newMedicines = [...selectedMedicines];
+    newMedicines[index] = {
+      ...newMedicines[index],
+      price,
+    };
+    setSelectedMedicines(newMedicines);
+  };
+
   const handleUpdateServiceQuantity = (index: number, quantity: number) => {
     const newServices = [...selectedServices];
     newServices[index] = {
@@ -339,8 +268,41 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
     setSelectedServices(newServices);
   };
 
+  const handleUpdateServicePrice = (index: number, price: number) => {
+    const newServices = [...selectedServices];
+    newServices[index] = {
+      ...newServices[index],
+      price,
+    };
+    setSelectedServices(newServices);
+  };
+
+  const handleUpdatePrescribedMedicineQuantity = (
+    index: number,
+    quantity: number
+  ) => {
+    const newMedicines = [...prescribedMedicines];
+    newMedicines[index] = {
+      ...newMedicines[index],
+      quantity,
+    };
+    setprescribedMedicines(newMedicines);
+  };
+
+  const handleUpdatePrescribedMedicinePrice = (
+    index: number,
+    price: number
+  ) => {
+    const newMedicines = [...prescribedMedicines];
+    newMedicines[index] = {
+      ...newMedicines[index],
+      price,
+    };
+    setprescribedMedicines(newMedicines);
+  };
+
   const totalAmount = calculateTotalAmount(
-    selectedMedicines,
+    selectedPrescription ? prescribedMedicines : selectedMedicines,
     selectedServices,
     discount,
     taxPercentage
@@ -349,36 +311,84 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
   const handleSaveBill = () => {
     const formValues = form.getValues();
 
-    const newBill = {
-      bill_id: generateBillId(),
-      name: formValues.name,
-      patient_id: selectedPatient?.patient_id,
-      mobile: formValues.mobile,
-      gender: formValues.gender,
-      age: formValues.age,
-      address: formValues.address,
-      medicines: selectedMedicines,
-      services: selectedServices,
-      generated_at: Date.now(),
-      payment_status: paymentStatus,
-      total_amount: totalAmount,
-      discount: discount,
-      payment_method: paymentMethod,
-      tax_percentage: taxPercentage,
-      notes: notes,
-    };
+    if (user && orgId) {
+      const newBill = {
+        bill_id: generateBillId(),
+        name: formValues.name,
+        mobile: formValues.mobile,
+        gender: formValues.gender,
+        generated_at: Date.now(),
+        generated_by: {
+          id: user.id,
+          name: user.fullName || "",
+          email: user.primaryEmailAddress?.emailAddress || "",
+        },
+        payment_status: paymentStatus,
+        total_amount: totalAmount,
+        discount: discount,
+        tax_percentage: taxPercentage,
+        notes: notes,
+        payment_method: paymentMethod,
+      };
+      const generatdBill: PharmacyTypes = selectedPatient
+        ? selectedPrescription
+          ? {
+              ...newBill,
+              prescription_id: selectedPrescription.prescription_id,
+              patient_id: selectedPatient.patient_id,
+              medicines: prescribedMedicines,
+              prescribed_by: {
+                id: selectedPrescription.prescribed_by.id,
+                name: selectedPrescription.prescribed_by.name,
+                email: selectedPrescription.prescribed_by.email,
+              },
+              services: [],
+            }
+          : {
+              ...newBill,
+              patient_id: selectedPatient.patient_id,
+              medicines: selectedMedicines,
+              services: selectedServices,
+            }
+        : {
+            ...newBill,
+            medicines: selectedMedicines,
+            services: selectedServices,
+          };
 
-    console.log(newBill);
-
-    // Reset form
-    form.reset();
-    setSelectedMedicines([]);
-    setSelectedServices([]);
-    setDiscount(0);
-    setTaxPercentage(0);
-    setNotes("");
-    setPaymentMethod("");
-    setPaymentStatus("Unpaid");
+      toast.promise(
+        async () => {
+          // setSubmissionLoader(true);
+          await setDoc(
+            doc(db, "doctor", orgId, "bills", newBill.bill_id),
+            generatdBill
+          ).then(
+            () => {
+              // setSubmissionLoader(false);
+              form.reset();
+              setSelectedMedicines([]);
+              setSelectedServices([]);
+              setDiscount(0);
+              setTaxPercentage(0);
+              setNotes("");
+              setPaymentMethod("Cash");
+              setPaymentStatus("Unpaid");
+            },
+            () => {
+              // setSubmissionLoader(false);
+            }
+          );
+        },
+        {
+          loading: "Loading...",
+          success: "Bill generated successfully",
+          error: "Failed to generate bill",
+        },
+        {
+          position: "bottom-left",
+        }
+      );
+    }
   };
 
   return (
@@ -528,13 +538,13 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                         <TableHead>Dosage</TableHead>
                         <TableHead>Duration</TableHead>
                         <TableHead>Qty</TableHead>
-                        <TableHead>Price</TableHead>
-                        <TableHead>Total</TableHead>
+                        <TableHead>Price(₹)</TableHead>
+                        <TableHead>Total(₹)</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {selectedPrescription.medicines.length > 0 ? (
-                        selectedPrescription.medicines.map((med, index) => (
+                      {prescribedMedicines.length > 0 ? (
+                        prescribedMedicines.map((med, index) => (
                           <TableRow
                             key={index}
                             className="hover:bg-transparent"
@@ -564,9 +574,39 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                             <TableCell>
                               {med.duration} {med.durationType}
                             </TableCell>
-                            <TableCell>{0}</TableCell>
-                            <TableCell>₹{(0).toFixed(2)}</TableCell>
-                            <TableCell>₹{(0).toFixed(2)}</TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-2">
+                                <Input
+                                  type="number"
+                                  min="1"
+                                  value={med.quantity}
+                                  onChange={(e) =>
+                                    handleUpdatePrescribedMedicineQuantity(
+                                      index,
+                                      parseInt(e.target.value) || 1
+                                    )
+                                  }
+                                  className="w-20 h-8 focus-visible:ring-[#2563eb]"
+                                />
+                                <span className="text-sm">{med.type}</span>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <Input
+                                type="number"
+                                value={med.price}
+                                onChange={(e) =>
+                                  handleUpdatePrescribedMedicinePrice(
+                                    index,
+                                    parseInt(e.target.value) || 1
+                                  )
+                                }
+                                className="w-28 h-8 focus-visible:ring-[#2563eb]"
+                              />
+                            </TableCell>
+                            <TableCell>
+                              ₹{(med.price * med.quantity).toFixed(2)}
+                            </TableCell>
                           </TableRow>
                         ))
                       ) : (
@@ -593,6 +633,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                       <div>
                         <FormLabel>Discount (%)</FormLabel>
                         <Input
+                          className="focus-visible:ring-[#2563eb]"
                           type="number"
                           min="0"
                           max="100"
@@ -606,6 +647,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                       <div>
                         <FormLabel>Tax (%)</FormLabel>
                         <Input
+                          className="focus-visible:ring-[#2563eb]"
                           type="number"
                           min="0"
                           value={taxPercentage}
@@ -620,9 +662,17 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                       <FormLabel>Payment Status</FormLabel>
                       <Select
                         value={paymentStatus}
-                        onValueChange={(value) => setPaymentStatus(value)}
+                        onValueChange={(value) =>
+                          setPaymentStatus(
+                            value as
+                              | "Paid"
+                              | "Unpaid"
+                              | "Not Required"
+                              | "Refunded"
+                          )
+                        }
                       >
-                        <SelectTrigger>
+                        <SelectTrigger className="focus:ring-[#2563eb]">
                           <SelectValue placeholder="Select status" />
                         </SelectTrigger>
                         <SelectContent>
@@ -647,7 +697,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                             )
                           }
                         >
-                          <SelectTrigger>
+                          <SelectTrigger className="focus:ring-[#2563eb]">
                             <SelectValue placeholder="Select method" />
                           </SelectTrigger>
                           <SelectContent>
@@ -663,6 +713,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                     <div>
                       <FormLabel>Notes</FormLabel>
                       <Input
+                        className="focus-visible:ring-[#2563eb]"
                         value={notes}
                         onChange={(e) => setNotes(e.target.value)}
                       />
@@ -682,7 +733,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                       <span>Medicines Total:</span>
                       <span>
                         ₹
-                        {selectedMedicines
+                        {prescribedMedicines
                           .reduce(
                             (sum, med) => sum + med.price * med.quantity,
                             0
@@ -692,16 +743,6 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                     </div>
                     <div className="flex justify-between">
                       <span>Services Total:</span>
-                      <span>
-                        ₹
-                        {selectedServices
-                          .reduce(
-                            (sum, service) =>
-                              sum + service.price * (service.quantity || 1),
-                            0
-                          )
-                          .toFixed(2)}
-                      </span>
                     </div>
                     {discount > 0 && (
                       <div className="flex justify-between text-muted-foreground">
@@ -709,15 +750,10 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                         <span>
                           -₹
                           {(
-                            (selectedMedicines.reduce(
+                            prescribedMedicines.reduce(
                               (sum, med) => sum + med.price * med.quantity,
                               0
-                            ) +
-                              selectedServices.reduce(
-                                (sum, service) =>
-                                  sum + service.price * (service.quantity || 1),
-                                0
-                              )) *
+                            ) *
                             (discount / 100)
                           ).toFixed(2)}
                         </span>
@@ -729,15 +765,10 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                         <span>
                           +₹
                           {(
-                            (selectedMedicines.reduce(
+                            prescribedMedicines.reduce(
                               (sum, med) => sum + med.price * med.quantity,
                               0
-                            ) +
-                              selectedServices.reduce(
-                                (sum, service) =>
-                                  sum + service.price * (service.quantity || 1),
-                                0
-                              )) *
+                            ) *
                             (1 - discount / 100) *
                             (taxPercentage / 100)
                           ).toFixed(2)}
@@ -763,11 +794,11 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                     value={medicineToAdd}
                     onValueChange={setMedicineToAdd}
                   >
-                    <SelectTrigger className="flex-grow">
+                    <SelectTrigger className="flex-grow focus:ring-[#2563eb]">
                       <SelectValue placeholder="Select medicine" />
                     </SelectTrigger>
                     <SelectContent>
-                      {medicines.map((med: any) => (
+                      {medicines.map((med) => (
                         <SelectItem key={med.id} value={med.id}>
                           {med.medicineName} ({med.type})
                         </SelectItem>
@@ -780,7 +811,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                     min="1"
                     value={quantity}
                     onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
-                    className="w-24"
+                    className="w-24 focus-visible:ring-[#2563eb]"
                     placeholder="Qty"
                   />
 
@@ -797,26 +828,27 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                 <div className="border rounded-md overflow-hidden">
                   <Table>
                     <TableHeader>
-                      <TableRow>
+                      <TableRow className="bg-muted/50">
                         <TableHead>Medicine</TableHead>
-                        <TableHead>Dosage</TableHead>
                         <TableHead>Qty</TableHead>
-                        <TableHead>Price</TableHead>
-                        <TableHead>Total</TableHead>
+                        <TableHead>Price(₹)</TableHead>
+                        <TableHead>Total(₹)</TableHead>
                         <TableHead className="w-[50px]"></TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {selectedMedicines.length > 0 ? (
                         selectedMedicines.map((med, index) => (
-                          <TableRow key={index}>
+                          <TableRow
+                            key={index}
+                            className="hover:bg-transparent"
+                          >
                             <TableCell>
                               {med.medicineName}
                               <div className="text-xs text-muted-foreground">
                                 {med.type}, {med.instruction}
                               </div>
                             </TableCell>
-                            <TableCell>{med.dosages}</TableCell>
                             <TableCell>
                               <Input
                                 type="number"
@@ -828,10 +860,23 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                                     parseInt(e.target.value) || 1
                                   )
                                 }
-                                className="w-16 h-8"
+                                className="w-16 h-8 focus-visible:ring-[#2563eb]"
                               />
                             </TableCell>
-                            <TableCell>₹{med.price.toFixed(2)}</TableCell>
+                            <TableCell>
+                              <Input
+                                type="number"
+                                min="1"
+                                value={med.price}
+                                onChange={(e) =>
+                                  handleUpdateMedicinePrice(
+                                    index,
+                                    parseInt(e.target.value) || 1
+                                  )
+                                }
+                                className="w-28 h-8 focus-visible:ring-[#2563eb]"
+                              />
+                            </TableCell>
                             <TableCell>
                               ₹{(med.price * med.quantity).toFixed(2)}
                             </TableCell>
@@ -848,7 +893,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                           </TableRow>
                         ))
                       ) : (
-                        <TableRow>
+                        <TableRow className="hover:bg-transparent">
                           <TableCell
                             colSpan={6}
                             className="text-center py-3 text-muted-foreground"
@@ -867,12 +912,19 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                 <CommonHeader label={"Services"} />
 
                 <div className="flex gap-2 mb-2 mt-3">
-                  <Select value={serviceToAdd} onValueChange={setServiceToAdd}>
-                    <SelectTrigger className="flex-grow">
+                  <Select
+                    value={serviceToAdd?.service_id ?? ""}
+                    onValueChange={(value) => {
+                      setServiceToAdd(
+                        services.find((service) => service.service_id === value)
+                      );
+                    }}
+                  >
+                    <SelectTrigger className="flex-grow focus:ring-[#2563eb]">
                       <SelectValue placeholder="Select service" />
                     </SelectTrigger>
                     <SelectContent>
-                      {services.map((service: any) => (
+                      {services.map((service) => (
                         <SelectItem
                           key={service.service_id}
                           value={service.service_id}
@@ -896,18 +948,21 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                 <div className="border rounded-md overflow-hidden">
                   <Table>
                     <TableHeader>
-                      <TableRow>
+                      <TableRow className="bg-muted/50">
                         <TableHead>Service</TableHead>
                         <TableHead>Qty</TableHead>
-                        <TableHead>Price</TableHead>
-                        <TableHead>Total</TableHead>
+                        <TableHead>Price(₹)</TableHead>
+                        <TableHead>Total(₹)</TableHead>
                         <TableHead className="w-[50px]"></TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {selectedServices.length > 0 ? (
                         selectedServices.map((service, index) => (
-                          <TableRow key={index}>
+                          <TableRow
+                            key={index}
+                            className="hover:bg-transparent"
+                          >
                             <TableCell>{service.service_name}</TableCell>
                             <TableCell>
                               <Input
@@ -920,10 +975,23 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                                     parseInt(e.target.value) || 1
                                   )
                                 }
-                                className="w-16 h-8"
+                                className="w-20 h-8 focus-visible:ring-[#2563eb]"
                               />
                             </TableCell>
-                            <TableCell>₹{service.price.toFixed(2)}</TableCell>
+                            <TableCell>
+                              <Input
+                                type="number"
+                                min="1"
+                                value={service.price || 1}
+                                onChange={(e) =>
+                                  handleUpdateServicePrice(
+                                    index,
+                                    parseInt(e.target.value) || 1
+                                  )
+                                }
+                                className="w-28 h-8 focus-visible:ring-[#2563eb]"
+                              />
+                            </TableCell>
                             <TableCell>
                               ₹
                               {(
@@ -943,7 +1011,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                           </TableRow>
                         ))
                       ) : (
-                        <TableRow>
+                        <TableRow className="hover:bg-transparent">
                           <TableCell
                             colSpan={5}
                             className="text-center py-3 text-muted-foreground"
@@ -967,6 +1035,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                       <div>
                         <FormLabel>Discount (%)</FormLabel>
                         <Input
+                          className="focus-visible:ring-[#2563eb]"
                           type="number"
                           min="0"
                           max="100"
@@ -980,6 +1049,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                       <div>
                         <FormLabel>Tax (%)</FormLabel>
                         <Input
+                          className="focus-visible:ring-[#2563eb]"
                           type="number"
                           min="0"
                           value={taxPercentage}
@@ -994,9 +1064,17 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                       <FormLabel>Payment Status</FormLabel>
                       <Select
                         value={paymentStatus}
-                        onValueChange={(value) => setPaymentStatus(value)}
+                        onValueChange={(value) =>
+                          setPaymentStatus(
+                            value as
+                              | "Paid"
+                              | "Unpaid"
+                              | "Not Required"
+                              | "Refunded"
+                          )
+                        }
                       >
-                        <SelectTrigger>
+                        <SelectTrigger className="focus:ring-[#2563eb]">
                           <SelectValue placeholder="Select status" />
                         </SelectTrigger>
                         <SelectContent>
@@ -1021,7 +1099,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                             )
                           }
                         >
-                          <SelectTrigger>
+                          <SelectTrigger className="focus:ring-[#2563eb]">
                             <SelectValue placeholder="Select method" />
                           </SelectTrigger>
                           <SelectContent>
@@ -1037,6 +1115,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                     <div>
                       <FormLabel>Notes</FormLabel>
                       <Input
+                        className="focus-visible:ring-[#2563eb]"
                         value={notes}
                         onChange={(e) => setNotes(e.target.value)}
                       />
@@ -1136,10 +1215,15 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                 control={form.control}
                 name="name"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="space-y-0">
                     <FormLabel>Patient Name</FormLabel>
                     <FormControl>
-                      <Input {...field} required />
+                      <Input
+                        placeholder="Patient Name..."
+                        className="focus-visible:ring-[#2563eb]"
+                        {...field}
+                        required
+                      />
                     </FormControl>
                   </FormItem>
                 )}
@@ -1149,10 +1233,15 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                 control={form.control}
                 name="mobile"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="space-y-0">
                     <FormLabel>Mobile Number</FormLabel>
                     <FormControl>
-                      <Input {...field} required />
+                      <Input
+                        placeholder="Mobile Number..."
+                        className="focus-visible:ring-[#2563eb]"
+                        {...field}
+                        required
+                      />
                     </FormControl>
                   </FormItem>
                 )}
@@ -1162,11 +1251,11 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                 control={form.control}
                 name="gender"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="space-y-0">
                     <FormLabel>Gender</FormLabel>
                     <Select value={field.value} onValueChange={field.onChange}>
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger className="focus:ring-[#2563eb]">
                           <SelectValue placeholder="Select gender" />
                         </SelectTrigger>
                       </FormControl>
@@ -1187,11 +1276,11 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
 
               <div className="flex gap-2 mb-2 mt-3">
                 <Select value={medicineToAdd} onValueChange={setMedicineToAdd}>
-                  <SelectTrigger className="flex-grow">
+                  <SelectTrigger className="flex-grow focus:ring-[#2563eb]">
                     <SelectValue placeholder="Select medicine" />
                   </SelectTrigger>
                   <SelectContent>
-                    {medicines.map((med: any) => (
+                    {medicines.map((med) => (
                       <SelectItem key={med.id} value={med.id}>
                         {med.medicineName} ({med.type})
                       </SelectItem>
@@ -1204,7 +1293,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                   min="1"
                   value={quantity}
                   onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
-                  className="w-24"
+                  className="w-24 focus-visible:ring-[#2563eb]"
                   placeholder="Qty"
                 />
 
@@ -1221,26 +1310,24 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
               <div className="border rounded-md overflow-hidden">
                 <Table>
                   <TableHeader>
-                    <TableRow>
+                    <TableRow className="bg-muted/50">
                       <TableHead>Medicine</TableHead>
-                      <TableHead>Dosage</TableHead>
                       <TableHead>Qty</TableHead>
-                      <TableHead>Price</TableHead>
-                      <TableHead>Total</TableHead>
+                      <TableHead>Price(₹)</TableHead>
+                      <TableHead>Total(₹)</TableHead>
                       <TableHead className="w-[50px]"></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {selectedMedicines.length > 0 ? (
                       selectedMedicines.map((med, index) => (
-                        <TableRow key={index}>
+                        <TableRow className="hover:bg-transparent" key={index}>
                           <TableCell>
                             {med.medicineName}
                             <div className="text-xs text-muted-foreground">
                               {med.type}, {med.instruction}
                             </div>
                           </TableCell>
-                          <TableCell>{med.dosages}</TableCell>
                           <TableCell>
                             <Input
                               type="number"
@@ -1252,10 +1339,23 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                                   parseInt(e.target.value) || 1
                                 )
                               }
-                              className="w-16 h-8"
+                              className="w-20 h-8 focus-visible:ring-[#2563eb]"
                             />
                           </TableCell>
-                          <TableCell>₹{med.price.toFixed(2)}</TableCell>
+                          <TableCell>
+                            <Input
+                              type="number"
+                              min="1"
+                              value={med.price}
+                              onChange={(e) =>
+                                handleUpdateMedicinePrice(
+                                  index,
+                                  parseInt(e.target.value) || 1
+                                )
+                              }
+                              className="w-28 h-8 focus-visible:ring-[#2563eb]"
+                            />
+                          </TableCell>
                           <TableCell>
                             ₹{(med.price * med.quantity).toFixed(2)}
                           </TableCell>
@@ -1272,7 +1372,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                         </TableRow>
                       ))
                     ) : (
-                      <TableRow>
+                      <TableRow className="hover:bg-transparent">
                         <TableCell
                           colSpan={6}
                           className="text-center py-3 text-muted-foreground"
@@ -1291,12 +1391,19 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
               <CommonHeader label="Services" />
 
               <div className="flex gap-2 mb-2 mt-3">
-                <Select value={serviceToAdd} onValueChange={setServiceToAdd}>
-                  <SelectTrigger className="flex-grow">
+                <Select
+                  value={serviceToAdd?.service_id ?? ""}
+                  onValueChange={(value) => {
+                    setServiceToAdd(
+                      services.find((service) => service.service_id === value)
+                    );
+                  }}
+                >
+                  <SelectTrigger className="flex-grow focus:ring-[#2563eb]">
                     <SelectValue placeholder="Select service" />
                   </SelectTrigger>
                   <SelectContent>
-                    {services.map((service: any) => (
+                    {services.map((service) => (
                       <SelectItem
                         key={service.service_id}
                         value={service.service_id}
@@ -1320,18 +1427,18 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
               <div className="border rounded-md overflow-hidden">
                 <Table>
                   <TableHeader>
-                    <TableRow>
+                    <TableRow className="bg-muted/50">
                       <TableHead>Service</TableHead>
                       <TableHead>Qty</TableHead>
-                      <TableHead>Price</TableHead>
-                      <TableHead>Total</TableHead>
+                      <TableHead>Price(₹)</TableHead>
+                      <TableHead>Total(₹)</TableHead>
                       <TableHead className="w-[50px]"></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {selectedServices.length > 0 ? (
                       selectedServices.map((service, index) => (
-                        <TableRow key={index}>
+                        <TableRow className="hover:bg-transparent" key={index}>
                           <TableCell>{service.service_name}</TableCell>
                           <TableCell>
                             <Input
@@ -1344,10 +1451,23 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                                   parseInt(e.target.value) || 1
                                 )
                               }
-                              className="w-16 h-8"
+                              className="w-20 h-8 focus-visible:ring-[#2563eb]"
                             />
                           </TableCell>
-                          <TableCell>₹{service.price.toFixed(2)}</TableCell>
+                          <TableCell>
+                            <Input
+                              type="number"
+                              min="1"
+                              value={service.price || 1}
+                              onChange={(e) =>
+                                handleUpdateServicePrice(
+                                  index,
+                                  parseInt(e.target.value) || 1
+                                )
+                              }
+                              className="w-28 h-8 focus-visible:ring-[#2563eb]"
+                            />
+                          </TableCell>
                           <TableCell>
                             ₹
                             {(service.price * (service.quantity || 1)).toFixed(
@@ -1367,7 +1487,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                         </TableRow>
                       ))
                     ) : (
-                      <TableRow>
+                      <TableRow className="hover:bg-transparent">
                         <TableCell
                           colSpan={5}
                           className="text-center py-3 text-muted-foreground"
@@ -1391,6 +1511,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                     <div>
                       <FormLabel>Discount (%)</FormLabel>
                       <Input
+                        className="focus-visible:ring-[#2563eb]"
                         type="number"
                         min="0"
                         max="100"
@@ -1404,6 +1525,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                     <div>
                       <FormLabel>Tax (%)</FormLabel>
                       <Input
+                        className="focus-visible:ring-[#2563eb]"
                         type="number"
                         min="0"
                         value={taxPercentage}
@@ -1418,9 +1540,17 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                     <FormLabel>Payment Status</FormLabel>
                     <Select
                       value={paymentStatus}
-                      onValueChange={(value) => setPaymentStatus(value)}
+                      onValueChange={(value) =>
+                        setPaymentStatus(
+                          value as
+                            | "Paid"
+                            | "Unpaid"
+                            | "Not Required"
+                            | "Refunded"
+                        )
+                      }
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className="focus:ring-[#2563eb]">
                         <SelectValue placeholder="Select status" />
                       </SelectTrigger>
                       <SelectContent>
@@ -1445,7 +1575,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                           )
                         }
                       >
-                        <SelectTrigger>
+                        <SelectTrigger className="focus:ring-[#2563eb]">
                           <SelectValue placeholder="Select method" />
                         </SelectTrigger>
                         <SelectContent>
@@ -1461,6 +1591,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                   <div>
                     <FormLabel>Notes</FormLabel>
                     <Input
+                      className="focus-visible:ring-[#2563eb]"
                       value={notes}
                       onChange={(e) => setNotes(e.target.value)}
                     />
@@ -1573,7 +1704,9 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
             disabled={
               !form.getValues().name ||
               !form.getValues().mobile ||
-              (selectedMedicines.length === 0 && selectedServices.length === 0)
+              (!selectedPrescription &&
+                selectedMedicines.length === 0 &&
+                selectedServices.length === 0)
             }
           >
             <Save className="h-4 w-4" />

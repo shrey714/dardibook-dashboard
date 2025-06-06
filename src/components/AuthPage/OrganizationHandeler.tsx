@@ -3,6 +3,8 @@ import React from "react";
 import { OrganizationList, useOrganizationList } from "@clerk/nextjs";
 import RegistrationForm from "@/components/forms/RegistrationForm";
 import Loader from "../common/Loader";
+import { dark } from "@clerk/themes";
+import { useTheme } from "next-themes";
 const OrganizationHandeler = () => {
   const { isLoaded, userMemberships, userInvitations } = useOrganizationList({
     userMemberships: {
@@ -12,6 +14,7 @@ const OrganizationHandeler = () => {
       infinite: true,
     },
   });
+  const { resolvedTheme } = useTheme();
 
   return (
     <>
@@ -44,11 +47,11 @@ const OrganizationHandeler = () => {
               organizationAvatarUploaderContainer: "text-foreground",
               organizationListPreviewItemActionButton: "text-foreground",
               avatarImageActionsUpload: "text-foreground dark:bg-muted",
-              button: "dark:bg-muted",
               footer: {
                 display: "none",
               },
             },
+            baseTheme: resolvedTheme === "dark" ? dark : undefined,
           }}
         />
       ) : (

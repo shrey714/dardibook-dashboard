@@ -70,7 +70,7 @@ export const extractTotalBillsDayCounts = (snapData: PharmacyTypes[], field: key
 };
 
 export const sumAmounts = (snapData: PharmacyTypes[]) =>
-    snapData.reduce((acc: number, doc: PharmacyTypes) => acc + (doc.total_amount || 0), 0);
+    Math.round(snapData.reduce((acc: number, doc: PharmacyTypes) => acc + (doc.total_amount || 0), 0));
 
 export function getUpcomingDatesRange(fromDays: number, toDays: number, timezone: string) {
     const today = utcToZonedTime(new Date(), timezone);

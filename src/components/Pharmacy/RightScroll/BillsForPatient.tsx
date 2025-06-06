@@ -14,9 +14,11 @@ import { Button } from "@/components/ui/button";
 const BillsForPatient = ({
   onViewBill,
   selectedPatient,
+  needsToReFetchBills,
 }: {
   selectedPatient: PharmacySelectedPatientType | undefined;
   onViewBill: (bill: PharmacyTypes) => void;
+  needsToReFetchBills: number;
 }) => {
   const [billsLoading, setBillsLoading] = useState(false);
   const [billsData, setBillsData] = useState<PharmacyTypes[]>([]);
@@ -57,7 +59,7 @@ const BillsForPatient = ({
     };
 
     getBillsForPatient();
-  }, [isLoaded, orgId, selectedPatient]);
+  }, [isLoaded, orgId, selectedPatient, needsToReFetchBills]);
 
   return (
     <div>

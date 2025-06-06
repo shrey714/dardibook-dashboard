@@ -53,7 +53,7 @@ function Admissions() {
   };
 
   return (
-    <React.Fragment>
+    <div className="h-full">
       <Dialog
         open={isModalOpen}
         onOpenChange={(state) => setIsModalOpen(state)}
@@ -75,7 +75,16 @@ function Admissions() {
           />
         </DialogContent>
       </Dialog>
-      <div className="w-full mb-16 mt-4 pl-4 min-h-[calc(100%-5rem)] flex flex-col">
+      {/* <div className="border-b py-2 sticky top-0 bg-muted z-10">
+        <Button
+          className="w-28 sm:w-32"
+          type="submit"
+          variant={"default"}
+          onClick={addNewBedHandler}
+        >
+          {bedAddLoader ? <Loader /> : "Add New Bed"}
+        </Button>
+      </div> */}
         <KanbanBoard
           isEditModalOpen={isEditModalOpen}
           bedId={bedId}
@@ -85,23 +94,10 @@ function Admissions() {
           refresh={refresh}
           setWasEdited={setWasEdited}
           wasEdited={wasEdited}
+          bedAddLoader={bedAddLoader}
+          addNewBedHandler={addNewBedHandler}
         />
-      </div>
-      <div
-        className="flex items-center justify-center gap-x-4 sm:gap-x-6 absolute 
-            bg-clip-padding backdrop-filter backdrop-blur-sm
-            bottom-0 py-2 border-t sm:py-3 left-0 right-0"
-      >
-        <Button
-          className="w-28 sm:w-32"
-          type="submit"
-          variant={"default"}
-          onClick={addNewBedHandler}
-        >
-          {bedAddLoader?<Loader />:"Add New Bed"}
-        </Button>
-      </div>
-    </React.Fragment>
+    </div>
   );
 }
 

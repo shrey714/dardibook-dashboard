@@ -19,6 +19,7 @@ import {
 import { CalendarPlusIcon, CalendarMinusIcon } from "lucide-react";
 import { DateTimePicker } from "../Appointment/DateTimePicker";
 import { Organization } from "@clerk/nextjs/server";
+import { CategoryBar } from "../ui/CategoryBar";
 
 interface BedEditModalProps {
   setIsEditModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -216,10 +217,10 @@ const BedEditModal: React.FC<BedEditModalProps> = ({
           value={admissionInfo?.admission_for.id || ""}
           onValueChange={(val) => {
             const member = memberships?.data?.find(
-              (mem) => mem.publicUserData.userId === val
+              (mem) => mem.publicUserData?.userId === val
             );
 
-            if (member) {
+            if (member && member.publicUserData) {
               const {
                 userId,
                 firstName = "",
@@ -250,7 +251,7 @@ const BedEditModal: React.FC<BedEditModalProps> = ({
           <SelectContent>
             {memberships &&
               memberships.data?.map((member, index) =>
-                member.publicUserData.userId ? (
+                member.publicUserData?.userId ? (
                   <SelectItem value={member.publicUserData.userId} key={index}>
                     {member.publicUserData.firstName}{" "}
                     {member.publicUserData.lastName}

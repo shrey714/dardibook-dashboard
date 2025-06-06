@@ -259,10 +259,10 @@ const BedAdmissionModal: React.FC<BedAdmissionModalProps> = ({
           name="admission_for"
           onValueChange={(val) => {
             const member = memberships?.data?.find(
-              (mem) => mem.publicUserData.userId === val
+              (mem) => mem.publicUserData?.userId === val
             );
 
-            if (member && member.publicUserData.userId) {
+            if (member && member.publicUserData?.userId) {
               const {
                 userId,
                 firstName = "",
@@ -290,7 +290,7 @@ const BedAdmissionModal: React.FC<BedAdmissionModalProps> = ({
           <SelectContent>
             {memberships &&
               memberships.data?.map((member, index) =>
-                member.publicUserData.userId ? (
+                member.publicUserData?.userId ? (
                   <SelectItem value={member.publicUserData.userId} key={index}>
                     {member.publicUserData.firstName}{" "}
                     {member.publicUserData.lastName}

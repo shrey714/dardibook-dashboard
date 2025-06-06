@@ -45,14 +45,14 @@ const PatientHistoryData: React.FC<PatientHistoryDataTypes> = ({ history }) => {
           <div className="space-y-3 mt-3 px-3">
             <div className="space-y-1">
               <p className="text-sm font-medium">Prescription Id</p>
-              <div className="flex items-center h-9 text-muted-foreground w-full rounded-md border px-3 text-base md:text-sm !leading-9 shadow-sm">
+              <div className="flex items-center min-h-9 text-muted-foreground w-full rounded-md border px-3 text-sm shadow-sm">
                 {history.prescription_id}
               </div>
             </div>
 
             <div className="space-y-1">
               <p className="text-sm font-medium">Next Visit</p>
-              <div className="flex items-center h-9 text-muted-foreground w-full rounded-md border px-3 text-base md:text-sm !leading-9 shadow-sm">
+              <div className="flex items-center min-h-9 text-muted-foreground w-full rounded-md border px-3 text-sm shadow-sm">
                 {history.nextVisit}
               </div>
             </div>
@@ -137,13 +137,13 @@ const PatientHistoryData: React.FC<PatientHistoryDataTypes> = ({ history }) => {
         <CommonHeader label={"Disease and Diagnosis"} />
         <div className="space-y-1 mt-3 px-3">
           <p className="text-sm font-medium">Bill Id</p>
-          <div className="flex items-center h-9 text-muted-foreground w-full lg:w-3/5 rounded-md border mt-3 px-3 text-base md:text-sm !leading-9 shadow-sm">
+          <div className="flex items-center min-h-9 text-muted-foreground w-full lg:w-3/5 rounded-md border mt-3 px-3 text-sm shadow-sm">
             {history.diseaseDetail}
           </div>
         </div>
         <div className="space-y-1 mt-3 px-3">
           <p className="text-sm font-medium">Advice or special instructions</p>
-          <div className="flex items-center h-9 text-muted-foreground w-full lg:w-3/5 rounded-md border mt-3 px-3 text-base md:text-sm !leading-9 shadow-sm">
+          <div className="flex items-center min-h-9 text-muted-foreground w-full lg:w-3/5 rounded-md border mt-3 px-3 py-1 text-sm shadow-sm">
             {history.advice}
           </div>
         </div>
@@ -214,21 +214,21 @@ const PatientHistoryData: React.FC<PatientHistoryDataTypes> = ({ history }) => {
           <div className="space-y-3 mt-3 px-3">
             <div className="space-y-1">
               <p className="text-sm font-medium">Hospital Name</p>
-              <div className="flex items-center h-9 text-muted-foreground w-full rounded-md border px-3 text-base md:text-sm !leading-9 shadow-sm">
+              <div className="flex items-center min-h-9 text-muted-foreground w-full rounded-md border px-3 py-1 text-sm shadow-sm">
                 {history.refer.hospitalName}
               </div>
             </div>
 
             <div className="space-y-1">
               <p className="text-sm font-medium">Appointed Doctor Name</p>
-              <div className="flex items-center h-9 text-muted-foreground w-full rounded-md border px-3 text-base md:text-sm !leading-9 shadow-sm">
+              <div className="flex items-center min-h-9 text-muted-foreground w-full rounded-md border px-3 py-1 text-sm shadow-sm">
                 {history.refer.doctorName}
               </div>
             </div>
 
             <div className="space-y-1">
               <p className="text-sm font-medium">Refer message</p>
-              <div className="flex items-center h-9 text-muted-foreground w-full rounded-md border px-3 text-base md:text-sm !leading-9 shadow-sm">
+              <div className="flex items-center min-h-9 text-muted-foreground w-full rounded-md border px-3 py-1 text-sm shadow-sm">
                 {history.refer.referMessage}
               </div>
             </div>

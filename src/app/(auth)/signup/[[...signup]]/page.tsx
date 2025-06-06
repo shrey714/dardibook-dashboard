@@ -1,53 +1,62 @@
-import FlickeringGrid from "@/components/AuthPage/FlickeringGrid";
 import Image from "next/image";
-import { Typewriter } from "@/components/common/Text-Typing";
-import { SignUp } from "@clerk/nextjs";
+import SignUpBox from "@/components/AuthPage/SignUpBox";
+import Link from "next/link";
 
 const Page = () => {
   return (
-    <>
-      <section className="relative bg-gray-300 h-svh w-full overflow-hidden flex justify-center">
-        <FlickeringGrid
-          className="z-0 absolute inset-0 size-full"
-          squareSize={4}
-          gridGap={6}
-          color="#60A5FA"
-          maxOpacity={0.5}
-          flickerChance={0.1}
-        />
-        <div className="h-svh flex flex-col items-center justify-center w-full sm:w-4/5">
-          <div className="z-50 flex flex-1 items-center justify-center">
-            <div className="w-full flex-col flex items-center justify-center">
-              <Typewriter
-                list={[
-                  "Welcome to DardiBook",
-                  "Access your DardiBook account to manage appointments, prescriptions and more.",
-                  "Stay connected and streamline your healthcare management.",
-                ]}
-              />
-            </div>
-          </div>
-
-          <div className="z-50 py-8 h-52 px-[12.5%] bg-gray-900 w-full flex flex-1 flex-col items-center justify-between rounded-t-3xl overflow-y-auto pt-12 shadow-[0_0_20px_2px_rgba(8,_112,_184,_0.7)] transition-all">
-            <SignUp
-              appearance={{
-                elements: {
-                  header: "hidden",
-                },
-              }}
-            />
+    <section
+      className="relative h-svh w-full overflow-hidden flex justify-center items-center"
+      style={{
+        background:
+          "linear-gradient(160deg, #020617 0%, #081C4F 35%, #0B3B7B 70%, #2A7FD0 100%)",
+      }}
+    >
+      <main className="z-[1] flex flex-col justify-center p-4 sm:p-9 box-border flex-[1_1_0%] max-w-[90%] sm:max-w-[500px] bg-black/25 backdrop-blur-[20px] rounded-[20px] md:min-w-[330px]">
+        <div>
+          <div className="mb-4 sm:mb-7 flex items-center justify-center">
             <Image
               alt="Logo"
               src="/Logo.svg"
-              width={56}
-              height={56}
-              className="h-12 sm:h-14 aspect-square mt-5"
+              width={60}
+              height={60}
+              className="h-[60px] aspect-square"
               priority
             />
           </div>
+          <div className="flex flex-col gap-2">
+            <SignUpBox />
+          </div>
+          <p className="text-muted-foreground text-center text-xs mt-1">
+            By clicking continue, you agree to our{" "}
+            <Link
+              href="https://dardibook.in/documents/terms-conditions"
+              className="hover:text-primary underline underline-offset-4"
+              target="_blank"
+            >
+              Terms of Service
+            </Link>{" "}
+            and{" "}
+            <Link
+              href="https://dardibook.in/documents/privacy-policy"
+              className="hover:text-primary underline underline-offset-4"
+              target="_blank"
+            >
+              Privacy Policy
+            </Link>
+            .
+          </p>
         </div>
-      </section>
-    </>
+      </main>
+
+      <div className="fixed top-0 left-0 w-full h-svh">
+        <iframe
+          src="https://db-marquee-frame.vercel.app"
+          width="100%"
+          height="100%"
+          title="visual"
+        ></iframe>
+      </div>
+    </section>
   );
 };
 

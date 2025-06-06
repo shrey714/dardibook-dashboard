@@ -8,6 +8,7 @@ import {
   X,
   CalendarClockIcon,
   CreditCard,
+  PrinterIcon,
 } from "lucide-react";
 import {
   Dialog,
@@ -50,6 +51,13 @@ import { useAuth } from "@clerk/nextjs";
 import toast from "react-hot-toast";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/firebase/firebaseConfig";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import PrintButton from "../PrintHandeler/PrintButton";
 
 interface BillHistoryModaltypes {
   billModal: boolean;
@@ -58,6 +66,7 @@ interface BillHistoryModaltypes {
   setselectedBillData: React.Dispatch<
     React.SetStateAction<PharmacyTypes | undefined>
   >;
+  setNeedsToReFetchBills: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const BillHistoryModal = ({
@@ -65,6 +74,7 @@ const BillHistoryModal = ({
   setbillModal,
   selectedBillData,
   setselectedBillData,
+  setNeedsToReFetchBills,
 }: BillHistoryModaltypes) => {
   const { orgId } = useAuth();
   const [updateLoader, setUpdateLoader] = useState(false);
@@ -84,8 +94,10 @@ const BillHistoryModal = ({
                 ...selectedBillData,
                 payment_method: method as "Cash" | "Card" | "UPI" | "Online",
               });
+              setNeedsToReFetchBills((prev) => prev + 1);
             },
-            () => {
+            (e) => {
+              console.log("error==", e);
               setUpdateLoader(false);
             }
           );
@@ -121,8 +133,10 @@ const BillHistoryModal = ({
                   | "Not Required"
                   | "Refunded",
               });
+              setNeedsToReFetchBills((prev) => prev + 1);
             },
-            () => {
+            (e) => {
+              console.log("error==", e);
               setUpdateLoader(false);
             }
           );
@@ -252,14 +266,14 @@ const BillHistoryModal = ({
                     <div className="grid grid-cols-2 gap-2">
                       <div className="space-y-1">
                         <p className="text-sm font-medium">Bill Id</p>
-                        <div className="flex items-center h-9 text-muted-foreground w-full rounded-md border px-3 text-base md:text-sm !leading-9 shadow-sm">
+                        <div className="flex items-center min-h-9 text-muted-foreground w-full rounded-md border px-3 text-sm shadow-sm">
                           {selectedBillData.bill_id}
                         </div>
                       </div>
 
                       <div className="space-y-1">
                         <p className="text-sm font-medium">Prescription Id</p>
-                        <div className="flex items-center h-9 text-muted-foreground w-full rounded-md border px-3 text-base md:text-sm !leading-9 shadow-sm">
+                        <div className="flex items-center min-h-9 text-muted-foreground w-full rounded-md border px-3 text-sm shadow-sm">
                           {selectedBillData.prescription_id ?? "-"}
                         </div>
                       </div>
@@ -267,7 +281,7 @@ const BillHistoryModal = ({
 
                     <div className="space-y-1">
                       <p className="text-sm font-medium">Notes</p>
-                      <div className="flex items-center h-9 text-muted-foreground w-full rounded-md border px-3 text-base md:text-sm !leading-9 shadow-sm">
+                      <div className="flex items-center min-h-9 text-muted-foreground w-full rounded-md border px-3 py-1 text-sm shadow-sm">
                         {selectedBillData.notes ?? "-"}
                       </div>
                     </div>
@@ -469,7 +483,50 @@ const BillHistoryModal = ({
                 </div>
               </div>
             </div>
-            <DialogFooter className="bg-slate-50 dark:bg-gray-900 w-full gap-1 border-t px-4 py-2 flex flex-row justify-end items-center">
+            <DialogFooter className="bg-slate-50 dark:bg-gray-900 w-full gap-2 border-t px-4 py-2 flex flex-wrap-reverse flex-row justify-end items-center sm:space-x-0">
+              <PrintButton
+                printType="bill"
+                data={{
+                  patient_id: selectedBillData.patient_id,
+                  name: selectedBillData.name,
+                  bill_id: selectedBillData.bill_id,
+                  prescription_id: selectedBillData.prescription_id,
+                  mobile: selectedBillData.mobile,
+                  gender: selectedBillData.gender,
+                  medicines: selectedBillData.medicines.map((medicine) => ({
+                    medicineName: medicine.medicineName,
+                    instruction: medicine.instruction,
+                    dosages: medicine.dosages,
+                    type: medicine.type,
+                    quantity: medicine.quantity,
+                    price: medicine.price,
+                    duration: medicine.duration,
+                    durationType: medicine.durationType,
+                  })),
+                  services: selectedBillData.services.map((service) => ({
+                    price: service.price,
+                    quantity: service.quantity,
+                    service_name: service.service_name,
+                  })),
+                  generated_at: selectedBillData.generated_at,
+                  prescribed_by: selectedBillData.prescribed_by?.name,
+                  generated_by: selectedBillData.generated_by.name,
+                  payment_status: selectedBillData.payment_status,
+                  total_amount: selectedBillData.total_amount,
+                  discount: selectedBillData.discount,
+                  payment_method: selectedBillData.payment_method,
+                  tax_percentage: selectedBillData.tax_percentage,
+                  notes: selectedBillData.notes,
+                }}
+                buttonProps={{
+                  size: "icon",
+                  className:
+                    "w-full sm:w-auto px-6 bg-gray-200 hover:bg-gray-300 text-gray-800 transition-colors",
+                }}
+              >
+                <PrinterIcon /> Print
+              </PrintButton>
+
               {selectedBillData.payment_status === "Paid" && (
                 <Select
                   disabled={updateLoader}

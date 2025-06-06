@@ -1,7 +1,12 @@
 "use client";
 
-import { ChevronRight, type LucideIcon } from "lucide-react";
-// import { ChevronRight, type LucideIcon } from "lucide-react"
+import { ChevronRight, ChevronDown, type LucideIcon } from "lucide-react";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { SidebarMenuAction } from "@/components/ui/sidebar";
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -51,54 +56,92 @@ export function NavMain({
           orgRole &&
           pages
             .filter((page) => page.roles.includes(orgRole))
-            .map((item, key) => (
-              <SidebarMenuItem key={key}>
-                <>
-                  <Link href={item.url} className="relative">
-                    <SidebarMenuButton
-                      tooltip={item.title}
-                      isActive={isSubPath(pathname, item.url)}
-                      className="pl-3 overflow-hidden h-auto"
-                    >
-                      <span
-                        className={`w-1 absolute -left-0.5 bg-foreground rounded-full transition-all duration-300 ease-in-out ${
-                          isSubPath(pathname, item.url)
-                            ? "h-2/3 opacity-100"
-                            : "h-0 opacity-0"
-                        }`}
-                      ></span>
-                      {item.icon && <item.icon />}
-                      <span>{item.title}</span>
-                      <ChevronRight
-                        className={`ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90 ${
-                          isSubPath(pathname, item.url) ? "visible" : "hidden"
-                        }`}
-                      />
-                    </SidebarMenuButton>
-                  </Link>
+            .map((item, key) => {
+              if (item.items?.length) {
+                return (
+                  <Collapsible
+                    key={key}
+                    asChild
+                    defaultOpen={false}
+                    open={isSubPath(pathname, item.url) ? true : undefined}
+                  >
+                    <SidebarMenuItem>
+                      <Link href={item.url} className="relative">
+                        <SidebarMenuButton
+                          tooltip={item.title}
+                          isActive={isSubPath(pathname, item.url)}
+                          className="pl-3 overflow-hidden h-auto"
+                        >
+                          <span
+                            className={`w-1 absolute -left-0.5 bg-foreground rounded-full transition-all duration-300 ease-in-out ${
+                              isSubPath(pathname, item.url)
+                                ? "h-2/3 opacity-100"
+                                : "h-0 opacity-0"
+                            }`}
+                          ></span>
+                          {item.icon && <item.icon />}
+                          <span>{item.title}</span>
+                        </SidebarMenuButton>
+                      </Link>
 
-                  {item.items?.length ? (
-                    <SidebarMenuSub className="gap-[2px]">
-                      {item.items
-                        .filter((page) => page.roles.includes(orgRole))
-                        .map((item, index) => (
-                          <SidebarMenuSubItem key={index}>
-                            <SidebarMenuSubButton
-                              asChild
-                              isActive={isSubPath(pathname, item.url)}
-                            >
-                              <Link href={item.url} className="truncate">
-                                {item.icon && <item.icon />}
-                                {item.title}
-                              </Link>
-                            </SidebarMenuSubButton>
-                          </SidebarMenuSubItem>
-                        ))}
-                    </SidebarMenuSub>
-                  ) : null}
-                </>
-              </SidebarMenuItem>
-            ))}
+                      <CollapsibleTrigger asChild>
+                        <SidebarMenuAction className="data-[state=open]:rotate-180 bg-transparent hover:bg-transparent right-1.5 top-[calc(18px-10px)]">
+                          <ChevronDown />
+                          <span className="sr-only">Toggle</span>
+                        </SidebarMenuAction>
+                      </CollapsibleTrigger>
+
+                      <CollapsibleContent>
+                        <SidebarMenuSub className="gap-0.5">
+                          {item.items
+                            .filter((page) => page.roles.includes(orgRole))
+                            .map((item, index) => (
+                              <SidebarMenuSubItem key={index}>
+                                <SidebarMenuSubButton
+                                  asChild
+                                  isActive={isSubPath(pathname, item.url)}
+                                >
+                                  <Link href={item.url} className="truncate">
+                                    {item.icon && <item.icon />}
+                                    {item.title}
+                                  </Link>
+                                </SidebarMenuSubButton>
+                              </SidebarMenuSubItem>
+                            ))}
+                        </SidebarMenuSub>
+                      </CollapsibleContent>
+                    </SidebarMenuItem>
+                  </Collapsible>
+                );
+              } else {
+                return (
+                  <SidebarMenuItem key={key}>
+                    <Link href={item.url} className="relative">
+                      <SidebarMenuButton
+                        tooltip={item.title}
+                        isActive={isSubPath(pathname, item.url)}
+                        className="pl-3 overflow-hidden h-auto"
+                      >
+                        <span
+                          className={`w-1 absolute -left-0.5 bg-foreground rounded-full transition-all duration-300 ease-in-out ${
+                            isSubPath(pathname, item.url)
+                              ? "h-2/3 opacity-100"
+                              : "h-0 opacity-0"
+                          }`}
+                        ></span>
+                        {item.icon && <item.icon />}
+                        <span>{item.title}</span>
+                        <ChevronRight
+                          className={`ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90 ${
+                            isSubPath(pathname, item.url) ? "visible" : "hidden"
+                          }`}
+                        />
+                      </SidebarMenuButton>
+                    </Link>
+                  </SidebarMenuItem>
+                );
+              }
+            })}
       </SidebarMenu>
     </SidebarGroup>
   );

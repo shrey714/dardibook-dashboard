@@ -25,6 +25,8 @@ import { useOrganization } from "@clerk/nextjs";
 import { useBedsStore } from "@/lib/stores/useBedsStore";
 import toast from "react-hot-toast";
 import { updateOrgMetadata } from "@/app/dashboard/settings/clinic/_actions";
+import { Button } from "../ui/button";
+import Loader from "../common/Loader";
 
 export type ColumnId = string;
 
@@ -35,7 +37,9 @@ export const KanbanBoard = ({
   refresh,
   isEditModalOpen,
   setWasEdited,
-  wasEdited
+  wasEdited,
+  addNewBedHandler,
+  bedAddLoader
 }: any) => {
   const { organization, isLoaded } = useOrganization();
   const { beds, bedPatients, loading } = useBedsStore((state) => state);
@@ -115,8 +119,6 @@ export const KanbanBoard = ({
       await updateOrgMetadata({ bedMetaData: updatedBeds });
       organization.reload();
       setColumns(updatedBeds);
-      // setRefresh((prev)=>!prev);
-
     } catch (error) {
       console.log(error);
       toast.error("Error in deleting bed");
@@ -220,6 +222,17 @@ export const KanbanBoard = ({
 
   return (
     <>
+    <div className="border-b py-2 sticky top-0 bg-muted z-10">
+            <Button
+              className="w-28 sm:w-32"
+              type="submit"
+              variant={"default"}
+              onClick={addNewBedHandler}
+            >
+              {bedAddLoader ? <Loader /> : "Add New Bed"}
+            </Button>
+          </div>
+    <div className="w-full mb-16 mt-4 pl-4 min-h-[calc(100%-5rem)] flex flex-col">
       {columns.length == 0 ? (
         <div className="flex flex-1 justify-center items-center h-full">
           No Beds are adeed
@@ -284,6 +297,7 @@ export const KanbanBoard = ({
             )}
         </DndContext>
       )}
+    </div>
     </>
   );
 
@@ -347,7 +361,7 @@ export const KanbanBoard = ({
         );
 
         // setIsEditModalOpen(true);
-        openEditModal(task.bedBookingId,task.bedId);
+        openEditModal(task.bedBookingId, task.bedId);
       }
     }
 
