@@ -380,15 +380,6 @@ body {
   }
 }
 
-.fc .fc-toolbar.fc-header-toolbar {
-  margin-bottom: 8px;
-}
-
-.fc .fc-toolbar-title {
-  font-size: 20px;
-  margin: 0px;
-}
-
 .fc-day-other {
   background-color: var(--fc-other-day-background-color);
 }
@@ -398,7 +389,7 @@ body {
 }
 
 .fc .fc-col-header-cell-cushion {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 400;
   line-height: 20px;
   text-transform: uppercase;
@@ -431,46 +422,11 @@ body {
 }
 
 .fc .fc-toolbar.fc-header-toolbar {
-  margin-bottom: 4px;
+  margin-bottom: 0px;
 }
 
-.fc .fc-toolbar.fc-header-toolbar .fc-toolbar-chunk {
-  display: flex;
-  align-items: center;
-  padding-inline: 8px;
-}
-
-.fc .fc-toolbar.fc-header-toolbar .fc-button-primary.fc-button {
-  background-color: transparent;
-  border: none;
-  font-size: small;
-}
-
-.fc .fc-toolbar.fc-header-toolbar .fc-button-primary:focus {
-  box-shadow: none;
-}
-
-.fc .fc-toolbar.fc-header-toolbar .fc-toolbar-title {
-  border: 1px solid hsl(var(--muted-foreground));
-  color: hsl(var(--muted-foreground));
-  border-radius: 999px;
-  padding-inline: 6px 24px;
-  font-size: 16px;
-  line-height: normal;
-  min-width: 150px;
-  text-align: center;
-}
-
-.fc .fc-toolbar.fc-header-toolbar .fc-button-primary.fc-today-button {
-  padding: 0px;
-  font-size: 14px;
-  line-height: normal;
-}
-
-.fc .fc-toolbar.fc-header-toolbar .fc-button-primary.fc-today-button:hover {
-  text-decoration: underline;
-}
-
-.fc .fc-toolbar.fc-header-toolbar .fc-button-primary.fc-today-button:disabled {
-  display: none;
+table.fc-col-header,
+.fc-scroller>div,
+.fc-scroller>div>table {
+  width: 100% !important;
 }

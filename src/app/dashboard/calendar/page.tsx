@@ -29,6 +29,8 @@ import {
   OrgBed,
   RegisterPatientFormTypes,
 } from "@/types/FormTypes";
+import { SidebarInset, SidebarProvider } from "@/components/ui/calendarSidebar";
+import { CalendarSidebarContent } from "@/components/Calendar/CalendarSidebarContent";
 
 function getAllStartOfDaysInMonth(date: Date) {
   const start = startOfMonth(date);
@@ -58,7 +60,7 @@ const memoryCache = new Map<
   string,
   { data: CalendarEventTypes[]; timestamp: number }
 >();
-const CACHE_DURATION_MS = 1 * 60 * 1000; // 1 hour
+const CACHE_DURATION_MS = 3 * 60 * 1000; // 3 min
 
 export default function TaskPage() {
   const { isLoaded, orgId } = useAuth();
@@ -239,22 +241,30 @@ export default function TaskPage() {
   const handleDatesSet = (arg: DatesSetArg) => {
     const newDate = arg.view.calendar.getDate();
     if (!monthDate || !isSameMonth(monthDate, newDate)) {
-      setMonthDate(newDate);
+      setMonthDate(startOfMonth(newDate));
     }
   };
 
   return (
-    <>
+    <div className="h-full w-full overflow-hidden relative">
       {loader && (
         <div className="h-full w-full bg-background/80 absolute z-[2]"></div>
       )}
-
-      <div className="w-full p-0 pt-1 sm:p-1 h-full">
-        <DataCalendar
+      <SidebarProvider defaultOpen={true} className="flex min-h-0 h-full">
+        <SidebarInset className="min-h-0 w-full">
+          <div className="w-full p-0 pt-1 sm:p-1 h-full space-y-1 relative">
+            <DataCalendar
+              calendarData={calendarData}
+              handleDatesSet={handleDatesSet}
+            />
+          </div>
+        </SidebarInset>
+        <CalendarSidebarContent
+          loader={loader}
           calendarData={calendarData}
-          handleDatesSet={handleDatesSet}
+          monthDate={monthDate ?? new Date()}
         />
-      </div>
-    </>
+      </SidebarProvider>
+    </div>
   );
 }

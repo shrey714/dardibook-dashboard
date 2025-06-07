@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { createRef, useState } from "react";
 
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -40,6 +40,7 @@ import {
   RegisterPatientFormTypes,
 } from "@/types/FormTypes";
 import { usePatientHistoryModalStore } from "@/lib/stores/patientHistoryModalStore";
+import { CalendarHeader } from "./CalendarHeader";
 
 const customLocale = {
   ...enUS,
@@ -68,10 +69,13 @@ export default function DataCalendar({
   const [eventModel, setEventModel] = useState(false);
   const [eventData, setEventData] = useState<EventImpl | EventApi>();
   const { openModal } = usePatientHistoryModalStore();
+  const calendarRef = createRef<FullCalendar>();
+
   return (
     <>
-      {/* model for more links */}
-      {/* <Dialog open={moreLinkModel} onOpenChange={setMoreLinkModel}>
+      <>
+        {/* model for more links */}
+        {/* <Dialog open={moreLinkModel} onOpenChange={setMoreLinkModel}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
             <DialogTitle>
@@ -186,8 +190,8 @@ export default function DataCalendar({
         </DialogContent>
       </Dialog> */}
 
-      {/* model for event link */}
-      {/* <Dialog open={eventModel} onOpenChange={setEventModel}>
+        {/* model for event link */}
+        {/* <Dialog open={eventModel} onOpenChange={setEventModel}>
         <DialogContent className="sm:max-w-[900px]">
           <DialogHeader>
             <DialogTitle>
@@ -232,8 +236,11 @@ export default function DataCalendar({
           </DialogFooter>
         </DialogContent>
       </Dialog> */}
-
+      </>
+      <CalendarHeader calendarRef={calendarRef} />
       <FullCalendar
+        ref={calendarRef}
+        // navLinks
         datesSet={handleDatesSet}
         fixedWeekCount={false}
         plugins={[dayGridPlugin, interactionPlugin]} //timeGridPlugin
@@ -241,7 +248,7 @@ export default function DataCalendar({
         headerToolbar={{
           right: "",
           center: "",
-          left: "title prev,next today", //dayGridMonth,timeGridWeek
+          left: "", // title prev,next today dayGridMonth,timeGridWeek
         }}
         nowIndicator={true}
         // moreLinkClick={(events) => {
@@ -251,7 +258,7 @@ export default function DataCalendar({
         // }}
         // eventBackgroundColor="transparent"
         // eventBorderColor="transparent"
-        height={"100%"}
+        height={"calc(100% - 44px)"}
         dayMaxEvents={3}
         editable={true}
         handleWindowResize={true}
