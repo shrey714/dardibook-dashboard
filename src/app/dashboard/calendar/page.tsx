@@ -186,10 +186,13 @@ export default function TaskPage() {
               patient_name: patientName,
               event_type: "bed",
               bed_details: {
+                admission_by: bed.admission_by.name,
+                admission_for: bed.admission_for.name,
                 bedId: bed.bedId,
                 admission_at: bed.admission_at,
                 discharge_at: bed.discharge_at,
                 dischargeMarked: bed.dischargeMarked,
+                discharged_by: bed.discharged_by?.name,
               },
             });
           }
