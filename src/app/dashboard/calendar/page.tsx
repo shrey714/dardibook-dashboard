@@ -255,12 +255,10 @@ export default function TaskPage() {
       )}
       <SidebarProvider defaultOpen={true} className="flex min-h-0 h-full">
         <SidebarInset className="min-h-0 w-full">
-          <div className="w-full p-0 pt-1 sm:p-1 h-full space-y-1 relative">
-            <DataCalendar
-              calendarData={calendarData}
-              handleDatesSet={handleDatesSet}
-            />
-          </div>
+          <DataCalendar
+            calendarData={calendarData}
+            handleDatesSet={handleDatesSet}
+          />
         </SidebarInset>
         <CalendarSidebarContent
           loader={loader}

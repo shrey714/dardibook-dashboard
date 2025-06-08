@@ -3,9 +3,7 @@ import React, { createRef } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import {
-  format,
-} from "date-fns";
+import { format } from "date-fns";
 import { Button } from "../ui/button";
 import {
   BedIcon,
@@ -20,12 +18,8 @@ import {
   UserPlus,
   UserPlusIcon,
 } from "lucide-react";
-import {
-  DatesSetArg,
-} from "@fullcalendar/core/index.js";
-import {
-  CalendarEventTypes,
-} from "@/types/FormTypes";
+import { DatesSetArg } from "@fullcalendar/core/index.js";
+import { CalendarEventTypes } from "@/types/FormTypes";
 import {
   Popover,
   PopoverClose,
@@ -56,7 +50,7 @@ export default function DataCalendar({
   const { openModal } = usePatientHistoryModalStore();
   const calendarRef = createRef<FullCalendar>();
   return (
-    <>
+    <div className="w-full p-0 pt-1 sm:p-1 h-full space-y-1 relative">
       <CalendarHeader calendarRef={calendarRef} />
       <FullCalendar
         ref={calendarRef}
@@ -410,6 +404,6 @@ export default function DataCalendar({
           draggedEvent?.extendedProps?.Data.event_type === "bed" ? false : false
         }
       />
-    </>
+    </div>
   );
 }
