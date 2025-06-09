@@ -84,11 +84,16 @@ const Availability: React.FC<AvailabilityProps> = ({ beds, bedPatients }) => {
         bookingDetails.push(undefined);
       } else if (free > 0) {
         result.push(free); // next free slot
+        colors.push("emerald");
         bookingDetails.push(undefined);
       }
 
       result.push(differenceInMinutes(end, start)); // occupied
-      differenceInMinutes(new Date(),start) ? colors.push("pink"):colors.push("gray");
+      if (differenceInMinutes(new Date(), start) > 0) {
+        colors.push("pink");
+      } else {
+        colors.push("gray");
+      }      
       bookingDetails.push(bookingDetail);
       console.log(result);
       current = end;

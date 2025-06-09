@@ -162,7 +162,7 @@ const CategoryBar = React.forwardRef<HTMLDivElement, CategoryBarProps>(
                 ? bedPatients[bed.patient_id]
                 : undefined;
               return (
-                <HoverCard>
+                <HoverCard key={index}>
                   <HoverCardTrigger asChild>
                     <div
                       key={`item-${index}`}
