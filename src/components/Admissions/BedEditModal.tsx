@@ -269,7 +269,7 @@ const BedEditModal: React.FC<BedEditModalProps> = ({
             registered_date={[]}
             date={fromDate}
             setDate={setFromDate}
-            icon={<CalendarPlusIcon mr-2 h-4 w-4 />}
+            icon={<CalendarPlusIcon className="mr-2 h-4 w-4" />}
           />
         </div>
         <div className="flex-1">
@@ -277,7 +277,7 @@ const BedEditModal: React.FC<BedEditModalProps> = ({
             registered_date={[]}
             date={toDate}
             setDate={setToDate}
-            icon={<CalendarMinusIcon mr-2 h-4 w-4 />}
+            icon={<CalendarMinusIcon className="mr-2 h-4 w-4" />}
           />
         </div>
       </div>

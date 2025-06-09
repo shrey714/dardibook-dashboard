@@ -298,15 +298,17 @@ const SliderThumbItem = forwardRef<
   HTMLDivElement,
   {
     index: number;
+    activeTab: number;
+    setActiveTab:React.Dispatch<React.SetStateAction<number>>;
   } & React.HTMLAttributes<HTMLDivElement>
->(({ className, index, children, ...props }, ref) => {
+>(({ className, index, activeTab, setActiveTab, children, ...props }, ref) => {
   const { activeIndex, onThumbClick, orientation } = useCarousel();
   const isSlideActive = activeIndex === index;
   return (
     <div
       {...props}
       ref={ref}
-      onClick={() => onThumbClick(index)}
+      onClick={() => {onThumbClick(index);setActiveTab(index)}}
       className={cn(
         "flex min-w-0 shrink-0 grow-0 bg-background p-1",
         `${orientation === "vertical" ? "pb-1" : "pr-1"}`,

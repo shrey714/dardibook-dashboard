@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Carousel,
   CarouselMainContainer,
@@ -7,8 +7,9 @@ import {
   CarouselThumbsContainer,
   SliderMainItem,
   SliderThumbItem,
+  useCarousel,
 } from "./Carousel";
-import { endOfDay, format, max, min, startOfDay } from "date-fns";
+import { compareAsc, differenceInMinutes, endOfDay, format, max, min, startOfDay } from "date-fns";
 import { HoverCard, HoverCardTrigger } from "@radix-ui/react-hover-card";
 import { HoverCardContent } from "../ui/hover-card";
 import { BedPatientTypes, OrgBed } from "@/types/FormTypes";
@@ -39,20 +40,60 @@ for (let i = -15; i <= 15; i++) {
 const totalHoursInDay = 24;
 
 const Availability: React.FC<AvailabilityProps> = ({ beds, bedPatients }) => {
+  const computeMinutes = (beds: OrgBed[],activeTab:number) => {
+    const targetDate = new Date(today);
+    targetDate.setDate(today.getDate() + activeTab - 15);
+
+    const dayStart = startOfDay(targetDate);
+    const dayEnd = endOfDay(targetDate);
+
+    const intervals: [Date, Date][] = [];
+
+    for (const { admission_at, discharge_at } of beds) {
+      const slotStart = max([new Date(admission_at), dayStart]);
+      const slotEnd = min([new Date(discharge_at), dayEnd]);
+
+      if (compareAsc(slotStart, slotEnd) < 0) {
+        intervals.push([slotStart, slotEnd]);
+      }
+    }
+
+    intervals.sort(([a], [b]) => compareAsc(a, b));
+
+    const result: number[] = [];
+    let current = dayStart;
+
+    for (const [start, end] of intervals) {
+      const free = differenceInMinutes(start, current);
+
+      if (result.length === 0) {
+        result.push(free); // first free slot (can be 0)
+      } else if (free > 0) {
+        result.push(free); // next free slot
+      }
+
+      result.push(differenceInMinutes(end, start)); // occupied
+      current = end;
+    }
+
+    // final free slot till end of day
+    if (compareAsc(current, dayEnd) < 0) {
+      result.push(differenceInMinutes(dayEnd, current));
+    }
+
+    return result;
+  };
+  const [activeTab, setActiveTab] = useState<number>(15);
   return (
     <Carousel className="py-3">
-      <CarouselNext className="top-1/3 -translate-y-1/3" />
-      <CarouselPrevious className="top-1/3 -translate-y-1/3" />
-      <CarouselMainContainer className="h-32">
+      <CarouselMainContainer className="h-1">
         {days.map((date, index) => {
-          const currentDay = new Date(today);
-          currentDay.setDate(today.getDate() + index - 15);
-
-          const startOfCurrentDay = startOfDay(currentDay);
-          const endOfCurrentDay = endOfDay(currentDay);
           return (
-            <SliderMainItem key={index} className="bg-transparent">
-              {/* <div className="outline outline-1 outline-border size-full flex items-center justify-center rounded-xl bg-background">
+            <SliderMainItem key={index}></SliderMainItem>
+          );
+        })}
+      </CarouselMainContainer>
+      {/* <div className="outline outline-1 outline-border size-full flex items-center justify-center rounded-xl bg-background">
                 <div className="w-[192rem] h-full overflow-x-scroll flex relative">
                   {[...Array(24).keys()].map((hour) => (
                     <div
@@ -182,19 +223,22 @@ const Availability: React.FC<AvailabilityProps> = ({ beds, bedPatients }) => {
                   })}
                 </div>
               </div> */}
-              <CategoryBar
-                      values={[10, 10, 20]}
-                      marker={{ value: 27, tooltip: "20", showAnimation: true }}
-                      colors={["pink", "amber", "emerald"]}
-                      className="mx-auto max-w-sm"
-                    />
-            </SliderMainItem>
-          );
-        })}
-      </CarouselMainContainer>
+      <CategoryBar
+        values={computeMinutes(beds,activeTab)}
+        marker={activeTab==15?{ value: differenceInMinutes(new Date().getTime(), startOfDay(today)), tooltip: format(new Date().getTime(),"HH:mm").toString(), showAnimation: true }:undefined}
+        // colors={["pink", "amber", "emerald"]}
+        className="mx-auto w-full"
+      />
+      {/* </SliderMainItem> */}
       <CarouselThumbsContainer>
         {days.map((date, index) => (
-          <SliderThumbItem key={index} index={index} className="bg-transparent">
+          <SliderThumbItem
+            key={index}
+            index={index}
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            className="bg-transparent"
+          >
             <div className="outline outline-1 outline-border size-full flex items-center justify-center rounded-xl bg-background text-xs sm:text-base">
               {date}
             </div>{" "}
