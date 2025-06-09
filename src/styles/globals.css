@@ -368,14 +368,16 @@ body {
 }
 
 /* calendar style */
+@layer base {
+  :root {
+    --fc-border-color: hsl(var(--border));
+    --fc-other-day-background-color: #eaecee;
+  }
 
-.fc .fc-toolbar.fc-header-toolbar {
-  margin-bottom: 8px;
-}
-
-.fc .fc-toolbar-title {
-  font-size: 20px;
-  margin: 0px;
+  .dark {
+    --fc-border-color: hsl(var(--border));
+    --fc-other-day-background-color: #000000;
+  }
 }
 
 .fc-day-other {
@@ -383,5 +385,48 @@ body {
 }
 
 .fc .fc-more-popover {
-  background: hsl(var(--background)) ;
+  background: hsl(var(--background));
+}
+
+.fc .fc-col-header-cell-cushion {
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 20px;
+  text-transform: uppercase;
+}
+
+.fc .fc-daygrid-day-number {
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: .3px;
+  white-space: nowrap;
+  color: hsl(var(--muted-foreground));
+  line-height: 16px;
+  pointer-events: auto;
+}
+
+.fc .fc-daygrid-day-top {
+  justify-content: center;
+}
+
+.fc .fc-day-today .fc-daygrid-day-number {
+  color: #062e6f;
+  margin-top: 4px;
+  background-color: #a8c7fa;
+  width: max-content;
+  min-width: 24px;
+  border-radius: 50%;
+  text-align: center;
+  aspect-ratio: 1 / 1;
+  pointer-events: auto;
+}
+
+.fc .fc-toolbar.fc-header-toolbar {
+  margin-bottom: 0px;
+}
+
+table.fc-col-header,
+.fc-scroller>div,
+.fc-scroller>div>table {
+  width: 100% !important;
 }

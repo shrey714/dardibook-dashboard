@@ -38,7 +38,7 @@ export function LogoHandeler({}) {
               <span className="self-center text-xl font-semibold whitespace-nowrap">
                 DardiBook
               </span>
-              <span className="text-[7px] font-semibold border-[1.5px] border-[--border] px-2 rounded-full">
+              <span className="text-[7px] font-semibold border-[1.5px] border-[--border] px-2 rounded-full leading-[normal]">
                 {orgRole === "org:clinic_head"
                   ? "Admin"
                   : orgRole === "org:doctor"

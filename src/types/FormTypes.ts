@@ -169,6 +169,7 @@ export interface PharmacySelectedPatientType {
 
 type BasePatientInfo = {
     patient_id: string;
+    patient_name?: string;
 };
 
 export type CalendarEventTypes =
@@ -184,10 +185,13 @@ export type CalendarEventTypes =
     | (BasePatientInfo & {
         event_type: "bed";
         bed_details: {
+            admission_by: string;
+            admission_for: string;
             bedId: string;
             admission_at: number;
             discharge_at: number;
             dischargeMarked: boolean;
+            discharged_by?: string;
         };
         appointment_details?: never;
     });

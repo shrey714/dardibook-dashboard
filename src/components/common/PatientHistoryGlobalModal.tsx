@@ -887,7 +887,7 @@ const PatientHistoryGlobalModal = () => {
             <DialogDescription hidden></DialogDescription>
             <div className="w-full gap-y-1 bg-slate-50 dark:bg-gray-900 border-b px-4 py-2 flex items-center justify-between flex-col sm:flex-row">
               {loader ? (
-                <div className="flex flex-1 items-center space-x-2 sm:space-x-4">
+                <div className="flex w-full flex-1 items-center space-x-2 sm:space-x-4">
                   <Skeleton className="size-9 md:size-11 rounded-full" />
                   <div className="w-full">
                     <Skeleton className="h-6 max-w-[200px]" />

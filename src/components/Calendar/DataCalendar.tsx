@@ -1,60 +1,44 @@
-import React, { useState } from "react";
+import React, { createRef } from "react";
 
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import timeGridPlugin from "@fullcalendar/timegrid";
-import {
-  addDays,
-  endOfDay,
-  endOfMonth,
-  format,
-  formatRelative,
-  isSameDay,
-  startOfDay,
-  startOfMonth,
-} from "date-fns";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogDescription,
-  DialogHeader,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import {} from "../ui/dialog";
+import { format } from "date-fns";
 import { Button } from "../ui/button";
-import { BedSingle, Calendar, UserPlus, UserRoundPlus } from "lucide-react";
 import {
-  DatesSetArg,
-  EventApi,
-  MoreLinkArg,
-} from "@fullcalendar/core/index.js";
-import { enUS } from "date-fns/locale";
-import { EventImpl } from "@fullcalendar/core/internal";
-import Link from "next/link";
-import { Separator } from "../ui/separator";
+  BedIcon,
+  BedSingle,
+  CalendarMinus,
+  CalendarPlusIcon,
+  ClipboardPlusIcon,
+  HistoryIcon,
+  LogOutIcon,
+  PencilLineIcon,
+  StethoscopeIcon,
+  UserPlus,
+  UserPlusIcon,
+} from "lucide-react";
+import { DatesSetArg } from "@fullcalendar/core/index.js";
+import { CalendarEventTypes } from "@/types/FormTypes";
 import {
-  CalendarEventTypes,
-  OrgBed,
-  RegisterPatientFormTypes,
-} from "@/types/FormTypes";
+  Popover,
+  PopoverClose,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { usePatientHistoryModalStore } from "@/lib/stores/patientHistoryModalStore";
-
-const customLocale = {
-  ...enUS,
-  formatRelative: (token: string) => {
-    const formatWithoutTime: Record<string, string> = {
-      lastWeek: "'last' eeee",
-      yesterday: "'yesterday'",
-      today: "'today'",
-      tomorrow: "'tomorrow'",
-      nextWeek: "eeee",
-      other: "MMMM dd, yyyy",
-    };
-    return formatWithoutTime[token];
-  },
-};
+import { CalendarHeader } from "./CalendarHeader";
+import { Cross2Icon } from "@radix-ui/react-icons";
+import { ScrollArea } from "../ui/scroll-area";
+import {
+  Timeline,
+  TimelineConnector,
+  TimelineContent,
+  TimelineDescription,
+  TimelineItem,
+  TimelineSeparator,
+  TimelineTitle,
+} from "@/components/ui/timeline";
 
 export default function DataCalendar({
   calendarData,
@@ -63,193 +47,29 @@ export default function DataCalendar({
   calendarData: CalendarEventTypes[];
   handleDatesSet: (arg: DatesSetArg) => void;
 }) {
-  const [moreLinkModel, setMoreLinkModel] = useState(false);
-  const [moreLinkEvents, setMoreLinkEvents] = useState<MoreLinkArg>();
-  const [eventModel, setEventModel] = useState(false);
-  const [eventData, setEventData] = useState<EventImpl | EventApi>();
   const { openModal } = usePatientHistoryModalStore();
+  const calendarRef = createRef<FullCalendar>();
   return (
-    <>
-      {/* model for more links */}
-      {/* <Dialog open={moreLinkModel} onOpenChange={setMoreLinkModel}>
-        <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle>
-              <div className="flex items-center justify-start">
-                <Calendar className="w-6 h-6" />
-                <span className="ml-2">
-                  All the events for{" "}
-                  {moreLinkEvents?.date &&
-                    formatRelative(moreLinkEvents.date, new Date(), {
-                      locale: customLocale,
-                    })}
-                </span>
-              </div>
-            </DialogTitle>
-            <DialogDescription>
-              Click on an appointment to view more details.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex flex-col gap-2 max-h-[50vh] overflow-y-auto max-w-full">
-            {moreLinkEvents?.allSegs?.map((event, index) => (
-              <Button
-                key={index}
-                type="button"
-                variant={"outline"}
-                className="border-2 w-full bg-muted/50 rounded-md min-h-min h-min flex flex-row items-center justify-start overflow-hidden p-0"
-                onClick={() => {
-                  setEventData(event?.event);
-                  setEventModel(true);
-                  return "none";
-                }}
-              >
-                <div className="bg-green-500/90 w-[3px] h-full"></div>
-
-                <div className="relative flex flex-1 flex-row items-center gap-2 p-2">
-                  <BedSingle />
-
-                  <Link
-                    href={{
-                      pathname: "history/patientHistory",
-                      query: {
-                        patientId: event?.event?.extendedProps?.patientData?.id,
-                      },
-                    }}
-                    className={`ml-2 text-sm underline`}
-                  >
-                    {event?.event?.extendedProps?.patientData?.id}
-                  </Link>
-                  {" - "}
-                  <p className="flex flex-row flex-1">
-                    {event?.event?.extendedProps?.patientData?.first_name}{" "}
-                    {event?.event?.extendedProps?.patientData?.last_name}
-                  </p>
-                </div>
-
-                <div className="bg-red-500/90 w-[3px] h-full"></div>
-              </Button>
-            ))}
-            <Separator />
-            {moreLinkEvents?.allSegs?.map((event, index) => (
-              <Button
-                key={index}
-                type="button"
-                variant={"outline"}
-                className="border-2 w-full bg-muted/50 rounded-md min-h-min h-min flex flex-row items-center justify-start px-3"
-                onClick={() => {
-                  setEventData(event?.event);
-                  setEventModel(true);
-                  return "none";
-                }}
-              >
-                <UserRoundPlus />
-
-                <Link
-                  href={{
-                    pathname: "history/patientHistory",
-                    query: {
-                      patientId: event?.event?.extendedProps?.patientData?.id,
-                    },
-                  }}
-                  className={`ml-2 text-sm underline`}
-                >
-                  {event?.event?.extendedProps?.patientData?.id}
-                </Link>
-                {" - "}
-                <p className="flex flex-row flex-1">
-                  {event?.event?.extendedProps?.patientData?.first_name}{" "}
-                  {event?.event?.extendedProps?.patientData?.last_name}
-                </p>
-                <p className="ml-2">
-                  {format(
-                    new Date(
-                      event?.event?.extendedProps?.patientData?.last_visited
-                    ),
-                    "hh:mm a"
-                  )}
-                </p>
-              </Button>
-            ))}
-            
-          </div>
-          <DialogFooter className="sm:justify-center">
-            <DialogClose asChild>
-              <Button
-                type="button"
-                variant={"outline"}
-                className="border-2 self-center rounded-full min-h-min h-min py-2 px-7 text-xs leading-none"
-              >
-                Close
-              </Button>
-            </DialogClose>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog> */}
-
-      {/* model for event link */}
-      {/* <Dialog open={eventModel} onOpenChange={setEventModel}>
-        <DialogContent className="sm:max-w-[900px]">
-          <DialogHeader>
-            <DialogTitle>
-              <div className="flex items-center justify-start">
-                <Calendar className="w-6 h-6" />
-                <span className="ml-2">
-                  Event timeline :{" "}
-                  {eventData?.event?.start &&
-                    formatRelative(eventData?.event?.start, new Date(), {
-                      locale: customLocale,
-                    })}
-                  {" - "}
-                  {eventData?.event?.end &&
-                    formatRelative(eventData?.event?.end, new Date(), {
-                      locale: customLocale,
-                    })}
-                </span>
-              </div>
-            </DialogTitle>
-            <DialogDescription>
-              Click on an event to view more details.
-              {eventData?.event?.title}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 max-h-[50vh] overflow-y-auto bg-muted/50 max-w-full py-4 px-5 border-2 border-border rounded-md">
-            <div className="grid grid-cols-4 items-center gap-4">Name</div>
-            <div className="grid grid-cols-4 items-center gap-4">Username</div>
-          </div>
-          <DialogFooter className="f-full sm:justify-center">
-            <Button type="submit">Add New</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog> */}
-
+    <div className="w-full p-0 pt-1 sm:p-1 h-full space-y-1 relative">
+      <CalendarHeader calendarRef={calendarRef} />
       <FullCalendar
+        ref={calendarRef}
+        // navLinks
         datesSet={handleDatesSet}
         fixedWeekCount={false}
         plugins={[dayGridPlugin, interactionPlugin]} //timeGridPlugin
         dayMaxEventRows={true}
         headerToolbar={{
-          right: "prev,next today",
-          center: "title",
-          left: "", //dayGridMonth,timeGridWeek
+          right: "",
+          center: "",
+          left: "", // title prev,next today dayGridMonth,timeGridWeek
         }}
         nowIndicator={true}
-        // moreLinkClick={(events) => {
-        //   setMoreLinkEvents(events);
-        //   setMoreLinkModel(true);
-        //   return "none";
-        // }}
-        // eventBackgroundColor="transparent"
-        // eventBorderColor="transparent"
-        height={"100%"}
+        height={"calc(100% - 44px)"}
         dayMaxEvents={3}
         editable={true}
         handleWindowResize={true}
-        eventClick={(event) => {
-          // setEventData(event?.event);
-          // setEventModel(true);
-          openModal({
-            patientId: event?.event.extendedProps?.Data.patient_id,
-          });
+        eventClick={() => {
           return "none";
         }}
         selectable={true}
@@ -258,7 +78,7 @@ export default function DataCalendar({
         events={calendarData.map((event) => {
           if (event.event_type === "bed") {
             return {
-              title: `${event.bed_details.bedId} (${event.patient_id})`,
+              title: `${event.bed_details.bedId} - ${event.patient_name}`,
               start: format(
                 new Date(event.bed_details.admission_at),
                 "yyyy-MM-dd'T'HH:mm:ss"
@@ -281,7 +101,7 @@ export default function DataCalendar({
             };
           } else if (event.event_type === "appointment") {
             return {
-              title: `${event.patient_id}`,
+              title: `${event.patient_name}`,
               date: format(
                 new Date(event.appointment_details.registered_at),
                 "yyyy-MM-dd"
@@ -302,20 +122,288 @@ export default function DataCalendar({
             return {};
           }
         })}
-        eventContent={(eventInfo) => (
-          <span className="flex flex-row gap-1 items-center px-2">
-            {eventInfo.event.extendedProps?.Data.event_type === "bed" ? (
-              <BedSingle size={15} />
-            ) : (
-              <UserPlus size={15} />
-            )}
-            {eventInfo.event.title}
-          </span>
-        )}
+        eventContent={(eventInfo) => {
+          return (
+            <Popover>
+              <PopoverTrigger asChild>
+                <span className="flex flex-row gap-0.5 sm:gap-1 items-center px-1 sm:px-2 text-[8px] sm:text-sm overflow-hidden text-clip">
+                  {eventInfo.event.extendedProps?.Data.event_type === "bed" ? (
+                    <BedSingle className="size-2.5 sm:size-3.5 shrink-0" />
+                  ) : (
+                    <UserPlus className="size-2.5 sm:size-3.5 shrink-0" />
+                  )}
+                  {eventInfo.event.title}
+                </span>
+              </PopoverTrigger>
+              <PopoverContent
+                side="left"
+                collisionPadding={20}
+                sideOffset={10}
+                className="w-96 max-w-md bg-muted/50 backdrop-blur-3xl border-0 p-0 overflow-hidden"
+                style={{
+                  boxShadow:
+                    "0 3px 4px 0 rgba(0,0,0,.14),0 3px 3px -2px rgba(0,0,0,.12),0 1px 8px 0 rgba(0,0,0,.2)",
+                }}
+              >
+                <header className="flex flex-row items-center justify-end p-2.5 pb-0">
+                  <PopoverClose asChild aria-label="Close">
+                    <Button
+                      variant="secondary"
+                      size="icon"
+                      className="rounded-full"
+                    >
+                      <Cross2Icon />
+                    </Button>
+                  </PopoverClose>
+                </header>
+                <ScrollArea className="h-96 w-full">
+                  <div className="pt-0 p-4 pb-0 flex flex-col gap-2">
+                    <Timeline orientation="vertical" className="pt-2 px-2 pb-2">
+                      <TimelineItem>
+                        <TimelineSeparator>
+                          <UserPlusIcon
+                            size={36}
+                            className="bg-blue-600/10 text-blue-600 border border-blue-600 rounded-full p-2"
+                          />
+                          <TimelineConnector />
+                        </TimelineSeparator>
+                        <TimelineContent>
+                          <TimelineTitle className="text-xs text-muted-foreground">
+                            {eventInfo.event.extendedProps?.Data?.patient_id}
+                          </TimelineTitle>
+                          <TimelineDescription className="text-primary text-sm font-medium">
+                            {eventInfo.event.extendedProps?.Data?.patient_name}
+                          </TimelineDescription>
+                        </TimelineContent>
+                      </TimelineItem>
+
+                      {eventInfo.event.extendedProps?.Data.event_type ===
+                        "appointment" && (
+                        <>
+                          <TimelineItem>
+                            <TimelineSeparator>
+                              <div className="px-[6px]">
+                                <CalendarPlusIcon
+                                  size={24}
+                                  className="text-primary"
+                                />
+                              </div>
+                              <TimelineConnector />
+                            </TimelineSeparator>
+                            <TimelineContent>
+                              <TimelineTitle className="text-xs text-muted-foreground">
+                                Registered On
+                              </TimelineTitle>
+                              <TimelineDescription className="text-primary text-sm font-medium">
+                                {format(
+                                  eventInfo.event.extendedProps?.Data
+                                    .appointment_details.registered_at,
+                                  "h.mm a, MMMM d, yyyy"
+                                )}
+                              </TimelineDescription>
+                            </TimelineContent>
+                          </TimelineItem>
+
+                          <TimelineItem>
+                            <TimelineSeparator>
+                              <div className="px-[6px]">
+                                <ClipboardPlusIcon
+                                  size={24}
+                                  className="text-green-600"
+                                />
+                              </div>
+                            </TimelineSeparator>
+
+                            {eventInfo.event.extendedProps?.Data
+                              .appointment_details.prescribed ? (
+                              <TimelineContent>
+                                <TimelineTitle className="text-xs text-muted-foreground">
+                                  Prescribed On
+                                </TimelineTitle>
+                                <TimelineDescription className="text-primary text-sm font-medium">
+                                  {format(
+                                    eventInfo.event.extendedProps?.Data
+                                      .appointment_details.prescribed_at,
+                                    "h.mm a, MMMM d, yyyy"
+                                  )}
+                                </TimelineDescription>
+                              </TimelineContent>
+                            ) : (
+                              <TimelineContent className="pb-0 flex items-center">
+                                <TimelineTitle>Not Prescribed</TimelineTitle>
+                              </TimelineContent>
+                            )}
+                          </TimelineItem>
+                        </>
+                      )}
+
+                      {eventInfo.event.extendedProps?.Data.event_type ===
+                        "bed" && (
+                        <>
+                          <TimelineItem>
+                            <TimelineSeparator>
+                              <div className="px-[6px]">
+                                <CalendarPlusIcon
+                                  size={24}
+                                  className="text-yellow-400"
+                                />
+                              </div>
+                              <TimelineConnector className="bg-yellow-400" />
+                            </TimelineSeparator>
+                            <TimelineContent>
+                              <TimelineTitle className="text-xs text-muted-foreground">
+                                Admitted on
+                              </TimelineTitle>
+                              <TimelineDescription className="text-primary text-sm font-medium">
+                                {format(
+                                  eventInfo.event.extendedProps?.Data
+                                    .bed_details.admission_at,
+                                  "h.mm a, MMMM d, yyyy"
+                                )}
+                              </TimelineDescription>
+                            </TimelineContent>
+                          </TimelineItem>
+
+                          <TimelineItem>
+                            <TimelineSeparator>
+                              <PencilLineIcon
+                                size={36}
+                                className="bg-blue-600/10 text-blue-600 border border-blue-600 rounded-md p-2"
+                              />
+                            </TimelineSeparator>
+                            <TimelineContent className="pb-1.5">
+                              <TimelineTitle className="text-xs text-muted-foreground">
+                                Admitted By
+                              </TimelineTitle>
+                              <TimelineDescription className="text-primary text-sm font-medium">
+                                {
+                                  eventInfo.event.extendedProps?.Data
+                                    .bed_details.admission_by
+                                }
+                              </TimelineDescription>
+                            </TimelineContent>
+                          </TimelineItem>
+
+                          <TimelineItem>
+                            <TimelineSeparator>
+                              <StethoscopeIcon
+                                size={36}
+                                className="bg-green-500/10 text-green-600 border border-green-600 rounded-md p-2"
+                              />
+                            </TimelineSeparator>
+                            <TimelineContent className="pb-1.5">
+                              <TimelineTitle className="text-xs text-muted-foreground">
+                                Admitted For
+                              </TimelineTitle>
+                              <TimelineDescription className="text-primary text-sm font-medium">
+                                {
+                                  eventInfo.event.extendedProps?.Data
+                                    .bed_details.admission_for
+                                }
+                              </TimelineDescription>
+                            </TimelineContent>
+                          </TimelineItem>
+
+                          <TimelineItem>
+                            <TimelineSeparator>
+                              <BedIcon
+                                size={36}
+                                className="bg-blue-600/10 text-blue-600 border border-blue-600 rounded-md p-2"
+                              />
+                              <TimelineConnector className="bg-red-500" />
+                            </TimelineSeparator>
+
+                            <TimelineContent className="pb-10">
+                              <TimelineTitle className="text-xs text-muted-foreground">
+                                Bed ID
+                              </TimelineTitle>
+                              <TimelineDescription className="text-primary text-sm font-medium">
+                                {
+                                  eventInfo.event.extendedProps?.Data
+                                    .bed_details.bedId
+                                }
+                              </TimelineDescription>
+                            </TimelineContent>
+                          </TimelineItem>
+
+                          <TimelineItem>
+                            <TimelineSeparator>
+                              <div className="px-[6px]">
+                                <CalendarMinus
+                                  size={24}
+                                  className="text-red-500"
+                                />
+                              </div>
+                              {eventInfo.event.extendedProps?.Data.bed_details
+                                .dischargeMarked && <TimelineConnector />}
+                            </TimelineSeparator>
+                            <TimelineContent>
+                              <TimelineTitle className="text-xs text-muted-foreground">
+                                {eventInfo.event.extendedProps?.Data.bed_details
+                                  .dischargeMarked
+                                  ? "Discharged on"
+                                  : "Discharge on"}
+                              </TimelineTitle>
+                              <TimelineDescription className="text-primary text-sm font-medium">
+                                {format(
+                                  eventInfo.event.extendedProps?.Data
+                                    .bed_details.discharge_at,
+                                  "h.mm a, MMMM d, yyyy"
+                                )}
+                              </TimelineDescription>
+                            </TimelineContent>
+                          </TimelineItem>
+
+                          {eventInfo.event.extendedProps?.Data.bed_details
+                            .dischargeMarked && (
+                            <TimelineItem>
+                              <TimelineSeparator>
+                                <LogOutIcon
+                                  size={36}
+                                  className="bg-red-500/10 text-red-500 border border-red-500 rounded-md p-2"
+                                />
+                              </TimelineSeparator>
+                              <TimelineContent className="pb-1.5">
+                                <TimelineTitle className="text-xs text-muted-foreground">
+                                  Discharged By
+                                </TimelineTitle>
+                                <TimelineDescription className="text-primary text-base font-medium">
+                                  {
+                                    eventInfo.event.extendedProps?.Data
+                                      .bed_details?.discharged_by
+                                  }
+                                </TimelineDescription>
+                              </TimelineContent>
+                            </TimelineItem>
+                          )}
+                        </>
+                      )}
+                    </Timeline>
+                  </div>
+                </ScrollArea>
+                <footer className="flex flex-row justify-end p-1 border-t">
+                  <Button
+                    className="rounded-full"
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      openModal({
+                        patientId:
+                          eventInfo.event.extendedProps?.Data.patient_id,
+                      });
+                    }}
+                  >
+                    <HistoryIcon /> History
+                  </Button>
+                </footer>
+              </PopoverContent>
+            </Popover>
+          );
+        }}
         eventAllow={(_, draggedEvent) =>
           draggedEvent?.extendedProps?.Data.event_type === "bed" ? false : false
         }
       />
-    </>
+    </div>
   );
 }
