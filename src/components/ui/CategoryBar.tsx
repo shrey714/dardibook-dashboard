@@ -102,9 +102,11 @@ const BarLabels = ({ values }: { values: number[] }) => {
 
 interface CategoryBarProps extends React.HTMLAttributes<HTMLDivElement> {
   values: number[];
+  bookingDetails: (OrgBed | undefined)[];
   colors?: AvailableChartColorsKeys[];
   marker?: { value: number; tooltip?: string; showAnimation?: boolean };
   showLabels?: boolean;
+  bedPatients: Record<string, BedPatientTypes>;
 }
 
 const CategoryBar = React.forwardRef<HTMLDivElement, CategoryBarProps>(
@@ -115,6 +117,8 @@ const CategoryBar = React.forwardRef<HTMLDivElement, CategoryBarProps>(
       marker,
       showLabels = true,
       className,
+      bookingDetails,
+      bedPatients,
       ...props
     },
     forwardedRef
@@ -153,7 +157,13 @@ const CategoryBar = React.forwardRef<HTMLDivElement, CategoryBarProps>(
             {values.map((value, index) => {
               const barColor = colors[index] ?? "gray";
               const percentage = (value / maxValue) * 100;
+              const bed = bookingDetails[index];
+              const matchingPatient = bed?.patient_id
+                ? bedPatients[bed.patient_id]
+                : undefined;
               return (
+                <HoverCard>
+                  <HoverCardTrigger asChild>
                     <div
                       key={`item-${index}`}
                       className={cx(
@@ -165,7 +175,64 @@ const CategoryBar = React.forwardRef<HTMLDivElement, CategoryBarProps>(
                         percentage === 0 && "hidden"
                       )}
                       style={{ width: `${percentage}%` }}
-                    />
+                    ></div>
+                  </HoverCardTrigger>
+                  {matchingPatient && bed && (
+                    <HoverCardContent
+                      className="w-auto bg-muted p-2 z-[1000]"
+                      sideOffset={20}
+                      asChild={false}
+                    >
+                      <div className="flex flex-row gap-x-4">
+                        <div className="flex flex-col items-start space-y-1">
+                          <h4 className="text-sm font-semibold">
+                            Id : {bed.patient_id}
+                          </h4>
+                          <h4 className="text-sm font-semibold">
+                            Name : {matchingPatient.name}
+                          </h4>
+                          <h4 className="text-sm font-semibold">
+                            Gender : {matchingPatient.gender}
+                          </h4>
+                          <h4 className="text-sm font-semibold">
+                            Age : {matchingPatient.age}
+                          </h4>
+                          <p className="flex text-sm items-center gap-2">
+                            <PhoneIcon size={16} className="text-primary" />{" "}
+                            {matchingPatient.mobile}
+                          </p>
+                        </div>
+                        <div className="flex flex-col items-start space-y-1">
+                          <p className="flex bg-blue-600/10 text-blue-600 text-sm items-center gap-2 px-2 py-1 w-full rounded-t-sm">
+                            <PencilLineIcon size={16} /> {bed.admission_by.name}
+                          </p>
+                          <p className="!mt-0 flex bg-green-500/10 text-green-600 text-sm items-center gap-2 px-2 py-1 w-full rounded-b-sm">
+                            <BriefcaseMedicalIcon size={16} />{" "}
+                            {bed.admission_for.name}
+                          </p>
+                          <p className="flex bg-green-500/10 text-green-600 text-sm items-center gap-2 px-2 py-1 w-full rounded-t-sm">
+                            <CalendarPlusIcon size={16} />{" "}
+                            {bed.admission_at &&
+                              format(bed.admission_at, "dd-MM-yyyy hh:mm aa")}
+                          </p>
+                          <p className="!mt-0 bg-red-500/10 text-red-600 flex text-sm items-center gap-2 px-2 py-1 w-full rounded-b-sm">
+                            <CalendarMinusIcon size={16} />{" "}
+                            {bed.discharge_at &&
+                              format(bed.discharge_at, "dd-MM-yyyy hh:mm aa")}
+                          </p>
+                        </div>
+                      </div>
+                      {bed.dischargeMarked ? (
+                        <div className="bg-red-500/10 mt-2 w-full rounded-md text-red-600 flex flex-row gap-4 px-3 py-1 items-center">
+                          <LogOut className="w-5 h-5" /> Discharged by{" "}
+                          {bed?.discharged_by?.name ?? ""}
+                        </div>
+                      ) : (
+                        <></>
+                      )}
+                    </HoverCardContent>
+                  )}
+                </HoverCard>
               );
             })}
           </div>
@@ -224,6 +291,16 @@ import { twMerge } from "tailwind-merge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./tooltip";
 import { addMinutes, format, startOfDay } from "date-fns";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "./hover-card";
+import { BedPatientTypes, OrgBed } from "@/types/FormTypes";
+import {
+  BriefcaseMedicalIcon,
+  CalendarMinusIcon,
+  CalendarPlusIcon,
+  LogOut,
+  PencilLineIcon,
+  PhoneIcon,
+} from "lucide-react";
+import { tr } from "date-fns/locale";
 
 export function cx(...args: ClassValue[]) {
   return twMerge(clsx(...args));
@@ -237,7 +314,7 @@ export { CategoryBar, type CategoryBarProps };
 
 type ColorUtility = "bg" | "stroke" | "fill" | "text";
 
-const chartColors = {
+export const chartColors = {
   blue: {
     bg: "bg-blue-500",
     stroke: "stroke-blue-500",
@@ -356,92 +433,3 @@ function hasOnlyOneValueForKey(array: any[], keyToCheck: string): boolean {
 
   return true;
 }
-
-// Tremor Tooltip [v1.0.0]
-
-// import * as TooltipPrimitives from "@radix-ui/react-tooltip"
-
-// interface TooltipProps
-//   extends Omit<TooltipPrimitives.TooltipContentProps, "content" | "onClick">,
-//   Pick<
-//     TooltipPrimitives.TooltipProps,
-//     "open" | "defaultOpen" | "onOpenChange" | "delayDuration"
-//   > {
-//   content: React.ReactNode
-//   onClick?: React.MouseEventHandler<HTMLButtonElement>
-//   side?: "bottom" | "left" | "top" | "right"
-//   showArrow?: boolean
-// }
-
-// const Tooltip = React.forwardRef<
-//   React.ElementRef<typeof TooltipPrimitives.Content>,
-//   TooltipProps
-// >(
-//   (
-//     {
-//       children,
-//       className,
-//       content,
-//       delayDuration,
-//       defaultOpen,
-//       open,
-//       onClick,
-//       onOpenChange,
-//       showArrow = true,
-//       side,
-//       sideOffset = 10,
-//       asChild,
-//       ...props
-//     }: TooltipProps,
-//     forwardedRef,
-//   ) => {
-//     return (
-//       <TooltipPrimitives.Provider delayDuration={150}>
-//         <TooltipPrimitives.Root
-//           open={open}
-//           defaultOpen={defaultOpen}
-//           onOpenChange={onOpenChange}
-//           delayDuration={delayDuration}
-//           tremor-id="tremor-raw"
-//         >
-//           <TooltipPrimitives.Trigger onClick={onClick} asChild={asChild}>
-//             {children}
-//           </TooltipPrimitives.Trigger>
-//           <TooltipPrimitives.Portal>
-//             <TooltipPrimitives.Content
-//               ref={forwardedRef}
-//               side={side}
-//               sideOffset={sideOffset}
-//               align="center"
-//               className={cx(
-//                 // base
-//                 "max-w-60 select-none rounded-md px-2.5 py-1.5 text-sm leading-5 shadow-md",
-//                 // text color
-//                 "text-gray-50 dark:text-gray-900",
-//                 // background color
-//                 "bg-gray-900 dark:bg-gray-50",
-//                 // transition
-//                 "will-change-[transform,opacity]",
-//                 "data-[side=bottom]:animate-slide-down-and-fade data-[side=left]:animate-slide-left-and-fade data-[side=right]:animate-slide-right-and-fade data-[side=top]:animate-slide-up-and-fade data-[state=closed]:animate-hide",
-//                 className,
-//               )}
-//               {...props}
-//             >
-//               {content}
-//               {showArrow ? (
-//                 <TooltipPrimitives.Arrow
-//                   className="border-none fill-gray-900 dark:fill-gray-50"
-//                   width={12}
-//                   height={7}
-//                   aria-hidden="true"
-//                 />
-//               ) : null}
-//             </TooltipPrimitives.Content>
-//           </TooltipPrimitives.Portal>
-//         </TooltipPrimitives.Root>
-//       </TooltipPrimitives.Provider>
-//     )
-//   },
-// )
-
-// Tooltip.displayName = "Tooltip"
