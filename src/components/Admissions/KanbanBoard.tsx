@@ -224,7 +224,7 @@ export const KanbanBoard = ({
 
   // Function to scroll to a specific bed and highlight it
   const [highlightedBed, setHighlightedBed] = useState<string | null>(null);
-
+  const highlightTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const scrollToBed = (bedId: string) => {
     const bedElement = document.getElementById(`bed-${bedId}`);
     if (bedElement) {
@@ -232,10 +232,14 @@ export const KanbanBoard = ({
         behavior: "smooth",
         block: "center",
       });
-
-      // Trigger highlighting animation
+      if (highlightTimeoutRef.current) {
+        clearTimeout(highlightTimeoutRef.current);
+      }
       setHighlightedBed(bedId);
-      setTimeout(() => setHighlightedBed(null), 2000); // Remove highlight after 2 seconds
+      highlightTimeoutRef.current = setTimeout(() => {
+        setHighlightedBed(null);
+        highlightTimeoutRef.current = null;
+      }, 2000);
     }
   };
 
@@ -250,9 +254,9 @@ export const KanbanBoard = ({
 
       <div className="w-[calc(100%-40px)] max-w-7xl mt-4 justify-self-center">
         <Button
-          className="w-full border-dashed"
+          className="w-full border"
           type="submit"
-          variant={"outline"}
+          variant="secondary"
           onClick={addNewBedHandler}
         >
           {bedAddLoader ? (
@@ -265,8 +269,8 @@ export const KanbanBoard = ({
         </Button>
       </div>
 
-      <div className="w-full mb-16 mt-4 pl-4 min-h-[calc(100%-5rem)] flex flex-col">
-        {columns.length == 0 ? (
+      <div className="w-full min-h-[calc(100%-5rem)] flex flex-col max-w-[2000px] justify-self-center">
+        {columns.length === 0 ? (
           <div className="flex flex-1 justify-center items-center h-full">
             No Beds are adeed
           </div>
@@ -293,6 +297,7 @@ export const KanbanBoard = ({
                     bedPatients={bedPatients}
                     loading={loading}
                     deleteBed={deleteBed}
+                    isHighlighted={highlightedBed === col.id}
                   />
                 ))}
               </SortableContext>
@@ -314,6 +319,7 @@ export const KanbanBoard = ({
                       bedPatients={bedPatients}
                       deleteBed={deleteBed}
                       loading={loading}
+                      isHighlighted={highlightedBed === activeColumn.id}
                     />
                   )}
                   {activeTask && (

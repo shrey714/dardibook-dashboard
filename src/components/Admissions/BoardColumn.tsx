@@ -6,10 +6,11 @@ import { TaskCard } from "./TaskCard";
 import { cva } from "class-variance-authority";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "@/components/ui/button";
-import { Trash, UserPlus, Users } from "lucide-react";
+import { Bed, Trash, UserPlus } from "lucide-react";
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 import { BedInfo, BedPatientTypes, OrgBed } from "@/types/FormTypes";
 import Loader from "../common/Loader";
+import { Skeleton } from "../ui/skeleton";
 
 export interface Column {
   id: UniqueIdentifier;
@@ -32,6 +33,7 @@ interface BoardColumnProps {
   openEditModal: any;
   deleteBed: any;
   loading: boolean;
+  isHighlighted?: boolean;
 }
 
 export function BoardColumn({
@@ -44,17 +46,13 @@ export function BoardColumn({
   openEditModal,
   deleteBed,
   loading,
+  isHighlighted = false,
 }: BoardColumnProps) {
   const tasksIds = useMemo(() => {
     return tasks.map((task) => task.bedBookingId);
   }, [tasks]);
 
-  const {
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({
+  const { setNodeRef, transform, transition, isDragging } = useSortable({
     id: column.id,
     data: {
       type: "Column",
@@ -71,7 +69,7 @@ export function BoardColumn({
   };
 
   const variants = cva(
-    "h-[500px] max-h-[500px] w-[350px] max-w-full bg-primary-foreground flex flex-col flex-shrink-0 snap-center",
+    "h-[500px] max-h-[500px] rounded-lg bg-primary-foreground flex flex-col flex-shrink-0 snap-center",
     {
       variants: {
         dragging: {
@@ -96,63 +94,50 @@ export function BoardColumn({
       id={`bed-${column.id}`}
       ref={setNodeRef}
       style={style}
-      className={`pb-4 ${variants({
+      className={`${variants({
         dragging: isOverlay ? "overlay" : isDragging ? "over" : undefined,
-      })}`}
+      })} ${
+        isHighlighted
+          ? "animate-pulse ring-2 ring-yellow-600 dark:ring-yellow-400 ring-opacity-75"
+          : ""
+      }`}
     >
-      <CardHeader className="p-4">
-        <Card>
-          <CardHeader className="p-1">
-            <CardTitle className="text-center flex">
-              {/* <Button
-                variant={"ghost"}
-                {...attributes}
-                {...listeners}
-                className=" p-1 text-primary/50 -ml-2 h-auto cursor-grab relative"
-              >
-                <span className="sr-only">{`Move column: ${column.id}`}</span>
-                <GripVertical />
-              </Button> */}
-              <p className="flex flex-1 justify-center">${column.id}</p>
-            </CardTitle>
-            <CardContent className="p-2">
-              <div className="flex flex-row justify-around items-center gap-2">
-                <Button
-                  className="bg-blue-500"
-                  variant="outline"
-                  // size="sm"
-                  onClick={() => {
-                    openAddModal(column.id);
-                  }}
-                >
-                  <UserPlus />
-                </Button>
-                <div className="flex-1 h-9 flex border-gray-400 rounded-lg bg-green-300 justify-center items-center gap-2">
-                  <Users />
-                  <p className="text-center text-md">{tasks.length}</p>
-                </div>
-                <Button
-                  className={`${
-                    !!tasks.length || loading
-                      ? "cursor-not-allowed opacity-50"
-                      : ""
-                  }`}
-                  variant={"destructive"}
-                  onClick={deleteHandler}
-                  aria-disabled={!!tasks.length || loading}
-                >
-                  {deleteLoader ? (
-                    <Loader />
-                  ) : (
-                    <>
-                      <Trash />
-                    </>
-                  )}
-                </Button>
-              </div>
-            </CardContent>
-          </CardHeader>
-        </Card>
+      <CardHeader className="p-4 pb-0">
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2 text-lg font-medium">
+            <Bed className="h-5 w-5 shrink-0" />
+            <p className="line-clamp-1" title={`Bed ${column.id}`}>
+              Bed {column.id}
+            </p>
+          </CardTitle>
+          <div className="flex items-center gap-2">
+            <Button
+              className="bg-blue-500 hover:bg-blue-500/90 text-white hover:text-white"
+              variant="outline"
+              onClick={() => {
+                openAddModal(column.id);
+              }}
+            >
+              <UserPlus />
+            </Button>
+            <Button
+              className={`${
+                !!tasks.length || loading ? "cursor-not-allowed opacity-50" : ""
+              }`}
+              variant={"destructive"}
+              onClick={deleteHandler}
+              aria-disabled={!!tasks.length || loading}
+            >
+              {deleteLoader ? (
+                <Loader />
+              ) : (
+                <>
+                  <Trash />
+                </>
+              )}
+            </Button>
+          </div>
+        </div>
       </CardHeader>
       <CardContent
         className={`p-4 overflow-auto flex gap-2 flex-col ${
@@ -160,15 +145,15 @@ export function BoardColumn({
         }`}
       >
         {loading ? (
-          <div className="w-full h-full flex justify-center items-center text-sm">
-            <Loader />
+          <Skeleton className="w-full h-full" />
+        ) : tasks.length === 0 ? (
+          <div
+            className={`border-2 border-dashed border-muted-foreground/60 h-full items-center justify-center flex flex-col rounded-lg p-8 text-center transition-colors text-muted-foreground/60`}
+          >
+            <Bed className={`h-8 w-8 mx-auto mb-2 text-muted-foreground`} />
+            <p className="text-sm font-medium">Available bed</p>
+            <p className="text-xs mt-1">Add new patient.</p>
           </div>
-        ) : tasks.length == 0 ? (
-          <>
-            <div className="w-full h-full flex justify-center items-center text-sm">
-              This Bed is Empty
-            </div>
-          </>
         ) : (
           <SortableContext items={tasksIds}>
             {tasks.map((task) => {
@@ -185,23 +170,6 @@ export function BoardColumn({
           </SortableContext>
         )}
       </CardContent>
-      {/* {!tasks.length && !loading && (
-        <CardFooter className="p-0">
-          <Button
-            className="w-full mx-4"
-            variant={"destructive"}
-            onClick={deleteHandler}
-          >
-            {deleteLoader ? (
-              <Loader />
-            ) : (
-              <>
-                <Trash /> Delete Bed
-              </>
-            )}
-          </Button>
-        </CardFooter>
-      )} */}
     </Card>
   );
 }
@@ -209,7 +177,7 @@ export function BoardColumn({
 export function BoardContainer({ children }: { children: React.ReactNode }) {
   const dndContext = useDndContext();
 
-  const variations = cva("px-2 md:px-0 flex lg:justify-center pb-4", {
+  const variations = cva("px-2 md:px-0 flex lg:justify-center", {
     variants: {
       dragging: {
         default: "snap-x snap-mandatory",
@@ -224,7 +192,9 @@ export function BoardContainer({ children }: { children: React.ReactNode }) {
         dragging: dndContext.active ? "active" : "default",
       })}`}
     >
-      <div className="flex flex-wrap gap-4 items-start h-full">{children}</div>
+      <div className="grid gap-3 px-3 pb-16 pt-4 grid-cols-[repeat(auto-fit,minmax(350px,350px))] justify-center">
+        {children}
+      </div>
       <ScrollBar orientation="horizontal" />
     </ScrollArea>
   );
