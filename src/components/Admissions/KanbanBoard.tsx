@@ -27,6 +27,8 @@ import toast from "react-hot-toast";
 import { updateOrgMetadata } from "@/app/dashboard/settings/clinic/_actions";
 import { Button } from "../ui/button";
 import Loader from "../common/Loader";
+import BedNavigationHeader from "./BedNavigation";
+import { PlusCircleIcon } from "lucide-react";
 
 export type ColumnId = string;
 
@@ -39,7 +41,7 @@ export const KanbanBoard = ({
   setWasEdited,
   wasEdited,
   addNewBedHandler,
-  bedAddLoader
+  bedAddLoader,
 }: any) => {
   const { organization, isLoaded } = useOrganization();
   const { beds, bedPatients, loading } = useBedsStore((state) => state);
@@ -220,84 +222,115 @@ export const KanbanBoard = ({
     },
   };
 
+  // Function to scroll to a specific bed and highlight it
+  const [highlightedBed, setHighlightedBed] = useState<string | null>(null);
+
+  const scrollToBed = (bedId: string) => {
+    const bedElement = document.getElementById(`bed-${bedId}`);
+    if (bedElement) {
+      bedElement.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+
+      // Trigger highlighting animation
+      setHighlightedBed(bedId);
+      setTimeout(() => setHighlightedBed(null), 2000); // Remove highlight after 2 seconds
+    }
+  };
+
   return (
     <>
-    <div className="border-b py-2 sticky top-0 bg-muted z-10">
-            <Button
-              className="w-28 sm:w-32"
-              type="submit"
-              variant={"default"}
-              onClick={addNewBedHandler}
-            >
-              {bedAddLoader ? <Loader /> : "Add New Bed"}
-            </Button>
-          </div>
-    <div className="w-full mb-16 mt-4 pl-4 min-h-[calc(100%-5rem)] flex flex-col">
-      {columns.length == 0 ? (
-        <div className="flex flex-1 justify-center items-center h-full">
-          No Beds are adeed
-        </div>
-      ) : (
-        <DndContext
-          accessibility={{
-            announcements,
-          }}
-          sensors={sensors}
-          onDragStart={onDragStart}
-          onDragEnd={onDragEnd}
-          onDragOver={onDragOver}
-        >
-          <BoardContainer>
-            <SortableContext items={columnsId}>
-              {columns.map((col) => (
-                <BoardColumn
-                  key={col.id}
-                  column={col}
-                  tasks={tasks.filter((task) => task.bedId === col.id)}
-                  setIsEditModalOpen={setIsEditModalOpen}
-                  openAddModal={openAddModal}
-                  openEditModal={openEditModal}
-                  bedPatients={bedPatients}
-                  loading={loading}
-                  deleteBed={deleteBed}
-                />
-              ))}
-            </SortableContext>
-          </BoardContainer>
+      {/* Bed Navigation Header */}
+      <BedNavigationHeader
+        beds={columns}
+        patients={beds}
+        onBedClick={scrollToBed}
+      />
 
-          {"document" in window &&
-            createPortal(
-              <DragOverlay>
-                {activeColumn && (
+      <div className="w-[calc(100%-40px)] max-w-7xl mt-4 justify-self-center">
+        <Button
+          className="w-full border-dashed"
+          type="submit"
+          variant={"outline"}
+          onClick={addNewBedHandler}
+        >
+          {bedAddLoader ? (
+            <Loader />
+          ) : (
+            <>
+              <PlusCircleIcon /> Add New Bed
+            </>
+          )}
+        </Button>
+      </div>
+
+      <div className="w-full mb-16 mt-4 pl-4 min-h-[calc(100%-5rem)] flex flex-col">
+        {columns.length == 0 ? (
+          <div className="flex flex-1 justify-center items-center h-full">
+            No Beds are adeed
+          </div>
+        ) : (
+          <DndContext
+            accessibility={{
+              announcements,
+            }}
+            sensors={sensors}
+            onDragStart={onDragStart}
+            onDragEnd={onDragEnd}
+            onDragOver={onDragOver}
+          >
+            <BoardContainer>
+              <SortableContext items={columnsId}>
+                {columns.map((col) => (
                   <BoardColumn
-                    isOverlay
-                    column={activeColumn}
-                    tasks={tasks.filter(
-                      (task) => task.bedId === activeColumn.id
-                    )}
+                    key={col.id}
+                    column={col}
+                    tasks={tasks.filter((task) => task.bedId === col.id)}
                     setIsEditModalOpen={setIsEditModalOpen}
                     openAddModal={openAddModal}
                     openEditModal={openEditModal}
                     bedPatients={bedPatients}
-                    deleteBed={deleteBed}
                     loading={loading}
+                    deleteBed={deleteBed}
                   />
-                )}
-                {activeTask && (
-                  <TaskCard
-                    task={activeTask}
-                    isOverlay
-                    bedPatientData={bedPatients[activeTask.patient_id]}
-                    setIsEditModalOpen={setIsEditModalOpen}
-                    openEditModal={openEditModal}
-                  />
-                )}
-              </DragOverlay>,
-              document.body
-            )}
-        </DndContext>
-      )}
-    </div>
+                ))}
+              </SortableContext>
+            </BoardContainer>
+
+            {"document" in window &&
+              createPortal(
+                <DragOverlay>
+                  {activeColumn && (
+                    <BoardColumn
+                      isOverlay
+                      column={activeColumn}
+                      tasks={tasks.filter(
+                        (task) => task.bedId === activeColumn.id
+                      )}
+                      setIsEditModalOpen={setIsEditModalOpen}
+                      openAddModal={openAddModal}
+                      openEditModal={openEditModal}
+                      bedPatients={bedPatients}
+                      deleteBed={deleteBed}
+                      loading={loading}
+                    />
+                  )}
+                  {activeTask && (
+                    <TaskCard
+                      task={activeTask}
+                      isOverlay
+                      bedPatientData={bedPatients[activeTask.patient_id]}
+                      setIsEditModalOpen={setIsEditModalOpen}
+                      openEditModal={openEditModal}
+                    />
+                  )}
+                </DragOverlay>,
+                document.body
+              )}
+          </DndContext>
+        )}
+      </div>
     </>
   );
 

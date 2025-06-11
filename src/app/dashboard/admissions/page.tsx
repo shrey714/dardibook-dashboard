@@ -3,15 +3,12 @@ import BedAdmissionModal from "@/components/Admissions/BedAdmissionModal";
 import BedEditModal from "@/components/Admissions/BedEditModal";
 import { KanbanBoard } from "@/components/Admissions/KanbanBoard";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Loader } from "lucide-react";
 import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
 import { useOrganization } from "@clerk/nextjs";
 import uniqid from "uniqid";
 import { BedInfo } from "@/types/FormTypes";
 import { updateOrgMetadata } from "../settings/clinic/_actions";
-import { AnimatePresence, motion } from "framer-motion";
 
 function Admissions() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -22,7 +19,6 @@ function Admissions() {
   const [bedAddLoader, setBedAddLoader] = useState(false);
   const [refresh, setRefresh] = useState(false);
   const [wasEdited, setWasEdited] = useState(false);
-  const [nameAsking, setNameAsking] = useState(false);
 
   const openAddModal = (bedId: string) => {
     setIsModalOpen(true);
@@ -53,7 +49,7 @@ function Admissions() {
   };
 
   return (
-    <div className="h-full">
+    <div className="h-auto relative">
       <Dialog
         open={isModalOpen}
         onOpenChange={(state) => setIsModalOpen(state)}
@@ -85,18 +81,18 @@ function Admissions() {
           {bedAddLoader ? <Loader /> : "Add New Bed"}
         </Button>
       </div> */}
-        <KanbanBoard
-          isEditModalOpen={isEditModalOpen}
-          bedId={bedId}
-          setbedId={setbedId}
-          openAddModal={openAddModal}
-          openEditModal={openEditModal}
-          refresh={refresh}
-          setWasEdited={setWasEdited}
-          wasEdited={wasEdited}
-          bedAddLoader={bedAddLoader}
-          addNewBedHandler={addNewBedHandler}
-        />
+      <KanbanBoard
+        isEditModalOpen={isEditModalOpen}
+        bedId={bedId}
+        setbedId={setbedId}
+        openAddModal={openAddModal}
+        openEditModal={openEditModal}
+        refresh={refresh}
+        setWasEdited={setWasEdited}
+        wasEdited={wasEdited}
+        bedAddLoader={bedAddLoader}
+        addNewBedHandler={addNewBedHandler}
+      />
     </div>
   );
 }

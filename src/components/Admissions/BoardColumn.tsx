@@ -4,14 +4,9 @@ import { CSS } from "@dnd-kit/utilities";
 import { useMemo, useState } from "react";
 import { TaskCard } from "./TaskCard";
 import { cva } from "class-variance-authority";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "../ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "@/components/ui/button";
-import {Trash, UserPlus, Users } from "lucide-react";
+import { Trash, UserPlus, Users } from "lucide-react";
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 import { BedInfo, BedPatientTypes, OrgBed } from "@/types/FormTypes";
 import Loader from "../common/Loader";
@@ -56,8 +51,6 @@ export function BoardColumn({
 
   const {
     setNodeRef,
-    attributes,
-    listeners,
     transform,
     transition,
     isDragging,
@@ -100,6 +93,7 @@ export function BoardColumn({
 
   return (
     <Card
+      id={`bed-${column.id}`}
       ref={setNodeRef}
       style={style}
       className={`pb-4 ${variants({
@@ -139,7 +133,9 @@ export function BoardColumn({
                 </div>
                 <Button
                   className={`${
-                    !!tasks.length || loading ? "cursor-not-allowed opacity-50" : ""
+                    !!tasks.length || loading
+                      ? "cursor-not-allowed opacity-50"
+                      : ""
                   }`}
                   variant={"destructive"}
                   onClick={deleteHandler}
