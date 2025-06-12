@@ -3,23 +3,9 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Button } from "@/components/ui/button";
 import { cva } from "class-variance-authority";
-import {
-  BadgeMinusIcon,
-  Check,
-  ClipboardPen,
-  Grip,
-  GripVertical,
-  LogIn,
-  LogOut,
-  Trash,
-  X,
-} from "lucide-react";
+import { Clock, PenBoxIcon, User } from "lucide-react";
 import { ColumnId } from "./KanbanBoard";
-import { format } from "date-fns";
 import { BedPatientTypes, OrgBed } from "@/types/FormTypes";
-import { useState } from "react";
-import Loader from "../common/Loader";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 
 export interface Task {
   id: UniqueIdentifier;
@@ -52,7 +38,6 @@ export function TaskCard({
   setIsEditModalOpen,
   openEditModal,
 }: TaskCardProps) {
-  const [dischargeLoader, setDischargeLoader] = useState(false);
   const {
     setNodeRef,
     attributes,
@@ -75,103 +60,74 @@ export function TaskCard({
   });
 
   const style = {
-    transition,
     transform: CSS.Translate.toString(transform),
+    transition,
   };
 
   const variants = cva("", {
     variants: {
       dragging: {
         over: "ring-2 opacity-30",
-        overlay: "ring-2 ring-primary",
+        overlay: "ring-2",
       },
     },
   });
 
-  const [popOpen, setPopOpen] = useState(false);
-
   return (
     <div
       ref={setNodeRef}
+      {...attributes}
+      {...listeners}
       style={style}
-      className={`container flex justify-between items-center rounded-md border h-24 overflow-hidden font-mono text-sm shadow-sm ${variants(
+      className={`container relative cursor-grab flex flex-row bg-border overflow-hidden rounded-md shadow-md hover:shadow-lg ${variants(
         {
           dragging: isOverlay ? "overlay" : isDragging ? "over" : undefined,
         }
       )}`}
     >
-      <div className="bg-yellow-300/90 w-1 h-full"></div>
-      <div className="flex flex-1 pr-2 items-center h-full">
-        <Button
-          variant={"ghost"}
-          size={"sm"}
-          {...attributes}
-          {...listeners}
-          className="px-3 text-secondary-foreground/50 h-auto cursor-grab"
-        >
-          <span className="sr-only">Move task</span>
-          <Grip />
-        </Button>
-        <div className="flex-1 h-full">
-          <div className="text-sm flex-[5] h-1/2">{bedPatientData.name}</div>
-          <div className="flex flex-[5] flex-wrap md:gap-2 h-1/2">
-            <p className="text-xs flex gap-1">
-              <LogIn size={14} />
-              {format(new Date(task.admission_at), "dd/MM HH:mm")}
-            </p>
-            <p className="text-xs flex gap-1">
-              <LogOut size={14} />
-              {format(new Date(task.discharge_at), "dd/MM HH:mm")}
-            </p>
+      <div className="absolute left-0 z-0 top-0 h-full w-full bg-center dark:bg-[radial-gradient(#ffffff1a_1px,transparent_1px)] bg-[radial-gradient(#58585852_1px,transparent_1px)] bg-[size:14px_14px]"></div>
+
+      <div className="bg-yellow-300 w-1 h-full absolute left-0"></div>
+      <div className="flex relative flex-1 flex-col h-full p-3">
+        <div className="flex items-center justify-between pointer-events-auto">
+          <div className="flex flex-row items-center gap-2">
+            <User className="size-5 text-primary shrink-0" />
+            <h3 className="font-semibold text-primary leading-none">
+              {bedPatientData.name}
+            </h3>
           </div>
-        </div>
-        <div className="flex h-full flex-col justify-around">
           <Button
-            className=""
-            variant="outline"
-            size="sm"
-            onClick={() => {
+            type="button"
+            size={"icon"}
+            onClick={(e) => {
+              console.log("shrey");
+              e.stopPropagation();
               openEditModal(task.bedBookingId, task.bedId);
             }}
+            variant={"ghost"}
           >
-            {dischargeLoader ? <Loader size="small" /> : <ClipboardPen />}
+            <PenBoxIcon />
           </Button>
-          <Popover open={popOpen}>
-            <PopoverTrigger asChild>
-              <Button
-                className=""
-                variant="outline"
-                size="sm"
-                onClick={() => setPopOpen(true)}
-                // onClick={() => {
-                //   // openEditModal(task.bedBookingId, task.bedId);
-                // }}
-              >
-                {dischargeLoader ? <Loader size="small" /> : <Trash />}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent
-              align="end"
-              className="w-48 flex flex-row justify-between items-center p-2"
-            >
-              <span className="">Are you sure?</span>
-              <span className="flex items-center">
-                <Button className="mr-1 h-6 w-6" size={"sm"}>
-                  <Check className="p-[2px]" />
-                </Button>
-                <Button
-                  size={"sm"}
-                  className=" h-6 w-6"
-                  onClick={() => setPopOpen(false)}
-                >
-                  <X className="p-[2px]" />
-                </Button>
-              </span>
-            </PopoverContent>
-          </Popover>
+        </div>
+        <div className="space-y-2 text-sm text-muted-foreground">
+          <p>
+            <span className="font-medium">Age:</span> {bedPatientData.age}
+          </p>
+          <div className="flex items-center gap-1 text-xs text-green-600 font-medium">
+            <Clock className="h-3 w-3" />
+            <span>
+              Admitted: {new Date(task.admission_at).toLocaleString()}
+            </span>
+          </div>
+          <div className="flex items-center gap-1 text-xs text-red-600 font-medium">
+            <Clock className="h-3 w-3" />
+            <span>
+              Discharge: {new Date(task.discharge_at).toLocaleString()}
+            </span>
+          </div>
         </div>
       </div>
-      <div className="bg-red-500 w-1 h-full"></div>
+      <div className="bg-red-500 w-1 h-full absolute right-0"></div>
     </div>
   );
 }

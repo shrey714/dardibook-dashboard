@@ -71,16 +71,6 @@ function Admissions() {
           />
         </DialogContent>
       </Dialog>
-      {/* <div className="border-b py-2 sticky top-0 bg-muted z-10">
-        <Button
-          className="w-28 sm:w-32"
-          type="submit"
-          variant={"default"}
-          onClick={addNewBedHandler}
-        >
-          {bedAddLoader ? <Loader /> : "Add New Bed"}
-        </Button>
-      </div> */}
       <KanbanBoard
         isEditModalOpen={isEditModalOpen}
         bedId={bedId}
