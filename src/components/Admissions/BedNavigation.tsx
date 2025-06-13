@@ -37,7 +37,7 @@ const BedNavigationHeader = ({
   };
 
   return (
-    <Card className="sticky top-0 z-[1] shadow-lg rounded-none bg-muted rounded-b-xl w-[calc(100%-40px)] max-w-7xl border-t-0 justify-self-center">
+    <Card className="sticky top-0 z-[1] shadow-lg rounded-none bg-muted rounded-b-xl w-[calc(100%-10px)] sm:w-[calc(100%-40px)] max-w-7xl border-t-0 justify-self-center">
       <CardContent className="p-0">
         <Accordion
           value={isExpanded ? "nav-header" : ""}

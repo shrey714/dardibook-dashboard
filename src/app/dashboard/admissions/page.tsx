@@ -8,7 +8,7 @@ import toast from "react-hot-toast";
 import { useOrganization } from "@clerk/nextjs";
 import uniqid from "uniqid";
 import { BedInfo } from "@/types/FormTypes";
-import { updateOrgMetadata } from "../settings/clinic/_actions";
+import { updateOrgBedMetaData } from "./_actions";
 
 function Admissions() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -34,18 +34,34 @@ function Admissions() {
   const addNewBedHandler = async () => {
     if (!organization) return;
     setBedAddLoader(true);
-    try {
-      const currentBeds = (organization.publicMetadata?.bedMetaData ||
-        []) as BedInfo[];
-      const updatedBeds = [...currentBeds, { id: uniqid.time() }];
-      const data = await updateOrgMetadata({ bedMetaData: updatedBeds });
-      organization.reload();
-      setRefresh((prev) => !prev);
-    } catch (error) {
-      toast.error("Error in adding Bed");
-    } finally {
-      setBedAddLoader(false);
-    }
+    const currentBeds = (organization.publicMetadata?.bedMetaData ||
+      []) as BedInfo[];
+    const updatedBeds = [...currentBeds, { id: uniqid.time() }];
+    toast.promise(
+      async () => {
+        await updateOrgBedMetaData(updatedBeds)
+          .then(
+            () => {
+              organization.reload();
+              setRefresh((prev) => !prev);
+            },
+            (error) => {
+              console.error("Error Adding New Bed:", error);
+            }
+          )
+          .finally(() => {
+            setBedAddLoader(false);
+          });
+      },
+      {
+        loading: "Adding new bed...",
+        success: "New bed added successfully",
+        error: "Error when adding bed",
+      },
+      {
+        position: "bottom-right",
+      }
+    );
   };
 
   return (

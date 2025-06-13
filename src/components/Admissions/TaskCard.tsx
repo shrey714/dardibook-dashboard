@@ -6,6 +6,7 @@ import { cva } from "class-variance-authority";
 import { Clock, PenBoxIcon, User } from "lucide-react";
 import { ColumnId } from "./KanbanBoard";
 import { BedPatientTypes, OrgBed } from "@/types/FormTypes";
+import { format } from "date-fns";
 
 export interface Task {
   id: UniqueIdentifier;
@@ -76,20 +77,15 @@ export function TaskCard({
   return (
     <div
       ref={setNodeRef}
-      {...attributes}
-      {...listeners}
       style={style}
-      className={`container relative cursor-grab flex flex-row bg-border overflow-hidden rounded-md shadow-md hover:shadow-lg ${variants(
+      className={`container relative flex flex-row bg-border overflow-hidden rounded-md shadow-md hover:shadow-lg ${variants(
         {
           dragging: isOverlay ? "overlay" : isDragging ? "over" : undefined,
         }
       )}`}
     >
-      <div className="absolute left-0 z-0 top-0 h-full w-full bg-center dark:bg-[radial-gradient(#ffffff1a_1px,transparent_1px)] bg-[radial-gradient(#58585852_1px,transparent_1px)] bg-[size:14px_14px]"></div>
-
-      <div className="bg-yellow-300 w-1 h-full absolute left-0"></div>
-      <div className="flex relative flex-1 flex-col h-full p-3">
-        <div className="flex items-center justify-between pointer-events-auto">
+      <div className="flex relative flex-1 flex-col h-full p-0">
+        <div className="flex items-center justify-between pointer-events-auto px-3 pt-1">
           <div className="flex flex-row items-center gap-2">
             <User className="size-5 text-primary shrink-0" />
             <h3 className="font-semibold text-primary leading-none">
@@ -109,24 +105,32 @@ export function TaskCard({
             <PenBoxIcon />
           </Button>
         </div>
-        <div className="space-y-2 text-sm text-muted-foreground">
+        <div className="text-sm space-y-1 text-muted-foreground px-3">
           <p>
             <span className="font-medium">Age:</span> {bedPatientData.age}
           </p>
           <div className="flex items-center gap-1 text-xs text-green-600 font-medium">
             <Clock className="h-3 w-3" />
             <span>
-              Admitted: {new Date(task.admission_at).toLocaleString()}
+              Admitted: {format(task.admission_at, "do MMM yy, h:mm a")}
             </span>
           </div>
           <div className="flex items-center gap-1 text-xs text-red-600 font-medium">
             <Clock className="h-3 w-3" />
             <span>
-              Discharge: {new Date(task.discharge_at).toLocaleString()}
+              Discharge: {format(task.discharge_at, "do MMM yy, h:mm a")}
             </span>
           </div>
         </div>
+        <div
+          {...attributes}
+          {...listeners}
+          className={`h-5 mt-1.5 z-0 ${
+            isDragging || isOverlay ? "cursor-grabbing" : "cursor-grab"
+          } w-full bg-center overflow-hidden dark:bg-[radial-gradient(#767676_1px,transparent_1px)] bg-[radial-gradient(#000000a1_1px,transparent_1px)] bg-[size:5px_5px] shadow-[inset_0px_21px_5px_-14px_hsl(var(--border))]`}
+        ></div>
       </div>
+      <div className="bg-yellow-300 w-1 h-full absolute left-0"></div>
       <div className="bg-red-500 w-1 h-full absolute right-0"></div>
     </div>
   );

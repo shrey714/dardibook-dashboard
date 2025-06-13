@@ -11,6 +11,12 @@ import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 import { BedInfo, BedPatientTypes, OrgBed } from "@/types/FormTypes";
 import Loader from "../common/Loader";
 import { Skeleton } from "../ui/skeleton";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export interface Column {
   id: UniqueIdentifier;
@@ -89,6 +95,8 @@ export function BoardColumn({
     // setDeleteLoader(false)
   };
 
+  const disableBtn = !!tasks.length || loading;
+
   return (
     <Card
       id={`bed-${column.id}`}
@@ -102,7 +110,7 @@ export function BoardColumn({
           : ""
       }`}
     >
-      <CardHeader className="p-4 pb-0">
+      <CardHeader className="p-4 pb-1">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-lg font-medium">
             <Bed className="h-5 w-5 shrink-0" />
@@ -111,36 +119,58 @@ export function BoardColumn({
             </p>
           </CardTitle>
           <div className="flex items-center gap-2">
-            <Button
-              className="bg-blue-500 hover:bg-blue-500/90 text-white hover:text-white"
-              variant="outline"
-              onClick={() => {
-                openAddModal(column.id);
-              }}
-            >
-              <UserPlus />
-            </Button>
-            <Button
-              className={`${
-                !!tasks.length || loading ? "cursor-not-allowed opacity-50" : ""
-              }`}
-              variant={"destructive"}
-              onClick={deleteHandler}
-              aria-disabled={!!tasks.length || loading}
-            >
-              {deleteLoader ? (
-                <Loader />
-              ) : (
-                <>
-                  <Trash />
-                </>
-              )}
-            </Button>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    className="bg-blue-500 hover:bg-blue-500/90 text-white hover:text-white"
+                    variant="outline"
+                    onClick={() => {
+                      openAddModal(column.id);
+                    }}
+                  >
+                    <UserPlus />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Add new patient</p>
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger
+                  className={`${
+                    disableBtn ? "cursor-not-allowed opacity-50" : ""
+                  }`}
+                  asChild={!disableBtn}
+                >
+                  <Button
+                    variant={"destructive"}
+                    onClick={deleteHandler}
+                    disabled={disableBtn}
+                  >
+                    {deleteLoader ? (
+                      <Loader />
+                    ) : (
+                      <>
+                        <Trash />
+                      </>
+                    )}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent className="max-w-60">
+                  <p>
+                    {disableBtn
+                      ? "You cannot remove this bed because it is currently occupied."
+                      : "Remove bed"}
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
         </div>
       </CardHeader>
       <CardContent
-        className={`p-4 overflow-auto flex gap-2 flex-col ${
+        className={`p-2 sm:p-4 overflow-auto flex gap-2 flex-col ${
           tasks.length == 0 ? "h-full" : ""
         }`}
       >
@@ -192,7 +222,7 @@ export function BoardContainer({ children }: { children: React.ReactNode }) {
         dragging: dndContext.active ? "active" : "default",
       })}`}
     >
-      <div className="grid gap-3 px-3 pb-16 pt-4 grid-cols-[repeat(auto-fit,minmax(350px,350px))] justify-center">
+      <div className="grid gap-3 px-1 sm:px-3 pb-16 pt-4 grid-cols-[repeat(auto-fit,minmax(250px,350px))] sm:grid-cols-[repeat(auto-fit,minmax(350px,350px))] justify-center">
         {children}
       </div>
       <ScrollBar orientation="horizontal" />

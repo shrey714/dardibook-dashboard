@@ -15,7 +15,6 @@ import {
   UniqueIdentifier,
   TouchSensor,
   MouseSensor,
-  PointerSensor,
 } from "@dnd-kit/core";
 import { SortableContext, arrayMove } from "@dnd-kit/sortable";
 import { TaskCard } from "./TaskCard";
@@ -25,11 +24,11 @@ import { BedInfo, OrgBed } from "@/types/FormTypes";
 import { useOrganization } from "@clerk/nextjs";
 import { useBedsStore } from "@/lib/stores/useBedsStore";
 import toast from "react-hot-toast";
-import { updateOrgMetadata } from "@/app/dashboard/settings/clinic/_actions";
 import { Button } from "../ui/button";
 import Loader from "../common/Loader";
 import BedNavigationHeader from "./BedNavigation";
 import { PlusCircleIcon } from "lucide-react";
+import { updateOrgBedMetaData } from "@/app/dashboard/admissions/_actions";
 
 export type ColumnId = string;
 
@@ -58,11 +57,6 @@ export const KanbanBoard = ({
     useSensor(TouchSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: coordinateGetter,
-    }),
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 0,
-      },
     })
   );
 
@@ -124,7 +118,7 @@ export const KanbanBoard = ({
         (bed: BedInfo) => bed.id !== bedIdToRemove
       );
 
-      await updateOrgMetadata({ bedMetaData: updatedBeds });
+      await updateOrgBedMetaData(updatedBeds);
       organization.reload();
       setColumns(updatedBeds);
     } catch (error) {
@@ -258,7 +252,7 @@ export const KanbanBoard = ({
         onBedClick={scrollToBed}
       />
 
-      <div className="w-[calc(100%-40px)] max-w-7xl mt-4 justify-self-center">
+      <div className="w-[calc(100%-10px)] sm:w-[calc(100%-40px)] max-w-7xl mt-4 justify-self-center">
         <Button
           className="w-full border"
           type="submit"
