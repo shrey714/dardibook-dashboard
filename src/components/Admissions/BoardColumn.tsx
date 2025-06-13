@@ -6,7 +6,7 @@ import { TaskCard } from "./TaskCard";
 import { cva } from "class-variance-authority";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "@/components/ui/button";
-import { Bed, Trash, UserPlus } from "lucide-react";
+import { Bed, Trash2, UserPlus } from "lucide-react";
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 import { BedInfo, BedPatientTypes, OrgBed } from "@/types/FormTypes";
 import Loader from "../common/Loader";
@@ -123,8 +123,9 @@ export function BoardColumn({
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
-                    className="bg-blue-500 hover:bg-blue-500/90 text-white hover:text-white"
-                    variant="outline"
+                    variant="ghost"
+                    size="sm"
+                    className="text-blue-500 hover:text-blue-700 bg-blue-500/10 hover:bg-blue-700/10"
                     onClick={() => {
                       openAddModal(column.id);
                     }}
@@ -144,7 +145,9 @@ export function BoardColumn({
                   asChild={!disableBtn}
                 >
                   <Button
-                    variant={"destructive"}
+                    variant="ghost"
+                    size="sm"
+                    className="text-red-500 hover:text-red-700 bg-red-500/10 hover:bg-red-700/10"
                     onClick={deleteHandler}
                     disabled={disableBtn}
                   >
@@ -152,7 +155,7 @@ export function BoardColumn({
                       <Loader />
                     ) : (
                       <>
-                        <Trash />
+                        <Trash2 />
                       </>
                     )}
                   </Button>

@@ -3,7 +3,12 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Button } from "@/components/ui/button";
 import { cva } from "class-variance-authority";
-import { Clock, PenBoxIcon, User } from "lucide-react";
+import {
+  CalendarMinus,
+  CalendarPlus,
+  PenBoxIcon,
+  User,
+} from "lucide-react";
 import { ColumnId } from "./KanbanBoard";
 import { BedPatientTypes, OrgBed } from "@/types/FormTypes";
 import { format } from "date-fns";
@@ -110,13 +115,13 @@ export function TaskCard({
             <span className="font-medium">Age:</span> {bedPatientData.age}
           </p>
           <div className="flex items-center gap-1 text-xs text-green-600 font-medium">
-            <Clock className="h-3 w-3" />
+            <CalendarPlus className="h-3 w-3" />
             <span>
               Admitted: {format(task.admission_at, "do MMM yy, h:mm a")}
             </span>
           </div>
           <div className="flex items-center gap-1 text-xs text-red-600 font-medium">
-            <Clock className="h-3 w-3" />
+            <CalendarMinus className="h-3 w-3" />
             <span>
               Discharge: {format(task.discharge_at, "do MMM yy, h:mm a")}
             </span>

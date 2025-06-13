@@ -74,6 +74,7 @@ export const KanbanBoard = ({
       }
       setWasEdited(false);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isEditModalOpen]);
 
   useEffect(() => {
