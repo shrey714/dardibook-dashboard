@@ -152,8 +152,8 @@ const CategoryBar = React.forwardRef<HTMLDivElement, CategoryBarProps>(
         {...props}
       >
         {showLabels ? <BarLabels values={values} /> : null}
-        <div className="relative flex h-4 w-full items-center">
-          <div className="flex h-full flex-1 items-center gap-0.5 overflow-hidden rounded-full">
+        <div className="relative flex h-8 w-full items-center">
+          <div className="flex h-full flex-1 items-center gap-0.5 overflow-hidden rounded-none">
             {values.map((value, index) => {
               const barColor = colors[index] ?? "gray";
               const percentage = (value / maxValue) * 100;

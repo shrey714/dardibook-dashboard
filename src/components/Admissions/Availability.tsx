@@ -133,7 +133,7 @@ const Availability: React.FC<AvailabilityProps> = ({ beds, bedPatients }) => {
             : undefined
         }
         colors={colors}
-        className="mx-auto w-full"
+        className="mx-auto w-full pb-5"
       />
       <CarouselThumbsContainer>
         {days.map((date, index) => (
