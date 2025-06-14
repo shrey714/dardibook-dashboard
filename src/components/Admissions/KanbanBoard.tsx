@@ -27,10 +27,25 @@ import toast from "react-hot-toast";
 import { Button } from "../ui/button";
 import Loader from "../common/Loader";
 import BedNavigationHeader from "./BedNavigation";
-import { PlusCircleIcon } from "lucide-react";
+import { AlertTriangle, Bed, PlusCircleIcon, X } from "lucide-react";
 import { updateOrgBedMetaData } from "@/app/dashboard/admissions/_actions";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 export type ColumnId = string;
+
+interface DeleteState {
+  deleteModalOpen: boolean;
+  deleteLoader: boolean;
+  bedToDelete: null | string;
+}
 
 export const KanbanBoard = ({
   openAddModal,
@@ -74,7 +89,7 @@ export const KanbanBoard = ({
       }
       setWasEdited(false);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isEditModalOpen]);
 
   useEffect(() => {
@@ -108,25 +123,6 @@ export const KanbanBoard = ({
       column,
     };
   }
-
-  const deleteBed = async (bedIdToRemove: string) => {
-    if (!organization) return;
-    try {
-      const currentBeds = (organization.publicMetadata?.bedMetaData ||
-        []) as BedInfo[];
-
-      const updatedBeds = currentBeds.filter(
-        (bed: BedInfo) => bed.id !== bedIdToRemove
-      );
-
-      await updateOrgBedMetaData(updatedBeds);
-      organization.reload();
-      setColumns(updatedBeds);
-    } catch (error) {
-      console.log(error);
-      toast.error("Error in deleting bed");
-    }
-  };
 
   const announcements: Announcements = {
     onDragStart({ active }) {
@@ -244,8 +240,159 @@ export const KanbanBoard = ({
     }
   };
 
+  // Delete Bed
+  const [deleteState, setDeleteState] = useState<DeleteState>({
+    deleteModalOpen: false,
+    deleteLoader: false,
+    bedToDelete: null,
+  });
+
+  const deleteBed = async (bedIdToRemove: string) => {
+    if (!organization) return;
+
+    setDeleteState({ ...deleteState, deleteLoader: true });
+    const currentBeds = (organization.publicMetadata?.bedMetaData ||
+      []) as BedInfo[];
+    const updatedBeds = currentBeds.filter(
+      (bed: BedInfo) => bed.id !== bedIdToRemove
+    );
+
+    toast.promise(
+      async () => {
+        await updateOrgBedMetaData(updatedBeds).then(
+          () => {
+            organization.reload();
+            setColumns(updatedBeds);
+            setDeleteState({
+              ...deleteState,
+              deleteModalOpen: false,
+              deleteLoader: false,
+            });
+          },
+          (error) => {
+            console.error("Error Adding New Bed:", error);
+            setDeleteState({ ...deleteState, deleteLoader: false });
+          }
+        );
+      },
+      {
+        loading: `Removing bed-${bedIdToRemove}...`,
+        success: `Bed-${bedIdToRemove} removed`,
+        error: `Error when removing bed-${bedIdToRemove}`,
+      },
+      {
+        position: "bottom-right",
+      }
+    );
+  };
+
+  const DoNotAllowToDeleteBed = !!beds.find(
+    (bed) => bed.bedId === deleteState.bedToDelete
+  );
   return (
     <>
+      {/* Bed delete dialog */}
+      <Dialog
+        open={deleteState.deleteModalOpen}
+        onOpenChange={(state) => {
+          setDeleteState({ ...deleteState, deleteModalOpen: state });
+        }}
+      >
+        <DialogContent showCloseBtn={false} className="pt-3 pb-5 px-5">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-red-600">
+              <AlertTriangle className="h-5 w-5" />
+              <p className="flex flex-1 text-left">Delete Bed</p>
+              <DialogClose type="button" asChild>
+                <Button type="button" variant="link" size={"icon"}>
+                  <X />
+                </Button>
+              </DialogClose>
+            </DialogTitle>
+            <DialogDescription hidden />
+          </DialogHeader>
+
+          <div className="flex items-center gap-3 p-3 bg-red-500/20 rounded-lg border border-red-800">
+            <Bed className="h-5 w-5 shrink-0 text-red-600" />
+            <div>
+              <p className="font-medium text-red-600">
+                Bed - {deleteState.bedToDelete}
+              </p>
+            </div>
+          </div>
+
+          {DoNotAllowToDeleteBed ? (
+            <div className="space-y-3">
+              <div className="p-3 bg-yellow-500/20 rounded-lg border border-yellow-800 flex flex-row gap-3 items-start">
+                <AlertTriangle className="h-5 w-5 shrink-0 text-yellow-600" />
+                <div className="flex flex-col gap-1">
+                  <p className="font-medium text-yellow-600 leading-tight">
+                    Warning: Bed Occupied
+                  </p>
+                  <p className="text-sm text-yellow-600 leading-none">
+                    This bed is currently assigned to a patient.
+                  </p>
+                </div>
+              </div>
+
+              <div className="text-sm text-muted-foreground space-y-2">
+                <p>
+                  <strong>Reason:</strong>
+                </p>
+                <ul className="list-disc list-inside space-y-1 ml-2">
+                  <li>
+                    This bed is either occupied or scheduled for a patient.
+                  </li>
+                  <li>Please make the bed available before deletion.</li>
+                </ul>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              <p className="text-muted-foreground leading-normal font-semibold">
+                Are you sure you want to delete this bed ?
+              </p>
+
+              <p className="text-sm text-muted-foreground">
+                <strong>Note:</strong> The bed is currently unoccupied and can
+                be safely deleted.
+              </p>
+
+              <div className="text-sm text-muted-foreground space-y-2">
+                <p>
+                  <strong>What happens next:</strong>
+                </p>
+                <ul className="list-disc list-inside space-y-1 ml-2">
+                  <li>The bed will be permanently deleted.</li>
+                  <li>This action cannot be undone.</li>
+                </ul>
+              </div>
+            </div>
+          )}
+
+          <DialogFooter className="gap-2">
+            <DialogClose type="button" asChild>
+              <Button type="button" variant="outline" className="flex-1">
+                Cancel
+              </Button>
+            </DialogClose>
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={() => {
+                if (deleteState.bedToDelete) {
+                  deleteBed(deleteState.bedToDelete);
+                }
+              }}
+              className="flex-1"
+              disabled={DoNotAllowToDeleteBed || deleteState.deleteLoader}
+            >
+              Delete Bed
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Bed Navigation Header */}
       <BedNavigationHeader
         beds={columns}
@@ -297,7 +444,7 @@ export const KanbanBoard = ({
                     openEditModal={openEditModal}
                     bedPatients={bedPatients}
                     loading={loading}
-                    deleteBed={deleteBed}
+                    setDeleteState={setDeleteState}
                     isHighlighted={highlightedBed === col.id}
                   />
                 ))}
@@ -318,7 +465,7 @@ export const KanbanBoard = ({
                       openAddModal={openAddModal}
                       openEditModal={openEditModal}
                       bedPatients={bedPatients}
-                      deleteBed={deleteBed}
+                      setDeleteState={setDeleteState}
                       loading={loading}
                       isHighlighted={highlightedBed === activeColumn.id}
                     />

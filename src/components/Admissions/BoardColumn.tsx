@@ -1,7 +1,7 @@
 import { SortableContext, useSortable } from "@dnd-kit/sortable";
 import { useDndContext, type UniqueIdentifier } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
-import { useMemo, useState } from "react";
+import { Dispatch, SetStateAction, useMemo } from "react";
 import { TaskCard } from "./TaskCard";
 import { cva } from "class-variance-authority";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import { Bed, Trash2, UserPlus } from "lucide-react";
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 import { BedInfo, BedPatientTypes, OrgBed } from "@/types/FormTypes";
-import Loader from "../common/Loader";
 import { Skeleton } from "../ui/skeleton";
 import {
   Tooltip,
@@ -29,6 +28,12 @@ export interface ColumnDragData {
   column: BedInfo;
 }
 
+interface DeleteState {
+  deleteModalOpen: boolean;
+  deleteLoader: boolean;
+  bedToDelete: null | string;
+}
+
 interface BoardColumnProps {
   column: BedInfo;
   tasks: OrgBed[];
@@ -37,7 +42,7 @@ interface BoardColumnProps {
   bedPatients: Record<string, BedPatientTypes>;
   openAddModal: any;
   openEditModal: any;
-  deleteBed: any;
+  setDeleteState: Dispatch<SetStateAction<DeleteState>>;
   loading: boolean;
   isHighlighted?: boolean;
 }
@@ -50,7 +55,7 @@ export function BoardColumn({
   setIsEditModalOpen,
   openAddModal,
   openEditModal,
-  deleteBed,
+  setDeleteState,
   loading,
   isHighlighted = false,
 }: BoardColumnProps) {
@@ -75,7 +80,7 @@ export function BoardColumn({
   };
 
   const variants = cva(
-    "h-[500px] max-h-[500px] rounded-lg bg-primary-foreground flex flex-col flex-shrink-0 snap-center",
+    "h-[500px] max-h-[500px] rounded-md bg-primary-foreground flex flex-col flex-shrink-0 snap-center",
     {
       variants: {
         dragging: {
@@ -87,15 +92,13 @@ export function BoardColumn({
     }
   );
 
-  const [deleteLoader, setDeleteLoader] = useState(false);
-
   const deleteHandler = () => {
-    setDeleteLoader(true);
-    deleteBed(column.id);
-    // setDeleteLoader(false)
+    setDeleteState((state) => ({
+      ...state,
+      deleteModalOpen: true,
+      bedToDelete: column.id,
+    }));
   };
-
-  const disableBtn = !!tasks.length || loading;
 
   return (
     <Card
@@ -138,34 +141,18 @@ export function BoardColumn({
                 </TooltipContent>
               </Tooltip>
               <Tooltip>
-                <TooltipTrigger
-                  className={`${
-                    disableBtn ? "cursor-not-allowed opacity-50" : ""
-                  }`}
-                  asChild={!disableBtn}
-                >
+                <TooltipTrigger asChild>
                   <Button
                     variant="ghost"
                     size="sm"
                     className="text-red-500 hover:text-red-700 bg-red-500/10 hover:bg-red-700/10"
                     onClick={deleteHandler}
-                    disabled={disableBtn}
                   >
-                    {deleteLoader ? (
-                      <Loader />
-                    ) : (
-                      <>
-                        <Trash2 />
-                      </>
-                    )}
+                    <Trash2 />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent className="max-w-60">
-                  <p>
-                    {disableBtn
-                      ? "You cannot remove this bed because it is currently occupied."
-                      : "Remove bed"}
-                  </p>
+                  <p>Remove bed</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
