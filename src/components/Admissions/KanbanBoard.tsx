@@ -38,6 +38,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Skeleton } from "../ui/skeleton";
 
 export type ColumnId = string;
 
@@ -418,9 +419,21 @@ export const KanbanBoard = ({
       </div>
 
       <div className="w-full min-h-[calc(100%-5rem)] flex flex-col max-w-[2000px] justify-self-center">
-        {columns.length === 0 ? (
-          <div className="flex flex-1 justify-center items-center h-full">
-            No Beds are adeed
+        {loading || !isLoaded ? (
+          <div className="grid gap-3 px-1 sm:px-3 pb-16 pt-4 grid-cols-[repeat(auto-fit,minmax(250px,350px))] sm:grid-cols-[repeat(auto-fit,minmax(350px,350px))] justify-center">
+            {[...Array(10)].map((_, i) => (
+              <Skeleton
+                key={i}
+                className="h-[500px] max-h-[500px] rounded-md bg-primary-foreground"
+              />
+            ))}
+          </div>
+        ) : columns.length === 0 ? (
+          <div className="flex flex-1 flex-col gap-4 justify-center items-center h-full min-h-96 py-5 px-2">
+            <img className="w-full max-w-[16rem]" src="/empty.svg" alt="" />
+            <p className="text-center text-muted-foreground">
+              No beds found. Please add beds to get started.
+            </p>
           </div>
         ) : (
           <DndContext
@@ -443,7 +456,6 @@ export const KanbanBoard = ({
                     openAddModal={openAddModal}
                     openEditModal={openEditModal}
                     bedPatients={bedPatients}
-                    loading={loading}
                     setDeleteState={setDeleteState}
                     isHighlighted={highlightedBed === col.id}
                   />
@@ -466,7 +478,6 @@ export const KanbanBoard = ({
                       openEditModal={openEditModal}
                       bedPatients={bedPatients}
                       setDeleteState={setDeleteState}
-                      loading={loading}
                       isHighlighted={highlightedBed === activeColumn.id}
                     />
                   )}

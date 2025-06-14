@@ -43,7 +43,6 @@ interface BoardColumnProps {
   openAddModal: any;
   openEditModal: any;
   setDeleteState: Dispatch<SetStateAction<DeleteState>>;
-  loading: boolean;
   isHighlighted?: boolean;
 }
 
@@ -56,7 +55,6 @@ export function BoardColumn({
   openAddModal,
   openEditModal,
   setDeleteState,
-  loading,
   isHighlighted = false,
 }: BoardColumnProps) {
   const tasksIds = useMemo(() => {
@@ -164,9 +162,7 @@ export function BoardColumn({
           tasks.length == 0 ? "h-full" : ""
         }`}
       >
-        {loading ? (
-          <Skeleton className="w-full h-full" />
-        ) : tasks.length === 0 ? (
+        {tasks.length === 0 ? (
           <div
             className={`border-2 border-dashed border-muted-foreground/60 h-full items-center justify-center flex flex-col rounded-lg p-8 text-center transition-colors text-muted-foreground/60`}
           >
@@ -197,7 +193,7 @@ export function BoardColumn({
 export function BoardContainer({ children }: { children: React.ReactNode }) {
   const dndContext = useDndContext();
 
-  const variations = cva("px-2 md:px-0 flex lg:justify-center", {
+  const variations = cva("", {
     variants: {
       dragging: {
         default: "snap-x snap-mandatory",
@@ -207,15 +203,12 @@ export function BoardContainer({ children }: { children: React.ReactNode }) {
   });
 
   return (
-    <ScrollArea
-      className={`h-full ${variations({
+    <div
+      className={`${variations({
         dragging: dndContext.active ? "active" : "default",
-      })}`}
+      })} h-full grid gap-3 px-1 sm:px-3 pb-16 pt-4 grid-cols-[repeat(auto-fit,minmax(250px,350px))] sm:grid-cols-[repeat(auto-fit,minmax(350px,350px))] justify-center`}
     >
-      <div className="grid gap-3 px-1 sm:px-3 pb-16 pt-4 grid-cols-[repeat(auto-fit,minmax(250px,350px))] sm:grid-cols-[repeat(auto-fit,minmax(350px,350px))] justify-center">
-        {children}
-      </div>
-      <ScrollBar orientation="horizontal" />
-    </ScrollArea>
+      {children}
+    </div>
   );
 }
