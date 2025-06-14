@@ -2,13 +2,14 @@
 import BedAdmissionModal from "@/components/Admissions/BedAdmissionModal";
 import BedEditModal from "@/components/Admissions/BedEditModal";
 import { KanbanBoard } from "@/components/Admissions/KanbanBoard";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { useOrganization } from "@clerk/nextjs";
 import uniqid from "uniqid";
 import { BedInfo } from "@/types/FormTypes";
 import { updateOrgBedMetaData } from "./_actions";
+import { DialogDescription } from "@radix-ui/react-dialog";
 
 function Admissions() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -70,6 +71,8 @@ function Admissions() {
         open={isModalOpen}
         onOpenChange={(state) => setIsModalOpen(state)}
       >
+        <DialogTitle hidden />
+        <DialogDescription hidden />
         <DialogContent className="max-w-screen-md ">
           <BedAdmissionModal setIsModalOpen={setIsModalOpen} bedId={bedId} />
         </DialogContent>
@@ -79,6 +82,8 @@ function Admissions() {
         onOpenChange={(state) => setIsEditModalOpen(state)}
       >
         <DialogContent className="max-w-screen-md ">
+          <DialogTitle hidden />
+          <DialogDescription hidden />
           <BedEditModal
             setIsEditModalOpen={setIsEditModalOpen}
             bookingId={bookingId}

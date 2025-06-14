@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -21,6 +21,7 @@ const BedNavigationHeader = ({
   onBedClick: (bedId: string) => void;
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const accordionRef = useRef<HTMLDivElement>(null);
   const handleBedClick = (bedId: string) => {
     onBedClick(bedId);
   };
@@ -30,6 +31,22 @@ const BedNavigationHeader = ({
     return assignedPatient ? "occupied" : "available";
   };
 
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        accordionRef.current &&
+        !accordionRef.current.contains(event.target as Node)
+      ) {
+        setIsExpanded(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   const getStatusColor = (status: string) => {
     return status === "occupied"
       ? "bg-red-500/20 text-red-600 hover:text-primary hover:bg-red-500/40"
@@ -37,7 +54,10 @@ const BedNavigationHeader = ({
   };
 
   return (
-    <Card className="sticky top-0 z-[1] shadow-lg rounded-none bg-muted rounded-b-xl w-[calc(100%-10px)] sm:w-[calc(100%-40px)] max-w-7xl border-t-0 justify-self-center">
+    <Card
+      ref={accordionRef}
+      className="sticky top-0 z-[1] shadow-lg rounded-none bg-muted rounded-b-xl w-[calc(100%-10px)] sm:w-[calc(100%-40px)] max-w-7xl border-t-0 justify-self-center"
+    >
       <CardContent className="p-0">
         <Accordion
           value={isExpanded ? "nav-header" : ""}
@@ -69,11 +89,11 @@ const BedNavigationHeader = ({
             </AccordionTrigger>
             <AccordionContent className="pb-0">
               <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2 p-2">
-                {beds.map((bed) => {
+                {beds.map((bed, index) => {
                   const status = getBedStatus(bed);
                   return (
                     <Button
-                      key={bed.id}
+                      key={index}
                       variant="ghost"
                       size="sm"
                       onClick={() => handleBedClick(bed.id)}

@@ -115,7 +115,7 @@ export function BoardColumn({
           <CardTitle className="flex items-center gap-2 text-lg font-medium">
             <Bed className="h-5 w-5 shrink-0" />
             <p className="line-clamp-1" title={`Bed ${column.id}`}>
-              Bed {column.id}
+              {column.id}
             </p>
           </CardTitle>
           <div className="flex items-center gap-2">
