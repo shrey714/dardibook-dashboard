@@ -143,7 +143,7 @@ export function TaskCard({
                 <Button variant="ghost" type="button" size="icon">
                   <Popover>
                     <PopoverTrigger asChild>
-                      <span>
+                      <span id="shrey" className="flex size-full items-center justify-center">
                         <ClipboardListIcon />
                       </span>
                     </PopoverTrigger>
