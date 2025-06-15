@@ -88,6 +88,11 @@ const BedNavigationHeader = ({
               </div>
             </AccordionTrigger>
             <AccordionContent className="pb-0">
+              {beds.length === 0 && (
+                <p className="w-full text-center text-muted-foreground text-sm leading-none">
+                  No beds found. Please add beds to get started.
+                </p>
+              )}
               <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2 p-2">
                 {beds.map((bed, index) => {
                   const status = getBedStatus(bed);
