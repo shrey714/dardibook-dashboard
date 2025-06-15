@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AnimatePresence, motion } from "framer-motion";
 import { RegistrationOptions } from "@/components/Settings/DefaultsTabs/RegistrationOptions";
@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronDown } from "lucide-react";
 import GeneralOptions from "@/components/Settings/DefaultsTabs/GeneralOptions";
 import { AdmissionOptions } from "@/components/Settings/DefaultsTabs/AdmissionOptions";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const tabs = [
   {
@@ -50,12 +51,25 @@ const tabs = [
 ];
 
 export default function SettingsMedicineInfoPage() {
-  const [tabValue, setTabValue] = useState(tabs[0].value);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get("tab");
+
+  const defaultTab = tabs.map((t) => t.value).includes(tabParam || "")
+    ? tabParam!
+    : tabs[0].value;
+
+  const handleTabChange = (value: string) => {
+    const params = new URLSearchParams(Array.from(searchParams.entries()));
+    params.set("tab", value);
+    router.push(`?${params.toString()}`, { scroll: false });
+  };
+
   return (
     <Tabs
       orientation="vertical"
-      defaultValue={tabs[0].value}
-      onValueChange={setTabValue}
+      value={defaultTab}
+      onValueChange={handleTabChange}
       className="w-full flex items-start gap-2 md:gap-4 justify-center py-2 sm:py-5 px-2 md:px-5 flex-col md:flex-row 2xl:gap-5 2xl:justify-center"
     >
       <Drawer>
@@ -63,9 +77,9 @@ export default function SettingsMedicineInfoPage() {
           <Button
             variant="secondary"
             className="sticky top-[60px] z-10 flex w-full md:hidden"
-            aria-label={`Open tab selector, current tab is ${tabValue}`}
+            aria-label={`Open tab selector, current tab is ${defaultTab}`}
           >
-            {tabValue} <ChevronDown />
+            {defaultTab} <ChevronDown />
           </Button>
         </DrawerTrigger>
         <DrawerContent className="md:hidden">
