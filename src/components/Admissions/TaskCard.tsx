@@ -52,7 +52,6 @@ export interface Task {
 
 interface TaskCardProps {
   task: OrgBed;
-  isOverlay?: boolean;
   bedPatientData: BedPatientTypes;
   setIsEditModalOpen: any;
   openEditModal: any;
@@ -70,7 +69,6 @@ export interface TaskDragData {
 
 export function TaskCard({
   task,
-  isOverlay,
   bedPatientData,
   setIsEditModalOpen,
   openEditModal,
@@ -107,7 +105,6 @@ export function TaskCard({
     variants: {
       dragging: {
         over: "ring-2 opacity-30",
-        overlay: "ring-2",
       },
     },
   });
@@ -118,7 +115,7 @@ export function TaskCard({
       style={style}
       className={`container relative flex flex-row bg-border overflow-hidden rounded-md shadow-md hover:shadow-lg ${variants(
         {
-          dragging: isOverlay ? "overlay" : isDragging ? "over" : undefined,
+          dragging: isDragging ? "over" : undefined,
         }
       )}`}
     >
@@ -364,7 +361,7 @@ export function TaskCard({
           {...attributes}
           {...listeners}
           className={`h-5 mt-1.5 z-0 ${
-            isDragging || isOverlay ? "cursor-grabbing" : "cursor-grab"
+            isDragging ? "cursor-grabbing" : "cursor-grab"
           } w-full bg-center overflow-hidden dark:bg-[radial-gradient(#767676_1px,transparent_1px)] bg-[radial-gradient(#000000a1_1px,transparent_1px)] bg-[size:5px_5px] shadow-[inset_0px_21px_5px_-14px_hsl(var(--border))]`}
         ></div>
       </div>

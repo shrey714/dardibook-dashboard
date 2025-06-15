@@ -10,7 +10,6 @@ import {
   type DragStartEvent,
   useSensor,
   useSensors,
-  KeyboardSensor,
   Announcements,
   UniqueIdentifier,
   TouchSensor,
@@ -19,7 +18,6 @@ import {
 import { SortableContext, arrayMove } from "@dnd-kit/sortable";
 import { TaskCard } from "./TaskCard";
 import { hasDraggableData } from "./utils";
-import { coordinateGetter } from "./multipleContainersKeyboardPreset";
 import { BedInfo, OrgBed } from "@/types/FormTypes";
 import { useOrganization } from "@clerk/nextjs";
 import { useBedsStore } from "@/lib/stores/useBedsStore";
@@ -65,15 +63,11 @@ export const KanbanBoard = ({
   const pickedUpTaskColumn = useRef<ColumnId | null>(null);
   const columnsId = useMemo(() => columns.map((col) => col.id), [columns]);
   const [tasks, setTasks] = useState<OrgBed[]>([]);
-  const [activeColumn, setActiveColumn] = useState<BedInfo | null>(null);
   const [activeTask, setActiveTask] = useState<OrgBed | null>(null);
   const [prevTaskState, setPrevTaskState] = useState<OrgBed | null>(null);
   const sensors = useSensors(
     useSensor(MouseSensor),
-    useSensor(TouchSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: coordinateGetter,
-    })
+    useSensor(TouchSensor)
   );
 
   useEffect(() => {
@@ -466,25 +460,9 @@ export const KanbanBoard = ({
             {"document" in window &&
               createPortal(
                 <DragOverlay>
-                  {activeColumn && (
-                    <BoardColumn
-                      isOverlay
-                      column={activeColumn}
-                      tasks={tasks.filter(
-                        (task) => task.bedId === activeColumn.id
-                      )}
-                      setIsEditModalOpen={setIsEditModalOpen}
-                      openAddModal={openAddModal}
-                      openEditModal={openEditModal}
-                      bedPatients={bedPatients}
-                      setDeleteState={setDeleteState}
-                      isHighlighted={highlightedBed === activeColumn.id}
-                    />
-                  )}
                   {activeTask && (
                     <TaskCard
                       task={activeTask}
-                      isOverlay
                       bedPatientData={bedPatients[activeTask.patient_id]}
                       setIsEditModalOpen={setIsEditModalOpen}
                       openEditModal={openEditModal}
@@ -502,10 +480,6 @@ export const KanbanBoard = ({
   function onDragStart(event: DragStartEvent) {
     if (!hasDraggableData(event.active)) return;
     const data = event.active.data.current;
-    if (data?.type === "Column") {
-      setActiveColumn(data.column);
-      return;
-    }
 
     if (data?.type === "Task") {
       setActiveTask(data.task);
@@ -516,27 +490,12 @@ export const KanbanBoard = ({
   }
 
   function onDragEnd(event: DragEndEvent) {
-    setActiveColumn(null);
     setActiveTask(null);
 
     const { active, over } = event;
     if (!over || !hasDraggableData(active)) return;
 
     const activeData = active.data.current;
-    const activeId = active.id;
-    const overId = over.id;
-
-    // Handle columns being reordered (no need to open modal here)
-    if (activeData?.type === "Column") {
-      if (activeId === overId) return;
-
-      setColumns((columns) => {
-        const oldIndex = columns.findIndex((col) => col.id === activeId);
-        const newIndex = columns.findIndex((col) => col.id === overId);
-        return arrayMove(columns, oldIndex, newIndex);
-      });
-      return;
-    }
 
     // ✅ Handle task being dropped into new column
     if (activeData?.type === "Task") {
@@ -558,7 +517,6 @@ export const KanbanBoard = ({
           )
         );
 
-        // setIsEditModalOpen(true);
         openEditModal(task.bedBookingId, task.bedId);
       }
     }

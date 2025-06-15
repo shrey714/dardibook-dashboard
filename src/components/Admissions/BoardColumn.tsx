@@ -37,7 +37,6 @@ interface DeleteState {
 interface BoardColumnProps {
   column: BedInfo;
   tasks: OrgBed[];
-  isOverlay?: boolean;
   setIsEditModalOpen: any;
   bedPatients: Record<string, BedPatientTypes>;
   openAddModal: any;
@@ -49,7 +48,6 @@ interface BoardColumnProps {
 export function BoardColumn({
   column,
   tasks,
-  isOverlay,
   bedPatients,
   setIsEditModalOpen,
   openAddModal,
@@ -84,7 +82,6 @@ export function BoardColumn({
         dragging: {
           default: "border-2 border-transparent",
           over: "ring-2 opacity-30",
-          overlay: "ring-2 ring-primary",
         },
       },
     }
@@ -104,7 +101,7 @@ export function BoardColumn({
       ref={setNodeRef}
       style={style}
       className={`${variants({
-        dragging: isOverlay ? "overlay" : isDragging ? "over" : undefined,
+        dragging: isDragging ? "over" : undefined,
       })} ${
         isHighlighted
           ? "animate-pulse ring-2 ring-yellow-600 dark:ring-yellow-400 ring-opacity-75"
