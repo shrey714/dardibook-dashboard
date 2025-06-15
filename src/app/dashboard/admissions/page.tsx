@@ -35,9 +35,10 @@ function Admissions() {
   const addNewBedHandler = async () => {
     if (!organization) return;
     setBedAddLoader(true);
-    const currentBeds = (organization.publicMetadata?.bedMetaData ||
+    const currentBeds = (organization.publicMetadata?.beds ||
       []) as BedInfo[];
     const updatedBeds = [...currentBeds, { bed_id: uniqid.time(),ward:"ICU" }];
+    console.log(updatedBeds);
     toast.promise(
       async () => {
         await updateOrgBedMetaData(updatedBeds)
