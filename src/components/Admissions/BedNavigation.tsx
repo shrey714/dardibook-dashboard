@@ -27,7 +27,7 @@ const BedNavigationHeader = ({
   };
 
   const getBedStatus = (bed: (typeof beds)[0]) => {
-    const assignedPatient = patients.find((p) => p.bedId === bed.id);
+    const assignedPatient = patients.find((p) => p.bedId === bed.bed_id);
     return assignedPatient ? "occupied" : "available";
   };
 
@@ -73,7 +73,7 @@ const BedNavigationHeader = ({
                 <Badge variant="failure">
                   {
                     beds.filter((bed) =>
-                      patients.find((patient) => patient.bedId === bed.id)
+                      patients.find((patient) => patient.bedId === bed.bed_id)
                     ).length
                   }{" "}
                   Occupied
@@ -81,7 +81,7 @@ const BedNavigationHeader = ({
                 <Badge variant="success">
                   {beds.length -
                     beds.filter((bed) =>
-                      patients.find((patient) => patient.bedId === bed.id)
+                      patients.find((patient) => patient.bedId === bed.bed_id)
                     ).length}{" "}
                   Available
                 </Badge>
@@ -96,7 +96,7 @@ const BedNavigationHeader = ({
                       key={index}
                       variant="ghost"
                       size="sm"
-                      onClick={() => handleBedClick(bed.id)}
+                      onClick={() => handleBedClick(bed.bed_id)}
                       className={`
                     relative h-12 flex flex-col items-center justify-center gap-1 p-1 text-xs transition-all duration-200 hover:shadow-md ${getStatusColor(
                       status
@@ -104,7 +104,7 @@ const BedNavigationHeader = ({
                   `}
                     >
                       <Bed className="h-3 w-3" />
-                      <span className="font-medium">{bed.id}</span>
+                      <span className="font-medium">{bed.bed_id}</span>
                     </Button>
                   );
                 })}

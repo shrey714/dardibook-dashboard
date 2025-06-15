@@ -37,7 +37,7 @@ function Admissions() {
     setBedAddLoader(true);
     const currentBeds = (organization.publicMetadata?.bedMetaData ||
       []) as BedInfo[];
-    const updatedBeds = [...currentBeds, { id: uniqid.time() }];
+    const updatedBeds = [...currentBeds, { bed_id: uniqid.time(),ward:"ICU" }];
     toast.promise(
       async () => {
         await updateOrgBedMetaData(updatedBeds)

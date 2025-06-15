@@ -60,13 +60,13 @@ export function BoardColumn({
   }, [tasks]);
 
   const { setNodeRef, transform, transition, isDragging } = useSortable({
-    id: column.id,
+    id: column.bed_id,
     data: {
       type: "Column",
       column,
     } satisfies ColumnDragData,
     attributes: {
-      roleDescription: `Column: ${column.id}`,
+      roleDescription: `Column: ${column.bed_id}`,
     },
   });
 
@@ -91,13 +91,13 @@ export function BoardColumn({
     setDeleteState((state) => ({
       ...state,
       deleteModalOpen: true,
-      bedToDelete: column.id,
+      bedToDelete: column.bed_id,
     }));
   };
 
   return (
     <Card
-      id={`bed-${column.id}`}
+      id={`bed-${column.bed_id}`}
       ref={setNodeRef}
       style={style}
       className={`${variants({
@@ -112,8 +112,8 @@ export function BoardColumn({
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-lg font-medium">
             <Bed className="h-5 w-5 shrink-0" />
-            <p className="line-clamp-1" title={`Bed ${column.id}`}>
-              {column.id}
+            <p className="line-clamp-1" title={`Bed ${column.bed_id}`}>
+              {column.bed_id}
             </p>
           </CardTitle>
           <div className="flex items-center gap-2">
@@ -125,7 +125,7 @@ export function BoardColumn({
                     size="sm"
                     className="text-blue-500 hover:text-blue-700 bg-blue-500/10 hover:bg-blue-700/10"
                     onClick={() => {
-                      openAddModal(column.id);
+                      openAddModal(column.bed_id);
                     }}
                   >
                     <UserPlus />

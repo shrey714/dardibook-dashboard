@@ -61,7 +61,7 @@ export const KanbanBoard = ({
   const { beds, bedPatients, loading } = useBedsStore((state) => state);
   const [columns, setColumns] = useState<BedInfo[]>([]);
   const pickedUpTaskColumn = useRef<ColumnId | null>(null);
-  const columnsId = useMemo(() => columns.map((col) => col.id), [columns]);
+  const columnsId = useMemo(() => columns.map((col) => col.bed_id), [columns]);
   const [tasks, setTasks] = useState<OrgBed[]>([]);
   const [activeTask, setActiveTask] = useState<OrgBed | null>(null);
   const [prevTaskState, setPrevTaskState] = useState<OrgBed | null>(null);
@@ -111,7 +111,7 @@ export const KanbanBoard = ({
     const taskPosition = tasksInColumn.findIndex(
       (task) => task.bedBookingId === taskId
     );
-    const column = columns.find((col) => col.id === columnId);
+    const column = columns.find((col) => col.bed_id === columnId);
     return {
       tasksInColumn,
       taskPosition,
@@ -125,7 +125,7 @@ export const KanbanBoard = ({
       if (active.data.current?.type === "Column") {
         const startColumnIdx = columnsId.findIndex((id) => id === active.id);
         const startColumn = columns[startColumnIdx];
-        return `Picked up Column ${startColumn?.id} at position: ${
+        return `Picked up Column ${startColumn?.bed_id} at position: ${
           startColumnIdx + 1
         } of ${columnsId.length}`;
       } else if (active.data.current?.type === "Task") {
@@ -138,7 +138,7 @@ export const KanbanBoard = ({
           active.data.current.task.patient_id
         } at position: ${taskPosition + 1} of ${
           tasksInColumn.length
-        } in column ${column?.id}`;
+        } in column ${column?.bed_id}`;
       }
     },
     onDragOver({ active, over }) {
@@ -149,8 +149,8 @@ export const KanbanBoard = ({
         over.data.current?.type === "Column"
       ) {
         const overColumnIdx = columnsId.findIndex((id) => id === over.id);
-        return `Column ${active.data.current.column.id} was moved over ${
-          over.data.current.column.id
+        return `Column ${active.data.current.column.bed_id} was moved over ${
+          over.data.current.column.bed_id
         } at position ${overColumnIdx + 1} of ${columnsId.length}`;
       } else if (
         active.data.current?.type === "Task" &&
@@ -163,13 +163,13 @@ export const KanbanBoard = ({
         if (over.data.current.task.bedId !== pickedUpTaskColumn.current) {
           return `Task ${
             active.data.current.task.patient_id
-          } was moved over column ${column?.id} in position ${
+          } was moved over column ${column?.bed_id} in position ${
             taskPosition + 1
           } of ${tasksInColumn.length}`;
         }
         return `Task was moved over position ${taskPosition + 1} of ${
           tasksInColumn.length
-        } in column ${column?.id}`;
+        } in column ${column?.bed_id}`;
       }
     },
     onDragEnd({ active, over }) {
@@ -184,7 +184,7 @@ export const KanbanBoard = ({
         const overColumnPosition = columnsId.findIndex((id) => id === over.id);
 
         return `Column ${
-          active.data.current.column.id
+          active.data.current.column.bed_id
         } was dropped into position ${overColumnPosition + 1} of ${
           columnsId.length
         }`;
@@ -197,13 +197,13 @@ export const KanbanBoard = ({
           over.data.current.task.bedId
         );
         if (over.data.current.task.bedId !== pickedUpTaskColumn.current) {
-          return `Task was dropped into column ${column?.id} in position ${
+          return `Task was dropped into column ${column?.bed_id} in position ${
             taskPosition + 1
           } of ${tasksInColumn.length}`;
         }
         return `Task was dropped into position ${taskPosition + 1} of ${
           tasksInColumn.length
-        } in column ${column?.id}`;
+        } in column ${column?.bed_id}`;
       }
       pickedUpTaskColumn.current = null;
     },
@@ -249,7 +249,7 @@ export const KanbanBoard = ({
     const currentBeds = (organization.publicMetadata?.bedMetaData ||
       []) as BedInfo[];
     const updatedBeds = currentBeds.filter(
-      (bed: BedInfo) => bed.id !== bedIdToRemove
+      (bed: BedInfo) => bed.bed_id !== bedIdToRemove
     );
 
     toast.promise(
@@ -443,15 +443,15 @@ export const KanbanBoard = ({
               <SortableContext items={columnsId}>
                 {columns.map((col) => (
                   <BoardColumn
-                    key={col.id}
+                    key={col.bed_id}
                     column={col}
-                    tasks={tasks.filter((task) => task.bedId === col.id)}
+                    tasks={tasks.filter((task) => task.bedId === col.bed_id)}
                     setIsEditModalOpen={setIsEditModalOpen}
                     openAddModal={openAddModal}
                     openEditModal={openEditModal}
                     bedPatients={bedPatients}
                     setDeleteState={setDeleteState}
-                    isHighlighted={highlightedBed === col.id}
+                    isHighlighted={highlightedBed === col.bed_id}
                   />
                 ))}
               </SortableContext>

@@ -66,7 +66,8 @@ export interface OrgBed {
 }
 
 export interface BedInfo {
-    id: string;
+    bed_id: string;
+    ward: string;
   }
 export interface TodayPatientsType {
     patient_id: string;
