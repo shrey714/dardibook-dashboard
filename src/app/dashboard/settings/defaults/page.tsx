@@ -19,6 +19,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ChevronDown } from "lucide-react";
 import GeneralOptions from "@/components/Settings/DefaultsTabs/GeneralOptions";
+import { AdmissionOptions } from "@/components/Settings/DefaultsTabs/AdmissionOptions";
 
 const tabs = [
   {
@@ -35,6 +36,11 @@ const tabs = [
     name: "Prescription Preferences",
     value: "Prescription",
     component: PrescriptionOptions,
+  },
+  {
+    name: "Admission Settings",
+    value: "Admission",
+    component: AdmissionOptions,
   },
   {
     name: "Pharmacy Settings",
@@ -113,7 +119,7 @@ export default function SettingsMedicineInfoPage() {
           >
             <motion.div
               key={tab.value}
-              className="flex flex-col mx-0 w-full gap-2"
+              className="flex flex-col mx-0 w-full"
               initial="hidden"
               animate="visible"
               exit="hidden"

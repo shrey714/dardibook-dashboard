@@ -248,7 +248,7 @@ export const RegistrationOptions = () => {
         </DialogContent>
       </Dialog>
 
-      <Card className="bg-sidebar/70 w-full shadow-none border h-min mx-auto">
+      <Card className="border border-b-0 rounded-b-none bg-sidebar/70 w-full shadow-none  h-min mx-auto">
         <CardHeader className="border-b p-4">
           <CardTitle className="font-normal text-muted-foreground">
             Add Registration Receipt Type
@@ -310,7 +310,7 @@ export const RegistrationOptions = () => {
           </form>
         </CardContent>
       </Card>
-      <div className="w-full flex flex-col flex-1 bg-sidebar/70 border rounded-md divide-y">
+      <div className="rounded-t-none w-full flex flex-col flex-1 bg-sidebar/70 border rounded-md divide-y">
         {!isLoaded ? (
           <div className="flex flex-1 items-center justify-center min-h-72 w-full">
             <Loader size="medium" />

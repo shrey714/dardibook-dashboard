@@ -1,7 +1,7 @@
 "use client";
 
 import React, { FormEvent, useEffect, useState } from "react";
-import { CirclePlus, InboxIcon, Pencil } from "lucide-react";
+import { CirclePlus, InboxIcon, Pencil, SaveIcon } from "lucide-react";
 import uniqid from "uniqid";
 import Loader from "@/components/common/Loader";
 import toast from "react-hot-toast";
@@ -53,7 +53,7 @@ export const PharmacyOptions = () => {
   return (
     <>
       <BillDefaults />
-      <Separator className="my-2" />
+      <Separator className="my-3" />
       <ServicesUpdateModal />
     </>
   );
@@ -212,7 +212,7 @@ const BillDefaults = () => {
                 className="text-sm gap-2 px-6"
                 type="submit"
               >
-                <CirclePlus width={20} height={20} /> Add
+                <SaveIcon width={20} height={20} /> Save
               </Button>
             </div>
           </fieldset>
@@ -430,7 +430,7 @@ const ServicesUpdateModal = () => {
         </DialogContent>
       </Dialog>
 
-      <Card className="bg-sidebar/70 w-full shadow-none border h-min mx-auto">
+      <Card className="border border-b-0 rounded-b-none bg-sidebar/70 w-full shadow-none h-min mx-auto">
         <CardHeader className="border-b p-4">
           <CardTitle className="font-normal text-muted-foreground">
             Add New Service
@@ -492,7 +492,7 @@ const ServicesUpdateModal = () => {
           </form>
         </CardContent>
       </Card>
-      <div className="w-full flex flex-col flex-1 bg-sidebar/70 border rounded-md divide-y">
+      <div className="rounded-t-none w-full flex flex-col flex-1 bg-sidebar/70 border rounded-md divide-y">
         {!isLoaded ? (
           <div className="flex flex-1 items-center justify-center min-h-72 w-full">
             <Loader size="medium" />
