@@ -91,7 +91,7 @@ export const KanbanBoard = ({
     const fetchBedMetaData = () => {
       if (organization && organization.publicMetadata) {
         const bedMetaData: BedInfo[] =
-          (organization.publicMetadata?.bedMetaData as BedInfo[]) || [];
+          (organization.publicMetadata?.beds as BedInfo[]) || [];
         setColumns(bedMetaData);
       }
     };
@@ -246,7 +246,7 @@ export const KanbanBoard = ({
     if (!organization) return;
 
     setDeleteState({ ...deleteState, deleteLoader: true });
-    const currentBeds = (organization.publicMetadata?.bedMetaData ||
+    const currentBeds = (organization.publicMetadata?.beds ||
       []) as BedInfo[];
     const updatedBeds = currentBeds.filter(
       (bed: BedInfo) => bed.bed_id !== bedIdToRemove

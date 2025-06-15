@@ -13,7 +13,7 @@ export const updateOrgBedMetaData = async (formdata: BedInfo[]) => {
 
   try {
     await client.organizations.updateOrganizationMetadata(orgId, {
-      publicMetadata: { bedMetaData: formdata },
+      publicMetadata: { beds: formdata },
     });
     return { message: "Org metadata Updated" };
   } catch (e) {
