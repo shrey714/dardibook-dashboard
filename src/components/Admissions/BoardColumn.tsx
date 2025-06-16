@@ -6,10 +6,8 @@ import { TaskCard } from "./TaskCard";
 import { cva } from "class-variance-authority";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "@/components/ui/button";
-import { Bed, Trash2, UserPlus } from "lucide-react";
-import { ScrollArea, ScrollBar } from "../ui/scroll-area";
+import { Bed, MapPinIcon, Trash2, UserPlus } from "lucide-react";
 import { BedInfo, BedPatientTypes, OrgBed } from "@/types/FormTypes";
-import { Skeleton } from "../ui/skeleton";
 import {
   Tooltip,
   TooltipContent,
@@ -109,11 +107,18 @@ export function BoardColumn({
       }`}
     >
       <CardHeader className="p-4 pb-1">
-        <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2 text-lg font-medium">
-            <Bed className="h-5 w-5 shrink-0" />
-            <p className="line-clamp-1" title={`Bed ${column.bed_id}`}>
+        <div className="flex items-baseline justify-between">
+          <CardTitle className="flex items-center flex-col text-lg font-medium">
+            <p
+              className="line-clamp-1 flex gap-2 items-center"
+              title={`Bed ${column.bed_id}`}
+            >
+              <Bed className="h-5 w-5 shrink-0" />
               {column.bed_id}
+            </p>
+            <p className="line-clamp-1 text-start w-full flex gap-1.5 items-center text-muted-foreground text-xs">
+              <MapPinIcon className="h-4 w-4 shrink-0" />
+              {column.ward}
             </p>
           </CardTitle>
           <div className="flex items-center gap-2">
