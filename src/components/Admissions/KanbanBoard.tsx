@@ -10,7 +10,6 @@ import {
   type DragStartEvent,
   useSensor,
   useSensors,
-  Announcements,
   UniqueIdentifier,
   TouchSensor,
   MouseSensor,
@@ -59,6 +58,7 @@ export const KanbanBoard = ({
 }: any) => {
   const { organization, isLoaded } = useOrganization();
   const { beds, bedPatients, loading } = useBedsStore((state) => state);
+  console.log("beddata just after zustand : ",beds);
   const [columns, setColumns] = useState<BedInfo[]>([]);
   const pickedUpTaskColumn = useRef<ColumnId | null>(null);
   const columnsId = useMemo(() => columns.map((col) => col.bed_id), [columns]);
@@ -103,116 +103,9 @@ export const KanbanBoard = ({
   }, [isLoaded, organization, refresh]);
 
   useEffect(() => {
-    if (!loading) setTasks(beds);
-  }, [beds, bedPatients, loading]);
-
-  function getDraggingTaskData(taskId: UniqueIdentifier, columnId: ColumnId) {
-    const tasksInColumn = tasks.filter((task) => task.bedId === columnId);
-    const taskPosition = tasksInColumn.findIndex(
-      (task) => task.bedBookingId === taskId
-    );
-    const column = columns.find((col) => col.bed_id === columnId);
-    return {
-      tasksInColumn,
-      taskPosition,
-      column,
-    };
-  }
-
-  const announcements: Announcements = {
-    onDragStart({ active }) {
-      if (!hasDraggableData(active)) return;
-      if (active.data.current?.type === "Column") {
-        const startColumnIdx = columnsId.findIndex((id) => id === active.id);
-        const startColumn = columns[startColumnIdx];
-        return `Picked up Column ${startColumn?.bed_id} at position: ${
-          startColumnIdx + 1
-        } of ${columnsId.length}`;
-      } else if (active.data.current?.type === "Task") {
-        pickedUpTaskColumn.current = active.data.current.task.bedId;
-        const { tasksInColumn, taskPosition, column } = getDraggingTaskData(
-          active.id,
-          pickedUpTaskColumn.current
-        );
-        return `Picked up Task ${
-          active.data.current.task.patient_id
-        } at position: ${taskPosition + 1} of ${
-          tasksInColumn.length
-        } in column ${column?.bed_id}`;
-      }
-    },
-    onDragOver({ active, over }) {
-      if (!hasDraggableData(active) || !hasDraggableData(over)) return;
-
-      if (
-        active.data.current?.type === "Column" &&
-        over.data.current?.type === "Column"
-      ) {
-        const overColumnIdx = columnsId.findIndex((id) => id === over.id);
-        return `Column ${active.data.current.column.bed_id} was moved over ${
-          over.data.current.column.bed_id
-        } at position ${overColumnIdx + 1} of ${columnsId.length}`;
-      } else if (
-        active.data.current?.type === "Task" &&
-        over.data.current?.type === "Task"
-      ) {
-        const { tasksInColumn, taskPosition, column } = getDraggingTaskData(
-          over.id,
-          over.data.current.task.bedId
-        );
-        if (over.data.current.task.bedId !== pickedUpTaskColumn.current) {
-          return `Task ${
-            active.data.current.task.patient_id
-          } was moved over column ${column?.bed_id} in position ${
-            taskPosition + 1
-          } of ${tasksInColumn.length}`;
-        }
-        return `Task was moved over position ${taskPosition + 1} of ${
-          tasksInColumn.length
-        } in column ${column?.bed_id}`;
-      }
-    },
-    onDragEnd({ active, over }) {
-      if (!hasDraggableData(active) || !hasDraggableData(over)) {
-        pickedUpTaskColumn.current = null;
-        return;
-      }
-      if (
-        active.data.current?.type === "Column" &&
-        over.data.current?.type === "Column"
-      ) {
-        const overColumnPosition = columnsId.findIndex((id) => id === over.id);
-
-        return `Column ${
-          active.data.current.column.bed_id
-        } was dropped into position ${overColumnPosition + 1} of ${
-          columnsId.length
-        }`;
-      } else if (
-        active.data.current?.type === "Task" &&
-        over.data.current?.type === "Task"
-      ) {
-        const { tasksInColumn, taskPosition, column } = getDraggingTaskData(
-          over.id,
-          over.data.current.task.bedId
-        );
-        if (over.data.current.task.bedId !== pickedUpTaskColumn.current) {
-          return `Task was dropped into column ${column?.bed_id} in position ${
-            taskPosition + 1
-          } of ${tasksInColumn.length}`;
-        }
-        return `Task was dropped into position ${taskPosition + 1} of ${
-          tasksInColumn.length
-        } in column ${column?.bed_id}`;
-      }
-      pickedUpTaskColumn.current = null;
-    },
-    onDragCancel({ active }) {
-      pickedUpTaskColumn.current = null;
-      if (!hasDraggableData(active)) return;
-      return `Dragging ${active.data.current?.type} cancelled.`;
-    },
-  };
+    if (!loading) setTasks(structuredClone(beds));
+    console.log("beds : ",beds);
+  }, [beds,loading]);
 
   // Function to scroll to a specific bed and highlight it
   const [highlightedBed, setHighlightedBed] = useState<string | null>(null);
@@ -431,9 +324,6 @@ export const KanbanBoard = ({
           </div>
         ) : (
           <DndContext
-            accessibility={{
-              announcements,
-            }}
             sensors={sensors}
             onDragStart={onDragStart}
             onDragEnd={onDragEnd}
