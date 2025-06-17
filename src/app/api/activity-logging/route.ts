@@ -28,7 +28,7 @@ export async function POST(req: Request) {
             userAgent,
         };
 
-        await addDoc(collection(db, "doctor", orgId, "logs"), log);
+        await addDoc(collection(db, "doctor", orgId, "activity_logs"), log);
 
         return new Response("Logged", { status: 200 });
     } catch (err) {
