@@ -7,6 +7,7 @@ import WeekSelector from "@/components/Home/WeekSelector";
 import { DashboardDataTypes } from "@/types/FormTypes";
 import { headers } from "next/headers";
 import { auth } from "@clerk/nextjs/server";
+import Temp2 from "./temp2";
 
 type PageProps = {
   searchParams: Promise<{ weekDate?: string }>;
@@ -61,6 +62,7 @@ export default async function Home({ searchParams }: PageProps) {
 
   return (
     <div className="p-1 py-2 gap-2 sm:p-2 sm:py-3 sm:gap-3 md:p-3 flex flex-col">
+      <Temp2 />
       <div className="w-full flex flex-row gap-2 sm:gap-3 items-center justify-end">
         <WeekSelector />
       </div>
