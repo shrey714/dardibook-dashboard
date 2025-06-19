@@ -1,59 +1,80 @@
 import React from "react";
-
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu";
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useOrganization } from "@clerk/nextjs";
+import { useLogStore } from "@/utility/activityLogging/useActivityLogStore";
+import { Clock12Icon, OctagonAlertIcon } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 
 export function NavHospital() {
   const { isLoaded, organization } = useOrganization();
-  return (
-    <NavigationMenu>
-      <NavigationMenuList>
-        <NavigationMenuItem className="flex">
-          <NavigationMenuTrigger
-            className="border rounded-full gap-1 px-1 bg-secondary"
-            disabled={!isLoaded}
-          >
-            {!isLoaded ? (
-              <div className="flex items-center gap-1">
-                <Skeleton className="h-7 w-7 rounded-sm" />
-                <div className="hidden md:block">
-                  <Skeleton className="h-5 w-[50px]" />
-                </div>
-              </div>
-            ) : (
-              <>
-                <Avatar className="rounded-full h-7 w-7 bg-secondary ring-0">
-                  <AvatarImage src={organization?.imageUrl} alt="H" />
-                  <AvatarFallback>H</AvatarFallback>
-                </Avatar>
-                <div className="w-[50px] overflow-hidden truncate hidden md:block">
-                  {organization?.name}
-                </div>
-              </>
-            )}
-          </NavigationMenuTrigger>
-          <NavigationMenuContent>
-            <div className="p-2 w-32 flex flex-1 flex-col gap-2">
-              <Avatar className="rounded-full border overflow-hidden aspect-square h-full w-full bg-transparent">
-                <AvatarImage src={organization?.imageUrl} alt="H" />
-                <AvatarFallback>H</AvatarFallback>
-              </Avatar>
+  const { isLoading, error } = useLogStore();
 
-              <div className="border-dotted border rounded-md py-1 px-2 leading-none">
-                {organization?.name}
-              </div>
-            </div>
-          </NavigationMenuContent>
-        </NavigationMenuItem>
-      </NavigationMenuList>
-    </NavigationMenu>
+  return (
+    <div className="rounded-full gap-1.5 p-0.5 bg-secondary flex items-center h-min">
+      {!isLoaded ? (
+        <div className="flex items-center gap-1">
+          <Skeleton className="size-6 rounded-full" />
+          <Skeleton className="h-3 w-[50px]" />
+        </div>
+      ) : (
+        <>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Avatar className="relative rounded-full size-7 bg-secondary ring-0">
+                <AnimatePresence mode="wait">
+                  {isLoading ? (
+                    <motion.span
+                      key="loading"
+                      className="absolute bg-black/80 size-full flex items-center justify-center"
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      transition={{ duration: 0.4 }}
+                    >
+                      <Clock12Icon className="size-6 shrink-0 text-green-600 animate-spin" />
+                    </motion.span>
+                  ) : error ? (
+                    <motion.span
+                      key="error"
+                      className="absolute bg-black/80 size-full flex items-center justify-center"
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      transition={{ duration: 0.4 }}
+                    >
+                      <OctagonAlertIcon className="size-6 shrink-0 text-red-600" />
+                    </motion.span>
+                  ) : null}
+                </AnimatePresence>
+
+                <AvatarImage src={organization?.imageUrl} alt="D" />
+                <AvatarFallback>D</AvatarFallback>
+              </Avatar>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>
+                {isLoading
+                  ? "Logging activity..."
+                  : error
+                  ? "Failed to log activity"
+                  : "Activity log is up to date"}
+              </p>
+            </TooltipContent>
+          </Tooltip>
+          <p
+            className="w-[50px] truncate leading-none text-sm"
+            title={organization?.name}
+          >
+            {organization?.name}
+          </p>
+        </>
+      )}
+    </div>
   );
 }
