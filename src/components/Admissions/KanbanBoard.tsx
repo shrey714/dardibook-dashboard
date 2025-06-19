@@ -45,17 +45,27 @@ interface DeleteState {
   bedToDelete: null | string;
 }
 
+interface KanbanBoardProps {
+  openAddModal: (bedId: string) => void;
+  openEditModal: (bookingId: string, bedId: string) => void;
+  refresh: boolean;
+  isEditModalOpen: boolean;
+  setWasEdited: React.Dispatch<React.SetStateAction<boolean>>;
+  wasEdited: boolean;
+  addNewBedHandler: () => Promise<void>;
+  bedAddLoader: boolean;
+}
+
 export const KanbanBoard = ({
   openAddModal,
   openEditModal,
-  setIsEditModalOpen,
   refresh,
   isEditModalOpen,
   setWasEdited,
   wasEdited,
   addNewBedHandler,
   bedAddLoader,
-}: any) => {
+}: KanbanBoardProps) => {
   const { organization, isLoaded } = useOrganization();
   const { beds, bedPatients, loading } = useBedsStore((state) => state);
   console.log("beddata just after zustand : ",beds);
@@ -336,7 +346,6 @@ export const KanbanBoard = ({
                     key={col.bed_id}
                     column={col}
                     tasks={tasks.filter((task) => task.bedId === col.bed_id)}
-                    setIsEditModalOpen={setIsEditModalOpen}
                     openAddModal={openAddModal}
                     openEditModal={openEditModal}
                     bedPatients={bedPatients}
@@ -354,7 +363,6 @@ export const KanbanBoard = ({
                     <TaskCard
                       task={activeTask}
                       bedPatientData={bedPatients[activeTask.patient_id]}
-                      setIsEditModalOpen={setIsEditModalOpen}
                       openEditModal={openEditModal}
                     />
                   )}

@@ -8,7 +8,7 @@ import toast from "react-hot-toast";
 import { Button } from "../ui/button";
 import Loader from "../common/Loader";
 import Availability from "./Availability";
-import { BedPatientTypes, OrgBed } from "@/types/FormTypes";
+import { BedPatientTypes, OrgBed, orgUserType } from "@/types/FormTypes";
 import {
   Select,
   SelectContent,
@@ -229,15 +229,17 @@ const BedEditModal: React.FC<BedEditModalProps> = ({
               } = member.publicUserData;
 
               const selectedMember = {
-                id: userId,
+                id: userId as string,
                 name: `${firstName} ${lastName}`.trim(),
                 email: identifier,
               };
 
-              setadmissionInfo((prev: any) => ({
-                ...prev,
+              if (!admissionInfo) return;
+
+              setadmissionInfo({
+                ...admissionInfo,
                 admission_for: selectedMember,
-              }));
+              });
             }
           }}
         >

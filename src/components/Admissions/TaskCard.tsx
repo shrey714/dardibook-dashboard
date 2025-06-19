@@ -53,8 +53,7 @@ export interface Task {
 interface TaskCardProps {
   task: OrgBed;
   bedPatientData: BedPatientTypes;
-  setIsEditModalOpen: any;
-  openEditModal: any;
+  openEditModal: (bookingId: string, bedId: string)=>void;
 }
 
 export type TaskType = "Task";
@@ -63,14 +62,12 @@ export interface TaskDragData {
   type: TaskType;
   task: OrgBed;
   bedPatientData: BedPatientTypes;
-  setIsEditModalOpen: any;
-  openEditModal: any;
+  openEditModal: (bookingId: string, bedId: string)=>void;
 }
 
 export function TaskCard({
   task,
   bedPatientData,
-  setIsEditModalOpen,
   openEditModal,
 }: TaskCardProps) {
   const { openModal } = usePatientHistoryModalStore();
@@ -88,7 +85,6 @@ export function TaskCard({
       type: "Task",
       task,
       bedPatientData,
-      setIsEditModalOpen,
       openEditModal,
     } satisfies TaskDragData,
     attributes: {

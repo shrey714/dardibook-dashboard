@@ -12,14 +12,14 @@ import { updateOrgBedMetaData } from "./_actions";
 import { DialogDescription } from "@radix-ui/react-dialog";
 
 function Admissions() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [bedId, setbedId] = useState("");
-  const [bookingId, setbookingId] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
+  const [bedId, setbedId] = useState<string>("");
+  const [bookingId, setbookingId] = useState<string>("");
   const { organization } = useOrganization();
-  const [bedAddLoader, setBedAddLoader] = useState(false);
-  const [refresh, setRefresh] = useState(false);
-  const [wasEdited, setWasEdited] = useState(false);
+  const [bedAddLoader, setBedAddLoader] = useState<boolean>(false);
+  const [refresh, setRefresh] = useState<boolean>(false);
+  const [wasEdited, setWasEdited] = useState<boolean>(false);
 
   const openAddModal = (bedId: string) => {
     setIsModalOpen(true);
@@ -95,8 +95,6 @@ function Admissions() {
       </Dialog>
       <KanbanBoard
         isEditModalOpen={isEditModalOpen}
-        bedId={bedId}
-        setbedId={setbedId}
         openAddModal={openAddModal}
         openEditModal={openEditModal}
         refresh={refresh}

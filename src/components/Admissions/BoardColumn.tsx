@@ -35,10 +35,9 @@ interface DeleteState {
 interface BoardColumnProps {
   column: BedInfo;
   tasks: OrgBed[];
-  setIsEditModalOpen: any;
   bedPatients: Record<string, BedPatientTypes>;
-  openAddModal: any;
-  openEditModal: any;
+  openAddModal: (bedId: string) => void;
+  openEditModal: (bookingId: string, bedId: string)=>void;
   setDeleteState: Dispatch<SetStateAction<DeleteState>>;
   isHighlighted?: boolean;
 }
@@ -47,7 +46,6 @@ export function BoardColumn({
   column,
   tasks,
   bedPatients,
-  setIsEditModalOpen,
   openAddModal,
   openEditModal,
   setDeleteState,
@@ -180,7 +178,6 @@ export function BoardColumn({
                   key={task.bedBookingId}
                   task={task}
                   bedPatientData={bedPatients[task.patient_id]}
-                  setIsEditModalOpen={setIsEditModalOpen}
                   openEditModal={openEditModal}
                 />
               );

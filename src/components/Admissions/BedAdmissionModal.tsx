@@ -169,7 +169,7 @@ const BedAdmissionModal: React.FC<BedAdmissionModalProps> = ({
         components={{
           DropdownIndicator: () => null,
           IndicatorSeparator: () => null,
-          Option: (patient: any) => {
+          Option: (patient) => {
             console.log(patient);
             return (
               <div
@@ -202,7 +202,7 @@ const BedAdmissionModal: React.FC<BedAdmissionModalProps> = ({
             );
           },
         }}
-        filterOption={(option: any, inputValue) => {
+        filterOption={(option, inputValue) => {
           const search = inputValue.toLowerCase();
           return (
             (option.data.label.toLowerCase().includes(search) ||
