@@ -84,7 +84,7 @@ const BillsGenerated = ({
 
   const filteredBills = searchTerm
     ? bills.filter(
-        (bill: any) =>
+        (bill: PharmacyTypes) =>
           bill.bill_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
           bill.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
           bill.mobile.includes(searchTerm)

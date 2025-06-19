@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { Button } from "../ui/button";
+import { Button, buttonVariants } from "../ui/button";
 import { LogOut } from "lucide-react";
 import animationData from "@/lottieFiles/SignOut.json";
 import {
@@ -15,8 +15,15 @@ import {
 } from "@/components/ui/dialog";
 import Lottie from "react-lottie";
 import { SignOutButton } from "@clerk/nextjs";
+import { VariantProps } from "class-variance-authority";
 
-const LogOutBTtn = ({ className, ...props }: any) => {
+interface LogOutBtnProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof buttonVariants> {
+  asChild?: boolean;
+}
+
+const LogOutBTtn: React.FC<LogOutBtnProps> = ({ className, ...props }) => {
   const defaultOptions = {
     loop: true,
     autoplay: true,

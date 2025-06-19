@@ -51,12 +51,12 @@ export default function SettingsDiseaseInfoPage() {
   const [addMedicinesData, setAddMedicinesData] = useState<string[]>([]);
   const [addLoader, setAddLoader] = useState(false);
   // --------------disease filter--------------
-  const filteredDIsease = (disease: any) => {
+  const filteredDIsease = (disease: Disease[]) => {
     return disease
       .sort((a: Disease, b: Disease) =>
         a.diseaseDetail.localeCompare(b.diseaseDetail)
       )
-      .filter((dname: any) =>
+      .filter((dname: Disease) =>
         dname?.diseaseDetail
           ?.toLowerCase()
           ?.includes(searchDisease?.toLowerCase())
@@ -302,7 +302,7 @@ export default function SettingsDiseaseInfoPage() {
               </>
             ) : (
               <>
-                {filteredDIsease(diseases).map((disease: any, index: any) => {
+                {filteredDIsease(diseases).map((disease: Disease, index: number) => {
                   return (
                     <DiseaseRow
                       key={index}

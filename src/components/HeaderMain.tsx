@@ -12,8 +12,9 @@ import LogOutBTtn from "./common/LogOutBTtn";
 import { ModeToggle } from "./common/mode-toggle";
 import { Menu } from "lucide-react";
 import { Button } from "./ui/button";
+import { User } from "@clerk/nextjs/server";
 
-const HeaderMain = async ({ user }: any) => {
+const HeaderMain = async ({ user }: { user: User | null }) => {
   const allPaths = [
     "about-us",
     "cancellation-policy",
@@ -26,7 +27,10 @@ const HeaderMain = async ({ user }: any) => {
   return (
     <nav className="sticky w-full z-20 top-0 start-0 p-4 pb-0">
       <div className="rounded-lg shadow-lg bg-secondary max-w-screen-xl flex flex-wrap items-center justify-between mx-auto px-4 py-2">
-        <Link href={"/"} className="cursor-pointer flex items-center ml-0 sm:ml-4 mr-3">
+        <Link
+          href={"/"}
+          className="cursor-pointer flex items-center ml-0 sm:ml-4 mr-3"
+        >
           <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
             DardiBook
           </span>
