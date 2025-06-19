@@ -65,6 +65,10 @@ export interface OrgBed {
     discharged_by?: orgUserType;
 }
 
+export interface BedInfo {
+    bed_id: string;
+    ward: string;
+  }
 export interface TodayPatientsType {
     patient_id: string;
     name: string;
