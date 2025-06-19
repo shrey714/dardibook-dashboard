@@ -9,6 +9,7 @@ import {
   CalendarPlus,
   CalendarPlusIcon,
   ClipboardListIcon,
+  ClockAlertIcon,
   LogOutIcon,
   PenBoxIcon,
   PencilLineIcon,
@@ -18,7 +19,7 @@ import {
 } from "lucide-react";
 import { ColumnId } from "./KanbanBoard";
 import { BedPatientTypes, OrgBed } from "@/types/FormTypes";
-import { format } from "date-fns";
+import { format, getTime } from "date-fns";
 import { usePatientHistoryModalStore } from "@/lib/stores/patientHistoryModalStore";
 import {
   Popover,
@@ -140,7 +141,10 @@ export function TaskCard({
                 <Button variant="ghost" type="button" size="icon">
                   <Popover>
                     <PopoverTrigger asChild>
-                      <span id="shrey" className="flex size-full items-center justify-center">
+                      <span
+                        id="shrey"
+                        className="flex size-full items-center justify-center"
+                      >
                         <ClipboardListIcon />
                       </span>
                     </PopoverTrigger>
@@ -340,22 +344,33 @@ export function TaskCard({
             </Tooltip>
           </TooltipProvider>
         </div>
-        <div className="text-sm space-y-1 text-muted-foreground px-3">
-          <p>
-            <span className="font-medium">Age:</span> {bedPatientData.age}
-          </p>
-          <div className="flex items-center gap-1 text-xs text-green-600 font-medium">
-            <CalendarPlus className="h-3 w-3" />
-            <span>
-              Admitted: {format(task.admission_at, "do MMM yy, h:mm a")}
-            </span>
+        <div className="text-sm text-muted-foreground px-3 flex">
+          <div className="flex flex-col flex-1 space-y-1">
+            <p>
+              <span className="font-medium">Age:</span> {bedPatientData.age}
+            </p>
+            <div className="flex items-center gap-1 text-xs text-green-600 font-medium">
+              <CalendarPlus className="h-3 w-3" />
+              <span>
+                Admitted: {format(task.admission_at, "do MMM yy, h:mm a")}
+              </span>
+            </div>
+            <div className="flex items-center gap-1 text-xs text-red-600 font-medium">
+              <CalendarMinus className="h-3 w-3" />
+              <span>
+                Discharge: {format(task.discharge_at, "do MMM yy, h:mm a")}
+              </span>
+            </div>
           </div>
-          <div className="flex items-center gap-1 text-xs text-red-600 font-medium">
-            <CalendarMinus className="h-3 w-3" />
-            <span>
-              Discharge: {format(task.discharge_at, "do MMM yy, h:mm a")}
-            </span>
-          </div>
+          {task.discharge_at < getTime(new Date()) && (
+            <div className="h-full flex items-center justify-end max-w-16 p-2 rounded-r-md flex-1 bg-gradient-to-l from-red-500/30 to-red-500/0">
+              <ClockAlertIcon
+                size={24}
+                strokeWidth={1.6}
+                className="text-red-500"
+              />
+            </div>
+          )}
         </div>
         <div
           {...attributes}
