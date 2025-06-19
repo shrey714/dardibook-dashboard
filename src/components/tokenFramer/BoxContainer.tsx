@@ -8,7 +8,12 @@ const BoxContainer = ({
   loading,
   isPaused,
   allowTokenSceenExpand,
-}: any) => {
+}: {
+  CurrentToken: number;
+  loading: boolean;
+  isPaused: boolean;
+  allowTokenSceenExpand: boolean;
+}) => {
   const [isExpanded, setisExpanded] = useState(false);
 
   return (

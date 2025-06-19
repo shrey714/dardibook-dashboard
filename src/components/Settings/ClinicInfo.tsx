@@ -41,7 +41,7 @@ const ClinicInfo = () => {
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setformdata((prevData: any) => ({
+    setformdata((prevData: DoctorInfo) => ({
       ...prevData,
       [name]: value,
     }));

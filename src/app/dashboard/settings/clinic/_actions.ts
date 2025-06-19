@@ -2,7 +2,16 @@
 
 import { auth, clerkClient } from '@clerk/nextjs/server'
 
-export const updateOrgMetadata = async (formdata: any) => {
+interface DoctorInfo {
+  doctorName: string;
+  degree: string;
+  registrationNumber: string;
+  clinicNumber: string;
+  phoneNumber: string;
+  clinicAddress: string;
+}
+
+export const updateOrgMetadata = async (formdata: DoctorInfo) => {
   const client = await clerkClient()
   const { orgId } = await auth()
 
@@ -12,7 +21,7 @@ export const updateOrgMetadata = async (formdata: any) => {
 
   try {
     await client.organizations.updateOrganizationMetadata(orgId, {
-      publicMetadata: formdata,
+      publicMetadata: { ...formdata },
     })
     return { message: 'Org metadata Updated' }
   } catch (e) {

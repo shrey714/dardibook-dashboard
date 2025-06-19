@@ -6,7 +6,7 @@ import MultipleSelector from "@/components/Settings/DiseaseInfo/MedicineMultiple
 interface DisplayDiseaseProps {
   disease: {
     diseaseDetail: string;
-    medicines: [];
+    medicines: string[];
     diseaseId: string;
   };
   index: number;

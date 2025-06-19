@@ -70,12 +70,12 @@ export default function SettingsMedicineInfoPage() {
   const [searchMedicine, setsearchMedicine] = useState("");
   const [addLoader, setAddLoader] = useState(false);
   // --------------medicine filter--------------
-  const filteredMedicine = (medicines: any) => {
+  const filteredMedicine = (medicines: Medicine[]) => {
     return medicines
       .sort((a: Medicine, b: Medicine) =>
         a.medicineName.localeCompare(b.medicineName)
       )
-      .filter((mname: any) =>
+      .filter((mname: Medicine) =>
         mname?.medicineName
           ?.toLowerCase()
           ?.includes(searchMedicine?.toLowerCase())
@@ -290,7 +290,7 @@ export default function SettingsMedicineInfoPage() {
             ) : (
               <>
                 {filteredMedicine(medicines).map(
-                  (medicine: any, index: any) => {
+                  (medicine: Medicine, index: number) => {
                     return (
                       <MedicineRow
                         key={index}
