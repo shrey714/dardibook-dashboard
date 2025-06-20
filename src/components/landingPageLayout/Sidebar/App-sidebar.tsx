@@ -5,7 +5,6 @@ import {
   Home,
   ClipboardPlusIcon,
   HistoryIcon,
-  SettingsIcon,
   SquarePenIcon,
   CalendarDaysIcon,
   Bed,
@@ -70,6 +69,12 @@ const pages = [
     roles: ["org:clinic_head", "org:doctor"],
   },
   {
+    title: "Pharmacy",
+    url: "/dashboard/pharmacy",
+    icon: PillIcon,
+    roles: ["org:clinic_head", "org:medical_staff"],
+  },
+  {
     title: "History",
     url: "/dashboard/history",
     icon: HistoryIcon,
@@ -127,23 +132,6 @@ const pages = [
       },
     ],
   },
-  {
-    title: "Pharmacy",
-    url: "/dashboard/pharmacy",
-    icon: PillIcon,
-    roles: ["org:clinic_head", "org:medical_staff"],
-  },
-  {
-    title: "Settings",
-    url: "/dashboard/settings",
-    icon: SettingsIcon,
-    roles: [
-      "org:clinic_head",
-      "org:doctor",
-      "org:assistant_doctor",
-      "org:medical_staff",
-    ],
-  },
 ];
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -152,15 +140,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   return (
     <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader>
+      <SidebarHeader className="pb-0">
         <LogoHandeler />
       </SidebarHeader>
-      <SidebarContent className="overflow-x-hidden">
+      <SidebarContent className="overflow-x-hidden pt-2">
         {state === "collapsed" && !isMobile ? <Pip /> : <TokenBox />}
         <NavMain pages={pages} pathname={pathname} />
       </SidebarContent>
-      <SidebarFooter>
-        <RolesLink />
+      <SidebarFooter className="gap-1">
+        <RolesLink pathname={pathname} />
         <NavUser />
         <ModeToggle />
       </SidebarFooter>
