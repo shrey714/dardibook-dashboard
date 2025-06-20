@@ -1,6 +1,5 @@
-import { db } from "@/firebase/firebaseConfig";
+import { adminDb } from "@/server/firebaseAdmin";
 import { auth, currentUser } from "@clerk/nextjs/server";
-import { collection, addDoc, Timestamp } from "firebase/firestore";
 import { headers } from "next/headers";
 
 export async function POST(req: Request) {
@@ -15,7 +14,7 @@ export async function POST(req: Request) {
         const body = await req.json();
 
         const log = {
-            time: Timestamp.now(),
+            time: new Date(),
             action: body.action,
             metadata: body.metadata || {},
             location: body.location || null,
@@ -28,7 +27,11 @@ export async function POST(req: Request) {
             userAgent,
         };
 
-        await addDoc(collection(db, "doctor", orgId, "activity_logs"), log);
+        await adminDb
+            .collection("doctor")
+            .doc(orgId)
+            .collection("activity_logs")
+            .add(log);
 
         return new Response("Logged", { status: 200 });
     } catch (err) {

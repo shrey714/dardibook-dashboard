@@ -1,20 +1,13 @@
 "use server";
 import { columns } from "@/components/History/prescriptions/columns";
 import { DataTable } from "@/components/History/common/data-table";
-import { db } from "@/firebase/firebaseConfig";
-import {
-  collectionGroup,
-  getDocs,
-  orderBy,
-  query,
-  where,
-} from "firebase/firestore";
 import { auth } from "@clerk/nextjs/server";
 import { PrescriptionFormTypes } from "@/types/FormTypes";
 import { error } from "console";
 import { DataTableToolbar } from "@/components/History/prescriptions/data-table-toolbar";
 import { Prescription } from "@/components/History/dataSchema/schema";
 import { checkPageAccess } from "@/app/dashboard/history/(history)/_actions";
+import { adminDb } from "@/server/firebaseAdmin";
 
 export default async function Page() {
   let prescriptions: Prescription[] = [];
@@ -37,14 +30,13 @@ export default async function Page() {
         </div>
       );
     }
-    const prescriptionsCollection = collectionGroup(db, "prescriptions");
-    const prescriptionsQuery = query(
-      prescriptionsCollection,
-      orderBy("created_at", "desc"),
-      where("orgId", "==", authInstance.orgId)
-    );
 
-    const querySnapshot = await getDocs(prescriptionsQuery);
+    const prescriptionsQuery = adminDb
+      .collectionGroup("prescriptions")
+      .where("orgId", "==", authInstance.orgId)
+      .orderBy("created_at", "desc");
+
+    const querySnapshot = await prescriptionsQuery.get();
 
     prescriptions = querySnapshot.docs.map((doc) => {
       const data = doc.data() as PrescriptionFormTypes;

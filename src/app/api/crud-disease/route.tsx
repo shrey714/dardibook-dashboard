@@ -1,12 +1,5 @@
-import { db } from "@/firebase/firebaseConfig";
+import { adminDb } from "@/server/firebaseAdmin";
 import { withAuth } from "@/server/withAuth";
-import {
-  collection,
-  deleteDoc,
-  doc,
-  getDocs,
-  setDoc,
-} from "firebase/firestore";
 import { NextResponse, NextRequest } from "next/server";
 
 const postDisease = async (request: NextRequest) => {
@@ -24,17 +17,18 @@ const postDisease = async (request: NextRequest) => {
       );
     }
 
-    const diseaseRef = doc(db, "doctor", uid, "diseaseData", diseaseId);
-
-    // Upload the disease object to Firestore
-    await setDoc(
-      diseaseRef,
-      {
-        ...diseaseData,
-        searchableString: diseaseData.diseaseDetail.toLowerCase().trim(),
-      },
-      { merge: true }
-    );
+    await adminDb
+      .collection("doctor")
+      .doc(uid)
+      .collection("diseaseData")
+      .doc(diseaseId)
+      .set(
+        {
+          ...diseaseData,
+          searchableString: diseaseData.diseaseDetail.toLowerCase().trim(),
+        },
+        { merge: true }
+      );
 
     return NextResponse.json({ data: "success" }, { status: 200 });
   } catch (error) {
@@ -59,9 +53,12 @@ const getDisease = async (request: NextRequest) => {
       );
     }
 
-    const diseaseRef = collection(db, "doctor", uid, "diseaseData");
-    // Upload the disease object to Firestore
-    const snapshot = await getDocs(diseaseRef);
+    const snapshot = await adminDb
+      .collection("doctor")
+      .doc(uid)
+      .collection("diseaseData")
+      .get();
+
     const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 
     // if (data.length == 0) {
@@ -95,9 +92,12 @@ const deleteDisease = async (request: NextRequest) => {
 
     const { id } = await request.json();
 
-    const diseaseRef = doc(db, "doctor", uid, "diseaseData", id);
-    // Upload the disease object to Firestore
-    await deleteDoc(diseaseRef);
+    await adminDb
+      .collection("doctor")
+      .doc(uid)
+      .collection("diseaseData")
+      .doc(id)
+      .delete();
 
     return NextResponse.json({ data: "success" }, { status: 200 });
   } catch (error) {
