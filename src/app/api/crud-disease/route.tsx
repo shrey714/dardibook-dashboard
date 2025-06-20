@@ -1,5 +1,4 @@
 import { adminDb } from "@/server/firebaseAdmin";
-import { withAuth } from "@/server/withAuth";
 import { NextResponse, NextRequest } from "next/server";
 
 const postDisease = async (request: NextRequest) => {
@@ -109,6 +108,6 @@ const deleteDisease = async (request: NextRequest) => {
   }
 };
 
-export const GET = withAuth(getDisease);
-export const POST = withAuth(postDisease);
-export const DELETE = withAuth(deleteDisease);
+export const GET = getDisease;
+export const POST = postDisease;
+export const DELETE = deleteDisease;

@@ -1,5 +1,4 @@
 import { NextResponse, NextRequest } from "next/server";
-import { withAuth } from "@/server/withAuth";
 import { adminDb } from "@/server/firebaseAdmin";
 
 const getDoctorData = async (request: NextRequest) => {
@@ -29,4 +28,4 @@ const getDoctorData = async (request: NextRequest) => {
   }
 };
 
-export const GET = withAuth(getDoctorData);
+export const GET = getDoctorData;

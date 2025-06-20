@@ -1,5 +1,4 @@
 import { NextResponse, NextRequest } from "next/server";
-import { withAuth } from "@/server/withAuth";
 import { adminDb } from "@/server/firebaseAdmin";
 
 // Utility function to check if the current time is between two timestamps
@@ -74,4 +73,4 @@ const checkSubscription = async (request: NextRequest) => {
   }
 }
 
-export const GET = withAuth(checkSubscription);
+export const GET = (checkSubscription);
