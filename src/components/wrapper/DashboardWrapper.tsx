@@ -86,6 +86,9 @@ const DashboardWrapper = ({ children }: { children: ReactNode }) => {
           }}
           className="bg-background"
         >
+          <p className="absolute bottom-2 right-2 text-muted-foreground text-xs font-medium">
+            Getting your Dashboard ready...
+          </p>
           <Loader size="large" />
         </div>
       ) : subscription ? (
