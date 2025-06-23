@@ -6,7 +6,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
@@ -18,7 +17,6 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import LogOutBTtn from "@/components/common/LogOutBTtn";
-import SubscriptionDialogBtn from "@/components/common/SubscriptionDialogBtn";
 import { useUser } from "@clerk/nextjs";
 
 export function NavUser({}) {
@@ -79,14 +77,6 @@ export function NavUser({}) {
                 </div>
               </div>
             </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <SubscriptionDialogBtn
-                size={"sm"}
-                variant={"secondary"}
-                className="w-full"
-              />
-            </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <LogOutBTtn
               size={"sm"}

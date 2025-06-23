@@ -1,14 +1,13 @@
 "use server";
 import { columns } from "@/components/History/patients/columns";
 import { DataTable } from "@/components/History/common/data-table";
-import { db } from "@/firebase/firebaseConfig";
-import { collection, getDocs, query } from "firebase/firestore";
 import { auth } from "@clerk/nextjs/server";
 import { RegisterPatientFormTypes } from "@/types/FormTypes";
 import { error } from "console";
 import { DataTableToolbar } from "@/components/History/patients/data-table-toolbar";
 import { Patient } from "@/components/History/dataSchema/schema";
 import { checkPageAccess } from "@/app/dashboard/history/(history)/_actions";
+import { adminDb } from "@/server/firebaseAdmin";
 
 export default async function Page() {
   let patients: Patient[] = [];
@@ -32,15 +31,12 @@ export default async function Page() {
       );
     }
 
-    const patientsCollection = collection(
-      db,
-      "doctor",
-      authInstance.orgId,
-      "patients"
-    );
-    const patientsQuery = query(patientsCollection);
+    const patientsQuery = adminDb
+      .collection("doctor")
+      .doc(authInstance.orgId)
+      .collection("patients");
 
-    const querySnapshot = await getDocs(patientsQuery);
+    const querySnapshot = await patientsQuery.get();
 
     patients = querySnapshot.docs.map((doc) => {
       const data = doc.data() as RegisterPatientFormTypes;

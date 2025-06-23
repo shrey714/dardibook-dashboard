@@ -1,12 +1,4 @@
-import { db } from "@/firebase/firebaseConfig";
-import { withAuth } from "@/server/withAuth";
-import {
-  collection,
-  deleteDoc,
-  doc,
-  getDocs,
-  setDoc,
-} from "firebase/firestore";
+import { adminDb } from "@/server/firebaseAdmin";
 import { NextResponse, NextRequest } from "next/server";
 
 const postMedicine = async (request: NextRequest) => {
@@ -24,17 +16,18 @@ const postMedicine = async (request: NextRequest) => {
       );
     }
 
-    const medicineRef = doc(db, "doctor", uid, "medicinesData", id);
-
-    // Upload the medicine object to Firestore
-    await setDoc(
-      medicineRef,
-      {
-        ...medicineData,
-        searchableString: medicineData.medicineName.toLowerCase().trim(),
-      },
-      { merge: true }
-    );
+    await adminDb
+      .collection("doctor")
+      .doc(uid)
+      .collection("medicinesData")
+      .doc(id)
+      .set(
+        {
+          ...medicineData,
+          searchableString: medicineData.medicineName.toLowerCase().trim(),
+        },
+        { merge: true }
+      );
 
     return NextResponse.json({ data: "success" }, { status: 200 });
   } catch (error) {
@@ -59,9 +52,12 @@ const getMedicine = async (request: NextRequest) => {
       );
     }
 
-    const medicineRef = collection(db, "doctor", uid, "medicinesData");
-    // Upload the medicine object to Firestore
-    const snapshot = await getDocs(medicineRef);
+    const snapshot = await adminDb
+      .collection("doctor")
+      .doc(uid)
+      .collection("medicinesData")
+      .get();
+
     const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 
     // if (data.length == 0) {
@@ -95,9 +91,12 @@ const deleteMedicine = async (request: NextRequest) => {
 
     const { id } = await request.json();
 
-    const medicineRef = doc(db, "doctor", uid, "medicinesData", id);
-    // Upload the medicine object to Firestore
-    await deleteDoc(medicineRef);
+    await adminDb
+      .collection("doctor")
+      .doc(uid)
+      .collection("medicinesData")
+      .doc(id)
+      .delete();
 
     return NextResponse.json({ data: "success" }, { status: 200 });
   } catch (error) {
@@ -109,6 +108,6 @@ const deleteMedicine = async (request: NextRequest) => {
   }
 };
 
-export const GET = withAuth(getMedicine);
-export const POST = withAuth(postMedicine);
-export const DELETE = withAuth(deleteMedicine);
+export const GET = getMedicine;
+export const POST = postMedicine;
+export const DELETE = deleteMedicine;

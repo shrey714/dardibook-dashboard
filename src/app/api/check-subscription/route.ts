@@ -1,7 +1,5 @@
 import { NextResponse, NextRequest } from "next/server";
-import { db } from "@/firebase/firebaseConfig"; // Adjust the path as necessary
-import { doc, getDoc } from 'firebase/firestore';
-import { withAuth } from "@/server/withAuth";
+import { adminDb } from "@/server/firebaseAdmin";
 
 // Utility function to check if the current time is between two timestamps
 function isCurrentTimeBetween(start: number, end: number) {
@@ -24,11 +22,11 @@ const checkSubscription = async (request: NextRequest) => {
 
   try {
     // Reference the user document in Firestore
-    const userDocRef = doc(db, 'doctor', userId);
-    const userDoc = await getDoc(userDocRef);
+    const userDoc = await adminDb.collection("doctor").doc(userId).get();
 
-    if (userDoc.exists() && userDoc.data().subscriptionId) {
-      // Fetch subscription details from the backend service
+    if (userDoc.exists && userDoc.data()) {
+      const userData = userDoc.data();
+
       const response = await fetch(
         "https://backend.dardibook.in/getSubDetails",
         {
@@ -36,7 +34,7 @@ const checkSubscription = async (request: NextRequest) => {
           headers: {
             "Content-Type": "application/json", // Set the content type to JSON
           },
-          body: JSON.stringify({ id: userDoc.data().subscriptionId }),
+          body: JSON.stringify({ id: userData?.subscriptionId || "" }),
         }
       );
 
@@ -75,4 +73,4 @@ const checkSubscription = async (request: NextRequest) => {
   }
 }
 
-export const GET = withAuth(checkSubscription);
+export const GET = (checkSubscription);

@@ -1,14 +1,13 @@
 "use server";
 import { columns } from "@/components/History/bills/columns";
 import { DataTable } from "@/components/History/common/data-table";
-import { db } from "@/firebase/firebaseConfig";
-import { collection, getDocs, orderBy, query } from "firebase/firestore";
 import { auth } from "@clerk/nextjs/server";
 import { PharmacyTypes } from "@/types/FormTypes";
 import { error } from "console";
 import { DataTableToolbar } from "@/components/History/bills/data-table-toolbar";
 import { Bill } from "@/components/History/dataSchema/schema";
 import { checkPageAccess } from "@/app/dashboard/history/(history)/_actions";
+import { adminDb } from "@/server/firebaseAdmin";
 
 export default async function Page() {
   let bills: Bill[] = [];
@@ -32,15 +31,13 @@ export default async function Page() {
       );
     }
 
-    const billsCollection = collection(
-      db,
-      "doctor",
-      authInstance.orgId,
-      "bills"
-    );
-    const billsQuery = query(billsCollection, orderBy("generated_at", "desc"));
+    const billsQuery = adminDb
+      .collection("doctor")
+      .doc(authInstance.orgId)
+      .collection("bills")
+      .orderBy("generated_at", "desc");
 
-    const querySnapshot = await getDocs(billsQuery);
+    const querySnapshot = await billsQuery.get();
 
     bills = querySnapshot.docs.map((doc) => {
       const data = doc.data() as PharmacyTypes;

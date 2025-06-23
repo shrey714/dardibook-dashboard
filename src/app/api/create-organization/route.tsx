@@ -1,4 +1,3 @@
-import { withAuth } from "@/server/withAuth";
 import { NextResponse, NextRequest } from "next/server";
 import { auth, clerkClient } from "@clerk/nextjs/server";
 
@@ -46,4 +45,4 @@ const createOrganization = async (request: NextRequest) => {
   }
 };
 
-export const POST = withAuth(createOrganization);
+export const POST = createOrganization;

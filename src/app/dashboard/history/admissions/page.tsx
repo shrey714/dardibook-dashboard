@@ -1,14 +1,13 @@
 "use server";
 import { columns } from "@/components/History/admissions/columns";
 import { DataTable } from "@/components/History/common/data-table";
-import { db } from "@/firebase/firebaseConfig";
-import { collection, getDocs, orderBy, query } from "firebase/firestore";
 import { auth } from "@clerk/nextjs/server";
 import { OrgBed } from "@/types/FormTypes";
 import { error } from "console";
 import { DataTableToolbar } from "@/components/History/admissions/data-table-toolbar";
 import { Admission } from "@/components/History/dataSchema/schema";
 import { checkPageAccess } from "@/app/dashboard/history/(history)/_actions";
+import { adminDb } from "@/server/firebaseAdmin";
 
 export default async function Page() {
   let admissions: Admission[] = [];
@@ -32,18 +31,13 @@ export default async function Page() {
       );
     }
 
-    const admissionsCollection = collection(
-      db,
-      "doctor",
-      authInstance.orgId,
-      "beds"
-    );
-    const admissionsQuery = query(
-      admissionsCollection,
-      orderBy("admission_at", "desc")
-    );
+    const admissionsQuery = adminDb
+      .collection("doctor")
+      .doc(authInstance.orgId)
+      .collection("beds")
+      .orderBy("admission_at", "desc");
 
-    const querySnapshot = await getDocs(admissionsQuery);
+    const querySnapshot = await admissionsQuery.get();
 
     admissions = querySnapshot.docs.map((doc) => {
       const data = doc.data() as OrgBed;

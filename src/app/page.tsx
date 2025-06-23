@@ -12,6 +12,9 @@ const Page = () => {
 
   return (
     <div className="w-screen h-svh overflow-hidden flex items-center justify-center bg-background">
+      <p className="absolute bottom-2 right-2 text-muted-foreground text-xs font-medium">
+        Taking you to your dashboard...
+      </p>
       <Image
         src="/Logo.svg"
         height={208}

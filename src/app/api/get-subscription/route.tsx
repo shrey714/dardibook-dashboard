@@ -1,4 +1,3 @@
-import { withAuth } from "@/server/withAuth";
 import { NextResponse, NextRequest } from "next/server";
 
 const getSubscription = async (request: NextRequest) => {
@@ -37,4 +36,4 @@ const getSubscription = async (request: NextRequest) => {
   }
 };
 
-export const GET = withAuth(getSubscription);
+export const GET = getSubscription;

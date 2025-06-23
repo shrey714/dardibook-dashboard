@@ -1,7 +1,5 @@
-import { db } from "@/firebase/firebaseConfig";
-import { doc, getDoc } from "firebase/firestore";
 import { NextResponse, NextRequest } from "next/server";
-import { withAuth } from "@/server/withAuth";
+import { adminDb } from "@/server/firebaseAdmin";
 
 const getDoctorData = async (request: NextRequest) => {
   try {
@@ -12,10 +10,9 @@ const getDoctorData = async (request: NextRequest) => {
       return NextResponse.json({ error: "UID is required." }, { status: 400 });
     }
 
-    const docRef = doc(db, "doctor", uid); // Adjust 'uid' if needed
-    const docSnap = await getDoc(docRef);
+    const docSnap = await adminDb.collection("doctor").doc(uid).get();
 
-    if (!docSnap.exists()) {
+    if (!docSnap.exists) {
       return NextResponse.json({ error: "Doctor not found" }, { status: 404 });
     }
 
@@ -31,4 +28,4 @@ const getDoctorData = async (request: NextRequest) => {
   }
 };
 
-export const GET = withAuth(getDoctorData);
+export const GET = getDoctorData;

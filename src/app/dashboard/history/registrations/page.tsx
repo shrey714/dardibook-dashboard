@@ -1,8 +1,6 @@
 "use server";
 import { columns } from "@/components/History/registrations/columns";
 import { DataTable } from "@/components/History/common/data-table";
-import { db } from "@/firebase/firebaseConfig";
-import { collection, getDocs, query } from "firebase/firestore";
 import { auth } from "@clerk/nextjs/server";
 import { RegisterPatientFormTypes } from "@/types/FormTypes";
 import { error } from "console";
@@ -10,6 +8,7 @@ import { DataTableToolbar } from "@/components/History/registrations/data-table-
 import { Registration } from "@/components/History/dataSchema/schema";
 import { isSameDay } from "date-fns";
 import { checkPageAccess } from "@/app/dashboard/history/(history)/_actions";
+import { adminDb } from "@/server/firebaseAdmin";
 
 export default async function Page() {
   let registrations: Registration[] = [];
@@ -32,15 +31,14 @@ export default async function Page() {
         </div>
       );
     }
-    const registrationsCollection = collection(
-      db,
-      "doctor",
-      authInstance.orgId,
-      "patients"
-    );
-    const registrationsQuery = query(registrationsCollection);
 
-    const querySnapshot = await getDocs(registrationsQuery);
+    const registrationsQuery = adminDb
+      .collection("doctor")
+      .doc(authInstance.orgId)
+      .collection("patients");
+
+    const querySnapshot = await registrationsQuery.get();
+
     registrations = querySnapshot.docs.flatMap((doc) => {
       const patient = doc.data() as RegisterPatientFormTypes;
 

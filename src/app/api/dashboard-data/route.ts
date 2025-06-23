@@ -1,11 +1,3 @@
-import { db } from "@/firebase/firebaseConfig";
-import {
-  collection,
-  collectionGroup,
-  getDocs,
-  query,
-  where,
-} from "firebase/firestore";
 import { NextResponse, NextRequest } from "next/server";
 
 import { auth, clerkClient } from "@clerk/nextjs/server";
@@ -36,6 +28,7 @@ import {
   Appointment,
 } from "@/types/FormTypes";
 import { utcToZonedTime, zonedTimeToUtc } from "date-fns-tz";
+import { adminDb } from "@/server/firebaseAdmin";
 
 export const GET = async (request: NextRequest) => {
   const { searchParams } = new URL(request.url);
@@ -87,58 +80,68 @@ export const GET = async (request: NextRequest) => {
     }));
 
   try {
-    const currentWeekBillsQuery = query(
-      collection(db, "doctor", orgId, "bills"),
+    const currentWeekBillsQuery = adminDb
+      .collection("doctor")
+      .doc(orgId)
+      .collection("bills")
+      .where("generated_at", ">=", currentWeekStart)
+      .where("generated_at", "<=", currentWeekEnd);
 
-      where("generated_at", ">=", currentWeekStart),
-      where("generated_at", "<=", currentWeekEnd)
-    );
-    const currentWeekPrescriptionsQuery = query(
-      collectionGroup(db, "prescriptions"),
-      where("orgId", "==", orgId),
-      where("created_at", ">=", currentWeekStart),
-      where("created_at", "<=", currentWeekEnd)
-    );
-    const currentWeekPatientsQuery = query(
-      collection(db, "doctor", orgId, "patients"),
-      where(
+    const currentWeekPrescriptionsQuery = adminDb
+      .collectionGroup("prescriptions")
+      .where("orgId", "==", orgId)
+      .where("created_at", ">=", currentWeekStart)
+      .where("created_at", "<=", currentWeekEnd);
+
+    const currentWeekPatientsQuery = adminDb
+      .collection("doctor")
+      .doc(orgId)
+      .collection("patients")
+      .where(
         "registered_date",
         "array-contains-any",
         getStartOfDaysBetween(currentWeekStart, currentWeekEnd, timezone)
-      )
-    );
-    const lastWeekBillsQuery = query(
-      collection(db, "doctor", orgId, "bills"),
+      );
 
-      where("generated_at", ">=", lastWeekStart),
-      where("generated_at", "<=", lastWeekEnd)
-    );
-    const lastWeekPrescriptionsQuery = query(
-      collectionGroup(db, "prescriptions"),
-      where("orgId", "==", orgId),
-      where("created_at", ">=", lastWeekStart),
-      where("created_at", "<=", lastWeekEnd)
-    );
-    const lastWeekPatientsQuery = query(
-      collection(db, "doctor", orgId, "patients"),
-      where(
+    const lastWeekBillsQuery = adminDb
+      .collection("doctor")
+      .doc(orgId)
+      .collection("bills")
+      .where("generated_at", ">=", lastWeekStart)
+      .where("generated_at", "<=", lastWeekEnd);
+
+    const lastWeekPrescriptionsQuery = adminDb
+      .collectionGroup("prescriptions")
+      .where("orgId", "==", orgId)
+      .where("created_at", ">=", lastWeekStart)
+      .where("created_at", "<=", lastWeekEnd);
+
+    const lastWeekPatientsQuery = adminDb
+      .collection("doctor")
+      .doc(orgId)
+      .collection("patients")
+      .where(
         "registered_date",
         "array-contains-any",
         getStartOfDaysBetween(lastWeekStart, lastWeekEnd, timezone)
-      )
-    );
-    const patientsInBedQuery = query(
-      collection(db, "doctor", orgId, "beds"),
-      where("dischargeMarked", "==", false)
-    );
-    const upcomingAppointmentsQuery = query(
-      collection(db, "doctor", orgId, "patients"),
-      where(
+      );
+
+    const patientsInBedQuery = adminDb
+      .collection("doctor")
+      .doc(orgId)
+      .collection("beds")
+      .where("dischargeMarked", "==", false);
+
+    const upcomingAppointmentsQuery = adminDb
+      .collection("doctor")
+      .doc(orgId)
+      .collection("patients")
+      .where(
         "registered_date",
         "array-contains-any",
         getUpcomingDatesRange(1, 14, timezone)
-      )
-    );
+      );
+
     const [
       currentWeekBillsSnap,
       lastWeekBillsSnap,
@@ -149,14 +152,14 @@ export const GET = async (request: NextRequest) => {
       patientsInBedSnap,
       upcomingAppointmentsSnap
     ] = await Promise.all([
-      getDocs(currentWeekBillsQuery),
-      getDocs(lastWeekBillsQuery),
-      getDocs(currentWeekPrescriptionsQuery),
-      getDocs(lastWeekPrescriptionsQuery),
-      getDocs(currentWeekPatientsQuery),
-      getDocs(lastWeekPatientsQuery),
-      getDocs(patientsInBedQuery),
-      getDocs(upcomingAppointmentsQuery)
+      currentWeekBillsQuery.get(),
+      lastWeekBillsQuery.get(),
+      currentWeekPrescriptionsQuery.get(),
+      lastWeekPrescriptionsQuery.get(),
+      currentWeekPatientsQuery.get(),
+      lastWeekPatientsQuery.get(),
+      patientsInBedQuery.get(),
+      upcomingAppointmentsQuery.get()
     ]);
 
 

@@ -2,15 +2,12 @@ import "@/styles/globals.css";
 import { DM_Sans } from "next/font/google";
 import Script from "next/script";
 import type { Metadata } from "next";
-// import AppWrapper from "@/components/wrapper/AppWrapper";
-// import ReduxWrapper from "@/components/wrapper/ReduxWrapper";
 import { Toaster } from "react-hot-toast";
-// import { Suspense } from "react";
-// import type { ThemeProviderProps } from "next-themes";
 import Image from "next/image";
 import { ThemeProvider as NextThemeProvider } from "next-themes";
 import { ClerkLoaded, ClerkLoading, ClerkProvider } from "@clerk/nextjs";
 import TopBarLoader from "@/components/common/TopBarLoader";
+import { FirebaseAuthProvider } from "@/components/wrapper/FirebaseAuthProvider";
 const DM_Sans_Font = DM_Sans({
   subsets: ["latin"],
   display: "swap",
@@ -53,6 +50,9 @@ export default async function RootLayout({
               <Toaster position="top-right" />
               <ClerkLoading>
                 <div className="w-screen h-svh overflow-hidden flex items-center justify-center bg-background">
+                  <p className="absolute bottom-2 right-2 text-muted-foreground text-xs font-medium">
+                    Welcome aboard DardiBook...
+                  </p>
                   <div>
                     <TopBarLoader />
                   </div>
@@ -66,7 +66,9 @@ export default async function RootLayout({
                   />
                 </div>
               </ClerkLoading>
-              <ClerkLoaded>{children}</ClerkLoaded>
+              <ClerkLoaded>
+                <FirebaseAuthProvider> {children}</FirebaseAuthProvider>
+              </ClerkLoaded>
             </NextThemeProvider>
           </body>
         </html>
@@ -74,11 +76,3 @@ export default async function RootLayout({
     </>
   );
 }
-
-// export default RootLayout;
-
-// <ReduxWrapper>
-//   <Suspense>
-//     <AppWrapper>{children}</AppWrapper>
-//   </Suspense>
-// </ReduxWrapper>
