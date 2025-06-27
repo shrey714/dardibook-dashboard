@@ -4,6 +4,8 @@ import {
   ArrowUpRight,
   CalendarMinusIcon,
   CalendarPlusIcon,
+  Check,
+  ChevronsUpDown,
 } from "lucide-react";
 import { db } from "@/firebase/firebaseConfig";
 import { writeBatch, doc, arrayUnion } from "firebase/firestore";
@@ -17,17 +19,32 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useAuth, useOrganization, useUser } from "@clerk/nextjs";
-import { OrgBed, orgUserType } from "@/types/FormTypes";
+import { BedInfo, orgUserType } from "@/types/FormTypes";
 import { DateTimePicker } from "../Appointment/DateTimePicker";
 import toast from "react-hot-toast";
 import { getTime, isBefore, isAfter } from "date-fns";
 import uniqid from "uniqid";
 import Availability from "./Availability";
 import { useBedsStore } from "@/lib/stores/useBedsStore";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import {
+  Command,
+  CommandInput,
+  CommandList,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+} from "@/components/ui/command";
 
 interface BedAdmissionModalProps {
   bedId: string;
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setbedId: React.Dispatch<React.SetStateAction<string>>;
 }
 
 interface SuggestionType {
@@ -41,6 +58,7 @@ interface SuggestionType {
 const BedAdmissionModal: React.FC<BedAdmissionModalProps> = ({
   bedId,
   setIsModalOpen,
+  setbedId,
 }) => {
   const { orgId } = useAuth();
   const { user } = useUser();
@@ -58,15 +76,23 @@ const BedAdmissionModal: React.FC<BedAdmissionModalProps> = ({
   });
 
   const [admissionFor, setAdmissionFor] = useState<orgUserType>({
-    id:"",
-    name:"",
-    email:""
+    id: "",
+    name: "",
+    email: "",
   });
   const [loader, setloader] = useState(false);
   const [warning, setWarning] = useState<string>("");
   const { beds, bedPatients } = useBedsStore((state) => state);
+  const [open, setOpen] = React.useState(false);
+  const [bedSearchId, setBedSearchId] = React.useState(bedId);
+  const [bedInfo, setBedInfo] = useState<BedInfo[] | []>([]);
+  const { organization, isLoaded } = useOrganization();
 
-    const fetchedSuggestions = todayPatients.map(
+  const filteredBeds = beds.filter((b) => b.bedId == bedId);
+
+  const fetchedSuggestions = todayPatients
+    .filter((todayPatient) => todayPatient.inBed === false)
+    .map(
       (todayPatient): SuggestionType => ({
         label: todayPatient.name,
         value: todayPatient.patient_id,
@@ -93,7 +119,7 @@ const BedAdmissionModal: React.FC<BedAdmissionModalProps> = ({
       return;
     }
 
-    const isClash = beds.some(({ admission_at, discharge_at }) => {
+    const isClash = filteredBeds.some(({ admission_at, discharge_at }) => {
       const existingStart = getTime(admission_at);
       const existingEnd = getTime(discharge_at);
 
@@ -162,15 +188,78 @@ const BedAdmissionModal: React.FC<BedAdmissionModalProps> = ({
     }
   };
 
+  useEffect(() => {
+    const fetchBedMetaData = () => {
+      if (organization && organization.publicMetadata) {
+        const bedMetaData: BedInfo[] =
+          (organization.publicMetadata?.beds as BedInfo[]) || [];
+        setBedInfo(bedMetaData);
+      }
+    };
+
+    if (isLoaded && organization) {
+      fetchBedMetaData();
+      // setTasks(beds);
+    }
+  }, [isLoaded, organization]);
+
+  // useEffect(()=>setToDate(new Date(0)),[fromDate]);
+
   return (
     <form className="flex flex-col" onSubmit={admitHandler}>
-      <p className="text-center">Bed Id : {bedId}</p>
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            role="combobox"
+            aria-expanded={open}
+            className="w-[200px] justify-between"
+          >
+            {bedSearchId
+              ? bedInfo.find((info) => info.bed_id === bedSearchId)?.bed_id
+              : "Select Bed..."}
+            <ChevronsUpDown className="opacity-50" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-[200px] p-0">
+          <Command>
+            <CommandInput placeholder="Search framework..." className="h-9" />
+            <CommandList>
+              <CommandEmpty>No beds are available</CommandEmpty>
+              <CommandGroup>
+                {bedInfo.map((info) => (
+                  <CommandItem
+                    key={info.bed_id}
+                    value={info.bed_id}
+                    onSelect={(currentValue) => {
+                      setBedSearchId(
+                        currentValue === bedSearchId ? "" : currentValue
+                      );
+                      setOpen(false);
+                      setbedId(currentValue);
+                    }}
+                  >
+                    {info.bed_id} {info.ward}
+                    <Check
+                      className={cn(
+                        "ml-auto",
+                        bedSearchId === info.bed_id
+                          ? "opacity-100"
+                          : "opacity-0"
+                      )}
+                    />
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
       <CreatableSelect
         components={{
           DropdownIndicator: () => null,
           IndicatorSeparator: () => null,
           Option: (patient) => {
-            console.log(patient);
             return (
               <div
                 {...patient.innerProps}
@@ -245,7 +334,7 @@ const BedAdmissionModal: React.FC<BedAdmissionModalProps> = ({
           menuList: () => "!py-1 md:!py-2",
         }}
       />
-      <Availability beds={beds} bedPatients={bedPatients} />
+      <Availability beds={filteredBeds} bedPatients={bedPatients} />
       <div className=" py-1 md:grid md:grid-cols-3 sm:gap-4 md:px-8">
         <label
           htmlFor="admission_for"
@@ -317,6 +406,7 @@ const BedAdmissionModal: React.FC<BedAdmissionModalProps> = ({
             date={toDate}
             setDate={setToDate}
             icon={<CalendarMinusIcon className="mr-2 h-4 w-4" />}
+            disableBefore={fromDate}
           />
         </div>
       </div>

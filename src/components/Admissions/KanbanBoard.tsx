@@ -68,17 +68,13 @@ export const KanbanBoard = ({
 }: KanbanBoardProps) => {
   const { organization, isLoaded } = useOrganization();
   const { beds, bedPatients, loading } = useBedsStore((state) => state);
-  console.log("beddata just after zustand : ",beds);
   const [columns, setColumns] = useState<BedInfo[]>([]);
   const pickedUpTaskColumn = useRef<ColumnId | null>(null);
   const columnsId = useMemo(() => columns.map((col) => col.bed_id), [columns]);
   const [tasks, setTasks] = useState<OrgBed[]>([]);
   const [activeTask, setActiveTask] = useState<OrgBed | null>(null);
   const [prevTaskState, setPrevTaskState] = useState<OrgBed | null>(null);
-  const sensors = useSensors(
-    useSensor(MouseSensor),
-    useSensor(TouchSensor)
-  );
+  const sensors = useSensors(useSensor(MouseSensor), useSensor(TouchSensor));
 
   useEffect(() => {
     if (isEditModalOpen == false) {
@@ -114,8 +110,7 @@ export const KanbanBoard = ({
 
   useEffect(() => {
     if (!loading) setTasks(structuredClone(beds));
-    console.log("beds : ",beds);
-  }, [beds,loading]);
+  }, [beds, loading]);
 
   // Function to scroll to a specific bed and highlight it
   const [highlightedBed, setHighlightedBed] = useState<string | null>(null);
@@ -149,8 +144,7 @@ export const KanbanBoard = ({
     if (!organization) return;
 
     setDeleteState({ ...deleteState, deleteLoader: true });
-    const currentBeds = (organization.publicMetadata?.beds ||
-      []) as BedInfo[];
+    const currentBeds = (organization.publicMetadata?.beds || []) as BedInfo[];
     const updatedBeds = currentBeds.filter(
       (bed: BedInfo) => bed.bed_id !== bedIdToRemove
     );
@@ -298,9 +292,9 @@ export const KanbanBoard = ({
         onBedClick={scrollToBed}
       />
 
-      <div className="w-[calc(100%-10px)] sm:w-[calc(100%-40px)] max-w-7xl mt-4 justify-self-center">
+      <div className="w-[calc(100%-10px)] sm:w-[calc(100%-40px)] max-w-7xl mt-4 justify-self-center flex gap-2">
         <Button
-          className="w-full border"
+          className="w-1/2 border"
           type="submit"
           variant="secondary"
           onClick={addNewBedHandler}
@@ -312,6 +306,13 @@ export const KanbanBoard = ({
               <PlusCircleIcon /> Add New Bed
             </>
           )}
+        </Button>
+        <Button
+          className="w-1/2 border"
+          variant="secondary"
+          onClick={() => openAddModal("")}
+        >
+          <PlusCircleIcon /> Admit New Patient
         </Button>
       </div>
 

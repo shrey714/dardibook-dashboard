@@ -71,18 +71,6 @@ export function BoardColumn({
     transform: CSS.Translate.toString(transform),
   };
 
-  const variants = cva(
-    "h-[500px] max-h-[500px] rounded-md bg-primary-foreground flex flex-col flex-shrink-0 snap-center",
-    {
-      variants: {
-        dragging: {
-          default: "border-2 border-transparent",
-          over: "ring-2 opacity-30",
-        },
-      },
-    }
-  );
-
   const deleteHandler = () => {
     setDeleteState((state) => ({
       ...state,
@@ -96,9 +84,7 @@ export function BoardColumn({
       id={`bed-${column.bed_id}`}
       ref={setNodeRef}
       style={style}
-      className={`${variants({
-        dragging: isDragging ? "over" : undefined,
-      })} ${
+      className={`h-[500px] max-h-[500px] rounded-md bg-primary-foreground flex flex-col flex-shrink-0 snap-center ${
         isHighlighted
           ? "animate-pulse ring-2 ring-yellow-600 dark:ring-yellow-400 ring-opacity-75"
           : ""
@@ -190,22 +176,10 @@ export function BoardColumn({
 }
 
 export function BoardContainer({ children }: { children: React.ReactNode }) {
-  const dndContext = useDndContext();
-
-  const variations = cva("", {
-    variants: {
-      dragging: {
-        default: "snap-x snap-mandatory",
-        active: "snap-none",
-      },
-    },
-  });
 
   return (
     <div
-      className={`${variations({
-        dragging: dndContext.active ? "active" : "default",
-      })} h-full grid gap-3 px-1 sm:px-3 pb-16 pt-4 grid-cols-[repeat(auto-fit,minmax(250px,350px))] sm:grid-cols-[repeat(auto-fit,minmax(350px,350px))] justify-center`}
+      className="h-full grid gap-3 px-1 sm:px-3 pb-16 pt-4 grid-cols-[repeat(auto-fit,minmax(250px,350px))] sm:grid-cols-[repeat(auto-fit,minmax(350px,350px))] justify-center"
     >
       {children}
     </div>

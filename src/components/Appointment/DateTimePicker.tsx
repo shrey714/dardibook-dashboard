@@ -19,13 +19,15 @@ interface DateTimePickerProps {
   date: Date;
   setDate: React.Dispatch<React.SetStateAction<Date>>;
   icon?: any;
+  disableBefore?: Date
 }
 
 export const DateTimePicker: React.FC<DateTimePickerProps> = ({
   registered_date,
   date,
   setDate,
-  icon
+  icon,
+  disableBefore
 }) => {
   const [isOpen, setIsOpen] = React.useState(false);
 
@@ -83,7 +85,7 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
           <Calendar
             disabled={[
               registered_date.map((date) => new Date(date)),
-              { before: new Date() },
+              { before: disableBefore ?? new Date() },
             ]}
             mode="single"
             selected={date}
