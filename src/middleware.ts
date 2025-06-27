@@ -10,21 +10,25 @@ const isHistoryRoute = createRouteMatcher(['/dashboard/history(.*)'])
 const isPharmacyRoute = createRouteMatcher(['/dashboard/pharmacy(.*)'])
 const isSettingsRoute = createRouteMatcher(['/dashboard/settings(.*)'])
 
-
+const isApiRoute = createRouteMatcher(['/api(.*)']);
+const isSubscriptionWebhookRoute = createRouteMatcher(['/api/subscription/subscription-webhooks(.*)']);
 
 export default clerkMiddleware(async (auth, req) => {
     const { userId, sessionClaims, orgId } = await auth();
-    if (createRouteMatcher(['/api(.*)'])(req)) {
+    if (isApiRoute(req) && !isSubscriptionWebhookRoute(req)) {
         await auth.protect();
     }
     if (isSubscriptionRoute(req)) {
         await auth.protect((has) => {
             return (
-                has({ role: 'org:clinic_head' })
+                has({ role: 'org:clinic_head' }) ||
+                has({ role: 'org:doctor' }) ||
+                has({ role: 'org:assistant_doctor' }) ||
+                has({ role: 'org:medical_staff' })
             )
         })
     }
-    if (!userId && !isAuthRoute(req)) {
+    if (!userId && !isAuthRoute(req) && !isSubscriptionWebhookRoute(req)) {
         await auth.protect();
     }
     if (userId && !sessionClaims?.metadata?.onboardingComplete && req.nextUrl.pathname !== '/onboarding') {

@@ -1,5 +1,3 @@
-import getPlanById from "@/app/services/razorpay/getPlanById";
-import { getSubscription } from "@/app/services/getSubscription";
 import React, { useEffect, useState } from "react";
 import Loader from "../common/Loader";
 import { SquareArrowOutUpRight } from "lucide-react";
@@ -42,17 +40,6 @@ const SubscriptionInfo = ({ subId, mainLoader }: any) => {
       if (!mainLoader && subId !== "") {
         setLoader(true);
         setError(null);
-
-        const result = await getSubscription(subId);
-        if (result.error) {
-          setError(result.error);
-        } else {
-          setSubscriptionData(result.data);
-        }
-
-        const planDetails = await getPlanById(result?.data?.plan_id);
-        const parsedPlanDetails = await planDetails.json();
-        setplanData(parsedPlanDetails?.item);
         setLoader(false);
       }
     };
