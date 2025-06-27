@@ -392,6 +392,17 @@ export const KanbanBoard = ({
     setActiveTask(null);
 
     const { active, over } = event;
+    if (!over && prevTaskState) {
+        setTasks((tasks) =>
+          tasks.map((t) =>
+            t.bedBookingId === prevTaskState.bedBookingId
+              ? { ...prevTaskState }
+              : t
+          )
+        );
+        setPrevTaskState(null);
+      return;
+    }
     if (!over || !hasDraggableData(active)) return;
 
     const activeData = active.data.current;
