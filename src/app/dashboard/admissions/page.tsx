@@ -88,7 +88,7 @@ useEffect(() => {
     if(isPatientAdmitted){
       const bookingId = bedPatients[patientIdParam].bed_info.find(bi=>bi.dischargeMarked==false)?.bedBookingId;
       const bedId = bedPatients[patientIdParam].bed_info.find(bi=>bi.dischargeMarked==false)?.bedId
-      bookingId && bedId ? openEditModal(bookingId,bedId) : null;
+      if(bookingId && bedId)openEditModal(bookingId,bedId);
     }
     else if (isTodaysPatient) {
       setbedId("");
