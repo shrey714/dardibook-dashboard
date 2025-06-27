@@ -1,18 +1,14 @@
 "use server";
 import Image from "next/image";
-import { currentUser } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import HeaderMain from "@/components/HeaderMain";
 import SubscriptionBox from "./SubscriptionBox";
-type Params = Promise<{ planId: string }>;
-export default async function Subscribe({
-  searchParams,
-}: {
-  searchParams: Params;
-}) {
+export default async function Subscribe() {
   const user = await currentUser();
-  const { planId } = await searchParams;
+  const authInstance = await auth();
+
   return (
-    <div className="flex overflow-y-auto pb-6 flex-col items-center min-h-screen w-full overflow-hidden">
+    <div className="flex relative pb-6 flex-col items-center min-h-svh w-full">
       <Image
         src="/Logo.svg"
         fill={true}
@@ -20,10 +16,25 @@ export default async function Subscribe({
         alt="logo"
       />
       <HeaderMain user={user} />
-      <div className="flex flex-1 items-center justify-center w-full max-w-screen-xl p-2">
-        <div className=" flex flex-col md:flex-row p-6 mx-auto max-w-screen-xl h-auto text-center rounded-lg border-2 border-border xl:p-8 bg-secondary/90 shadow-md flex-1">
-          <SubscriptionBox planId={planId} />
-        </div>
+      <div className="flex flex-1 items-center w-full max-w-screen-xl p-2 pt-4 flex-col gap-4">
+        {!authInstance.orgId || !authInstance.orgRole ? (
+          <div className="w-full flex-1 text-muted-foreground text-sm md:text-base p-4 overflow-hidden flex items-center justify-center gap-4 flex-col">
+            User is not authorized for this organization.
+          </div>
+        ) : authInstance.orgRole !== "org:clinic_head" ? (
+          <div className="w-full flex-1 text-center text-muted-foreground text-sm md:text-base p-4 overflow-hidden flex items-center justify-center gap-4 flex-col">
+            <img
+              className="w-full max-w-40 lg:mx-auto"
+              src="/NoAccess.svg"
+              alt="No Access"
+            />
+            You do not have access to view Subscriptions.
+            <br />
+            Please contact your administrator for any queries.
+          </div>
+        ) : (
+          <SubscriptionBox />
+        )}
       </div>
     </div>
   );

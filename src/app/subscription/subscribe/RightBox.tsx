@@ -54,7 +54,7 @@ const RightBox = ({ thisPlanDetails, handleSubscription, isValid }: any) => {
         <Button
           disabled={!isValid}
           onClick={() => {
-            handleSubscription();
+            handleSubscription(thisPlanDetails.id);
           }}
           className="btn btn-sm text-sm"
         >
