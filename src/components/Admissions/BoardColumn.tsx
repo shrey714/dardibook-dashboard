@@ -144,7 +144,7 @@ export function BoardColumn({
         </div>
       </CardHeader>
       <CardContent
-        className={`p-2 sm:p-4 overflow-auto flex gap-2 flex-col ${
+        className={`p-2 sm:p-4 overflow-auto ${
           tasks.length == 0 ? "h-full" : ""
         }`}
       >
@@ -157,7 +157,8 @@ export function BoardColumn({
             <p className="text-xs mt-1">Add new patient.</p>
           </div>
         ) : (
-          <SortableContext items={tasksIds}>
+          <div className="flex flex-col gap-4">
+            <SortableContext items={tasksIds}>
             {tasks.map((task) => {
               return (
                 <TaskCard
@@ -169,6 +170,7 @@ export function BoardColumn({
               );
             })}
           </SortableContext>
+          </div>
         )}
       </CardContent>
     </Card>
