@@ -141,6 +141,7 @@ const CategoryBar = React.forwardRef<HTMLDivElement, CategoryBarProps>(
       () => getPositionLeft(adjustedMarkerValue, maxValue),
       [adjustedMarkerValue, maxValue]
     );
+    const isMobile = useIsMobile();
 
     return (
       <div
@@ -161,7 +162,79 @@ const CategoryBar = React.forwardRef<HTMLDivElement, CategoryBarProps>(
               const matchingPatient = bed?.patient_id
                 ? bedPatients[bed.patient_id]
                 : undefined;
-              return (
+              return isMobile?(
+                <Popover key={index}>
+                <PopoverTrigger asChild>
+                  <div
+                    key={`item-${index}`}
+                    className={cx(
+                      `h-full ${matchingPatient && bed ? "cursor-pointer":""}`,
+                      getColorClassName(
+                        barColor as AvailableChartColorsKeys,
+                        "bg"
+                      ),
+                      percentage === 0 && "hidden"
+                    )}
+                    style={{ width: `${percentage}%` }}
+                  ></div>
+                </PopoverTrigger>
+                {matchingPatient && bed && (
+                  <PopoverContent
+                    className="w-auto bg-muted p-2 z-[1000]"
+                    sideOffset={20}
+                    asChild={false}
+                  >
+                    <div className="flex flex-row gap-x-4">
+                      <div className="flex flex-col items-start space-y-1">
+                        <h4 className="text-sm font-semibold">
+                          Id : {bed.patient_id}
+                        </h4>
+                        <h4 className="text-sm font-semibold">
+                          Name : {matchingPatient.name}
+                        </h4>
+                        <h4 className="text-sm font-semibold">
+                          Gender : {matchingPatient.gender}
+                        </h4>
+                        <h4 className="text-sm font-semibold">
+                          Age : {matchingPatient.age}
+                        </h4>
+                        <p className="flex text-sm items-center gap-2">
+                          <PhoneIcon size={16} className="text-primary" />{" "}
+                          {matchingPatient.mobile}
+                        </p>
+                      </div>
+                      <div className="flex flex-col items-start space-y-1">
+                        <p className="flex bg-blue-600/10 text-blue-600 text-sm items-center gap-2 px-2 py-1 w-full rounded-t-sm">
+                          <PencilLineIcon size={16} /> {bed.admission_by.name}
+                        </p>
+                        <p className="!mt-0 flex bg-green-500/10 text-green-600 text-sm items-center gap-2 px-2 py-1 w-full rounded-b-sm">
+                          <BriefcaseMedicalIcon size={16} />{" "}
+                          {bed.admission_for.name}
+                        </p>
+                        <p className="flex bg-green-500/10 text-green-600 text-sm items-center gap-2 px-2 py-1 w-full rounded-t-sm">
+                          <CalendarPlusIcon size={16} />{" "}
+                          {bed.admission_at &&
+                            format(bed.admission_at, "dd-MM-yyyy hh:mm aa")}
+                        </p>
+                        <p className="!mt-0 bg-red-500/10 text-red-600 flex text-sm items-center gap-2 px-2 py-1 w-full rounded-b-sm">
+                          <CalendarMinusIcon size={16} />{" "}
+                          {bed.discharge_at &&
+                            format(bed.discharge_at, "dd-MM-yyyy hh:mm aa")}
+                        </p>
+                      </div>
+                    </div>
+                    {bed.dischargeMarked ? (
+                      <div className="bg-red-500/10 mt-2 w-full rounded-md text-red-600 flex flex-row gap-4 px-3 py-1 items-center">
+                        <LogOut className="w-5 h-5" /> Discharged by{" "}
+                        {bed?.discharged_by?.name ?? ""}
+                      </div>
+                    ) : (
+                      <></>
+                    )}
+                  </PopoverContent>
+                )}
+              </Popover>
+              ):(
                 <HoverCard key={index}>
                   <HoverCardTrigger asChild>
                     <div
@@ -249,7 +322,7 @@ const CategoryBar = React.forwardRef<HTMLDivElement, CategoryBarProps>(
               }}
             >
               {marker.tooltip ? (
-                <Tooltip>
+                <Tooltip open={isMobile?true:undefined}>
                   <TooltipContent className="bg-white">
                     <div className="text-red-500">{marker.tooltip}</div>
                   </TooltipContent>
@@ -300,7 +373,8 @@ import {
   PencilLineIcon,
   PhoneIcon,
 } from "lucide-react";
-import { tr } from "date-fns/locale";
+import { Popover, PopoverContent, PopoverTrigger } from "@radix-ui/react-popover";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export function cx(...args: ClassValue[]) {
   return twMerge(clsx(...args));
@@ -381,17 +455,6 @@ const AvailableChartColors: AvailableChartColorsKeys[] = Object.keys(
   chartColors
 ) as Array<AvailableChartColorsKeys>;
 
-const constructCategoryColors = (
-  categories: string[],
-  colors: AvailableChartColorsKeys[]
-): Map<string, AvailableChartColorsKeys> => {
-  const categoryColors = new Map<string, AvailableChartColorsKeys>();
-  categories.forEach((category, index) => {
-    categoryColors.set(category, colors[index % colors.length]);
-  });
-  return categoryColors;
-};
-
 const getColorClassName = (
   color: AvailableChartColorsKeys,
   type: ColorUtility
@@ -404,32 +467,3 @@ const getColorClassName = (
   };
   return chartColors[color]?.[type] ?? fallbackColor[type];
 };
-
-// Tremor Raw getYAxisDomain [v0.0.0]
-
-const getYAxisDomain = (
-  autoMinValue: boolean,
-  minValue: number | undefined,
-  maxValue: number | undefined
-) => {
-  const minDomain = autoMinValue ? "auto" : minValue ?? 0;
-  const maxDomain = maxValue ?? "auto";
-  return [minDomain, maxDomain];
-};
-
-// Tremor Raw hasOnlyOneValueForKey [v0.1.0]
-
-function hasOnlyOneValueForKey(array: any[], keyToCheck: string): boolean {
-  const val: any[] = [];
-
-  for (const obj of array) {
-    if (Object.prototype.hasOwnProperty.call(obj, keyToCheck)) {
-      val.push(obj[keyToCheck]);
-      if (val.length > 1) {
-        return false;
-      }
-    }
-  }
-
-  return true;
-}

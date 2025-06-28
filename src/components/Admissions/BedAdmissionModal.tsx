@@ -40,6 +40,7 @@ import {
   CommandGroup,
   CommandItem,
 } from "@/components/ui/command";
+import Loader from "../common/Loader";
 
 interface BedAdmissionModalProps {
   bedId: string;
@@ -91,7 +92,10 @@ const BedAdmissionModal: React.FC<BedAdmissionModalProps> = ({
   const filteredBeds = beds.filter((b) => b.bedId == bedId);
 
   const fetchedSuggestions = todayPatients
-    .filter((todayPatient) => todayPatient.inBed === false)
+    .filter((todayPatient) => {
+      const isAlreadyAdmitted = beds.some(b=>b.patient_id==todayPatient.patient_id);
+      return todayPatient.inBed === false && !isAlreadyAdmitted;
+    })
     .map(
       (todayPatient): SuggestionType => ({
         label: todayPatient.name,
@@ -105,11 +109,6 @@ const BedAdmissionModal: React.FC<BedAdmissionModalProps> = ({
   const admitHandler = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
     if (!orgId || !bedId || !user) return;
-
-    if (patientId == "") {
-      setWarning("Please Select the patient");
-      return;
-    }
 
     if (
       getTime(fromDate) === getTime(new Date(0)) ||
@@ -256,6 +255,7 @@ const BedAdmissionModal: React.FC<BedAdmissionModalProps> = ({
         </PopoverContent>
       </Popover>
       <CreatableSelect
+        required
         components={{
           DropdownIndicator: () => null,
           IndicatorSeparator: () => null,
@@ -413,7 +413,7 @@ const BedAdmissionModal: React.FC<BedAdmissionModalProps> = ({
       {warning.length > 0 && (
         <p className="text-center text-red-600 font-normal pb-4">{warning}</p>
       )}
-      <Button type="submit"> {loader ? "loading" : "Add Patient"} </Button>
+      <Button type="submit" disabled={bedId.length==0}> {loader ? <Loader /> : "Add Patient"} </Button>
     </form>
   );
 };

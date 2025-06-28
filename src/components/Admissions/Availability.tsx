@@ -18,17 +18,7 @@ import {
   min,
   startOfDay,
 } from "date-fns";
-import { HoverCard, HoverCardTrigger } from "@radix-ui/react-hover-card";
-import { HoverCardContent } from "../ui/hover-card";
 import { BedPatientTypes, OrgBed } from "@/types/FormTypes";
-import {
-  BriefcaseMedicalIcon,
-  CalendarMinusIcon,
-  CalendarPlusIcon,
-  LogOut,
-  PencilLineIcon,
-  PhoneIcon,
-} from "lucide-react";
 import { CategoryBar, chartColors } from "../ui/CategoryBar";
 
 interface AvailabilityProps {
@@ -95,7 +85,6 @@ const Availability: React.FC<AvailabilityProps> = ({ beds, bedPatients }) => {
         colors.push("gray");
       }      
       bookingDetails.push(bookingDetail);
-      console.log(result);
       current = end;
     }
 

@@ -275,7 +275,7 @@ const BedEditModal: React.FC<BedEditModalProps> = ({
         </PopoverTrigger>
         <PopoverContent className="w-[200px] p-0">
           <Command>
-            <CommandInput placeholder="Search framework..." className="h-9" />
+            <CommandInput placeholder="Search framework..." className="h-9" required/>
             <CommandList>
               <CommandEmpty>No beds are available</CommandEmpty>
               <CommandGroup>
@@ -385,6 +385,7 @@ const BedEditModal: React.FC<BedEditModalProps> = ({
             date={toDate}
             setDate={setToDate}
             icon={<CalendarMinusIcon className="mr-2 h-4 w-4" />}
+            disableBefore={fromDate}
           />
         </div>
       </div>
