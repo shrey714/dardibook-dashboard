@@ -11,6 +11,7 @@ import { useOrganization } from "@clerk/nextjs";
 import { ClerkSubscriptiontypes } from "@/types/SubscriptionTypes";
 import { useRouter } from "next/navigation";
 import { fromUnixTime, isWithinInterval } from "date-fns";
+import CookieConsent from "../common/CookieConsent";
 const DashboardWrapper = ({ children }: { children: ReactNode }) => {
   const { organization, isLoaded } = useOrganization();
   const router = useRouter();
@@ -74,6 +75,7 @@ const DashboardWrapper = ({ children }: { children: ReactNode }) => {
           {children}
         </SidebarInset>
       </SidebarProvider>
+      <CookieConsent />
     </>
   );
 };

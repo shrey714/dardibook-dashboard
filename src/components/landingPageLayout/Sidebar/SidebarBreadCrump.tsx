@@ -65,10 +65,10 @@ const SidebarBreadCrump = () => {
           </BreadcrumbList>
         </Breadcrumb>
       </div>
-      <div className="flex items-center pl-4">
-          <CollaborationProvider>
-            <AvatarStack />
-          </CollaborationProvider>
+      <div className="flex items-center pl-4 flex-1 overflow-hidden justify-end">
+        <CollaborationProvider>
+          <AvatarStack />
+        </CollaborationProvider>
         <NavHospital />
         <FullscreenToggle />
       </div>

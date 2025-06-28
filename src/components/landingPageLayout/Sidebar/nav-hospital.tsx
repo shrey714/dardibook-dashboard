@@ -16,7 +16,7 @@ export function NavHospital() {
   const { isLoading, error } = useLogStore();
 
   return (
-    <div className="rounded-full gap-1.5 p-0.5 bg-secondary flex items-center h-min">
+    <div className="rounded-full p-0.5 bg-secondary flex items-center h-min overflow-auto">
       {!isLoaded ? (
         <div className="flex items-center gap-1">
           <Skeleton className="size-6 rounded-full" />
@@ -68,7 +68,7 @@ export function NavHospital() {
             </TooltipContent>
           </Tooltip>
           <p
-            className="w-[50px] truncate leading-none text-sm"
+            className="truncate leading-none text-xs sm:text-sm ml-1.5 mr-1.5"
             title={organization?.name}
           >
             {organization?.name}
