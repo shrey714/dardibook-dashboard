@@ -140,14 +140,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   return (
     <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader className="pb-0">
+      <SidebarHeader className="pb-0 group-data-[collapsible=icon]:pt-[18px] group-data-[collapsible=icon]:pb-3">
         <LogoHandeler />
       </SidebarHeader>
       <SidebarContent className="overflow-x-hidden pt-2">
         {state === "collapsed" && !isMobile ? <Pip /> : <TokenBox />}
         <NavMain pages={pages} pathname={pathname} />
       </SidebarContent>
-      <SidebarFooter className="gap-1">
+      <SidebarFooter className="gap-1 group-data-[collapsible=icon]:gap-3.5 group-data-[collapsible=icon]:pb-4">
         <RolesLink pathname={pathname} />
         <NavUser />
         <ModeToggle />

@@ -352,8 +352,8 @@ body {
 
 .pip {
   position: absolute;
-  top: 53px;
-  left: 50px;
+  top: 52px;
+  left: 70px;
   width: 341.5px;
   /* maintain aspect ratio of dimensions of this original img source */
   height: 255px;

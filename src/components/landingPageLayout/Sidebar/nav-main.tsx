@@ -51,7 +51,7 @@ export function NavMain({
       <SidebarGroupLabel className="h-6 group-data-[collapsible=icon]:hidden">
         Links
       </SidebarGroupLabel>
-      <SidebarMenu>
+      <SidebarMenu className="group-data-[collapsible=icon]:gap-3.5">
         {isLoaded &&
           orgRole &&
           pages
@@ -66,22 +66,30 @@ export function NavMain({
                     open={isSubPath(pathname, item.url) ? true : undefined}
                   >
                     <SidebarMenuItem>
-                      <Link href={item.url} className="relative">
+                      <Link
+                        href={item.url}
+                        className="relative flex flex-col items-center"
+                      >
                         <SidebarMenuButton
                           tooltip={item.title}
                           isActive={isSubPath(pathname, item.url)}
                           className="pl-3 overflow-hidden h-auto"
                         >
                           <span
-                            className={`w-1 absolute -left-0.5 bg-foreground rounded-full transition-all duration-300 ease-in-out ${
+                            className={`w-1 absolute -left-0.5 bg-foreground rounded-full transition-all duration-300 ease-in-out group-data-[collapsible=icon]:hidden ${
                               isSubPath(pathname, item.url)
                                 ? "h-2/3 opacity-100"
                                 : "h-0 opacity-0"
                             }`}
                           ></span>
                           {item.icon && <item.icon />}
-                          <span>{item.title}</span>
+                          <span className="group-data-[collapsible=icon]:hidden">
+                            {item.title}
+                          </span>
                         </SidebarMenuButton>
+                        <span className="text-[10px] leading-3 font-medium mt-1 max-w-[52px] truncate hidden group-data-[collapsible=icon]:block">
+                          {item.title}
+                        </span>
                       </Link>
 
                       <CollapsibleTrigger asChild>
@@ -116,27 +124,35 @@ export function NavMain({
               } else {
                 return (
                   <SidebarMenuItem key={key}>
-                    <Link href={item.url} className="relative">
+                    <Link
+                      href={item.url}
+                      className="relative flex flex-col items-center"
+                    >
                       <SidebarMenuButton
                         tooltip={item.title}
                         isActive={isSubPath(pathname, item.url)}
                         className="pl-3 overflow-hidden h-auto"
                       >
                         <span
-                          className={`w-1 absolute -left-0.5 bg-foreground rounded-full transition-all duration-300 ease-in-out ${
+                          className={`w-1 absolute -left-0.5 bg-foreground rounded-full transition-all duration-300 ease-in-out group-data-[collapsible=icon]:hidden ${
                             isSubPath(pathname, item.url)
                               ? "h-2/3 opacity-100"
                               : "h-0 opacity-0"
                           }`}
                         ></span>
                         {item.icon && <item.icon />}
-                        <span>{item.title}</span>
+                        <span className="group-data-[collapsible=icon]:hidden">
+                          {item.title}
+                        </span>
                         <ChevronRight
-                          className={`ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90 ${
+                          className={`ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90 group-data-[collapsible=icon]:hidden ${
                             isSubPath(pathname, item.url) ? "visible" : "hidden"
                           }`}
                         />
                       </SidebarMenuButton>
+                      <span className="text-[10px] leading-3 font-medium mt-1 max-w-[52px] truncate hidden group-data-[collapsible=icon]:block">
+                        {item.title}
+                      </span>
                     </Link>
                   </SidebarMenuItem>
                 );

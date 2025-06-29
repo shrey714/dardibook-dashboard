@@ -14,23 +14,23 @@ export function LogoHandeler({}) {
   const { orgRole } = useAuth();
   return (
     <SidebarMenu>
-      <SidebarMenuItem>
+      <SidebarMenuItem className="flex items-center justify-center">
         <SidebarMenuButton
           size="lg"
-          className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+          className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground gap-0"
         >
-          <div className="flex aspect-square size-8 items-center justify-center rounded-md bg-white">
+          <div className="flex aspect-square size-9 items-center justify-center rounded-md bg-white">
             <Image
               alt="Logo"
               src="/Logo.svg"
-              width={32}
-              height={32}
+              width={36}
+              height={36}
               className="aspect-square size-7"
               priority
             />
           </div>
 
-          <div className="grid flex-1 items-center text-sm leading-tight">
+          <div className="grid flex-1 items-center text-sm leading-tight group-data-[collapsible=icon]:hidden ml-2">
             <Link
               href={"/"}
               className="cursor-pointer flex flex-row items-center justify-center gap-1 w-fit self-center"
