@@ -106,7 +106,7 @@ const RolesLink = ({ pathname }: { pathname: string }) => {
               className="pl-3 overflow-hidden h-auto"
             >
               <span
-                className={`w-1 absolute -left-0.5 bg-foreground rounded-full transition-all duration-300 ease-in-out group-data-[collapsible=icon]:hidden${
+                className={`w-1 absolute -left-0.5 bg-foreground rounded-full transition-all duration-300 ease-in-out group-data-[collapsible=icon]:hidden ${
                   isSubPath(pathname, "/dashboard/settings")
                     ? "h-2/3 opacity-100"
                     : "h-0 opacity-0"

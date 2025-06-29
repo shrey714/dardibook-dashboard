@@ -77,7 +77,7 @@ const Medical = () => {
       />
       <div
         className={cn(
-          "w-full p-0 flex flex-row items-center absolute top-[35px]",
+          "w-full p-0 flex flex-row items-center absolute top-[33px]",
           isDesktop ? "z-[1]" : "z-[2] hidden sm:flex"
         )}
       >
@@ -123,7 +123,7 @@ const Medical = () => {
               </TabsList>
 
               <TabsContent
-                className="[--content-height:calc(100svh-252px)]"
+                className="[--content-height:calc(100svh-250px)]"
                 value="registered"
               >
                 <TodayRegisteredPatients
@@ -132,14 +132,14 @@ const Medical = () => {
               </TabsContent>
 
               <TabsContent
-                className="[--content-height:calc(100svh-296px)]"
+                className="[--content-height:calc(100svh-294px)]"
                 value="inbed"
               >
                 <PatientsInBed onSelectPatient={handleBedPatientSelect} />
               </TabsContent>
 
               <TabsContent
-                className="[--content-height:calc(100svh-296px)]"
+                className="[--content-height:calc(100svh-294px)]"
                 value="bills"
               >
                 <BillsGenerated onViewBill={handleViewBill} />
