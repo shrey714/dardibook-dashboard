@@ -5,16 +5,9 @@ import { usePathname } from "next/navigation";
 
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { useAuth } from "@clerk/nextjs";
+import { sidebarNavItems } from "./settings-sidebar-config";
 
-interface SettingSidebarNavProps extends React.HTMLAttributes<HTMLElement> {
-  items: {
-    href: string;
-    title: string;
-    roles: string[];
-  }[];
-}
-
-export function SettingSidebarNav({ items }: SettingSidebarNavProps) {
+export function SettingSidebarNav() {
   const pathname = usePathname();
   const { orgRole, isLoaded } = useAuth();
 
@@ -27,7 +20,7 @@ export function SettingSidebarNav({ items }: SettingSidebarNavProps) {
               <div className="flex items-center">
                 {isLoaded &&
                   orgRole &&
-                  items
+                  sidebarNavItems
                     .filter((page) => page.roles.includes(orgRole))
                     .map((item, index) => (
                       <Link
