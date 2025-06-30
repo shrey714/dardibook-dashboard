@@ -10,7 +10,6 @@ import {
   type DragStartEvent,
   useSensor,
   useSensors,
-  UniqueIdentifier,
   TouchSensor,
   MouseSensor,
 } from "@dnd-kit/core";
@@ -73,21 +72,32 @@ export const KanbanBoard = ({
   const columnsId = useMemo(() => columns.map((col) => col.bed_id), [columns]);
   const [tasks, setTasks] = useState<OrgBed[]>([]);
   const [activeTask, setActiveTask] = useState<OrgBed | null>(null);
-  const [prevTaskState, setPrevTaskState] = useState<OrgBed | null>(null);
+  
+  const [prevTaskState, setPrevTaskState] = useState<{
+    task: OrgBed;
+    bookingId: string;
+  } | null>(null);
+  
   const sensors = useSensors(useSensor(MouseSensor), useSensor(TouchSensor));
+
+  // Track which booking is currently being edited
+  const [currentEditingBookingId, setCurrentEditingBookingId] = useState<string | null>(null);
 
   useEffect(() => {
     if (isEditModalOpen == false) {
-      if (!wasEdited && prevTaskState) {
+      // Only revert if the task wasn't edited AND it matches the current editing booking
+      if (!wasEdited && prevTaskState && prevTaskState.bookingId === currentEditingBookingId) {
         setTasks((tasks) =>
           tasks.map((t) =>
-            t.bedBookingId === prevTaskState.bedBookingId
-              ? { ...prevTaskState }
+            t.bedBookingId === prevTaskState.task.bedBookingId
+              ? { ...prevTaskState.task }
               : t
           )
         );
-        setPrevTaskState(null);
       }
+      // Clear the previous task state and current editing booking when modal closes
+      setPrevTaskState(null);
+      setCurrentEditingBookingId(null);
       setWasEdited(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -104,7 +114,6 @@ export const KanbanBoard = ({
 
     if (isLoaded && organization) {
       fetchBedMetaData();
-      // setTasks(beds);
     }
   }, [isLoaded, organization, refresh]);
 
@@ -348,7 +357,11 @@ export const KanbanBoard = ({
                     column={col}
                     tasks={tasks.filter((task) => task.bedId === col.bed_id)}
                     openAddModal={openAddModal}
-                    openEditModal={openEditModal}
+                    openEditModal={(bookingId, bedId) => {
+                      // Set the current editing booking ID when opening edit modal
+                      setCurrentEditingBookingId(bookingId);
+                      openEditModal(bookingId, bedId);
+                    }}
                     bedPatients={bedPatients}
                     setDeleteState={setDeleteState}
                     isHighlighted={highlightedBed === col.bed_id}
@@ -364,7 +377,11 @@ export const KanbanBoard = ({
                     <TaskCard
                       task={activeTask}
                       bedPatientData={bedPatients[activeTask.patient_id]}
-                      openEditModal={openEditModal}
+                      openEditModal={(bookingId, bedId) => {
+                        // Set the current editing booking ID when opening edit modal from drag overlay
+                        setCurrentEditingBookingId(bookingId);
+                        openEditModal(bookingId, bedId);
+                      }}
                     />
                   )}
                 </DragOverlay>,
@@ -383,7 +400,11 @@ export const KanbanBoard = ({
     if (data?.type === "Task") {
       setActiveTask(data.task);
       pickedUpTaskColumn.current = data.task.bedId;
-      setPrevTaskState({ ...data.task });
+      // Store the previous task state with its booking ID
+      setPrevTaskState({
+        task: { ...data.task },
+        bookingId: data.task.bedBookingId
+      });
       return;
     }
   }
@@ -393,14 +414,15 @@ export const KanbanBoard = ({
 
     const { active, over } = event;
     if (!over && prevTaskState) {
-        setTasks((tasks) =>
-          tasks.map((t) =>
-            t.bedBookingId === prevTaskState.bedBookingId
-              ? { ...prevTaskState }
-              : t
-          )
-        );
-        setPrevTaskState(null);
+      // Only revert if no valid drop target and we have previous state
+      setTasks((tasks) =>
+        tasks.map((t) =>
+          t.bedBookingId === prevTaskState.task.bedBookingId
+            ? { ...prevTaskState.task }
+            : t
+        )
+      );
+      setPrevTaskState(null);
       return;
     }
     if (!over || !hasDraggableData(active)) return;
@@ -414,6 +436,8 @@ export const KanbanBoard = ({
       const newColumnId = over.data.current?.task?.bedId || over.id;
 
       if (oldColumnId === newColumnId) {
+        // Clear previous task state if dropped in same column
+        setPrevTaskState(null);
         pickedUpTaskColumn.current = null;
         return;
       }
@@ -427,6 +451,8 @@ export const KanbanBoard = ({
           )
         );
 
+        // Set the current editing booking ID when opening edit modal after drag
+        setCurrentEditingBookingId(task.bedBookingId);
         openEditModal(task.bedBookingId, task.bedId);
       }
     }
