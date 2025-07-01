@@ -41,6 +41,8 @@ import {
   CommandItem,
 } from "@/components/ui/command";
 import Loader from "../common/Loader";
+import { logActivity } from "@/utility/activityLogging/logActivity";
+import { PatientActivityLog } from "@/types/logTypes";
 
 interface BedAdmissionModalProps {
   bedId: string;
@@ -118,6 +120,11 @@ const BedAdmissionModal: React.FC<BedAdmissionModalProps> = ({
       return;
     }
 
+    if (getTime(fromDate) <= Date.now() || getTime(toDate) <= Date.now()) {
+      setWarning("Booking times must be in the future.");
+      return;
+    }
+
     const isClash = filteredBeds.some(({ admission_at, discharge_at }) => {
       const existingStart = getTime(admission_at);
       const existingEnd = getTime(discharge_at);
@@ -139,22 +146,23 @@ const BedAdmissionModal: React.FC<BedAdmissionModalProps> = ({
       const bedBookingId = uniqid.time();
       const batch = writeBatch(db);
       const bedRef = doc(db, "doctor", orgId, "beds", bedBookingId);
+      const bedAdmissionData = {
+        admission_for: admissionFor,
+        patient_id: patientId,
+        bedBookingId: bedBookingId,
+        bedId: bedId,
+        admission_at: getTime(fromDate),
+        discharge_at: getTime(toDate),
+        dischargeMarked: false,
+        admission_by: {
+          id: user.id,
+          name: user.fullName,
+          email: user.primaryEmailAddress?.emailAddress,
+        },
+      }
       batch.set(
         bedRef,
-        {
-          admission_for: admissionFor,
-          patient_id: patientId,
-          bedBookingId: bedBookingId,
-          bedId: bedId,
-          admission_at: getTime(fromDate),
-          discharge_at: getTime(toDate),
-          dischargeMarked: false,
-          admission_by: {
-            id: user.id,
-            name: user.fullName,
-            email: user.primaryEmailAddress?.emailAddress,
-          },
-        },
+        bedAdmissionData,
         { merge: true }
       );
       const patientRef = doc(db, "doctor", orgId, "patients", patientId);
@@ -178,6 +186,17 @@ const BedAdmissionModal: React.FC<BedAdmissionModalProps> = ({
         { merge: true }
       );
       await batch.commit();
+      //logging
+      const logData: PatientActivityLog = {
+        agent_id: user.id,
+        id: bedBookingId,
+        action: "admitted", 
+        timestamp: Date.now(),
+        oldData:null,
+        newData:bedAdmissionData,
+        module: "admission"
+      };
+      logActivity(logData);
     } catch (error) {
       console.log(error);
       toast.error("Error updating");

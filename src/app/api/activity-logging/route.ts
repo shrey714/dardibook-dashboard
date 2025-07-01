@@ -12,26 +12,13 @@ export async function POST(req: Request) {
         const ipAddress = headersList.get("x-forwarded-for") || null;
         const userAgent = headersList.get("user-agent") || null;
         const body = await req.json();
-
-        const log = {
-            time: new Date(),
-            action: body.action,
-            metadata: body.metadata || {},
-            location: body.location || null,
-            user: {
-                userId: user.id,
-                userName: user.fullName,
-                userRole: orgRole,
-            },
-            ipAddress,
-            userAgent,
-        };
+       
 
         await adminDb
             .collection("doctor")
             .doc(orgId)
             .collection("activity_logs")
-            .add(log);
+            .add(body);
 
         return new Response("Logged", { status: 200 });
     } catch (err) {

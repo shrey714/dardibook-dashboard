@@ -116,7 +116,7 @@ export function TaskCard({
         }
       )}`}
     >
-      <div className="flex relative flex-1 flex-col h-full p-0">
+      {bedPatientData && <div className="flex relative flex-1 flex-col h-full p-0">
         <div className="flex items-center justify-between pointer-events-auto px-3 pt-1">
           <div className="flex flex-1 flex-row items-center gap-2">
             <User className="size-5 text-primary shrink-0" />
@@ -375,7 +375,7 @@ export function TaskCard({
             isDragging ? "cursor-grabbing" : "cursor-grab"
           } w-full bg-center overflow-hidden dark:bg-[radial-gradient(#767676_1px,transparent_1px)] bg-[radial-gradient(#000000a1_1px,transparent_1px)] bg-[size:5px_5px] shadow-[inset_0px_21px_5px_-14px_hsl(var(--border))]`}
         ></div>
-      </div>
+      </div>}
       <div className="bg-yellow-300 w-1 h-full absolute left-0"></div>
       <div className="bg-red-500 w-1 h-full absolute right-0"></div>
     </div>

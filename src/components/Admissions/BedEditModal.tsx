@@ -47,6 +47,8 @@ import {
   CommandGroup,
   CommandItem,
 } from "@/components/ui/command";
+import { diff, PatientActivityLog } from "@/types/logTypes";
+import { logActivity } from "@/utility/activityLogging/logActivity";
 
 interface BedEditModalProps {
   setIsEditModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -65,7 +67,6 @@ const BedEditModal: React.FC<BedEditModalProps> = ({
 }) => {
   const { user } = useUser();
   const { orgId } = useAuth();
-  const [dischargeLoader, setDischargeLoader] = useState(false);
   const { beds, bedPatients } = useBedsStore((state) => state);
   const filteredBeds = beds.filter((b) => b.bedId == bedId);
   const [open, setOpen] = React.useState(false);
@@ -86,7 +87,9 @@ const BedEditModal: React.FC<BedEditModalProps> = ({
   const [admissionInfo, setadmissionInfo] = useState<OrgBed | undefined>(
     selectedAdmission
   );
-  const [loader, setloader] = useState(false);
+  const [updateLoader, setUpdateLoader] = useState(false);
+  const [dischargeNowLoader, setDischargeNowLoader] = useState(false);
+  const [alreadyDischargedLoader, setAlreadyDischargedLoader] = useState(false);
   const [warning, setWarning] = useState<string>("");
 
   const { memberships } = useOrganization({
@@ -98,7 +101,8 @@ const BedEditModal: React.FC<BedEditModalProps> = ({
   });
 
   const dischargePatient = async (alreadyDischarged: boolean) => {
-    setDischargeLoader(true);
+    if(alreadyDischarged)setAlreadyDischargedLoader(true)
+      else setDischargeNowLoader(true);
     if (!orgId || !user) return;
 
     try {
@@ -109,7 +113,7 @@ const BedEditModal: React.FC<BedEditModalProps> = ({
       const bedPatientData = bedPatients[currentBedData?.patient_id];
 
       const bedRef = doc(db, "doctor", orgId, "beds", bookingId);
-      batch.update(bedRef, {
+      const dischargedBookingInfo = {
         dischargeMarked: true,
         discharge_at: alreadyDischarged
           ? currentBedData.discharge_at
@@ -119,7 +123,8 @@ const BedEditModal: React.FC<BedEditModalProps> = ({
           name: user.fullName,
           email: user.primaryEmailAddress?.emailAddress,
         },
-      });
+      }
+      batch.update(bedRef, dischargedBookingInfo);
 
       const patientRef = doc(
         db,
@@ -134,7 +139,7 @@ const BedEditModal: React.FC<BedEditModalProps> = ({
               ...patient_bed,
               dischargeMarked: true,
               discharge_at:
-                currentBedData.discharge_at < getTime(new Date())
+              alreadyDischarged
                   ? currentBedData.discharge_at
                   : getTime(new Date()),
               discharged_by: {
@@ -147,6 +152,19 @@ const BedEditModal: React.FC<BedEditModalProps> = ({
       );
 
       batch.update(patientRef, { bed_info: updatedBedInfo });
+
+      //logging
+      const logData: PatientActivityLog = {
+        agent_id: user.id,
+        id: bookingId,
+        action: "discharged",
+        timestamp: Date.now(),
+        oldData:null,
+        newData:dischargedBookingInfo,
+        module: "admission"
+      };
+      logActivity(logData);
+
       setWasEdited(true);
 
       await batch.commit();
@@ -155,7 +173,8 @@ const BedEditModal: React.FC<BedEditModalProps> = ({
       console.log(error);
       toast.error("Error discharging");
     } finally {
-      setDischargeLoader(false);
+      if(alreadyDischarged)setAlreadyDischargedLoader(false)
+        else setDischargeNowLoader(false);
       setIsEditModalOpen(false);
     }
   };
@@ -169,6 +188,11 @@ const BedEditModal: React.FC<BedEditModalProps> = ({
       getTime(toDate) === getTime(new Date(0))
     ) {
       setWarning("Please Select appropriate booking times");
+      return;
+    }
+
+    if (getTime(fromDate) <= Date.now() || getTime(toDate) <= Date.now()) {
+      setWarning("Booking times must be in the future.");
       return;
     }
 
@@ -193,19 +217,20 @@ const BedEditModal: React.FC<BedEditModalProps> = ({
       return;
     }
 
-    setloader(true);
+    setUpdateLoader(true);
 
     try {
       const bedBookingId = admissionInfo?.bedBookingId || "";
       const batch = writeBatch(db);
       const bedRef = doc(db, "doctor", orgId, "beds", bedBookingId);
-      batch.update(bedRef, {
+      const updatedBookingInfo = {
         ...admissionInfo,
         bedBookingId: bedBookingId,
         bedId: bedId,
         admission_at: getTime(fromDate),
         discharge_at: getTime(toDate),
-      });
+      };
+      batch.update(bedRef, updatedBookingInfo);
       const { patient_id, ...admissionInfoExcludingPatientId } =
         admissionInfo as OrgBed;
 
@@ -226,12 +251,26 @@ const BedEditModal: React.FC<BedEditModalProps> = ({
         bed_info: updatedBedInfo,
       });
       await batch.commit();
+
+      //logging
+      const { oldData:oldLogData, newData:newLogData } = diff(selectedAdmission!, updatedBookingInfo);
+      const logData: PatientActivityLog = {
+        agent_id: user.id,
+        id: bookingId,
+        action: "admission_updated", //added | updated | removed
+        timestamp: Date.now(),
+        oldData:oldLogData,
+        newData:newLogData,
+        module: "admission"
+      };
+      logActivity(logData);
+
       setWasEdited(true);
     } catch (error) {
       console.log(error);
       toast.error("Error updating");
     } finally {
-      setloader(false);
+      setUpdateLoader(false);
       setIsEditModalOpen(false);
     }
   };
@@ -399,7 +438,7 @@ const BedEditModal: React.FC<BedEditModalProps> = ({
             className=""
             type="button"
           >
-            {dischargeLoader ? (
+            {alreadyDischargedLoader ? (
               <Loader />
             ) : (
               <>
@@ -414,7 +453,7 @@ const BedEditModal: React.FC<BedEditModalProps> = ({
           className=""
           type="button"
         >
-          {dischargeLoader ? (
+          {dischargeNowLoader ? (
             <Loader />
           ) : (
             <>
@@ -424,7 +463,7 @@ const BedEditModal: React.FC<BedEditModalProps> = ({
           )}
         </Button>
         <Button type="submit" className="">
-          {dischargeLoader ? (
+          {updateLoader ? (
             <Loader />
           ) : (
             <>
