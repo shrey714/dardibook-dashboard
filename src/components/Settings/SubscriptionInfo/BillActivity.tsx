@@ -40,174 +40,44 @@ import {
 import {
   ChevronLeft,
   ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
   Settings2Icon,
   ArrowUpDown,
   MoreHorizontal,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import {
+  collection,
+  endBefore,
+  getCountFromServer,
+  getDocs,
+  limit,
+  limitToLast,
+  orderBy,
+  query,
+  QueryDocumentSnapshot,
+  startAfter,
+} from "firebase/firestore";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { db } from "@/firebase/firebaseConfig";
+import {
+  RazorPayPaymentTypes,
+  RazorPaySubscriptionTypes,
+} from "@/types/SubscriptionTypes";
+import { useAuth } from "@clerk/nextjs";
 
-const data: Payment[] = [
-  {
-    id: "bhqcj4p",
-    amount: 721,
-    status: "failed",
-    email: "carmella@example.com",
-  },
-  {
-    id: "m5g84i9",
-    amount: 316,
-    status: "success",
-    email: "ken99@example.com",
-  },
-  {
-    id: "3u1euv4",
-    amount: 242,
-    status: "success",
-    email: "Abe45@example.com",
-  },
-  {
-    id: "dervws0",
-    amount: 837,
-    status: "processing",
-    email: "Monserrat44@example.com",
-  },
-  {
-    id: "5kma5ae",
-    amount: 874,
-    status: "success",
-    email: "Silas22@example.com",
-  },
-  {
-    id: "bhqej4p",
-    amount: 721,
-    status: "failed",
-    email: "carmella@example.com",
-  },
-  {
-    id: "m5gr84",
-    amount: 316,
-    status: "success",
-    email: "ken99@example.com",
-  },
-  {
-    id: "3u1reu",
-    amount: 242,
-    status: "success",
-    email: "Abe45@example.com",
-  },
-  {
-    id: "derv1w",
-    amount: 837,
-    status: "processing",
-    email: "Monserrat44@example.com",
-  },
-  {
-    id: "5kma53",
-    amount: 874,
-    status: "success",
-    email: "Silas22@example.com",
-  },
-  {
-    id: "bhqcj",
-    amount: 721,
-    status: "failed",
-    email: "carmella@example.com",
-  },
-  {
-    id: "m5g84",
-    amount: 316,
-    status: "success",
-    email: "ken99@example.com",
-  },
-  {
-    id: "m5gr84i9",
-    amount: 316,
-    status: "success",
-    email: "ken99@example.com",
-  },
-  {
-    id: "3u1reuv4",
-    amount: 242,
-    status: "success",
-    email: "Abe45@example.com",
-  },
-  {
-    id: "derv1ws0",
-    amount: 837,
-    status: "processing",
-    email: "Monserrat44@example.com",
-  },
-  {
-    id: "5kma53ae",
-    amount: 874,
-    status: "success",
-    email: "Silas22@example.com",
-  },
-  {
-    id: "3u1eu",
-    amount: 242,
-    status: "success",
-    email: "Abe45@example.com",
-  },
-  {
-    id: "dervw",
-    amount: 837,
-    status: "processing",
-    email: "Monserrat44@example.com",
-  },
-  {
-    id: "5kma5",
-    amount: 874,
-    status: "success",
-    email: "Silas22@example.com",
-  },
-  {
-    id: "bhqej",
-    amount: 721,
-    status: "failed",
-    email: "carmella@example.com",
-  },
-  {
-    id: "vws0",
-    amount: 837,
-    status: "processing",
-    email: "Monserrat44@example.com",
-  },
-  {
-    id: "a5ae",
-    amount: 874,
-    status: "success",
-    email: "Silas22@example.com",
-  },
-  {
-    id: "ej4p",
-    amount: 721,
-    status: "failed",
-    email: "carmella@example.com",
-  },
-  {
-    id: "r84",
-    amount: 316,
-    status: "success",
-    email: "ken99@example.com",
-  },
-  {
-    id: "reu",
-    amount: 242,
-    status: "success",
-    email: "Abe45@example.com",
-  },
-];
+export type RazorpayWebhookPayload = {
+  event: string;
+  subscription?: RazorPaySubscriptionTypes;
+  payment?: RazorPayPaymentTypes;
+};
 
 export type Payment = {
   id: string;
   amount: number;
-  status: "pending" | "processing" | "success" | "failed";
+  status: string;
   email: string;
+  created_at?: number;
 };
 
 const columns: ColumnDef<Payment>[] = [
@@ -316,19 +186,142 @@ const columns: ColumnDef<Payment>[] = [
   },
 ];
 
+const pageSize = 10;
+
 const BillActivity = () => {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
+  const { orgId, isLoaded } = useAuth();
+
+  // firestore pagination --- start
+  const [isLoading, setIsLoading] = useState(true);
+  const [list, setList] = useState<Payment[]>([]);
+  const [page, setPage] = useState<number>(1);
+  const [currentDocs, setcurrentDocs] = useState<QueryDocumentSnapshot[]>([]);
+  const [totalCount, setTotalCount] = useState<number>(0);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (orgId && isLoaded) {
+        setIsLoading(true);
+
+        const collectionRef = collection(db, "doctor", orgId, "subscriptions");
+
+        const [snapshot, countSnapshot] = await Promise.all([
+          getDocs(
+            query(
+              collectionRef,
+              orderBy("subscription.created_at", "desc"),
+              limit(pageSize)
+            )
+          ),
+          getCountFromServer(collectionRef),
+        ]);
+
+        setTotalCount(countSnapshot.data().count);
+        setcurrentDocs(snapshot.docs);
+
+        const items: Payment[] = snapshot.docs.map((doc) => {
+          const data = doc.data() as RazorpayWebhookPayload;
+          return {
+            id: doc.id,
+            amount: 0,
+            status: data.event,
+            email: "unknown@gmail.com",
+            created_at: data.subscription?.created_at,
+          };
+        });
+
+        setPage(1);
+        setList(items);
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [isLoaded, orgId]);
+
+  const showNext = () => {
+    if (list.length === 0) {
+      alert("Thats all we have for now !");
+    } else {
+      const fetchNextData = async () => {
+        if (orgId && isLoaded) {
+          setIsLoading(true);
+          const snapshot = await getDocs(
+            query(
+              collection(db, "doctor", orgId, "subscriptions"),
+              orderBy("subscription.created_at", "desc"),
+              limit(pageSize),
+              startAfter(currentDocs[currentDocs.length - 1])
+            )
+          );
+          setcurrentDocs(snapshot.docs);
+          const items: Payment[] = [];
+          snapshot.forEach((doc) => {
+            const data = doc.data() as RazorpayWebhookPayload;
+            items.push({
+              id: doc.id,
+              amount: 0,
+              status: data.event,
+              email: "unknown@gmail.com",
+              created_at: data.subscription?.created_at,
+            });
+          });
+          setList(items);
+          setPage(page + 1);
+          if (table.getCanNextPage()) table.nextPage();
+          setIsLoading(false);
+        }
+      };
+      fetchNextData();
+    }
+  };
+
+  const showPrevious = () => {
+    const fetchPreviousData = async () => {
+      if (orgId && isLoaded) {
+        setIsLoading(true);
+        const snapshot = await getDocs(
+          query(
+            collection(db, "doctor", orgId, "subscriptions"),
+            orderBy("subscription.created_at", "desc"),
+            limitToLast(pageSize),
+            endBefore(currentDocs[0])
+          )
+        );
+        setcurrentDocs(snapshot.docs);
+        const items: Payment[] = [];
+        snapshot.forEach((doc) => {
+          const data = doc.data() as RazorpayWebhookPayload;
+          items.push({
+            id: doc.id,
+            amount: 0,
+            status: data.event,
+            email: "unknown@gmail.com",
+            created_at: data.subscription?.created_at,
+          });
+        });
+        setList(items);
+        setPage(page - 1);
+        if (table.getCanPreviousPage()) table.previousPage();
+        setIsLoading(false);
+      }
+    };
+    fetchPreviousData();
+  };
+
+  // firestore pagination --- end
 
   const table = useReactTable({
     initialState: {
       pagination: {
-        pageSize: 10,
+        pageSize,
       },
     },
-    data,
+    data: list,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -356,7 +349,7 @@ const BillActivity = () => {
           <CardDescription hidden></CardDescription>
         </CardHeader>
         <CardContent className="p-0 w-full">
-          {true ? (
+          {isLoading ? (
             <table className="w-full caption-bottom text-sm">
               <thead className="[&_tr]:border-b">
                 <tr className="border-b transition-colors bg-muted/50">
@@ -372,7 +365,7 @@ const BillActivity = () => {
               </thead>
 
               <tbody className="[&_tr:last-child]:border-0">
-                {[...Array(10)].map((_, i) => (
+                {[...Array(pageSize)].map((_, i) => (
                   <tr key={i} className="border-b">
                     {[...Array(5)].map((_, i) => (
                       <td key={i} className="py-[14px] px-2 align-middle h-min">
@@ -436,30 +429,18 @@ const BillActivity = () => {
         </CardContent>
         <CardFooter className="border-t py-2 px-4 flex items-center justify-between space-x-2 gap-4 flex-row bg-sidebar/70">
           <div className="text-sm text-muted-foreground hidden sm:block">
-            {`${table.getPaginationRowModel().rows.length} / ${
-              table.getFilteredRowModel().rows.length
-            } row(s)`}
+            {`${list.length} row(s)`}
           </div>
           <div className="flex flex-1 items-center justify-end space-x-4 md:space-x-6">
             <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-              Page {table.getState().pagination.pageIndex + 1} of{" "}
-              {table.getPageCount()}
+              Page {page} of {Math.ceil(totalCount / pageSize)}
             </div>
             <div className="flex items-center space-x-2">
               <Button
                 variant="outline"
-                className="hidden h-8 w-8 p-0 lg:flex"
-                onClick={() => table.setPageIndex(0)}
-                disabled={!table.getCanPreviousPage()}
-              >
-                <span className="sr-only">Go to first page</span>
-                <ChevronsLeft />
-              </Button>
-              <Button
-                variant="outline"
                 className="h-8 w-8 p-0"
-                onClick={() => table.previousPage()}
-                disabled={!table.getCanPreviousPage()}
+                onClick={() => showPrevious()}
+                disabled={page === 1 || isLoading}
               >
                 <span className="sr-only">Go to previous page</span>
                 <ChevronLeft />
@@ -467,20 +448,15 @@ const BillActivity = () => {
               <Button
                 variant="outline"
                 className="h-8 w-8 p-0"
-                onClick={() => table.nextPage()}
-                disabled={!table.getCanNextPage()}
+                onClick={() => showNext()}
+                disabled={
+                  list.length < pageSize ||
+                  isLoading ||
+                  list.length === totalCount
+                }
               >
                 <span className="sr-only">Go to next page</span>
                 <ChevronRight />
-              </Button>
-              <Button
-                variant="outline"
-                className="hidden h-8 w-8 p-0 lg:flex"
-                onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-                disabled={!table.getCanNextPage()}
-              >
-                <span className="sr-only">Go to last page</span>
-                <ChevronsRight />
               </Button>
             </div>
           </div>
