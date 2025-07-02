@@ -34,6 +34,8 @@ export interface RazorPayPlanTypes {
 
 export interface ClerkSubscriptiontypes {
     status: string;
+    sub_id: string;
+    plan_id: string;
     current_start?: number | null | undefined,
     current_end?: number | null | undefined,
 }

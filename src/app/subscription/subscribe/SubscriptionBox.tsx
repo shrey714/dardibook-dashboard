@@ -81,6 +81,8 @@ const SubscriptionBox = () => {
             response,
             subscriptionId: subscriptiondata.id,
             orgId,
+            sub_id: response.razorpay_subscription_id,
+            plan_id: planId,
           });
 
           if (result.success) {
