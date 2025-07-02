@@ -53,7 +53,6 @@ export const PharmacyOptions = () => {
   return (
     <>
       <BillDefaults />
-      <Separator className="my-3" />
       <ServicesUpdateModal />
     </>
   );
@@ -114,7 +113,7 @@ const BillDefaults = () => {
   return (
     <Card className="bg-sidebar/70 w-full shadow-none border h-min mx-auto">
       <CardHeader className="border-b p-4">
-        <CardTitle className="font-normal text-muted-foreground">
+        <CardTitle className="font-medium tracking-normal">
           Bill Defaults
         </CardTitle>
         <CardDescription hidden></CardDescription>
@@ -347,7 +346,9 @@ const ServicesUpdateModal = () => {
       <Dialog open={serviceEditModel} onOpenChange={setServiceEditModel}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>Edit Service</DialogTitle>
+            <DialogTitle className="font-medium tracking-normal">
+              Edit Service
+            </DialogTitle>
             <DialogDescription>
               Modify details for{" "}
               {
@@ -430,9 +431,9 @@ const ServicesUpdateModal = () => {
         </DialogContent>
       </Dialog>
 
-      <Card className="border border-b-0 rounded-b-none bg-sidebar/70 w-full shadow-none h-min mx-auto">
+      <Card className="border border-b-0 rounded-b-none bg-sidebar/70 w-full shadow-none h-min mx-auto mt-2 md:mt-5">
         <CardHeader className="border-b p-4">
-          <CardTitle className="font-normal text-muted-foreground">
+          <CardTitle className="font-medium tracking-normal">
             Add New Service
           </CardTitle>
           <CardDescription hidden></CardDescription>

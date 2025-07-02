@@ -24,7 +24,7 @@ const GeneralOptions = () => {
   return (
     <Card className="bg-sidebar/70 w-full shadow-none border h-min mx-auto">
       <CardHeader className="border-b p-4">
-        <CardTitle className="font-normal text-muted-foreground">
+        <CardTitle className="font-medium tracking-normal">
           Theme Preferences
         </CardTitle>
         <CardDescription hidden></CardDescription>

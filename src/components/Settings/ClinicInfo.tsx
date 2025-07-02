@@ -77,7 +77,7 @@ const ClinicInfo = () => {
   return (
     <Card className="mx-auto max-w-4xl 2xl:mx-0 shadow-none border h-min bg-sidebar/70 2xl:max-w-2xl">
       <CardHeader className="border-b p-5">
-        <CardTitle>Clinic Information</CardTitle>
+        <CardTitle className="font-medium tracking-normal">Clinic Information</CardTitle>
         <CardDescription>Update your basic clinic information.</CardDescription>
       </CardHeader>
       <CardContent className="p-0">

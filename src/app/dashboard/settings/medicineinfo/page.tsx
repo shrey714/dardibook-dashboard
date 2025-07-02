@@ -169,7 +169,7 @@ export default function SettingsMedicineInfoPage() {
       <div className="w-full py-2 sm:py-5 px-2 md:px-5 2xl:flex 2xl:flex-row 2xl:gap-5 2xl:justify-center">
         <Card className="bg-sidebar/70 w-full shadow-none border h-min mx-auto max-w-4xl 2xl:mx-0 2xl:max-w-xl">
           <CardHeader className="border-b p-4">
-            <CardTitle className="font-normal text-muted-foreground">
+            <CardTitle className="font-medium tracking-normal">
               Add new medicine
             </CardTitle>
             <CardDescription hidden></CardDescription>
@@ -432,7 +432,7 @@ const EditMedicineDataModel: React.FC<EditMedicineDataModel> = ({
     <Dialog open={medicineEditModel} onOpenChange={setMedicineEditModel}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>
+          <DialogTitle className="font-medium tracking-normal">
             {
               medicines?.find((medicine) => medicine.id === editForMedicineId)
                 ?.medicineName

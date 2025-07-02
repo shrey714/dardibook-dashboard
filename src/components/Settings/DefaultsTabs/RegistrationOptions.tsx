@@ -168,7 +168,7 @@ export const RegistrationOptions = () => {
       <Dialog open={receiptEditModel} onOpenChange={setReceiptEditModel}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>Edit Receipt Type</DialogTitle>
+            <DialogTitle className="font-medium tracking-normal">Edit Receipt Type</DialogTitle>
             <DialogDescription>
               Modify details for{" "}
               {
@@ -250,7 +250,7 @@ export const RegistrationOptions = () => {
 
       <Card className="border border-b-0 rounded-b-none bg-sidebar/70 w-full shadow-none  h-min mx-auto">
         <CardHeader className="border-b p-4">
-          <CardTitle className="font-normal text-muted-foreground">
+          <CardTitle className="font-medium tracking-normal">
             Add Registration Receipt Type
           </CardTitle>
           <CardDescription hidden></CardDescription>

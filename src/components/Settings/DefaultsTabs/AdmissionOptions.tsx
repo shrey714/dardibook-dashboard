@@ -194,7 +194,9 @@ export const AdmissionOptions = () => {
       <Dialog open={bedEditModel} onOpenChange={setBedEditModel}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>Edit Bed</DialogTitle>
+            <DialogTitle className="font-medium tracking-normal">
+              Edit Bed
+            </DialogTitle>
             <DialogDescription>
               Modify details for{" "}
               {
@@ -331,10 +333,10 @@ export const AdmissionOptions = () => {
 
       <Card className="border border-b-0 rounded-b-none bg-sidebar/70 w-full shadow-none h-min mx-auto">
         <CardHeader className="border-b p-4">
-          <CardTitle className="font-normal text-muted-foreground">
+          <CardTitle className="font-medium tracking-normal">
             Add New Bed
           </CardTitle>
-          <CardDescription className="text-xs text-muted-foreground/80">
+          <CardDescription>
             Add, edit and remove beds with ward assignments
           </CardDescription>
         </CardHeader>

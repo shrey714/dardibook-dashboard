@@ -18,7 +18,7 @@ const PersonalInfo = () => {
   return (
     <Card className="mx-auto max-w-4xl 2xl:mx-0 shadow-none border h-min flex flex-1 flex-col bg-sidebar/70 2xl:max-w-xl">
       <CardHeader className="border-b p-5">
-        <CardTitle>
+        <CardTitle className="font-medium tracking-normal">
           Personal Information
           <span className="ml-2 text-xs text-green-600 font-semibold border border-green-600 px-2 rounded-full">
             {orgRole === "org:clinic_head"
