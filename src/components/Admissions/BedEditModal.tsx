@@ -191,6 +191,11 @@ const BedEditModal: React.FC<BedEditModalProps> = ({
       return;
     }
 
+    if (getTime(toDate) <= getTime(fromDate)) {
+      setWarning("Can't discharge before admission");
+      return;
+    }
+
     if (getTime(fromDate) <= Date.now() || getTime(toDate) <= Date.now()) {
       setWarning("Booking times must be in the future.");
       return;
