@@ -57,16 +57,16 @@ const pages = [
     roles: ["org:clinic_head", "org:doctor", "org:assistant_doctor"],
   },
   {
-    title: "Admissions",
-    url: "/dashboard/admissions",
-    icon: Bed,
-    roles: ["org:clinic_head", "org:doctor", "org:assistant_doctor"],
-  },
-  {
     title: "Prescribe",
     url: "/dashboard/prescribe",
     icon: ClipboardPlusIcon,
     roles: ["org:clinic_head", "org:doctor"],
+  },
+  {
+    title: "Admissions",
+    url: "/dashboard/admissions",
+    icon: Bed,
+    roles: ["org:clinic_head", "org:doctor", "org:assistant_doctor"],
   },
   {
     title: "Pharmacy",

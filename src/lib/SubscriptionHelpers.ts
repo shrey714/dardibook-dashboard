@@ -157,3 +157,13 @@ export async function getPlanDetails(id: string) {
         throw new Error("Failed to get plan");
     }
 }
+
+export async function getInvoiceDetails(id: string) {
+    try {
+        const invoice = await razorpay.invoices.fetch(id);
+        return invoice;
+    } catch (error) {
+        console.error("Error getting invoice:", error);
+        throw new Error("Failed to get invoice");
+    }
+}

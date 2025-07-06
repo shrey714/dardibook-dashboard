@@ -25,8 +25,6 @@ import {
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -43,6 +41,7 @@ import {
   Settings2Icon,
   ArrowUpDown,
   MoreHorizontal,
+  InfoIcon,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import {
@@ -56,6 +55,7 @@ import {
   query,
   QueryDocumentSnapshot,
   startAfter,
+  where,
 } from "firebase/firestore";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -65,6 +65,16 @@ import {
   RazorPaySubscriptionTypes,
 } from "@/types/SubscriptionTypes";
 import { useAuth } from "@clerk/nextjs";
+import { format } from "date-fns";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import toast from "react-hot-toast";
+import { getInvoiceDetails } from "@/lib/SubscriptionHelpers";
+import { Invoices } from "razorpay/dist/types/invoices";
 
 export type RazorpayWebhookPayload = {
   event: string;
@@ -73,36 +83,54 @@ export type RazorpayWebhookPayload = {
 };
 
 export type Payment = {
-  id: string;
-  amount: number;
-  status: string;
-  email: string;
-  created_at?: number;
+  id: string | null;
+  method: string | null;
+  amount: number | string | null;
+  created_at: number | null;
+  invoice_id: string | null;
 };
 
 const columns: ColumnDef<Payment>[] = [
   {
-    accessorKey: "status",
-    header: () => <div className="text-left pl-4">Status</div>,
+    accessorKey: "created_at",
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        className="p-1 h-min"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      >
+        Created On
+        <ArrowUpDown />
+      </Button>
+    ),
     cell: ({ row }) => (
-      <div className="capitalize pl-4">{row.getValue("status")}</div>
+      <div className="capitalize pl-4">
+        {format(
+          new Date(Number(row.getValue("created_at")) * 1000),
+          "LLL dd, yyyy"
+        )}
+      </div>
     ),
     enableHiding: true,
+    enableSorting: true,
   },
   {
-    accessorKey: "email",
+    accessorKey: "method",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
+          className="p-1 h-min"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Email
+          Method
           <ArrowUpDown />
         </Button>
       );
     },
-    cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
+    cell: ({ row }) => (
+      <div className="lowercase">{row.getValue("method")}</div>
+    ),
     enableHiding: true,
   },
   {
@@ -111,11 +139,11 @@ const columns: ColumnDef<Payment>[] = [
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue("amount"));
 
-      // Format the amount as a dollar amount
-      const formatted = new Intl.NumberFormat("en-US", {
+      const formatted = new Intl.NumberFormat("en-IN", {
         style: "currency",
-        currency: "USD",
-      }).format(amount);
+        currency: "INR",
+        minimumFractionDigits: 0,
+      }).format(Number(amount) / 100);
 
       return <div className="text-right font-medium">{formatted}</div>;
     },
@@ -169,15 +197,43 @@ const columns: ColumnDef<Payment>[] = [
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <DropdownMenuItem
-                onClick={() => navigator.clipboard.writeText(payment.id)}
+                onClick={() =>
+                  navigator.clipboard.writeText(payment.id || "Invalid Id")
+                }
               >
                 Copy payment ID
               </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>View customer</DropdownMenuItem>
-              <DropdownMenuItem>View payment details</DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={async () => {
+                  if (row.original.invoice_id) {
+                    const promise = toast.promise(
+                      getInvoiceDetails(row.original.invoice_id),
+                      {
+                        loading: "Fetching invoice...",
+                        success: "Invoice fetched successfully!",
+                        error: "Failed to fetch invoice.",
+                      }
+                    );
+
+                    try {
+                      const invoice: Invoices.RazorpayInvoice = await promise;
+
+                      if (invoice.short_url) {
+                        window.open(invoice.short_url, "_blank");
+                      } else {
+                        toast.error("Invoice link not available.");
+                      }
+                    } catch (error) {
+                      console.error("Error getting invoice ", error);
+                    }
+                  } else {
+                    toast.error("Invoice id does not exist");
+                  }
+                }}
+              >
+                Get Invoice
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -213,11 +269,14 @@ const BillActivity = () => {
           getDocs(
             query(
               collectionRef,
+              where("event", "==", "subscription.charged"),
               orderBy("subscription.created_at", "desc"),
               limit(pageSize)
             )
           ),
-          getCountFromServer(collectionRef),
+          getCountFromServer(
+            query(collectionRef, where("event", "==", "subscription.charged"))
+          ),
         ]);
 
         setTotalCount(countSnapshot.data().count);
@@ -226,11 +285,11 @@ const BillActivity = () => {
         const items: Payment[] = snapshot.docs.map((doc) => {
           const data = doc.data() as RazorpayWebhookPayload;
           return {
-            id: doc.id,
-            amount: 0,
-            status: data.event,
-            email: "unknown@gmail.com",
-            created_at: data.subscription?.created_at,
+            id: data.payment?.id || null,
+            method: data.payment?.method || null,
+            amount: data.payment?.amount || null,
+            created_at: data.payment?.created_at || null,
+            invoice_id: data.payment?.invoice_id || null,
           };
         });
 
@@ -253,6 +312,7 @@ const BillActivity = () => {
           const snapshot = await getDocs(
             query(
               collection(db, "doctor", orgId, "subscriptions"),
+              where("event", "==", "subscription.charged"),
               orderBy("subscription.created_at", "desc"),
               limit(pageSize),
               startAfter(currentDocs[currentDocs.length - 1])
@@ -263,11 +323,11 @@ const BillActivity = () => {
           snapshot.forEach((doc) => {
             const data = doc.data() as RazorpayWebhookPayload;
             items.push({
-              id: doc.id,
-              amount: 0,
-              status: data.event,
-              email: "unknown@gmail.com",
-              created_at: data.subscription?.created_at,
+              id: data.payment?.id || null,
+              method: data.payment?.method || null,
+              amount: data.payment?.amount || null,
+              created_at: data.payment?.created_at || null,
+              invoice_id: data.payment?.invoice_id || null,
             });
           });
           setList(items);
@@ -287,6 +347,7 @@ const BillActivity = () => {
         const snapshot = await getDocs(
           query(
             collection(db, "doctor", orgId, "subscriptions"),
+            where("event", "==", "subscription.charged"),
             orderBy("subscription.created_at", "desc"),
             limitToLast(pageSize),
             endBefore(currentDocs[0])
@@ -297,11 +358,11 @@ const BillActivity = () => {
         snapshot.forEach((doc) => {
           const data = doc.data() as RazorpayWebhookPayload;
           items.push({
-            id: doc.id,
-            amount: 0,
-            status: data.event,
-            email: "unknown@gmail.com",
-            created_at: data.subscription?.created_at,
+            id: data.payment?.id || null,
+            method: data.payment?.method || null,
+            amount: data.payment?.amount || null,
+            created_at: data.payment?.created_at || null,
+            invoice_id: data.payment?.invoice_id || null,
           });
         });
         setList(items);
@@ -343,8 +404,21 @@ const BillActivity = () => {
     <>
       <Card className="p-0 w-full shadow-none border overflow-hidden">
         <CardHeader className="border-b p-4 bg-sidebar/70">
-          <CardTitle className="font-medium tracking-normal">
+          <CardTitle className="font-medium tracking-normal flex gap-x-2 items-center">
             Billing Activity & Invoices
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <InfoIcon className="size-5" />
+                </TooltipTrigger>
+                <TooltipContent className="max-w-64">
+                  <p>
+                    Membership fees are billed at the start of each period and
+                    may take some time to appear in your account after billing.
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </CardTitle>
           <CardDescription hidden></CardDescription>
         </CardHeader>

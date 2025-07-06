@@ -280,7 +280,7 @@ export function BedSidebar({
       </SidebarContent3>
       <SidebarSeparator3 />
       <SidebarContent3 className="overflow-x-hidden w-auto pt-0">
-        <SidebarGroup3 className="group-data-[collapsible=icon]:hidden py-[4px]">
+        <SidebarGroup3 className="group-data-[collapsible=icon]:hidden pt-1">
           <SidebarGroupContent3>
             {loader ? (
               <SidebarMenu3 className="py-2">
@@ -296,19 +296,17 @@ export function BedSidebar({
                 Empty
               </div>
             ) : (
-              <ul className="w-full">
-                <Reorder.Group
-                  values={bedsForDate}
-                  onReorder={() => {}}
-                  draggable={false}
-                >
-                  <BedPatientList
-                    patientsForDate={patientsForDate}
-                    bedsForDate={bedsForDate}
-                    forDate={date}
-                  />
-                </Reorder.Group>
-              </ul>
+              <Reorder.Group
+                values={bedsForDate}
+                onReorder={() => {}}
+                draggable={false}
+              >
+                <BedPatientList
+                  patientsForDate={patientsForDate}
+                  bedsForDate={bedsForDate}
+                  forDate={date}
+                />
+              </Reorder.Group>
             )}
           </SidebarGroupContent3>
         </SidebarGroup3>

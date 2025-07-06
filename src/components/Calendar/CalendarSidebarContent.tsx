@@ -134,7 +134,7 @@ export function CalendarSidebarContent({
         </SidebarGroup>
 
         <SidebarGroup className="py-0">
-          <SidebarGroupLabel className="border-b">
+          <SidebarGroupLabel className="border-b rounded-none">
             {date
               ? formatRelative(date, new Date(), { locale: customLocale })
               : format(monthDate, "MMMM, yyyy")}
@@ -314,7 +314,7 @@ export function CalendarSidebarContent({
           </SidebarMenu>
         </SidebarGroup>
 
-        <SidebarGroup className="py-0">
+        <SidebarGroup className="pt-0 pb-10">
           <SidebarGroupLabel className="">Admissions</SidebarGroupLabel>
           <SidebarMenu>
             {loader ? (
