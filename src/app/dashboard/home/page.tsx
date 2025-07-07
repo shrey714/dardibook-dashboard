@@ -5,8 +5,8 @@ import DoctorsPerformanceChart from "@/components/Home/DoctorsPerformanceChart";
 import BedAppointmentsActivity from "@/components/Home/BedAppointmentsActivity";
 import WeekSelector from "@/components/Home/WeekSelector";
 import { DashboardDataTypes } from "@/types/FormTypes";
-import { headers } from "next/headers";
 import { auth } from "@clerk/nextjs/server";
+import { getDashboardData } from "@/lib/DashboardHelpers";
 
 type PageProps = {
   searchParams: Promise<{ weekDate?: string }>;
@@ -15,13 +15,13 @@ type PageProps = {
 export default async function Home({ searchParams }: PageProps) {
   const { weekDate } = await searchParams;
   const weekTimestamp = weekDate ? parseInt(weekDate, 10) : Date.now();
-  const headersList = await headers();
-  const protocol = headersList.get("x-forwarded-proto") || "http";
-  const host = headersList.get("host") || "";
-  const baseUrl = `${protocol}://${host}`;
+
+  if (isNaN(weekTimestamp)) {
+    notFound();
+  }
 
   const authInstance = await auth();
-  if (!authInstance.orgRole) {
+  if (!authInstance.orgRole || !authInstance.orgId) {
     return (
       <div className="p-4 text-center text-red-500">
         You are not authorized for this organization..
@@ -29,27 +29,9 @@ export default async function Home({ searchParams }: PageProps) {
     );
   }
 
-  if (isNaN(weekTimestamp)) {
-    notFound();
-  }
-
   let dashboardData: DashboardDataTypes;
   try {
-    const res = await fetch(
-      `${baseUrl}/api/dashboard-data?weekDate=${weekTimestamp}`,
-      {
-        method: "GET",
-        headers: {
-          cookie: headersList.get("cookie") || "",
-        },
-        cache: "no-store",
-      }
-    );
-    if (!res.ok) {
-      throw new Error("Failed to fetch dashboard data");
-    }
-    const data = await res.json();
-    dashboardData = data.data;
+    dashboardData = await getDashboardData(authInstance.orgId, weekTimestamp);
   } catch (error) {
     console.error("Error loading dashboard:", error);
     return (

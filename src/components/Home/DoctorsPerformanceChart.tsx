@@ -19,7 +19,7 @@ const DoctorsPerformanceChart = ({
     <div className="col-span-3 md:col-span-6">
       <div className="border dark:border-0 shadow bg-muted/50 text-card-foreground rounded-lg h-full">
         <div className="flex flex-col space-y-1.5 p-6">
-          <div className="leading-none font-semibold tracking-tight">
+          <div className="leading-none font-medium tracking-tight">
             {DoctorsPerformanceChartData.title}
           </div>
           <div className="text-muted-foreground text-sm">
