@@ -62,13 +62,14 @@ const OrganizationHandeler = () => {
           )}
 
           <div className="w-full flex flex-1 flex-col border-2 rounded-md overflow-hidden border-border bg-gradient-to-b from-muted/50 to-muted max-w-screen-xl">
-            <div className="flex flex-col gap-y-1 items-center py-8 border-b">
-              <h1 className="text-foreground font-bold text-[1.0625rem] leading-[1.41176] tracking-normal">
-                Create an organization
+            <div className="flex flex-col gap-y-1 items-center py-8 border-b px-8">
+              <h1 className="text-foreground font-bold text-[1.0625rem] text-center leading-[1.41176] tracking-normal">
+                Clinic Registration Form
               </h1>
 
-              <p className="text-gray-600 dark:text-gray-300 text-[0.8125rem] font-normal leading-[1.38462] break-words">
-                to continue to DardiBook
+              <p className="text-gray-600 dark:text-gray-300 text-[0.8125rem] text-center font-normal leading-[1.38462] break-words">
+                Please fill in all the required information to register your
+                clinic
               </p>
             </div>
             <div className="w-full py-8 sm:py-12 px-8 md:px-12 lg:px-36 flex items-center justify-between">

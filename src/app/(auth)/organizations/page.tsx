@@ -8,7 +8,7 @@ export default async function CreateOrganization() {
   const user = await currentUser();
 
   return (
-    <section className="w-screen min-h-svh flex flex-col items-center gap-2 px-2 pb-2 sm:px-4 sm:pb-2">
+    <section className="w-screen min-h-svh flex flex-col items-center gap-4 px-2 pb-2 sm:px-4 sm:pb-2">
       <HeaderMain user={user} />
       <OrganizationHandeler />
       <div className="w-full flex flex-1 flex-col items-center justify-end">
