@@ -1,16 +1,14 @@
 "use client";
 /* eslint-disable @next/next/no-img-element */
-import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import React, { ChangeEvent, FormEvent, useState } from "react";
 import Loader from "../common/Loader";
 import { CircleX, FileImage } from "lucide-react";
 import LogOutBTtn from "../common/LogOutBTtn";
 import { useAuth } from "@clerk/nextjs";
-import { useRouter } from "next/navigation";
 import { createOrganization } from "@/app/services/createOrganization";
 
 const RegistrationForm = () => {
-  const { isLoaded, orgId } = useAuth();
-  const router = useRouter();
+  const { orgId } = useAuth();
   const [clinicLogoPreview, setClinicLogoPreview] = useState<string | null>(
     null
   );
@@ -57,11 +55,7 @@ const RegistrationForm = () => {
   };
 
   const [submissionLoader, setSubmissionLoader] = useState(false);
-  useEffect(() => {
-    if (isLoaded && orgId) {
-      router.replace("/");
-    }
-  }, [router, isLoaded, orgId]);
+
   const [formData, setFormData] = useState({
     clinicName: "",
     doctorName: "",

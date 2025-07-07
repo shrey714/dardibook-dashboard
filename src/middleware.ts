@@ -35,7 +35,7 @@ export default clerkMiddleware(async (auth, req) => {
         const onboardingUrl = new URL('/onboarding', req.url)
         return NextResponse.redirect(onboardingUrl)
     }
-    if (userId && !orgId && sessionClaims?.metadata?.onboardingComplete && req.nextUrl.pathname !== "/organizations" && req.nextUrl.pathname !== "/api/organizations") {
+    if (userId && !orgId && sessionClaims?.metadata?.onboardingComplete && req.nextUrl.pathname !== "/organizations" && req.nextUrl.pathname !== "/api/create-organization") {
         const url = new URL("/organizations", req.url);
         return NextResponse.redirect(url)
     }
