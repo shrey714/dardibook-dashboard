@@ -23,7 +23,12 @@ export default async function Home({ searchParams }: PageProps) {
   const authInstance = await auth();
   if (!authInstance.orgRole || !authInstance.orgId) {
     return (
-      <div className="p-4 text-center text-red-500">
+      <div className="w-full h-full text-muted-foreground text-sm md:text-base p-4 overflow-hidden flex items-center justify-center gap-4 flex-col">
+        <img
+          className="w-full max-w-40 lg:mx-auto"
+          src="/ErrorTriangle.svg"
+          alt="Error"
+        />
         You are not authorized for this organization..
       </div>
     );
@@ -35,7 +40,12 @@ export default async function Home({ searchParams }: PageProps) {
   } catch (error) {
     console.error("Error loading dashboard:", error);
     return (
-      <div className="p-4 text-center text-red-500">
+      <div className="w-full h-full text-muted-foreground text-sm md:text-base p-4 overflow-hidden flex items-center justify-center gap-4 flex-col">
+        <img
+          className="w-full max-w-40 lg:mx-auto"
+          src="/ErrorTriangle.svg"
+          alt="Error"
+        />
         Failed to load dashboard data. Please try again later.
       </div>
     );
