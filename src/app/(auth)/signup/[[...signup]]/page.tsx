@@ -30,7 +30,7 @@ const Page = () => {
             By clicking continue, you agree to our{" "}
             <Link
               href="https://dardibook.in/documents/terms-conditions"
-              className="hover:text-primary underline underline-offset-4"
+              className="hover:text-white underline underline-offset-4"
               target="_blank"
             >
               Terms of Service
@@ -38,7 +38,7 @@ const Page = () => {
             and{" "}
             <Link
               href="https://dardibook.in/documents/privacy-policy"
-              className="hover:text-primary underline underline-offset-4"
+              className="hover:text-white underline underline-offset-4"
               target="_blank"
             >
               Privacy Policy

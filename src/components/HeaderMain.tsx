@@ -13,7 +13,6 @@ import { ModeToggle } from "./common/mode-toggle";
 import { Menu } from "lucide-react";
 import { Button } from "./ui/button";
 import { User } from "@clerk/nextjs/server";
-import HeaderClerkOrganizationSwitcher from "./common/ClerkOrganizationSwitcher";
 
 const HeaderMain = async ({ user }: { user: User | null }) => {
   const allPaths = [
@@ -37,8 +36,6 @@ const HeaderMain = async ({ user }: { user: User | null }) => {
           </span>
         </Link>
         <div className="flex items-center justify-center flex-row gap-2">
-          <HeaderClerkOrganizationSwitcher />
-
           {/* user menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
