@@ -1,4 +1,4 @@
-import { storeSubscriptionToFirestore, updateClerkSubscriptionStatus } from "@/lib/SubscriptionHelpers";
+import { storeSubscriptionToFirestore, updateClerkSubscriptionStatus } from "@/lib/actions/SubscriptionHelpers";
 import { RazorPayPaymentTypes, RazorPaySubscriptionTypes } from "@/types/SubscriptionTypes";
 import { NextRequest, NextResponse } from "next/server";
 import { validateWebhookSignature } from 'razorpay/dist/utils/razorpay-utils';

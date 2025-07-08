@@ -15,7 +15,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import toast from "react-hot-toast";
-import { createOrganization } from "@/lib/actions/createOrganization";
+import { createOrganization } from "@/lib/actions/OrganizationHelpers";
 
 // Type definitions
 interface FormData {

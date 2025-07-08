@@ -33,7 +33,7 @@ import { ClerkSubscriptiontypes } from "@/types/SubscriptionTypes";
 import {
   getPlanDetails,
   getSubscriptionDetails,
-} from "@/lib/SubscriptionHelpers";
+} from "@/lib/actions/SubscriptionHelpers";
 import { Subscriptions } from "razorpay/dist/types/subscriptions";
 import { Plans } from "razorpay/dist/types/plans";
 import { Skeleton } from "@/components/ui/skeleton";

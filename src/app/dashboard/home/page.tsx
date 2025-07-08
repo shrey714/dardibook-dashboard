@@ -6,7 +6,7 @@ import BedAppointmentsActivity from "@/components/Home/BedAppointmentsActivity";
 import WeekSelector from "@/components/Home/WeekSelector";
 import { DashboardDataTypes } from "@/types/FormTypes";
 import { auth } from "@clerk/nextjs/server";
-import { getDashboardData } from "@/lib/DashboardHelpers";
+import { getDashboardData } from "@/lib/actions/DashboardHelpers";
 
 type PageProps = {
   searchParams: Promise<{ weekDate?: string }>;

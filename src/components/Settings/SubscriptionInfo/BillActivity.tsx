@@ -73,7 +73,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import toast from "react-hot-toast";
-import { getInvoiceDetails } from "@/lib/SubscriptionHelpers";
+import { getInvoiceDetails } from "@/lib/actions/SubscriptionHelpers";
 import { Invoices } from "razorpay/dist/types/invoices";
 
 export type RazorpayWebhookPayload = {

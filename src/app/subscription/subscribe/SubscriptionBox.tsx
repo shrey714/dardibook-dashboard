@@ -29,7 +29,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import {
   createSubscriptionWithUserNote,
   verifyAndActivateSubscription,
-} from "@/lib/SubscriptionHelpers";
+} from "@/lib/actions/SubscriptionHelpers";
 import { fromUnixTime, isWithinInterval } from "date-fns";
 
 const SubscriptionBox = () => {
