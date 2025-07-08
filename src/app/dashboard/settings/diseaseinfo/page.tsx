@@ -2,10 +2,9 @@
 
 import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
-import { CirclePlus } from "lucide-react";
+import { CirclePlus, InboxIcon } from "lucide-react";
 import DiseaseRow from "@/components/Settings/DiseaseInfo/DiseaseRow";
 import uniqid from "uniqid";
-import { getDiseases } from "@/app/services/crudDisease";
 import Loader from "@/components/common/Loader";
 import toast from "react-hot-toast";
 import {
@@ -125,12 +124,16 @@ export default function SettingsDiseaseInfoPage() {
   useEffect(() => {
     const fetchdisease = async () => {
       if (orgId) {
-        const data = await getDiseases(orgId);
-        if (data?.data) {
-          setdiseases(data?.data);
-        } else {
-          setdiseases(null);
+        const diseaseDataRef = collection(db, "doctor", orgId, "diseaseData");
+        const snapshot = await getDocs(diseaseDataRef);
+
+        if (snapshot.empty) {
+          setdiseases([]);
         }
+        const data = snapshot.docs.map((doc) => ({
+          ...doc.data(),
+        }));
+        setdiseases(data as Disease[]);
       }
     };
     fetchdisease();
@@ -296,23 +299,26 @@ export default function SettingsDiseaseInfoPage() {
               </div>
             ) : filteredDIsease(diseases).length === 0 ? (
               <>
-                <div className="flex flex-1 items-center justify-center text-muted-foreground min-h-72">
+                <div className="flex flex-1 items-center justify-center text-muted-foreground min-h-72 gap-2 flex-col">
+                  <InboxIcon />
                   No disease data available
                 </div>
               </>
             ) : (
               <>
-                {filteredDIsease(diseases).map((disease: Disease, index: number) => {
-                  return (
-                    <DiseaseRow
-                      key={index}
-                      index={index}
-                      disease={disease}
-                      setDiseaseEditModel={setDiseaseEditModel}
-                      setEditForDiseaseId={setEditForDiseaseId}
-                    />
-                  );
-                })}
+                {filteredDIsease(diseases).map(
+                  (disease: Disease, index: number) => {
+                    return (
+                      <DiseaseRow
+                        key={index}
+                        index={index}
+                        disease={disease}
+                        setDiseaseEditModel={setDiseaseEditModel}
+                        setEditForDiseaseId={setEditForDiseaseId}
+                      />
+                    );
+                  }
+                )}
               </>
             )}
           </div>
