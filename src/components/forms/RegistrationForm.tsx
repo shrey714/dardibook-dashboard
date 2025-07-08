@@ -1,356 +1,436 @@
-"use client";
-/* eslint-disable @next/next/no-img-element */
-import React, { ChangeEvent, FormEvent, useState } from "react";
-import Loader from "../common/Loader";
-import { CircleX, FileImage } from "lucide-react";
-import LogOutBTtn from "../common/LogOutBTtn";
-import { useAuth } from "@clerk/nextjs";
-import { createOrganization } from "@/app/services/createOrganization";
+import React, { useState, ChangeEvent } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { CircleX, FileImage, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import toast from "react-hot-toast";
+import { createOrganization } from "@/lib/actions/createOrganization";
 
-const RegistrationForm = () => {
-  const { orgId } = useAuth();
+// Type definitions
+interface FormData {
+  clinicName: string;
+  doctorName: string;
+  degree: string;
+  registrationNumber: string;
+  clinicNumber: string;
+  phoneNumber: string;
+  clinicAddress: string;
+  clinicLogo: File | null;
+  signaturePhoto: File | null;
+}
+
+interface FileUploadFieldProps {
+  fieldName: keyof FormData;
+  label: string;
+  preview: string | null;
+  accept?: string;
+}
+
+// Validation schema using Zod
+const formSchema = z.object({
+  clinicName: z.string().min(2, "Clinic name must be at least 2 characters"),
+  doctorName: z.string().min(2, "Doctor name must be at least 2 characters"),
+  degree: z.string().min(2, "Degree must be at least 2 characters"),
+  registrationNumber: z
+    .string()
+    .min(3, "Registration number must be at least 3 characters"),
+  clinicNumber: z
+    .string()
+    .regex(/^\d+$/, "Clinic number must contain only digits"),
+  phoneNumber: z
+    .string()
+    .regex(/^\d{10}$/, "Phone number must be exactly 10 digits"),
+  clinicAddress: z
+    .string()
+    .min(10, "Clinic address must be at least 10 characters"),
+  clinicLogo: z.instanceof(File, { message: "Clinic logo is required" }),
+  signaturePhoto: z.instanceof(File, {
+    message: "Signature photo is required",
+  }),
+});
+
+type FormSchemaType = z.infer<typeof formSchema>;
+
+const RegistrationForm: React.FC = () => {
   const [clinicLogoPreview, setClinicLogoPreview] = useState<string | null>(
     null
   );
   const [signaturePhotoPreview, setSignaturePhotoPreview] = useState<
     string | null
   >(null);
+  const [submissionLoader, setSubmissionLoader] = useState<boolean>(false);
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value, files } = e.target;
+  const form = useForm<FormSchemaType>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      clinicName: "",
+      doctorName: "",
+      degree: "",
+      registrationNumber: "",
+      clinicNumber: "",
+      phoneNumber: "",
+      clinicAddress: "",
+      clinicLogo: undefined,
+      signaturePhoto: undefined,
+    },
+  });
 
-    if (files && files[0]) {
-      const file = files[0];
+  const handleFileChange = (
+    e: ChangeEvent<HTMLInputElement>,
+    fieldName: keyof FormData
+  ): void => {
+    const file = e.target.files?.[0];
+    if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        if (name === "clinicLogo") {
+        if (fieldName === "clinicLogo") {
           setClinicLogoPreview(reader.result as string);
-        } else if (name === "signaturePhoto") {
+        } else if (fieldName === "signaturePhoto") {
           setSignaturePhotoPreview(reader.result as string);
         }
       };
       reader.readAsDataURL(file);
-      setFormData((prevData) => ({
-        ...prevData,
-        [name]: file,
-      }));
-    } else {
-      setFormData((prevData) => ({
-        ...prevData,
-        [name]: value,
-      }));
+      form.setValue(fieldName, file);
     }
   };
 
-  const handleRemoveImage = (name: string) => {
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: null,
-    }));
-    if (name === "clinicLogo") {
+  const handleRemoveImage = (fieldName: keyof FormData): void => {
+    form.resetField(fieldName);
+    if (fieldName === "clinicLogo") {
       setClinicLogoPreview(null);
-    } else if (name === "signaturePhoto") {
+    } else if (fieldName === "signaturePhoto") {
       setSignaturePhotoPreview(null);
     }
   };
 
-  const [submissionLoader, setSubmissionLoader] = useState(false);
-
-  const [formData, setFormData] = useState({
-    clinicName: "",
-    doctorName: "",
-    degree: "",
-    registrationNumber: "",
-    clinicNumber: "",
-    phoneNumber: "",
-    clinicAddress: "",
-    clinicLogo: null as File | null,
-    signaturePhoto: null as File | null,
-  });
-
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    if (!orgId) {
-      setSubmissionLoader(true);
-      const data = await createOrganization(formData);
-      if (data?.status === 200) {
+  const onSubmit = async (formData: FormSchemaType): Promise<void> => {
+    setSubmissionLoader(true);
+    try {
+      const result = await createOrganization(formData);
+      if (result?.status === 200) {
         setSubmissionLoader(false);
         window.location.reload();
       } else {
-        setSubmissionLoader(false);
+        throw new Error(result?.error || "Unknown error");
       }
+    } catch (error) {
+      toast.error("Registration failed. Please try again.", {
+        position: "bottom-right",
+      });
+      console.error("Submission error:", error);
+    } finally {
+      setSubmissionLoader(false);
     }
   };
 
+  const FileUploadField: React.FC<FileUploadFieldProps> = ({
+    fieldName,
+    label,
+    preview,
+    accept = "image/*",
+  }) => (
+    <FormField
+      control={form.control}
+      name={fieldName}
+      render={() => (
+        <FormItem>
+          <FormLabel>
+            {label}
+            <span className="text-destructive ml-1">*</span>
+          </FormLabel>
+          <FormControl>
+            <div className="mt-2 flex justify-center rounded-lg border border-dashed border-border px-6 py-8">
+              <div className="text-center">
+                {preview ? (
+                  <div className="relative">
+                    <img
+                      src={preview}
+                      alt={label}
+                      className="mx-auto h-24 w-24 object-cover rounded-md"
+                    />
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="sm"
+                      className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0"
+                      onClick={() => handleRemoveImage(fieldName)}
+                    >
+                      <CircleX className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ) : (
+                  <>
+                    <FileImage className="mx-auto h-12 w-12 text-muted-foreground" />
+                    <div className="mt-4 flex text-sm leading-6">
+                      <Label
+                        htmlFor={fieldName}
+                        className="relative flex-col w-full text-center cursor-pointer font-medium text-primary hover:text-primary/80"
+                      >
+                        <span>Upload {label}</span>
+                        <Input
+                          id={fieldName}
+                          type="file"
+                          className="sr-only"
+                          accept={accept}
+                          onChange={(e) => handleFileChange(e, fieldName)}
+                        />
+                      </Label>
+                    </div>
+                    <p className="text-xs leading-5 text-muted-foreground">
+                      Recommend size 1:1, up to 2mb (PNG, JPG)
+                    </p>
+                  </>
+                )}
+              </div>
+            </div>
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  );
+
   return (
-    <form
-      onSubmit={handleSubmit}
-      autoFocus={true}
-      autoComplete="off"
-      className="w-full"
-    >
-      <fieldset disabled={submissionLoader} className="grid grid-cols-12 gap-6">
-        {/* Clinic Name */}
-        <div className="col-span-12 sm:col-span-6">
-          <label htmlFor="clinicName" className="block text-sm font-medium">
-            Clinic Name<span className="text-red-500 ml-1">*</span>
-          </label>
-          <input
-            required
-            type="text"
-            id="clinicName"
-            name="clinicName"
-            className="form-input py-[6px] mt-1 w-full rounded-md border-gray-200 bg-gray-300 text-sm text-gray-700"
-            value={formData.clinicName}
-            autoFocus={true}
-            onChange={handleChange}
-          />
-        </div>
-        {/* Doctor Name */}
-        <div className="col-span-12 sm:col-span-6">
-          <label htmlFor="doctorName" className="block text-sm font-medium">
-            Doctor Name<span className="text-red-500 ml-1">*</span>
-          </label>
-          <input
-            required
-            type="text"
-            id="doctorName"
-            name="doctorName"
-            className="form-input py-[6px] mt-1 w-full rounded-md border-gray-200 bg-gray-300 text-sm text-gray-700"
-            value={formData.doctorName}
-            onChange={handleChange}
-          />
-        </div>
-
-        {/* Degree */}
-        <div className="col-span-12 sm:col-span-6">
-          <label htmlFor="degree" className="block text-sm font-medium">
-            Degree<span className="text-red-500 ml-1">*</span>
-          </label>
-          <input
-            required
-            type="text"
-            id="degree"
-            name="degree"
-            className="form-input py-[6px] mt-1 w-full rounded-md border-gray-200 bg-gray-300 text-sm text-gray-700"
-            value={formData.degree}
-            onChange={handleChange}
-          />
-        </div>
-        {/* Registraion number */}
-        <div className="col-span-12 sm:col-span-6">
-          <label
-            htmlFor="registrationNumber"
-            className="block text-sm font-medium"
-          >
-            Registration Number<span className="text-red-500 ml-1">*</span>
-          </label>
-          <input
-            required
-            type="text"
-            id="registrationNumber"
-            name="registrationNumber"
-            className="form-input py-[6px] mt-1 w-full rounded-md border-gray-200 bg-gray-300 text-sm text-gray-700"
-            value={formData.registrationNumber}
-            onChange={handleChange}
-          />
-        </div>
-
-        {/* Clinic Number */}
-        <div className="col-span-12 sm:col-span-6">
-          <label htmlFor="clinicNumber" className="block text-sm font-medium">
-            Clinic Number<span className="text-red-500 ml-1">*</span>
-          </label>
-          <input
-            required
-            type="tel"
-            id="clinicNumber"
-            name="clinicNumber"
-            className="form-input py-[6px] mt-1 w-full rounded-md border-gray-200 bg-gray-300 text-sm text-gray-700"
-            value={formData.clinicNumber}
-            pattern="\d*" // Ensures only numeric input
-            title="Please enter a valid mobile number."
-            onChange={handleChange}
-          />
-        </div>
-        {/* Phone Number */}
-        <div className="col-span-12 sm:col-span-6">
-          <label htmlFor="phoneNumber" className="block text-sm font-medium">
-            Phone Number<span className="text-red-500 ml-1">*</span>
-          </label>
-          <input
-            required
-            type="tel"
-            id="phoneNumber"
-            name="phoneNumber"
-            className="form-input py-[6px] mt-1 w-full rounded-md border-gray-200 bg-gray-300 text-sm text-gray-700"
-            value={formData.phoneNumber}
-            pattern="^\d{10}$" // Adjust the pattern to match the format you want
-            title="Please enter a valid 10-digit mobile number."
-            maxLength={10}
-            onChange={handleChange}
-          />
-        </div>
-        {/* Clinic Address */}
-        <div className="col-span-12">
-          <label htmlFor="clinicAddress" className="block text-sm font-medium">
-            Clinic Address<span className="text-red-500 ml-1">*</span>
-          </label>
-          <input
-            required
-            type="text"
-            id="clinicAddress"
-            name="clinicAddress"
-            className="form-input py-[6px] mt-1 w-full rounded-md border-gray-200 bg-gray-300 text-sm text-gray-700"
-            value={formData.clinicAddress}
-            onChange={handleChange}
-          />
-        </div>
-
-        {/* Clinic Logo */}
-        <div className="col-span-12 sm:col-span-6">
-          <label
-            htmlFor="clinicLogo"
-            className="block text-sm font-medium leading-6"
-          >
-            Clinic Logo<span className="text-red-500 ml-1">*</span>
-          </label>
-          <div className="mt-2 flex justify-center rounded-lg border border-dashed border-ring px-6 py-8">
-            <div className="text-center">
-              {clinicLogoPreview ? (
-                <div className="relative">
-                  <img
-                    src={clinicLogoPreview}
-                    alt="Clinic Logo"
-                    className="mx-auto h-24 w-24 object-cover"
-                  />
-                  <button
-                    type="button"
-                    className="absolute top-0 right-0 -mt-2 -mr-2"
-                    onClick={() => handleRemoveImage("clinicLogo")}
-                  >
-                    <CircleX className="h-6 w-6 text-red-500" />
-                  </button>
-                </div>
-              ) : (
-                <>
-                  <FileImage aria-hidden="true" className="mx-auto h-12 w-12" />
-                  <div className="mt-4 flex text-sm leading-6">
-                    <label
-                      htmlFor="clinicLogo"
-                      className="relative cursor-pointer font-semibold text-indigo-600 hover:text-indigo-500"
-                    >
-                      <span>Upload a Clinic Logo</span>
-                      <input
-                        // required
-                        id="clinicLogo"
-                        name="clinicLogo"
-                        type="file"
-                        className="sr-only"
-                        accept="image/*"
-                        onChange={handleChange}
-                      />
-                    </label>
-                  </div>
-                  <p className="text-xs leading-5 text-gray-600">PNG, JPG</p>
-                </>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 w-full">
+        <fieldset
+          disabled={submissionLoader}
+          className="grid grid-cols-12 gap-6"
+        >
+          {/* Clinic Name */}
+          <div className="col-span-12 sm:col-span-6">
+            <FormField
+              control={form.control}
+              name="clinicName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    Clinic Name
+                    <span className="text-destructive ml-1">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Enter clinic name"
+                      {...field}
+                      autoFocus
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
-            </div>
+            />
           </div>
-        </div>
 
-        {/* Signature Photo */}
-        <div className="col-span-12 sm:col-span-6">
-          <label
-            htmlFor="signaturePhoto"
-            className="block text-sm font-medium leading-6"
-          >
-            Signature Photo<span className="text-red-500 ml-1">*</span>
-          </label>
-          <div className="mt-2 flex justify-center rounded-lg border border-dashed border-ring px-6 py-8">
-            <div className="text-center">
-              {signaturePhotoPreview ? (
-                <div className="relative">
-                  <img
-                    src={signaturePhotoPreview}
-                    alt="Signature Photo"
-                    className="mx-auto h-24 w-24 object-cover"
-                  />
-                  <button
-                    type="button"
-                    className="absolute top-0 right-0 -mt-2 -mr-2"
-                    onClick={() => handleRemoveImage("signaturePhoto")}
-                  >
-                    <CircleX className="h-6 w-6 text-red-500" />
-                  </button>
-                </div>
-              ) : (
-                <>
-                  <FileImage aria-hidden="true" className="mx-auto h-12 w-12" />
-                  <div className="mt-4 flex text-sm leading-6">
-                    <label
-                      htmlFor="signaturePhoto"
-                      className="relative cursor-pointer font-semibold text-indigo-600 hover:text-indigo-500"
-                    >
-                      <span>Upload a Signature Logo</span>
-                      <input
-                        // required
-                        id="signaturePhoto"
-                        name="signaturePhoto"
-                        type="file"
-                        className="sr-only"
-                        accept="image/*"
-                        onChange={handleChange}
-                      />
-                    </label>
-                  </div>
-                  <p className="text-xs leading-5">PNG, JPG</p>
-                </>
+          {/* Doctor Name */}
+          <div className="col-span-12 sm:col-span-6">
+            <FormField
+              control={form.control}
+              name="doctorName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    Doctor Name
+                    <span className="text-destructive ml-1">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter doctor name" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
-            </div>
+            />
           </div>
-        </div>
 
-        <div className="col-span-12">
-          <p className="text-xs sm:text-sm">
-            By creating an account, you agree to our{" "}
-            <a
-              href="https://dardibook.in/documents/terms-conditions"
-              target="_blank"
-              className="text-gray-500 underline"
+          {/* Degree */}
+          <div className="col-span-12 sm:col-span-6">
+            <FormField
+              control={form.control}
+              name="degree"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    Degree
+                    <span className="text-destructive ml-1">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Enter degree (e.g., MBBS, MD)"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          {/* Registration Number */}
+          <div className="col-span-12 sm:col-span-6">
+            <FormField
+              control={form.control}
+              name="registrationNumber"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    Registration Number
+                    <span className="text-destructive ml-1">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter registration number" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          {/* Clinic Number */}
+          <div className="col-span-12 sm:col-span-6">
+            <FormField
+              control={form.control}
+              name="clinicNumber"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    Clinic Number
+                    <span className="text-destructive ml-1">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      type="tel"
+                      placeholder="Enter clinic number"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          {/* Phone Number */}
+          <div className="col-span-12 sm:col-span-6">
+            <FormField
+              control={form.control}
+              name="phoneNumber"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    Phone Number
+                    <span className="text-destructive ml-1">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      type="tel"
+                      placeholder="Enter 10-digit phone number"
+                      maxLength={10}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          {/* Clinic Address */}
+          <div className="col-span-12">
+            <FormField
+              control={form.control}
+              name="clinicAddress"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    Clinic Address
+                    <span className="text-destructive ml-1">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Enter complete clinic address"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          {/* Clinic Logo */}
+          <div className="col-span-12 sm:col-span-6">
+            <FileUploadField
+              fieldName="clinicLogo"
+              label="Clinic Logo"
+              preview={clinicLogoPreview}
+            />
+          </div>
+
+          {/* Signature Photo */}
+          <div className="col-span-12 sm:col-span-6">
+            <FileUploadField
+              fieldName="signaturePhoto"
+              label="Signature Photo"
+              preview={signaturePhotoPreview}
+            />
+          </div>
+
+          {/* Terms and Conditions */}
+          <div className="col-span-12">
+            <p className="text-xs sm:text-sm text-muted-foreground">
+              By creating an account, you agree to our{" "}
+              <a
+                href="https://dardibook.in/documents/terms-conditions"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary underline hover:text-primary/80"
+              >
+                terms and conditions
+              </a>{" "}
+              and{" "}
+              <a
+                href="https://dardibook.in/documents/privacy-policy"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary underline hover:text-primary/80"
+              >
+                privacy policy
+              </a>
+              .
+            </p>
+          </div>
+
+          {/* Submit Button */}
+          <div className="col-span-12 flex justify-center">
+            <Button
+              type="submit"
+              disabled={submissionLoader}
+              className="w-full max-w-md h-10 text-base font-semibold rounded-full"
+              variant="default"
             >
-              terms and conditions
-            </a>
-            {"  "}
-            and{"  "}
-            <a
-              href="https://dardibook.in/documents/privacy-policy"
-              target="_blank"
-              className="text-gray-500 underline"
-            >
-              privacy policy
-            </a>
-            .
-          </p>
-        </div>
-
-        <div className="col-span-12 flex justify-center sm:gap-6">
-          <button
-            disabled={submissionLoader}
-            className="bg-gray-300 max-w-screen-md border-0 animate-none btn px-5 py-[10px] text-gray-800 outline-none min-w-40 transition-all flex items-center justify-center h-10 text-base sm:text-lg font-bold tracking-wide w-full rounded-full select-none"
-          >
-            {submissionLoader ? <Loader size="medium" /> : "Register myself"}
-          </button>
-        </div>
-
-        <div className="col-span-12">
-          <p className="text-xs font-medium sm:text-sm flex gap-1 items-center">
-            Want to use another account :{" "}
-            <LogOutBTtn size={"sm"} variant={"destructive"} />
-          </p>
-        </div>
-      </fieldset>
-    </form>
+              {submissionLoader ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Registering...
+                </>
+              ) : (
+                "Register Clinic"
+              )}
+            </Button>
+          </div>
+        </fieldset>
+      </form>
+    </Form>
   );
 };
 
