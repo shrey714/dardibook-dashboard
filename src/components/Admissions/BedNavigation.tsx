@@ -1,24 +1,34 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Bed } from "lucide-react";
+import { Bed, User } from "lucide-react";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { BedInfo, OrgBed } from "@/types/FormTypes";
+import { BedInfo, BedPatientTypes, OrgBed } from "@/types/FormTypes";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@radix-ui/react-popover";
+import { getOverdueClashes } from "./utils";
 
 const BedNavigationHeader = ({
   beds,
   patients,
   onBedClick,
+  onWarningClick,
+  bedPatients
 }: {
   beds: BedInfo[];
   patients: OrgBed[];
   onBedClick: (bedId: string) => void;
+  onWarningClick: (bookingId: string)=> void;
+  bedPatients: Record<string, BedPatientTypes>;
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const accordionRef = useRef<HTMLDivElement>(null);
@@ -30,6 +40,17 @@ const BedNavigationHeader = ({
     const assignedPatient = patients.find((p) => p.bedId === bed.bed_id);
     return assignedPatient ? "occupied" : "available";
   };
+
+  const [clashMap, setClashMap] = useState(() => getOverdueClashes(patients));
+
+  useEffect(() => {
+    setClashMap(getOverdueClashes(patients));
+    const interval = setInterval(() => {
+      setClashMap(getOverdueClashes(patients));
+    }, 60_000);
+
+    return () => clearInterval(interval);
+  }, [patients]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -85,6 +106,11 @@ const BedNavigationHeader = ({
                     ).length}{" "}
                   Available
                 </Badge>
+                {Object.keys(clashMap).length > 0 && (
+                  <Badge className="hover:shadow-md bg-yellow-500/20 text-yellow-600  hover:bg-yellow-500/40">
+                    {Object.keys(clashMap).length} warning
+                  </Badge>
+                )}
               </div>
             </AccordionTrigger>
             <AccordionContent className="pb-0">
@@ -113,6 +139,61 @@ const BedNavigationHeader = ({
                     </Button>
                   );
                 })}
+                {Object.entries(clashMap).map(
+                  ([overdueId, clashingIds], index) => {
+                    return (
+                      <Popover key={index}>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => onWarningClick(overdueId)}
+                            className="relative h-12 flex flex-col items-center justify-center gap-1 text-xs transition-all duration-200 hover:shadow-md bg-yellow-500/20 text-yellow-700 hover:text-yellow-900 hover:bg-yellow-400/40"
+                          >
+                            <User className="h-3 w-3" />
+                            <span className="font-medium">{bedPatients[overdueId].name}</span>
+                          </Button>
+                        </PopoverTrigger>
+
+                        <PopoverContent className="mt-2 p-0 w-[340px] sm:w-[420px] rounded-xl shadow-lg border border-red-300">
+                          <Card className="bg-primary-foreground">
+                            <div className="p-4 border-b border-red-200">
+                              <h3 className="text-base font-semibold text-red-800">
+                                Overdue Clash Detected
+                              </h3>
+                              <p className="text-sm text-red-700 mt-1">
+                                The following bookings are clashing with{" "}
+                                <span className="font-semibold">
+                                  {overdueId}
+                                </span>
+                                . Please update them accordingly.
+                              </p>
+                            </div>
+
+                            <CardContent className="p-4">
+                              <div className="flex flex-wrap gap-2">
+                                {clashingIds.map((ids, index) => (
+                                  <Button
+                                    key={index}
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => onWarningClick(ids)}
+                                    className="relative h-12 flex flex-col items-center justify-center gap-1 text-xs transition-all duration-200 hover:shadow-md bg-red-200 text-red-800 hover:bg-red-300"
+                                  >
+                                    <User className="h-4 w-4" />
+                                    <span className="font-medium">
+                                      {bedPatients[ids].name}
+                                    </span>
+                                  </Button>
+                                ))}
+                              </div>
+                            </CardContent>
+                          </Card>
+                        </PopoverContent>
+                      </Popover>
+                    );
+                  }
+                )}
               </div>
             </AccordionContent>
           </AccordionItem>

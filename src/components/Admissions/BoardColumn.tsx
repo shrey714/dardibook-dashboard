@@ -40,6 +40,7 @@ interface BoardColumnProps {
   openEditModal: (bookingId: string, bedId: string)=>void;
   setDeleteState: Dispatch<SetStateAction<DeleteState>>;
   isHighlighted?: boolean;
+  highlightedBooking?: string;
 }
 
 export function BoardColumn({
@@ -50,6 +51,7 @@ export function BoardColumn({
   openEditModal,
   setDeleteState,
   isHighlighted = false,
+  highlightedBooking=""
 }: BoardColumnProps) {
   const tasksIds = useMemo(() => {
     return tasks.map((task) => task.bedBookingId);
@@ -166,6 +168,7 @@ export function BoardColumn({
                   task={task}
                   bedPatientData={bedPatients[task.patient_id]}
                   openEditModal={openEditModal}
+                  isHighlightedBooking={highlightedBooking===task.patient_id}
                 />
               );
             })}

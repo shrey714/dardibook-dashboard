@@ -123,6 +123,7 @@ export const KanbanBoard = ({
 
   // Function to scroll to a specific bed and highlight it
   const [highlightedBed, setHighlightedBed] = useState<string | null>(null);
+  const [highlightedBooking, setHighlightedBooking] = useState<string>("");
   const highlightTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const scrollToBed = (bedId: string) => {
     const bedElement = document.getElementById(`bed-${bedId}`);
@@ -137,6 +138,25 @@ export const KanbanBoard = ({
       setHighlightedBed(bedId);
       highlightTimeoutRef.current = setTimeout(() => {
         setHighlightedBed(null);
+        highlightTimeoutRef.current = null;
+      }, 2000);
+    }
+  };
+
+  const scrollToBooking = (bookingId: string) => {
+    console.log(bookingId)
+    const bedElement = document.getElementById(`booking-${bookingId}`);
+    if (bedElement) {
+      bedElement.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+      if (highlightTimeoutRef.current) {
+        clearTimeout(highlightTimeoutRef.current);
+      }
+      setHighlightedBooking(bookingId);
+      highlightTimeoutRef.current = setTimeout(() => {
+        setHighlightedBooking("");
         highlightTimeoutRef.current = null;
       }, 2000);
     }
@@ -298,7 +318,9 @@ export const KanbanBoard = ({
       <BedNavigationHeader
         beds={columns}
         patients={beds}
+        bedPatients={bedPatients}
         onBedClick={scrollToBed}
+        onWarningClick={scrollToBooking}
       />
 
       <div className="w-[calc(100%-10px)] sm:w-[calc(100%-40px)] max-w-7xl mt-4 justify-self-center flex gap-2">
@@ -365,6 +387,7 @@ export const KanbanBoard = ({
                     bedPatients={bedPatients}
                     setDeleteState={setDeleteState}
                     isHighlighted={highlightedBed === col.bed_id}
+                    highlightedBooking={highlightedBooking}
                   />
                 ))}
               </SortableContext>

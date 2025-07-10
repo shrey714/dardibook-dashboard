@@ -55,6 +55,7 @@ interface TaskCardProps {
   task: OrgBed;
   bedPatientData: BedPatientTypes;
   openEditModal: (bookingId: string, bedId: string)=>void;
+  isHighlightedBooking?: boolean;
 }
 
 export type TaskType = "Task";
@@ -70,6 +71,7 @@ export function TaskCard({
   task,
   bedPatientData,
   openEditModal,
+  isHighlightedBooking
 }: TaskCardProps) {
   const { openModal } = usePatientHistoryModalStore();
 
@@ -108,13 +110,18 @@ export function TaskCard({
 
   return (
     <div
+      id={`booking-${task.patient_id}`}
       ref={setNodeRef}
       style={style}
       className={`container relative flex flex-row bg-border overflow-hidden rounded-md shadow-md hover:shadow-lg ${variants(
         {
           dragging: isDragging ? "over" : undefined,
         }
-      )}`}
+      )} ${
+        isHighlightedBooking
+          ? "animate-pulse ring-2 ring-yellow-600 dark:ring-yellow-400 ring-opacity-75"
+          : ""
+      }`}
     >
       {bedPatientData && <div className="flex relative flex-1 flex-col h-full p-0">
         <div className="flex items-center justify-between pointer-events-auto px-3 pt-1">

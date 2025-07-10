@@ -29,10 +29,9 @@ import {
   FileEdit,
   ChevronsUpDown,
   Check,
+  Trash,
 } from "lucide-react";
-import { DateTimePicker } from "../Appointment/DateTimePicker";
-import { Organization } from "@clerk/nextjs/server";
-import { CategoryBar } from "../ui/CategoryBar";
+import { DateTimePicker } from "./DateTimePicker";
 import {
   Popover,
   PopoverContent,
@@ -90,6 +89,7 @@ const BedEditModal: React.FC<BedEditModalProps> = ({
   const [updateLoader, setUpdateLoader] = useState(false);
   const [dischargeNowLoader, setDischargeNowLoader] = useState(false);
   const [alreadyDischargedLoader, setAlreadyDischargedLoader] = useState(false);
+  const [deleteLoader, setDeleteLoader] = useState(false);
   const [warning, setWarning] = useState<string>("");
 
   const { memberships } = useOrganization({
@@ -100,7 +100,65 @@ const BedEditModal: React.FC<BedEditModalProps> = ({
     },
   });
 
+  const validateDatesForUpdate = (admissionDate: Date, dischargeDate: Date): string => {
+    setWarning("");
+
+    if (
+      getTime(admissionDate) === getTime(new Date(0)) ||
+      getTime(dischargeDate) === getTime(new Date(0))
+    ) {
+      return "Please select both admission and discharge times";
+    }
+
+    if (getTime(dischargeDate) <= getTime(admissionDate)) {
+      return "Discharge time cannot be earlier than admission time";
+    }
+
+    const isClash = filteredBeds.some(
+      ({ admission_at, discharge_at, bedBookingId }) => {
+        if (bedBookingId === bookingId) {
+          return false;
+        }
+        const existingStart = getTime(admission_at);
+        const existingEnd = getTime(discharge_at);
+
+        return (
+          isBefore(getTime(admissionDate), existingEnd) &&
+          isAfter(getTime(dischargeDate), existingStart)
+        );
+      }
+    );
+
+    if (isClash) {
+      return "This time slot conflicts with an existing booking";
+    }
+
+    return "";
+  };
+
   const dischargePatient = async (alreadyDischarged: boolean) => {
+    if(!alreadyDischarged){
+      const isClash = filteredBeds.some(
+        ({ admission_at, discharge_at, bedBookingId }) => {
+          if (bedBookingId === bookingId) {
+            return false;
+          }
+          const existingStart = getTime(admission_at);
+          const existingEnd = getTime(discharge_at);
+  
+          return (
+            isBefore(getTime(fromDate), existingEnd) &&
+            isAfter(Date.now(), existingStart)
+          );
+        }
+      );
+      console.log(isClash);
+  
+      if (isClash) {
+        setWarning("Discharge Time is clashing with future bookings please update the future bookings");
+        return;
+      }
+    }
     if(alreadyDischarged)setAlreadyDischargedLoader(true)
       else setDischargeNowLoader(true);
     if (!orgId || !user) return;
@@ -179,46 +237,56 @@ const BedEditModal: React.FC<BedEditModalProps> = ({
     }
   };
 
+  const deleteBookingHandler = async (bookingId: string) => {
+    const deletePromise = async () => {
+      setDeleteLoader(true);
+      const batch = writeBatch(db);
+  
+      const currentBedData = beds.find((bed) => bed.bedBookingId === bookingId);
+      if (!currentBedData || !orgId) throw new Error("Booking not found");
+  
+      const patientId = currentBedData.patient_id;
+      const bedRef = doc(db, "doctor", orgId, "beds", bookingId);
+      const patientRef = doc(db, "doctor", orgId, "patients", patientId);
+  
+      const bedPatientData = bedPatients[patientId];
+      if (!bedPatientData) throw new Error("Patient not found");
+  
+      const updatedBedInfo = bedPatientData.bed_info.filter(
+        (patient_bed) => patient_bed.bedBookingId !== bookingId
+      );
+  
+      batch.delete(bedRef);
+      batch.update(patientRef, { bed_info: updatedBedInfo });
+  
+      await batch.commit();
+    };
+  
+    await toast.promise(
+      deletePromise().finally(()=>{
+        setDeleteLoader(false);
+        setIsEditModalOpen(false);
+      }),
+      {
+        loading: "Deleting booking...",
+        success: "Booking deleted successfully!",
+        error: (err) => err.message || "Failed to delete booking",
+      },
+      {
+        style: {
+          minWidth: "250px",
+        },
+      }
+    );
+  };
+
   const updateHandler = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
     if (!orgId || !bedId || !user) return;
 
-    if (
-      getTime(fromDate) === getTime(new Date(0)) ||
-      getTime(toDate) === getTime(new Date(0))
-    ) {
-      setWarning("Please Select appropriate booking times");
-      return;
-    }
-
-    if (getTime(toDate) <= getTime(fromDate)) {
-      setWarning("Can't discharge before admission");
-      return;
-    }
-
-    if (getTime(fromDate) <= Date.now() || getTime(toDate) <= Date.now()) {
-      setWarning("Booking times must be in the future.");
-      return;
-    }
-
-    const isClash = filteredBeds.some(
-      ({ admission_at, discharge_at, bedBookingId }) => {
-        if (bedBookingId === bookingId) {
-          //Ignore checking clash with the booking being updated itself
-          return false;
-        }
-        const existingStart = getTime(admission_at);
-        const existingEnd = getTime(discharge_at);
-
-        return (
-          isBefore(getTime(fromDate), existingEnd) &&
-          isAfter(getTime(toDate), existingStart)
-        );
-      }
-    );
-
-    if (isClash) {
-      setWarning("This time slot is already booked");
+    const validationError = validateDatesForUpdate(fromDate, toDate);
+    if (validationError) {
+      setWarning(validationError);
       return;
     }
 
@@ -280,6 +348,28 @@ const BedEditModal: React.FC<BedEditModalProps> = ({
     }
   };
 
+  const fromDateTimeChangeHandler = (admissionDataFromCalender: Date) => {
+    setFromDate(admissionDataFromCalender);
+    
+    if (getTime(toDate) !== getTime(new Date(0))) {
+      const validationError = validateDatesForUpdate(admissionDataFromCalender, toDate);
+      setWarning(validationError);
+    } else {
+      setWarning("");
+    }
+  };
+
+  const toDateTimeChangeHandler = (dischargeDataFromCalender: Date) => {
+    setToDate(dischargeDataFromCalender);
+    
+    if (getTime(fromDate) !== getTime(new Date(0))) {
+      const validationError = validateDatesForUpdate(fromDate, dischargeDataFromCalender);
+      setWarning(validationError);
+    } else {
+      setWarning("");
+    }
+  };
+
   useEffect(() => {
     const fetchBedMetaData = () => {
       if (organization && organization.publicMetadata) {
@@ -291,11 +381,18 @@ const BedEditModal: React.FC<BedEditModalProps> = ({
 
     if (isLoaded && organization) {
       fetchBedMetaData();
-      // setTasks(beds);
     }
   }, [isLoaded, organization]);
-  
-  // useEffect(()=>setToDate(new Date(0)),[fromDate]);
+
+  const isFormValid = () => {
+    return (
+      bedId.length > 0 &&
+      admissionInfo?.admission_for.id &&
+      getTime(fromDate) !== getTime(new Date(0)) &&
+      getTime(toDate) !== getTime(new Date(0)) &&
+      warning.length === 0
+    );
+  };
 
   const isOverDue =
     selectedAdmission?.discharge_at &&
@@ -319,7 +416,7 @@ const BedEditModal: React.FC<BedEditModalProps> = ({
         </PopoverTrigger>
         <PopoverContent className="w-[200px] p-0">
           <Command>
-            <CommandInput placeholder="Search framework..." className="h-9" required/>
+            <CommandInput placeholder="Search bed..." className="h-9" required/>
             <CommandList>
               <CommandEmpty>No beds are available</CommandEmpty>
               <CommandGroup>
@@ -417,26 +514,28 @@ const BedEditModal: React.FC<BedEditModalProps> = ({
       <div className="flex flex-col md:px-8 sm:flex-row gap-2 pt-1 pb-4">
         <div className="flex-1">
           <DateTimePicker
-            registered_date={[]}
             date={fromDate}
             setDate={setFromDate}
             icon={<CalendarPlusIcon className="mr-2 h-4 w-4" />}
+            onChange={fromDateTimeChangeHandler}
+            required
           />
         </div>
         <div className="flex-1">
           <DateTimePicker
-            registered_date={[]}
             date={toDate}
             setDate={setToDate}
             icon={<CalendarMinusIcon className="mr-2 h-4 w-4" />}
             disableBefore={fromDate}
+            onChange={toDateTimeChangeHandler}
+            required
           />
         </div>
       </div>
       {warning.length > 0 && (
         <p className="text-center text-red-600 font-normal pb-4">{warning}</p>
       )}
-      <div className="flex gap-2 m-auto">
+      <div className="grid gap-2 grid-cols-2 md:grid-cols-4 m-auto">
         {isOverDue && (
           <Button
             onClick={() => dischargePatient(true)}
@@ -467,13 +566,23 @@ const BedEditModal: React.FC<BedEditModalProps> = ({
             </>
           )}
         </Button>
-        <Button type="submit" className="">
+        <Button type="submit" className="" disabled={!isFormValid() || updateLoader}>
           {updateLoader ? (
             <Loader />
           ) : (
             <>
               <FileEdit className="w-4 h-4 mr-2" />
               Update Booking
+            </>
+          )}
+        </Button>
+        <Button type="button" className="" onClick={()=>{deleteBookingHandler(bookingId)}} disabled={deleteLoader}>
+          {deleteLoader ? (
+            <Loader />
+          ) : (
+            <>
+              <Trash className="w-4 h-4 mr-2" />
+              Delete Booking
             </>
           )}
         </Button>

@@ -1,11 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Button } from "../ui/button";
 import {
   ArrowUpRight,
   CalendarMinusIcon,
   CalendarPlusIcon,
-  Check,
-  ChevronsUpDown,
 } from "lucide-react";
 import { db } from "@/firebase/firebaseConfig";
 import { writeBatch, doc, arrayUnion } from "firebase/firestore";
@@ -20,26 +18,12 @@ import {
 } from "@/components/ui/select";
 import { useAuth, useOrganization, useUser } from "@clerk/nextjs";
 import { BedInfo, orgUserType } from "@/types/FormTypes";
-import { DateTimePicker } from "../Appointment/DateTimePicker";
+import { DateTimePicker } from "./DateTimePicker";
 import toast from "react-hot-toast";
 import { getTime, isBefore, isAfter } from "date-fns";
 import uniqid from "uniqid";
 import Availability from "./Availability";
 import { useBedsStore } from "@/lib/stores/useBedsStore";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
-import {
-  Command,
-  CommandInput,
-  CommandList,
-  CommandEmpty,
-  CommandGroup,
-  CommandItem,
-} from "@/components/ui/command";
 import Loader from "../common/Loader";
 import { logActivity } from "@/utility/activityLogging/logActivity";
 import { PatientActivityLog } from "@/types/logTypes";
@@ -86,8 +70,6 @@ const BedAdmissionModal: React.FC<BedAdmissionModalProps> = ({
   const [loader, setloader] = useState(false);
   const [warning, setWarning] = useState<string>("");
   const { beds, bedPatients } = useBedsStore((state) => state);
-  const [open, setOpen] = React.useState(false);
-  const [bedSearchId, setBedSearchId] = React.useState(bedId);
   const [bedInfo, setBedInfo] = useState<BedInfo[] | []>([]);
   const { organization, isLoaded } = useOrganization();
 
@@ -108,21 +90,27 @@ const BedAdmissionModal: React.FC<BedAdmissionModalProps> = ({
       })
     );
 
-  const admitHandler = async (e: { preventDefault: () => void }) => {
-    e.preventDefault();
-    if (!orgId || !bedId || !user) return;
+  const validateDates = (admissionDate: Date, dischargeDate: Date): string => {
+    setWarning("");
 
     if (
-      getTime(fromDate) === getTime(new Date(0)) ||
-      getTime(toDate) === getTime(new Date(0))
+      getTime(admissionDate) === getTime(new Date(0)) ||
+      getTime(dischargeDate) === getTime(new Date(0))
     ) {
-      setWarning("Please Select appropriate booking times");
-      return;
+      return "Please select both admission and discharge times";
     }
 
-    if (getTime(fromDate) <= Date.now() || getTime(toDate) <= Date.now()) {
-      setWarning("Booking times must be in the future.");
-      return;
+    if (getTime(dischargeDate) <= getTime(admissionDate)) {
+      return "Discharge time cannot be earlier than admission time";
+    }
+
+    const now = Date.now();
+    if (getTime(admissionDate) <= now) {
+      return "Admission time must be in the future";
+    }
+
+    if (getTime(dischargeDate) <= now) {
+      return "Discharge time must be in the future";
     }
 
     const isClash = filteredBeds.some(({ admission_at, discharge_at }) => {
@@ -130,13 +118,25 @@ const BedAdmissionModal: React.FC<BedAdmissionModalProps> = ({
       const existingEnd = getTime(discharge_at);
 
       return (
-        isBefore(getTime(fromDate), existingEnd) &&
-        isAfter(getTime(toDate), existingStart)
+        isBefore(getTime(admissionDate), existingEnd) &&
+        isAfter(getTime(dischargeDate), existingStart)
       );
     });
 
     if (isClash) {
-      setWarning("This time slot is already booked");
+      return "This time slot conflicts with an existing booking";
+    }
+
+    return "";
+  };
+
+  const admitHandler = async (e: { preventDefault: () => void }) => {
+    e.preventDefault();
+    if (!orgId || !bedId || !user) return;
+
+    const validationError = validateDates(fromDate, toDate);
+    if (validationError) {
+      setWarning(validationError);
       return;
     }
 
@@ -206,6 +206,51 @@ const BedAdmissionModal: React.FC<BedAdmissionModalProps> = ({
     }
   };
 
+  const suggestedBeds = useMemo(() => {
+    if (
+      getTime(fromDate) === getTime(new Date(0)) || 
+      getTime(toDate) === getTime(new Date(0)) ||
+      getTime(toDate) <= getTime(fromDate) ||
+      getTime(fromDate) <= Date.now() ||
+      getTime(toDate) <= Date.now()
+    ) {
+      return [];
+    }
+
+    setbedId("");
+    return bedInfo.filter((info) => {
+      const bookingsForBed = beds.filter(b => b.bedId === info.bed_id);
+      return !bookingsForBed.some(({ admission_at, discharge_at }) => {
+        return (
+          isBefore(getTime(fromDate), getTime(discharge_at)) &&
+          isAfter(getTime(toDate), getTime(admission_at))
+        );
+      });
+    });
+  }, [bedInfo, beds, fromDate, toDate, setbedId]);
+
+  const fromDateTimeChangeHandler = (admissionDataFromCalender: Date) => {
+    setFromDate(admissionDataFromCalender);
+    
+    if (getTime(toDate) !== getTime(new Date(0))) {
+      const validationError = validateDates(admissionDataFromCalender, toDate);
+      setWarning(validationError);
+    } else {
+      setWarning("");
+    }
+  };
+
+  const toDateTimeChangeHandler = (dischargeDataFromCalender: Date) => {
+    setToDate(dischargeDataFromCalender);
+    
+    if (getTime(fromDate) !== getTime(new Date(0))) {
+      const validationError = validateDates(fromDate, dischargeDataFromCalender);
+      setWarning(validationError);
+    } else {
+      setWarning("");
+    }
+  };
+
   useEffect(() => {
     const fetchBedMetaData = () => {
       if (organization && organization.publicMetadata) {
@@ -217,62 +262,22 @@ const BedAdmissionModal: React.FC<BedAdmissionModalProps> = ({
 
     if (isLoaded && organization) {
       fetchBedMetaData();
-      // setTasks(beds);
     }
   }, [isLoaded, organization]);
 
-  // useEffect(()=>setToDate(new Date(0)),[fromDate]);
+  const isFormValid = () => {
+    return (
+      patientId.length > 0 &&
+      bedId.length > 0 &&
+      admissionFor.id.length > 0 &&
+      getTime(fromDate) !== getTime(new Date(0)) &&
+      getTime(toDate) !== getTime(new Date(0)) &&
+      warning.length === 0
+    );
+  };
 
   return (
-    <form className="flex flex-col" onSubmit={admitHandler}>
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            role="combobox"
-            aria-expanded={open}
-            className="w-[200px] justify-between"
-          >
-            {bedSearchId
-              ? bedInfo.find((info) => info.bed_id === bedSearchId)?.bed_id
-              : "Select Bed..."}
-            <ChevronsUpDown className="opacity-50" />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-[200px] p-0">
-          <Command>
-            <CommandInput placeholder="Search framework..." className="h-9" />
-            <CommandList>
-              <CommandEmpty>No beds are available</CommandEmpty>
-              <CommandGroup>
-                {bedInfo.map((info) => (
-                  <CommandItem
-                    key={info.bed_id}
-                    value={info.bed_id}
-                    onSelect={(currentValue) => {
-                      setBedSearchId(
-                        currentValue === bedSearchId ? "" : currentValue
-                      );
-                      setOpen(false);
-                      setbedId(currentValue);
-                    }}
-                  >
-                    {info.bed_id} {info.ward}
-                    <Check
-                      className={cn(
-                        "ml-auto",
-                        bedSearchId === info.bed_id
-                          ? "opacity-100"
-                          : "opacity-0"
-                      )}
-                    />
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </CommandList>
-          </Command>
-        </PopoverContent>
-      </Popover>
+    <form className="flex flex-col h-[400px] overflow-y-scroll" onSubmit={admitHandler}>
       <CreatableSelect
         required
         components={{
@@ -413,26 +418,58 @@ const BedAdmissionModal: React.FC<BedAdmissionModalProps> = ({
       <div className="flex flex-col md:px-8 sm:flex-row gap-2 pt-1 pb-4">
         <div className="flex-1">
           <DateTimePicker
-            registered_date={[]}
+            disableBefore={new Date()}
             date={fromDate}
             setDate={setFromDate}
             icon={<CalendarPlusIcon className="mr-2 h-4 w-4" />}
+            onChange={fromDateTimeChangeHandler}
+            required
           />
         </div>
         <div className="flex-1">
           <DateTimePicker
-            registered_date={[]}
             date={toDate}
             setDate={setToDate}
             icon={<CalendarMinusIcon className="mr-2 h-4 w-4" />}
             disableBefore={fromDate}
+            onChange={toDateTimeChangeHandler}
+            required
           />
         </div>
       </div>
+      {suggestedBeds.length > 0 && (
+        <div className="md:px-8 mb-4">
+          <h3 className="text-sm font-semibold text-gray-700 mb-2">
+            Available Beds
+          </h3>
+          <div className="flex flex-wrap gap-3 overflow-x-auto pb-2 scroll-smooth h-[100px] overflow-y-scroll">
+            {suggestedBeds.map((bed, index) => (
+              <button
+                key={index}
+                type="button"
+                onClick={() => {
+                  setbedId(bed.bed_id);
+                }}
+                className={`min-w-[120px] shrink-0 rounded-lg border px-3 py-2 text-sm font-medium transition hover:bg-blue-100 ${
+                  bed.bed_id === bedId
+                    ? "bg-blue-500 text-gray-700 border-blue-600"
+                    : "bg-white text-gray-700 border-gray-300"
+                }`}
+              >
+                <p className="truncate">{bed.bed_id}</p>
+                <p className="text-xs text-muted-foreground">{bed.ward}</p>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {warning.length > 0 && (
         <p className="text-center text-red-600 font-normal pb-4">{warning}</p>
       )}
-      <Button type="submit" disabled={bedId.length==0}> {loader ? <Loader /> : "Add Patient"} </Button>
+      <Button type="submit" disabled={!isFormValid() || loader}>
+        {loader ? <Loader /> : "Add Patient"}
+      </Button>
     </form>
   );
 };
