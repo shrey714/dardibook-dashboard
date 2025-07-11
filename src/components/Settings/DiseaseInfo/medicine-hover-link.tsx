@@ -11,6 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/firebase/firebaseConfig";
 import { useAuth } from "@clerk/nextjs";
+import { cn } from "@/lib/utils";
 
 interface Medicine {
   id: string;
@@ -21,7 +22,13 @@ interface Medicine {
   active: boolean;
 }
 
-const MedicineHoverLink = ({ label }: { label: string }) => {
+const MedicineHoverLink = ({
+  label,
+  className,
+}: {
+  label: string;
+  className?: string;
+}) => {
   const [medicine, setMedicine] = useState<Medicine | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const { orgId } = useAuth();
@@ -54,7 +61,10 @@ const MedicineHoverLink = ({ label }: { label: string }) => {
       <HoverCardTrigger asChild>
         <Button
           variant="link"
-          className="text-secondary h-auto px-2 py-0.5 rounded-sm"
+          className={cn(
+            "text-secondary h-auto px-2 py-0.5 rounded-sm",
+            className
+          )}
         >
           {label}
         </Button>

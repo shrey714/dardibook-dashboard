@@ -1,11 +1,10 @@
 "use client";
 
-import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import React, { FormEvent, useEffect, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
-import { CirclePlus, InboxIcon } from "lucide-react";
+import { CirclePlus, Download, FileText, InboxIcon } from "lucide-react";
 import DiseaseRow from "@/components/Settings/DiseaseInfo/DiseaseRow";
 import uniqid from "uniqid";
-import Loader from "@/components/common/Loader";
 import toast from "react-hot-toast";
 import {
   Card,
@@ -34,37 +33,40 @@ import {
   DialogDescription,
   DialogHeader,
 } from "@/components/ui/dialog";
+import {
+  downloadCSV,
+  exportDiseasesToCSV,
+  generateSampleCSV,
+} from "@/lib/csv-utils";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  AdvancedFilters,
+  applyDiseaseFilters,
+} from "@/components/Settings/DiseaseInfo/DiseaseFilters";
+import DiseaseImportCSV from "@/components/Settings/DiseaseInfo/DiseaseImportCSV";
 
-interface Disease {
+export interface Disease {
   diseaseDetail: string;
   medicines: string[];
   diseaseId: string;
   searchableString: string;
 }
 
+export interface FilterCriteria {
+  searchTerm: string;
+  medicineCountMin: number | null;
+  medicineCountMax: number | null;
+  specificMedicines: string[];
+  sortBy: "name" | "medicineCount";
+  sortOrder: "asc" | "desc";
+}
+
 export default function SettingsDiseaseInfoPage() {
   const { orgId } = useAuth();
 
   const [diseases, setdiseases] = useState<Disease[] | null>(null);
-  const [searchDisease, setsearchDisease] = useState("");
   const [addMedicinesData, setAddMedicinesData] = useState<string[]>([]);
   const [addLoader, setAddLoader] = useState(false);
-  // --------------disease filter--------------
-  const filteredDIsease = (disease: Disease[]) => {
-    return disease
-      .sort((a: Disease, b: Disease) =>
-        a.diseaseDetail.localeCompare(b.diseaseDetail)
-      )
-      .filter((dname: Disease) =>
-        dname?.diseaseDetail
-          ?.toLowerCase()
-          ?.includes(searchDisease?.toLowerCase())
-      );
-  };
-  const handleFilterChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.target;
-    setsearchDisease(value);
-  };
   // --------------new disease form handeler-----------
   const submitHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -141,6 +143,63 @@ export default function SettingsDiseaseInfoPage() {
   // --------------Edit Disease Data-----------
   const [diseaseEditModel, setDiseaseEditModel] = useState<boolean>(false);
   const [editForDiseaseId, setEditForDiseaseId] = useState<string>("");
+
+  // -------------Export / Import diseases--------
+  const handleExportCSV = (diseasesToExport: Disease[] | null) => {
+    if (!diseasesToExport || diseasesToExport.length === 0) {
+      toast.error("No diseases to export", {
+        position: "bottom-right",
+      });
+      return;
+    }
+
+    try {
+      const csvContent = exportDiseasesToCSV(diseasesToExport);
+      const filename = `diseases-export-${
+        new Date().toISOString().split("T")[0]
+      }.csv`;
+      downloadCSV(csvContent, filename);
+
+      toast.success(`Exported ${diseasesToExport.length} diseases to CSV`, {
+        position: "bottom-right",
+      });
+    } catch (error) {
+      console.error("Export error:", error);
+      toast.error("Failed to export diseases", {
+        position: "bottom-right",
+      });
+    }
+  };
+
+  const handleDownloadSample = () => {
+    try {
+      const sampleContent = generateSampleCSV();
+      downloadCSV(sampleContent, "sample-diseases.csv");
+
+      toast.success("Sample CSV downloaded", {
+        position: "bottom-right",
+      });
+    } catch (error) {
+      console.error("Sample download error:", error);
+      toast.error("Failed to download sample", {
+        position: "bottom-right",
+      });
+    }
+  };
+
+  // -------------Advance filtering and searching-----------
+  const [filters, setFilters] = useState<FilterCriteria>({
+    searchTerm: "",
+    medicineCountMin: null,
+    medicineCountMax: null,
+    specificMedicines: [],
+    sortBy: "name",
+    sortOrder: "asc",
+  });
+  const filteredDiseases = diseases
+    ? applyDiseaseFilters(diseases, filters)
+    : [];
+
   return (
     <>
       <EditDiseaseDataModel
@@ -263,41 +322,63 @@ export default function SettingsDiseaseInfoPage() {
         </Card>
 
         <div className="flex flex-col mt-2 sm:mt-5 2xl:mt-0 mx-auto 2xl:mx-0 max-w-4xl gap-2 w-full">
-          {/* search disease */}
-          <div className="relative w-full md:w-3/4">
-            <div className="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
-              <svg
-                className="w-5 h-5 text-gray-500"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-                xmlns="http://www.w3.org/2000/svg"
+          {/* CSV Import/Export Controls */}
+          <Card className="bg-sidebar/70 border shadow-none">
+            <CardHeader className="border-b p-4">
+              <CardTitle className="font-medium tracking-normal">
+                Disease Management
+              </CardTitle>
+              <CardDescription>
+                Import and export disease data using CSV files
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-wrap gap-2 p-3 sm:p-4">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  handleExportCSV(diseases);
+                }}
+                disabled={!diseases || diseases.length === 0}
+                className="gap-2"
               >
-                <path
-                  fillRule="evenodd"
-                  clipRule="evenodd"
-                  d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                ></path>
-              </svg>
-            </div>
-            <div className="flex items-center gap-1">
-              <input
-                type="text"
-                id="searchDisease"
-                placeholder="Search by disease name.."
-                value={searchDisease}
-                onChange={handleFilterChange}
-                className="form-input bg-transparent border border-border text-sm rounded-lg block w-full pl-10"
-              />
-            </div>
+                <Download className="h-4 w-4" />
+                <p className="hidden sm:block">Export CSV</p>
+              </Button>
+              <DiseaseImportCSV diseases={diseases} setdiseases={setdiseases} />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleDownloadSample}
+                className="gap-2 mr-0 ml-auto"
+              >
+                <FileText className="h-4 w-4" />
+                <p className="hidden sm:block">Download Sample</p>
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* search/filter disease */}
+          <div className="relative w-full">
+            <AdvancedFilters
+              diseases={diseases || []}
+              filters={filters}
+              onFiltersChange={setFilters}
+            />
           </div>
 
           {/* diaplay disease */}
           <div className="w-full flex flex-col flex-1 bg-sidebar/70 border rounded-md">
             {diseases === null ? (
-              <div className="flex flex-1 items-center justify-center min-h-72 w-full">
-                <Loader size="medium" />
+              <div className="w-full divide-y rounded-md overflow-hidden">
+                {[...Array(5)].map((_, i) => (
+                  <Skeleton
+                    key={i}
+                    className="h-20 w-full rounded-none bg-sidebar/40"
+                  />
+                ))}
               </div>
-            ) : filteredDIsease(diseases).length === 0 ? (
+            ) : filteredDiseases.length === 0 ? (
               <>
                 <div className="flex flex-1 items-center justify-center text-muted-foreground min-h-72 gap-2 flex-col">
                   <InboxIcon />
@@ -306,19 +387,17 @@ export default function SettingsDiseaseInfoPage() {
               </>
             ) : (
               <>
-                {filteredDIsease(diseases).map(
-                  (disease: Disease, index: number) => {
-                    return (
-                      <DiseaseRow
-                        key={index}
-                        index={index}
-                        disease={disease}
-                        setDiseaseEditModel={setDiseaseEditModel}
-                        setEditForDiseaseId={setEditForDiseaseId}
-                      />
-                    );
-                  }
-                )}
+                {filteredDiseases.map((disease: Disease, index: number) => {
+                  return (
+                    <DiseaseRow
+                      key={index}
+                      index={index}
+                      disease={disease}
+                      setDiseaseEditModel={setDiseaseEditModel}
+                      setEditForDiseaseId={setEditForDiseaseId}
+                    />
+                  );
+                })}
               </>
             )}
           </div>
