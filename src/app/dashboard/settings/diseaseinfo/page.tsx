@@ -44,6 +44,7 @@ import {
   applyDiseaseFilters,
 } from "@/components/Settings/DiseaseInfo/DiseaseFilters";
 import DiseaseImportCSV from "@/components/Settings/DiseaseInfo/DiseaseImportCSV";
+import { BulkOperations } from "@/components/Settings/DiseaseInfo/BulkOperations";
 
 export interface Disease {
   diseaseDetail: string;
@@ -199,6 +200,25 @@ export default function SettingsDiseaseInfoPage() {
   const filteredDiseases = diseases
     ? applyDiseaseFilters(diseases, filters)
     : [];
+
+  // -------------Bulk Edits----------------
+  const [selectedDiseases, setSelectedDiseases] = useState<Set<string>>(
+    new Set()
+  );
+
+  const handleBulkDelete = async (diseaseIds: string[]) => {
+    if (!orgId) return;
+
+    const promises = diseaseIds.map(async (id) => {
+      await deleteDoc(doc(db, "doctor", orgId, "diseaseData", id));
+    });
+
+    await Promise.all(promises).then(() => {
+      setdiseases((prev) =>
+        prev ? prev.filter((d) => !diseaseIds.includes(d.diseaseId)) : []
+      );
+    });
+  };
 
   return (
     <>
@@ -367,6 +387,16 @@ export default function SettingsDiseaseInfoPage() {
             />
           </div>
 
+          {/* Bulk Operations */}
+          {diseases && diseases.length > 0 && (
+            <BulkOperations
+              diseases={filteredDiseases}
+              selectedDiseases={selectedDiseases}
+              onSelectionChange={setSelectedDiseases}
+              onBulkDelete={handleBulkDelete}
+            />
+          )}
+
           {/* diaplay disease */}
           <div className="w-full flex flex-col flex-1 bg-sidebar/70 border rounded-md">
             {diseases === null ? (
@@ -395,6 +425,16 @@ export default function SettingsDiseaseInfoPage() {
                       disease={disease}
                       setDiseaseEditModel={setDiseaseEditModel}
                       setEditForDiseaseId={setEditForDiseaseId}
+                      isSelected={selectedDiseases.has(disease.diseaseId)}
+                      onSelectionChange={(selected) => {
+                        const newSelection = new Set(selectedDiseases);
+                        if (selected) {
+                          newSelection.add(disease.diseaseId);
+                        } else {
+                          newSelection.delete(disease.diseaseId);
+                        }
+                        setSelectedDiseases(newSelection);
+                      }}
                     />
                   );
                 })}
