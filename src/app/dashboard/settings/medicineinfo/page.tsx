@@ -4,7 +4,6 @@ import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { CirclePlus } from "lucide-react";
 import MedicineRow from "@/components/Settings/MedicineInfo/MedicineRow";
 import uniqid from "uniqid";
-import { getMedicines } from "@/app/services/crudMedicine";
 import Loader from "@/components/common/Loader";
 import toast from "react-hot-toast";
 import {
@@ -22,7 +21,13 @@ import {
   DialogHeader,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { doc, setDoc, updateDoc } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDocs,
+  setDoc,
+  updateDoc,
+} from "firebase/firestore";
 import {
   Select,
   SelectContent,
@@ -144,12 +149,16 @@ export default function SettingsMedicineInfoPage() {
   useEffect(() => {
     const fetchmedicine = async () => {
       if (orgId) {
-        const data = await getMedicines(orgId);
-        if (data?.data) {
-          setmedicines(data?.data);
-        } else {
-          setmedicines(null);
+        const diseaseDataRef = collection(db, "doctor", orgId, "medicinesData");
+        const snapshot = await getDocs(diseaseDataRef);
+
+        if (snapshot.empty) {
+          setmedicines([]);
         }
+        const data = snapshot.docs.map((doc) => ({
+          ...doc.data(),
+        }));
+        setmedicines(data as Medicine[]);
       }
     };
     fetchmedicine();
