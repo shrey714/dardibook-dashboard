@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Download } from "lucide-react";
+import { Download, Trash2 } from "lucide-react";
 import toast from "react-hot-toast";
 import { Disease } from "@/app/dashboard/settings/diseaseinfo/page";
 import { downloadCSV, exportDiseasesToCSV } from "@/lib/csv-utils";
@@ -113,16 +113,23 @@ export const BulkOperations: React.FC<BulkOperationsProps> = ({
 
         {selectedCount > 0 && (
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={handleExportSelected}>
-              <Download className="h-4 w-4 mr-2" />
-              Export Selected
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleExportSelected}
+              className="gap-2"
+            >
+              <Download className="h-4 w-4" />
+              <p className="hidden sm:block">Export Selected</p>
             </Button>
             <Button
               variant="destructive"
               size="sm"
               onClick={() => setDeleteDialogOpen(true)}
+              className="gap-2"
             >
-              Delete Selected
+              <Trash2 className="h-4 w-4" />
+              <p className="hidden sm:block">Delete Selected</p>
             </Button>
           </div>
         )}
