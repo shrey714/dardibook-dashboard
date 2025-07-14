@@ -35,6 +35,15 @@ import {
 import { updatePrescriptionReceiptDefaults } from "@/app/dashboard/settings/defaults/_actions";
 
 export const PrescriptionOptions = () => {
+  return (
+    <>
+      <PrescriptionReceiptType />
+      <MedicineTypes />
+    </>
+  );
+};
+
+const PrescriptionReceiptType = () => {
   const { orgId } = useAuth();
   const { organization, isLoaded } = useOrganization();
   const [receipts, setReceipts] = useState<ReceiptDetails[]>([]);
@@ -168,7 +177,9 @@ export const PrescriptionOptions = () => {
       <Dialog open={receiptEditModel} onOpenChange={setReceiptEditModel}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle className="font-medium tracking-normal">Edit Receipt Type</DialogTitle>
+            <DialogTitle className="font-medium tracking-normal">
+              Edit Receipt Type
+            </DialogTitle>
             <DialogDescription>
               Modify details for{" "}
               {
@@ -248,7 +259,7 @@ export const PrescriptionOptions = () => {
         </DialogContent>
       </Dialog>
 
-      <Card className="border border-b-0 rounded-b-none bg-sidebar/70 w-full shadow-none h-min mx-auto">
+      <Card className="border rounded-md border-b-0 rounded-b-none bg-sidebar/70 w-full shadow-none h-min mx-auto">
         <CardHeader className="border-b p-4">
           <CardTitle className="font-medium tracking-normal">
             Add Prescription Receipt Type
@@ -354,5 +365,19 @@ export const PrescriptionOptions = () => {
         )}
       </div>
     </>
+  );
+};
+
+const MedicineTypes = () => {
+  return (
+    <Card className="border rounded-md bg-sidebar/70 w-full shadow-none h-min mx-auto mt-2 md:mt-5">
+      <CardHeader className="border-b p-4">
+        <CardTitle className="font-medium tracking-normal">
+          Add New Medicine Type
+        </CardTitle>
+        <CardDescription hidden></CardDescription>
+      </CardHeader>
+      <CardContent className="py-4 px-3 md:px-8">HELLOW</CardContent>
+    </Card>
   );
 };

@@ -331,7 +331,7 @@ export const AdmissionOptions = () => {
         </DialogContent>
       </Dialog>
 
-      <Card className="border border-b-0 rounded-b-none bg-sidebar/70 w-full shadow-none h-min mx-auto">
+      <Card className="border rounded-md border-b-0 rounded-b-none bg-sidebar/70 w-full shadow-none h-min mx-auto">
         <CardHeader className="border-b p-4">
           <CardTitle className="font-medium tracking-normal">
             Add New Bed

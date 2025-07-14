@@ -111,7 +111,7 @@ const BillDefaults = () => {
   };
 
   return (
-    <Card className="bg-sidebar/70 w-full shadow-none border h-min mx-auto">
+    <Card className="bg-sidebar/70 rounded-md w-full shadow-none border h-min mx-auto">
       <CardHeader className="border-b p-4">
         <CardTitle className="font-medium tracking-normal">
           Bill Defaults
@@ -431,7 +431,7 @@ const ServicesUpdateModal = () => {
         </DialogContent>
       </Dialog>
 
-      <Card className="border border-b-0 rounded-b-none bg-sidebar/70 w-full shadow-none h-min mx-auto mt-2 md:mt-5">
+      <Card className="border rounded-md border-b-0 rounded-b-none bg-sidebar/70 w-full shadow-none h-min mx-auto mt-2 md:mt-5">
         <CardHeader className="border-b p-4">
           <CardTitle className="font-medium tracking-normal">
             Add New Service
