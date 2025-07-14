@@ -26,7 +26,7 @@ const Page = () => {
           <div className="flex flex-col gap-2">
             <LoginBox />
           </div>
-          <p className="text-muted-foreground text-center text-xs mt-1">
+          <p className="text-slate-400 text-center text-xs mt-1">
             By clicking continue, you agree to our{" "}
             <Link
               href="https://dardibook.in/documents/terms-conditions"

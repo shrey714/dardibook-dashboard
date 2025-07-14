@@ -51,13 +51,12 @@ import {
   PrescriptionFormTypes,
   ServiceItems,
 } from "@/types/FormTypes";
-import { doc, setDoc } from "firebase/firestore";
+import { collection, doc, getDocs, setDoc } from "firebase/firestore";
 import { db } from "@/firebase/firebaseConfig";
 import toast from "react-hot-toast";
 import { Badge } from "@/components/ui/badge";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAuth, useOrganization, useUser } from "@clerk/nextjs";
-import { getMedicines } from "@/app/services/crudMedicine";
 
 const calculateTotalAmount = (
   medicines: MedicineItems[],
@@ -144,16 +143,20 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
   useEffect(() => {
     const fetchmedicine = async () => {
       if (orgId) {
-        const data = await getMedicines(orgId);
-        if (data?.data) {
-          setMedicines(data?.data);
-        } else {
+        const diseaseDataRef = collection(db, "doctor", orgId, "medicinesData");
+        const snapshot = await getDocs(diseaseDataRef);
+
+        if (snapshot.empty) {
           setMedicines([]);
         }
+        const medicineData = snapshot.docs.map((doc) => ({
+          ...doc.data(),
+        }));
+        setMedicines(medicineData as MedicinesDetails[]);
       }
     };
     fetchmedicine();
-  }, []);
+  }, [orgId]);
 
   useEffect(() => {
     if (isLoaded && organization && organization.publicMetadata.services) {
