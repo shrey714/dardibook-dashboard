@@ -118,7 +118,10 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
             )}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="max-w-80 sm:w-80 p-0 overflow-hidden" align="end">
+        <PopoverContent
+          className="max-w-80 sm:w-80 p-0 overflow-hidden"
+          align="end"
+        >
           <div className="flex items-center justify-between px-4 py-2 bg-border">
             <h4 className="font-medium">Advanced Filters</h4>
             <Button
@@ -285,6 +288,7 @@ export const applyDiseaseFilters = (
   }
 
   // Sorting
+  console.log("filtered==", filtered);
   filtered.sort((a, b) => {
     let comparison = 0;
 

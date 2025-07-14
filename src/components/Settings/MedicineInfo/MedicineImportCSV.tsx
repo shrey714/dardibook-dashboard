@@ -9,7 +9,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Disease } from "@/app/dashboard/settings/diseaseinfo/page";
 import {
   FileUpload,
   FileUploadDropzone,
@@ -31,33 +30,33 @@ import {
 } from "lucide-react";
 import { useCallback, useState } from "react";
 import toast from "react-hot-toast";
-import { processCSVFile } from "@/lib/csv-utils";
+import { processMedicinesCSVFile } from "@/lib/csv-utils";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import MedicineHoverLink from "./medicine-hover-link";
 import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
-import { doc, getDoc, writeBatch } from "firebase/firestore";
+import { doc, writeBatch } from "firebase/firestore";
 import { db } from "@/firebase/firebaseConfig";
 import { useAuth } from "@clerk/nextjs";
 import uniqid from "uniqid";
+import { Medicine } from "@/app/dashboard/settings/medicineinfo/page";
 
 interface CSVImportDialogProps {
-  diseases: Disease[] | null;
-  setdiseases: React.Dispatch<React.SetStateAction<Disease[] | null>>;
+  medicines: Medicine[] | null;
+  setmedicines: React.Dispatch<React.SetStateAction<Medicine[] | null>>;
 }
 
-export interface CSVDisease {
-  diseaseDetail: string;
-  medicines: string[];
+export interface CSVMedicine {
+  medicineName: string;
+  type: string;
+  instruction: string;
 }
 
-const DiseaseImportCSV: React.FC<CSVImportDialogProps> = ({
-  diseases,
-  setdiseases,
+const MedicineImportCSV: React.FC<CSVImportDialogProps> = ({
+  medicines,
+  setmedicines,
 }) => {
   const [files, setFiles] = useState<File[]>([]);
   const [errors, setErrors] = useState<string[]>([]);
-  const [validRows, setValidRows] = useState<CSVDisease[] | null>(null);
+  const [validRows, setValidRows] = useState<CSVMedicine[] | null>(null);
   const [medValidationLoader, setMedValidationLoader] = useState(false);
   const { orgId } = useAuth();
 
@@ -100,52 +99,11 @@ const DiseaseImportCSV: React.FC<CSVImportDialogProps> = ({
       try {
         const uploadPromises = files.map(async (file) => {
           try {
-            const result = await processCSVFile(file, diseases || []);
+            setMedValidationLoader(true);
+            const result = await processMedicinesCSVFile(file, medicines || []);
             setErrors(result.errors);
             setValidRows(result.validRows);
             onProgress(file, 40);
-            setMedValidationLoader(true);
-            const invalidMedicines: string[] = [];
-
-            const validationChecks = orgId
-              ? result.uniqueMedicines.map(async (medicine) => {
-                  const docRef = doc(
-                    db,
-                    "doctor",
-                    orgId,
-                    "medicinesData",
-                    medicine
-                  );
-                  const snap = await getDoc(docRef);
-
-                  if (!snap.exists()) {
-                    invalidMedicines.push(medicine);
-                  }
-                })
-              : [];
-
-            await Promise.all(validationChecks);
-
-            const cleanedValidRows = result.validRows.map((row) => ({
-              diseaseDetail: row.diseaseDetail,
-              medicines: row.medicines.filter(
-                (med) => !invalidMedicines.includes(med.trim())
-              ),
-            }));
-
-            const medicineErrors = result.validRows.flatMap((row, index) => {
-              return row.medicines
-                .filter((med) => invalidMedicines.includes(med.trim()))
-                .map(
-                  (med) =>
-                    `Row ${
-                      index + 2
-                    }: Invalid medicine "${med}" not found in database`
-                );
-            });
-
-            setValidRows(cleanedValidRows);
-            setErrors((prev) => [...prev, ...medicineErrors]);
             setMedValidationLoader(false);
             onSuccess(file);
           } catch (error) {
@@ -165,7 +123,7 @@ const DiseaseImportCSV: React.FC<CSVImportDialogProps> = ({
         console.error("Unexpected error during upload:", error);
       }
     },
-    [diseases, orgId]
+    [medicines]
   );
 
   const handleImport = async () => {
@@ -174,30 +132,32 @@ const DiseaseImportCSV: React.FC<CSVImportDialogProps> = ({
     setMedValidationLoader(true);
     try {
       const batch = writeBatch(db);
-      const newDiseases: Disease[] = [];
+      const newMedicines: Medicine[] = [];
 
-      validRows.forEach((disease) => {
-        if (!disease.diseaseDetail) return;
+      validRows.forEach((medicine) => {
+        if (!medicine.medicineName) return;
 
-        const newDisease: Disease = {
-          diseaseDetail: disease.diseaseDetail,
-          medicines: disease.medicines,
-          searchableString: disease.diseaseDetail.toLowerCase(),
-          diseaseId: uniqid(),
+        const newMedicine: Medicine = {
+          medicineName: medicine.medicineName,
+          type: medicine.type,
+          instruction: medicine.instruction,
+          searchableString: medicine.medicineName.toLowerCase(),
+          id: uniqid(),
+          active: true,
         };
 
         batch.set(
-          doc(db, "doctor", orgId, "diseaseData", newDisease.diseaseId),
-          newDisease
+          doc(db, "doctor", orgId, "medicinesData", newMedicine.id),
+          newMedicine
         );
 
-        newDiseases.push(newDisease);
+        newMedicines.push(newMedicine);
       });
 
       await toast.promise(
         async () => {
           await batch.commit().then(() => {
-            setdiseases((prev) => [...(prev || []), ...newDiseases]);
+            setmedicines((prev) => [...(prev || []), ...newMedicines]);
             setFiles([]);
             setErrors([]);
             setValidRows(null);
@@ -205,7 +165,7 @@ const DiseaseImportCSV: React.FC<CSVImportDialogProps> = ({
         },
         {
           loading: "Saving...",
-          success: `Successfully saved ${newDiseases.length} diseases`,
+          success: `Successfully saved ${newMedicines.length} diseases`,
           error: "Failed to save",
         },
         {
@@ -241,11 +201,11 @@ const DiseaseImportCSV: React.FC<CSVImportDialogProps> = ({
       <DialogContent className="max-w-[95%] h-[90%] sm:max-w-[74%] sm:h-[90%] p-0 flex flex-col gap-0 overflow-hidden">
         <DialogHeader className="px-3 py-3 sm:px-5 sm:py-4 bg-border shadow-sm">
           <DialogTitle className="font-medium tracking-normal">
-            Import Diseases from CSV
+            Import Medicines from CSV
           </DialogTitle>
           <DialogDescription className="line-clamp-1">
-            Upload a CSV file to import disease data. Make sure your CSV follows
-            the correct format.
+            Upload a CSV file to import medicines data. Make sure your CSV
+            follows the correct format.
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-1 flex-col p-3 sm:p-5 items-center overflow-y-auto pb-20 sm:pb-20">
@@ -336,24 +296,24 @@ const DiseaseImportCSV: React.FC<CSVImportDialogProps> = ({
                 Ready to Import
               </AlertTitle>
               <AlertDescription className="text-xs">
-                Found {validRows.length} valid diseases ready for import.
+                Found {validRows.length} valid medicines ready for import.
               </AlertDescription>
             </Alert>
           )}
 
-          {/* diaplay imported disease */}
+          {/* diaplay imported medicine */}
           {validRows && (
             <div className="mt-3 w-full flex flex-col bg-sidebar/70 border rounded-md">
               {validRows.length === 0 ? (
                 <>
                   <div className="flex flex-1 items-center justify-center text-muted-foreground min-h-40 gap-2 flex-col">
                     <InboxIcon />
-                    No disease data available to import
+                    No medicine data available to import
                   </div>
                 </>
               ) : (
                 <>
-                  {validRows.map((disease: CSVDisease, index: number) => {
+                  {validRows.map((medicine: CSVMedicine, index: number) => {
                     return (
                       <div
                         key={index}
@@ -363,24 +323,23 @@ const DiseaseImportCSV: React.FC<CSVImportDialogProps> = ({
                       >
                         <div className="col-span-4 h-auto flex justify-start items-start">
                           <p className="text-sm font-normal">
-                            {disease.diseaseDetail}
+                            {medicine.medicineName}
                           </p>
                         </div>
 
-                        <div className="relative flex flex-wrap gap-2 col-span-8 w-full h-min">
-                          {disease.medicines.map((med, i) =>
-                            medValidationLoader ? (
-                              <Skeleton key={i} className="h-6 w-20" />
-                            ) : (
-                              <Badge
-                                key={i}
-                                variant={"default"}
-                                className="text-sm p-0 bg-muted-foreground"
-                              >
-                                <MedicineHoverLink label={med} />
-                              </Badge>
-                            )
+                        <div className="col-span-2">
+                          {medicine.type && (
+                            <Badge
+                              variant="outline"
+                              className="text-xs font-medium"
+                            >
+                              {medicine.type}
+                            </Badge>
                           )}
+                        </div>
+
+                        <div className="col-span-5 [&:empty]:invisible border rounded-md flex items-center h-min py-[0px] sm:py-[5.5px] px-2 text-muted-foreground bg-background border-border text-sm w-full">
+                          {medicine.instruction || "No Instruction"}
                         </div>
                       </div>
                     );
@@ -405,7 +364,7 @@ const DiseaseImportCSV: React.FC<CSVImportDialogProps> = ({
               ) : (
                 <>
                   <CheckCircle className="h-4 w-4" />
-                  Import {validRows.length} Diseases
+                  Import {validRows.length} Medicines
                 </>
               )}
             </Button>
@@ -423,4 +382,4 @@ const DiseaseImportCSV: React.FC<CSVImportDialogProps> = ({
   );
 };
 
-export default DiseaseImportCSV;
+export default MedicineImportCSV;

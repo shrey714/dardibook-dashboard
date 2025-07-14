@@ -1,10 +1,9 @@
 "use client";
 
-import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
-import { CirclePlus } from "lucide-react";
+import React, { FormEvent, useEffect, useState } from "react";
+import { CirclePlus, Download, FileText } from "lucide-react";
 import MedicineRow from "@/components/Settings/MedicineInfo/MedicineRow";
 import uniqid from "uniqid";
-import Loader from "@/components/common/Loader";
 import toast from "react-hot-toast";
 import {
   Card,
@@ -38,13 +37,21 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-interface Medicine {
+export interface Medicine {
   medicineName: string;
   type: string;
   id: string;
   instruction: string;
   searchableString: string;
   active: boolean;
+}
+export interface FilterCriteria {
+  searchTerm: string;
+  medicineTypes: string[];
+  activeStatus: "all" | "active" | "inactive";
+  hasInstructions: "all" | "with" | "without";
+  sortBy: "name" | "type" | "recent";
+  sortOrder: "asc" | "desc";
 }
 const medicineTypes = [
   { label: "Type", value: "", isDefault: true },
@@ -68,28 +75,24 @@ const medicineTypes = [
 import { useAuth } from "@clerk/nextjs";
 import { Separator } from "@/components/ui/separator";
 import { db } from "@/firebase/firebaseConfig";
+import {
+  downloadCSV,
+  exportMedicinesToCSV,
+  generateSampleMedicinesCSV,
+} from "@/lib/csv-utils";
+import {
+  AdvancedFilters,
+  applyMedicineFilters,
+} from "@/components/Settings/MedicineInfo/MedicineFilters";
+import { Skeleton } from "@/components/ui/skeleton";
+import { BulkOperations } from "@/components/Settings/MedicineInfo/BulkOperations";
+import MedicineImportCSV from "@/components/Settings/MedicineInfo/MedicineImportCSV";
 
 export default function SettingsMedicineInfoPage() {
   const { orgId } = useAuth();
   const [medicines, setmedicines] = useState<Medicine[] | null>(null);
-  const [searchMedicine, setsearchMedicine] = useState("");
   const [addLoader, setAddLoader] = useState(false);
-  // --------------medicine filter--------------
-  const filteredMedicine = (medicines: Medicine[]) => {
-    return medicines
-      .sort((a: Medicine, b: Medicine) =>
-        a.medicineName.localeCompare(b.medicineName)
-      )
-      .filter((mname: Medicine) =>
-        mname?.medicineName
-          ?.toLowerCase()
-          ?.includes(searchMedicine?.toLowerCase())
-      );
-  };
-  const handleFilterChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.target;
-    setsearchMedicine(value);
-  };
+
   // --------------new medicine form handeler-----------
   const submitHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -166,6 +169,92 @@ export default function SettingsMedicineInfoPage() {
   // --------------Edit Medicine Data-----------
   const [medicineEditModel, setMedicineEditModel] = useState<boolean>(false);
   const [editForMedicineId, setEditForMedicineId] = useState<string>("");
+
+  // -------------Export / Import diseases--------
+  // CSV Export functionality
+  const handleExportCSV = () => {
+    if (!medicines || medicines.length === 0) {
+      toast.error("No medicines to export", {
+        position: "bottom-right",
+      });
+      return;
+    }
+
+    try {
+      const csvContent = exportMedicinesToCSV(medicines);
+      const filename = `medicines-export-${
+        new Date().toISOString().split("T")[0]
+      }.csv`;
+      downloadCSV(csvContent, filename);
+
+      toast.success(`Exported ${medicines.length} medicines to CSV`, {
+        position: "bottom-right",
+      });
+    } catch (error) {
+      console.error("Export error:", error);
+      toast.error("Failed to export medicines", {
+        position: "bottom-right",
+      });
+    }
+  };
+
+  // Download sample CSV
+  const handleDownloadSample = () => {
+    try {
+      const sampleContent = generateSampleMedicinesCSV();
+      downloadCSV(sampleContent, "sample-medicines.csv");
+
+      toast.success("Sample CSV downloaded", {
+        position: "bottom-right",
+      });
+    } catch (error) {
+      console.error("Sample download error:", error);
+      toast.error("Failed to download sample", {
+        position: "bottom-right",
+      });
+    }
+  };
+
+  // -------------Advance filtering and searching-----------
+  const [filters, setFilters] = useState<FilterCriteria>({
+    searchTerm: "",
+    medicineTypes: [],
+    activeStatus: "all" as "all" | "active" | "inactive",
+    hasInstructions: "all" as "all" | "with" | "without",
+    sortBy: "name" as "name" | "type" | "recent",
+    sortOrder: "asc" as "asc" | "desc",
+  });
+
+  const filteredMedicines = medicines
+    ? applyMedicineFilters(medicines, filters)
+    : [];
+
+  // -------------Bulk Edits----------------
+  const [selectedMedicines, setSelectedMedicines] = useState<Set<string>>(
+    new Set()
+  );
+
+  // Bulk status change handler
+  const handleBulkStatusChange = async (
+    medicineIds: string[],
+    active: boolean
+  ) => {
+    if (!orgId) return;
+
+    const promises = medicineIds.map(async (id) => {
+      await updateDoc(doc(db, "doctor", orgId, "medicinesData", id), {
+        active,
+      });
+    });
+    await Promise.all(promises).then(() => {
+      setmedicines((prev) =>
+        prev
+          ? prev.map((m) => (medicineIds.includes(m.id) ? { ...m, active } : m))
+          : []
+      );
+    });
+  };
+
   return (
     <>
       <EditMedicineDataModel
@@ -259,58 +348,102 @@ export default function SettingsMedicineInfoPage() {
         </Card>
 
         <div className="flex flex-col mt-2 sm:mt-5 2xl:mt-0 mx-auto 2xl:mx-0 max-w-4xl gap-2 w-full">
-          <div className="relative w-full md:w-3/4">
-            <div className="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
-              <svg
-                className="w-5 h-5 text-gray-500"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-                xmlns="http://www.w3.org/2000/svg"
+          {/* CSV Import/Export Controls */}
+          <Card className="bg-sidebar/70 border shadow-none">
+            <CardHeader className="border-b p-4">
+              <CardTitle className="font-medium tracking-normal">
+                Medicine Management
+              </CardTitle>
+              <CardDescription>
+                Import and export medicine data using CSV files
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-wrap gap-2 p-3 sm:p-4">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  handleExportCSV();
+                }}
+                disabled={!medicines || medicines.length === 0}
+                className="gap-2"
               >
-                <path
-                  fillRule="evenodd"
-                  clipRule="evenodd"
-                  d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                ></path>
-              </svg>
-            </div>
-            <div className="flex items-center gap-1">
-              <input
-                type="text"
-                id="searchMedicine"
-                placeholder="Search by medicine name.."
-                value={searchMedicine}
-                onChange={handleFilterChange}
-                className="form-input bg-transparent border border-border text-sm rounded-lg block w-full pl-10"
+                <Download className="h-4 w-4" />
+                <p className="hidden sm:block">Export CSV</p>
+              </Button>
+              <MedicineImportCSV
+                medicines={medicines}
+                setmedicines={setmedicines}
               />
-            </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleDownloadSample}
+                className="gap-2 mr-0 ml-auto"
+              >
+                <FileText className="h-4 w-4" />
+                <p className="hidden sm:block">Download Sample</p>
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Advanced Filters */}
+          <div className="relative w-full">
+            <AdvancedFilters
+              medicines={medicines || []}
+              filters={filters}
+              onFiltersChange={setFilters}
+            />
           </div>
+
+          {/* Bulk Operations */}
+          {medicines && medicines.length > 0 && (
+            <BulkOperations
+              medicines={filteredMedicines}
+              selectedMedicines={selectedMedicines}
+              onSelectionChange={setSelectedMedicines}
+              onBulkStatusChange={handleBulkStatusChange}
+            />
+          )}
 
           {/* diaplay medicine */}
           <div className="w-full flex flex-col flex-1 bg-sidebar/70 border rounded-md">
             {medicines === null ? (
-              <div className="flex flex-1 items-center justify-center min-h-72 w-full">
-                <Loader size="medium" />
+              <div className="w-full divide-y rounded-md overflow-hidden">
+                {[...Array(5)].map((_, i) => (
+                  <Skeleton
+                    key={i}
+                    className="h-20 w-full rounded-none bg-sidebar/40"
+                  />
+                ))}
               </div>
-            ) : filteredMedicine(medicines).length === 0 ? (
+            ) : filteredMedicines.length === 0 ? (
               <div className="flex flex-1 items-center justify-center text-muted-foreground min-h-72">
                 No medicine data available
               </div>
             ) : (
               <>
-                {filteredMedicine(medicines).map(
-                  (medicine: Medicine, index: number) => {
-                    return (
-                      <MedicineRow
-                        key={index}
-                        index={index}
-                        medicine={medicine}
-                        setMedicineEditModel={setMedicineEditModel}
-                        setEditForMedicineId={setEditForMedicineId}
-                      />
-                    );
-                  }
-                )}
+                {filteredMedicines.map((medicine: Medicine, index: number) => {
+                  return (
+                    <MedicineRow
+                      key={index}
+                      index={index}
+                      medicine={medicine}
+                      setMedicineEditModel={setMedicineEditModel}
+                      setEditForMedicineId={setEditForMedicineId}
+                      isSelected={selectedMedicines.has(medicine.id)}
+                      onSelectionChange={(selected) => {
+                        const newSelection = new Set(selectedMedicines);
+                        if (selected) {
+                          newSelection.add(medicine.id);
+                        } else {
+                          newSelection.delete(medicine.id);
+                        }
+                        setSelectedMedicines(newSelection);
+                      }}
+                    />
+                  );
+                })}
               </>
             )}
           </div>
@@ -538,8 +671,8 @@ const EditMedicineDataModel: React.FC<EditMedicineDataModel> = ({
                     medicines?.find(
                       (medicine) => medicine.id === editForMedicineId
                     )?.active ?? true
-                      ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                      : "bg-destructive text-destructive-foreground hover:bg-destructive/90 "
+                      ? "!bg-primary !text-primary-foreground !hover:bg-primary/90"
+                      : "!bg-destructive !text-destructive-foreground hover:!bg-destructive/90"
                   }`}
                 >
                   <SelectValue placeholder="Status" />

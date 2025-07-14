@@ -1,5 +1,7 @@
 import { Disease } from "@/app/dashboard/settings/diseaseinfo/page";
+import { Medicine } from "@/app/dashboard/settings/medicineinfo/page";
 import { CSVDisease } from "@/components/Settings/DiseaseInfo/DiseaseImportCSV";
+import { CSVMedicine } from "@/components/Settings/MedicineInfo/MedicineImportCSV";
 import Papa from "papaparse";
 
 // Convert diseases array to CSV format
@@ -127,6 +129,124 @@ export const processCSVFile = (
                     errors,
                     validRows,
                     uniqueMedicines: Array.from(uniqueMedicinesSet),
+                });
+            },
+            error: (error) => reject(error.message),
+        });
+    });
+};
+
+
+
+
+// Convert medicines array to CSV format
+export const exportMedicinesToCSV = (medicines: Medicine[]): string => {
+    const headers = ["Medicine Name", "Type", "Instruction", "Active", "Medicine ID"];
+    const csvRows = [headers.join(",")];
+
+    medicines.forEach((medicine) => {
+        const row = [
+            `"${medicine.medicineName.replace(/"/g, '""')}"`, // Escape quotes
+            `"${medicine.type.replace(/"/g, '""')}"`,
+            `"${medicine.instruction.replace(/"/g, '""')}"`,
+            `"${medicine.active ? 'Active' : 'Inactive'}"`,
+            `"${medicine.id.replace(/"/g, '""')}"`
+        ];
+        csvRows.push(row.join(","));
+    });
+
+    return csvRows.join("\n");
+};
+
+// Generate sample CSV content
+export const generateSampleMedicinesCSV = (): string => {
+    const sampleData: Medicine[] = [
+        {
+            medicineName: "Paracetamol",
+            type: "TAB",
+            instruction: "Take 1 tablet twice daily after meals",
+            active: true,
+            id: "sample-001",
+            searchableString: "paracetamol"
+        },
+        {
+            medicineName: "Amoxicillin",
+            type: "CAP",
+            instruction: "Take 1 capsule three times daily",
+            active: true,
+            id: "sample-002",
+            searchableString: "amoxicillin"
+        },
+        {
+            medicineName: "Cough Syrup",
+            type: "SYRUP",
+            instruction: "Take 10ml twice daily",
+            active: false,
+            id: "sample-003",
+            searchableString: "cough syrup"
+        }
+    ];
+
+    return exportMedicinesToCSV(sampleData);
+};
+
+export const processMedicinesCSVFile = (
+    file: File,
+    existingMedicines: Medicine[]
+): Promise<{
+    errors: string[];
+    validRows: CSVMedicine[];
+}> => {
+    return new Promise((resolve, reject) => {
+        Papa.parse(file, {
+            header: true,
+            skipEmptyLines: true,
+            complete: (results) => {
+                const errors: string[] = [];
+                const validRows: CSVMedicine[] = [];
+                const csvMedicineDetails = new Set<string>();
+
+                const rows = results.data as any[];
+
+                if (rows.length > 200) {
+                    errors.push("CSV must contain fewer than 200 rows.");
+                    return resolve({ errors, validRows });
+                }
+
+                rows.forEach((row, index) => {
+                    const rowNumber = index + 2;
+
+                    const medicineName: string = row["Medicine Name"]?.trim();
+                    const type: string = row["Type"]?.trim();
+                    const instruction: string = row["Instruction"]?.trim();
+
+                    if (!medicineName) {
+                        errors.push(`Row ${rowNumber}: medicine Name is missing.`);
+                        return;
+                    }
+
+                    if (csvMedicineDetails.has(medicineName)) {
+                        errors.push(`Row ${rowNumber}: Duplicate medicine Name "${medicineName}" in CSV.`);
+                        return;
+                    }
+
+                    const alreadyExists = existingMedicines.some(
+                        (d) => d.medicineName.toLowerCase() === medicineName.toLowerCase()
+                    );
+
+                    if (alreadyExists) {
+                        errors.push(`Row ${rowNumber}: Medicine Name "${medicineName}" already exists.`);
+                        return;
+                    }
+
+                    csvMedicineDetails.add(medicineName);
+
+                    validRows.push({ medicineName, type, instruction });
+                });
+
+                resolve({
+                    errors,
+                    validRows,
                 });
             },
             error: (error) => reject(error.message),
