@@ -139,8 +139,11 @@ const Page = () => {
       email: "",
     },
     receipt_details:
-      isLoaded && organization && organization.publicMetadata.prescription_receipt_types
-        ? (organization.publicMetadata.prescription_receipt_types as ReceiptDetails[])
+      isLoaded &&
+      organization &&
+      organization.publicMetadata.prescription_receipt_types
+        ? (organization.publicMetadata
+            .prescription_receipt_types as ReceiptDetails[])
         : [],
   });
   const [patientBarData, setpatientBarData] = useState<patientBarDataTypes>({
@@ -340,7 +343,7 @@ const Page = () => {
         </Dialog>
       )}
 
-      {todayPatientsLoading && bedsLoading ? (
+      {todayPatientsLoading || bedsLoading ? (
         <div className="w-full h-full overflow-hidden flex items-center justify-center z-50">
           <Loader size="medium" />
         </div>

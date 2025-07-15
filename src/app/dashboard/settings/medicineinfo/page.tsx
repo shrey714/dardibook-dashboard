@@ -53,26 +53,13 @@ export interface FilterCriteria {
   sortBy: "name" | "type" | "recent";
   sortOrder: "asc" | "desc";
 }
-const medicineTypes = [
-  { label: "Type", value: "", isDefault: true },
-  { label: "Tablet", value: "TAB" },
-  { label: "Capsule", value: "CAP" },
-  { label: "Syrup", value: "SYRUP" },
-  { label: "Drop", value: "DROP" },
-  { label: "Cream", value: "CREAM" },
-  { label: "Lotion", value: "LOTION" },
-  { label: "Serum", value: "SERUM" },
-  { label: "Soap", value: "SOAP" },
-  { label: "Spray", value: "SPRAY" },
-  { label: "Gel", value: "GEL" },
-  { label: "Ointment", value: "OINTMENT" },
-  { label: "Inhaler", value: "INHALER" },
-  { label: "Injection", value: "INJECTION" },
-  { label: "Powder", value: "POWDER" },
-  { label: "Patch", value: "PATCH" },
-  { label: "Suppository", value: "SUPPOSITORY" },
-];
-import { useAuth } from "@clerk/nextjs";
+
+interface Medicine_Types {
+  value: string;
+  isDefault: boolean;
+}
+
+import { useAuth, useOrganization } from "@clerk/nextjs";
 import { Separator } from "@/components/ui/separator";
 import { db } from "@/firebase/firebaseConfig";
 import {
@@ -90,6 +77,7 @@ import MedicineImportCSV from "@/components/Settings/MedicineInfo/MedicineImport
 
 export default function SettingsMedicineInfoPage() {
   const { orgId } = useAuth();
+  const { organization, isLoaded } = useOrganization();
   const [medicines, setmedicines] = useState<Medicine[] | null>(null);
   const [addLoader, setAddLoader] = useState(false);
 
@@ -170,6 +158,13 @@ export default function SettingsMedicineInfoPage() {
   const [medicineEditModel, setMedicineEditModel] = useState<boolean>(false);
   const [editForMedicineId, setEditForMedicineId] = useState<string>("");
 
+  const options =
+    isLoaded &&
+    organization &&
+    Array.isArray(organization.publicMetadata.medicine_types)
+      ? (organization.publicMetadata.medicine_types as Medicine_Types[])
+      : [];
+  const defaultType = options.find((t) => t.isDefault)?.value ?? "";
   // -------------Export / Import diseases--------
   // CSV Export functionality
   const handleExportCSV = () => {
@@ -304,12 +299,12 @@ export default function SettingsMedicineInfoPage() {
                   <select
                     name="type"
                     id="type"
-                    defaultValue={""}
+                    defaultValue={defaultType}
                     className="h-min mt-1 form-select w-full border-border rounded-md py-1.5 placeholder:text-gray-400 shadow-sm bg-background focus:ring-1 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                   >
-                    {medicineTypes.map((type, index) => (
+                    {options.map((type, index) => (
                       <option key={index} value={type.value}>
-                        {type.label}
+                        {type.value}
                       </option>
                     ))}
                   </select>
@@ -470,6 +465,14 @@ const EditMedicineDataModel: React.FC<EditMedicineDataModel> = ({
 }) => {
   const { orgId } = useAuth();
   const [updateLoader, setUpdateLoader] = useState(false);
+  const { organization, isLoaded } = useOrganization();
+
+  const options =
+    isLoaded &&
+    organization &&
+    Array.isArray(organization.publicMetadata.medicine_types)
+      ? (organization.publicMetadata.medicine_types as Medicine_Types[])
+      : [];
 
   const submitHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -625,9 +628,9 @@ const EditMedicineDataModel: React.FC<EditMedicineDataModel> = ({
                 }
                 className="h-min mt-1 form-select w-full border-border rounded-md py-1.5 placeholder:text-gray-400 shadow-sm bg-background focus:ring-1 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
               >
-                {medicineTypes.map((type, index) => (
+                {options.map((type, index) => (
                   <option key={index} value={type.value}>
-                    {type.label}
+                    {type.value}
                   </option>
                 ))}
               </select>

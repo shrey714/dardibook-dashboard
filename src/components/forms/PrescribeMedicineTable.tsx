@@ -7,30 +7,16 @@ import { Button } from "../ui/button";
 import { DosageTypes, MedicinesDetails } from "@/types/FormTypes";
 import { Kbd } from "../ui/kbd";
 import { useHotkeys } from "react-hotkeys-hook";
+import { useOrganization } from "@clerk/nextjs";
 
 interface PrescribeMedicineTableProps {
   rows: MedicinesDetails[];
   setRows: (medicines: MedicinesDetails[]) => void;
 }
-const medicineTypes = [
-  { label: "Type", value: "", isDefault: true },
-  { label: "Tablet", value: "TAB" },
-  { label: "Capsule", value: "CAP" },
-  { label: "Syrup", value: "SYRUP" },
-  { label: "Drop", value: "DROP" },
-  { label: "Cream", value: "CREAM" },
-  { label: "Lotion", value: "LOTION" },
-  { label: "Serum", value: "SERUM" },
-  { label: "Soap", value: "SOAP" },
-  { label: "Spray", value: "SPRAY" },
-  { label: "Gel", value: "GEL" },
-  { label: "Ointment", value: "OINTMENT" },
-  { label: "Inhaler", value: "INHALER" },
-  { label: "Injection", value: "INJECTION" },
-  { label: "Powder", value: "POWDER" },
-  { label: "Patch", value: "PATCH" },
-  { label: "Suppository", value: "SUPPOSITORY" },
-];
+interface Medicine_Types {
+  value: string;
+  isDefault: boolean;
+}
 const durationTypes = [
   { label: "day", value: "day", isDefault: true },
   { label: "month", value: "month" },
@@ -41,6 +27,7 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
   setRows,
 }) => {
   const [rowIdCounter, setRowIdCounter] = useState(uniqid());
+  const { organization, isLoaded } = useOrganization();
 
   const addRow = () => {
     const newRow = {
@@ -148,6 +135,14 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
 
   useHotkeys("shift+n", () => addRow());
 
+  const options =
+    isLoaded &&
+    organization &&
+    Array.isArray(organization.publicMetadata.medicine_types)
+      ? (organization.publicMetadata.medicine_types as Medicine_Types[])
+      : [];
+  const defaultType = options.find((t) => t.isDefault)?.value ?? "";
+
   return (
     <div className="mx-auto px-0 text-center">
       <table className="table w-full">
@@ -193,21 +188,16 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
                     />
 
                     <select
-                      value={row.type}
+                      value={row.type || defaultType}
                       name="type"
                       onChange={(e) => {
                         handleInputChange(row.id, e);
                       }}
-                      defaultValue={""}
-                      className="flex flex-1 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-select py-1 pl-2 sm:text-sm sm:leading-6"
+                      className="flex flex-1 disabled:text-primary shadow-sm rounded-md border-border bg-background form-select py-1 pl-2 sm:text-sm sm:leading-6"
                     >
-                      {medicineTypes.map((type, index) => (
-                        <option
-                          key={index}
-                          value={type.value}
-                          // selected={type.isDefault || false}
-                        >
-                          {type.label}
+                      {options.map((type, index) => (
+                        <option key={index} value={type.value}>
+                          {type.value}
                         </option>
                       ))}
                     </select>
@@ -246,12 +236,11 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
                     className="flex flex-1 w-20 py-1.5 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input pl-2 sm:text-sm sm:leading-6"
                   />
                   <select
-                    value={row.durationType}
+                    value={row.durationType || "day"}
                     name="durationType"
                     onChange={(e) => {
                       handleInputChange(row.id, e);
                     }}
-                    defaultValue={"day"}
                     className="flex flex-1 py-1.5 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-select pl-2 sm:text-sm sm:leading-6"
                   >
                     {durationTypes.map((type, index) => (

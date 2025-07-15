@@ -598,6 +598,7 @@ const MedicineTypes = () => {
                   autoFocus
                   type="text"
                   placeholder="Injection..."
+                  required
                   defaultValue={editForMedicineType?.value}
                 />
               </div>
