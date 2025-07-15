@@ -45,6 +45,8 @@ import {
 } from "@/components/Settings/DiseaseInfo/DiseaseFilters";
 import DiseaseImportCSV from "@/components/Settings/DiseaseInfo/DiseaseImportCSV";
 import { BulkOperations } from "@/components/Settings/DiseaseInfo/BulkOperations";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
 export interface Disease {
   diseaseDetail: string;
@@ -241,30 +243,19 @@ export default function SettingsDiseaseInfoPage() {
             <form onSubmit={submitHandler} autoComplete="off">
               <fieldset
                 disabled={addLoader}
-                className="w-full rounded-lg grid grid-cols-6 gap-1 md:gap-4"
+                className="w-full rounded-lg grid grid-cols-6 gap-2 md:gap-4"
               >
-                <div className="col-span-6 sm:col-span-3 2xl:col-span-6">
-                  <label
-                    htmlFor="diseaseDetail"
-                    className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-                  >
-                    Disease Name
-                  </label>
-                  <input
-                    className="h-min mt-1 form-input w-full block bg-background rounded-md border-border py-1.5 shadow-sm placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                <div className="col-span-6 sm:col-span-3 2xl:col-span-6 space-y-2">
+                  <Label htmlFor="diseaseDetail">Disease Name</Label>
+                  <Input
                     name="diseaseDetail"
                     id="diseaseDetail"
                     placeholder="Disease Name.."
                     required
                   />
                 </div>
-                <div className="col-span-6 sm:col-span-3 2xl:col-span-6">
-                  <label
-                    htmlFor="medicines"
-                    className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-                  >
-                    Medicines
-                  </label>
+                <div className="col-span-6 sm:col-span-3 2xl:col-span-6 space-y-2">
+                  <Label htmlFor="medicines">Medicines</Label>
                   <MultipleSelector
                     value={addMedicinesData.map((medicine) => ({
                       label: medicine,

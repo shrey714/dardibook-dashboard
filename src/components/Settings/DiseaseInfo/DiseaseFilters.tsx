@@ -288,7 +288,6 @@ export const applyDiseaseFilters = (
   }
 
   // Sorting
-  console.log("filtered==", filtered);
   filtered.sort((a, b) => {
     let comparison = 0;
 

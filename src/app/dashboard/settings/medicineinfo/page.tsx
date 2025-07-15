@@ -36,6 +36,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 export interface Medicine {
   medicineName: string;
@@ -271,66 +273,53 @@ export default function SettingsMedicineInfoPage() {
             <form onSubmit={submitHandler} autoComplete="off">
               <fieldset
                 disabled={addLoader}
-                className="w-full rounded-lg grid grid-cols-6 gap-1 md:gap-4"
+                className="w-full rounded-lg grid grid-cols-6 gap-2 md:gap-4"
               >
-                <div className="col-span-6 sm:col-span-3 2xl:col-span-6">
-                  <label
-                    htmlFor="medicineName"
-                    className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-                  >
-                    Medicine Name
-                  </label>
-                  <input
-                    className="h-min mt-1 form-input w-full block bg-background rounded-md border-border py-1.5 shadow-sm placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                    name="medicineName"
+                {/* Medicine Name */}
+                <div className="col-span-6 sm:col-span-3 2xl:col-span-6 space-y-2">
+                  <Label htmlFor="medicineName">Medicine Name</Label>
+                  <Input
                     id="medicineName"
+                    name="medicineName"
                     placeholder="Medicine name.."
                     required
                   />
                 </div>
 
-                <div className="col-span-6 sm:col-span-3 2xl:col-span-6">
-                  <label
-                    htmlFor="type"
-                    className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-                  >
-                    Type
-                  </label>
-                  <select
-                    name="type"
-                    id="type"
-                    defaultValue={defaultType}
-                    className="h-min mt-1 form-select w-full border-border rounded-md py-1.5 placeholder:text-gray-400 shadow-sm bg-background focus:ring-1 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                  >
-                    {options.map((type, index) => (
-                      <option key={index} value={type.value}>
-                        {type.value}
-                      </option>
-                    ))}
-                  </select>
+                {/* Medicine Type */}
+                <div className="col-span-6 sm:col-span-3 2xl:col-span-6 space-y-2">
+                  <Label htmlFor="type">Type</Label>
+                  <Select name="type" defaultValue={defaultType}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select type..." />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-96">
+                      {options.map((type, index) => (
+                        <SelectItem key={index} value={type.value}>
+                          {type.value}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
-                <div className="col-span-6">
-                  <label
-                    htmlFor="instruction"
-                    className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-                  >
-                    Instruction
-                  </label>
-                  <input
-                    className="h-min mt-1 form-input w-full block bg-background rounded-md border-border py-1.5 shadow-sm placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                    name="instruction"
+                {/* Instruction */}
+                <div className="col-span-6 space-y-2">
+                  <Label htmlFor="instruction">Instruction</Label>
+                  <Input
                     id="instruction"
+                    name="instruction"
                     placeholder="Instruction.."
                   />
                 </div>
 
+                {/* Submit */}
                 <Separator className="w-full col-span-6" />
                 <div className="flex col-span-6 w-full items-center justify-end">
                   <Button
                     tabIndex={0}
                     role="button"
-                    variant={"outline"}
+                    variant="outline"
                     className="text-sm gap-2 px-6"
                     type="submit"
                   >
