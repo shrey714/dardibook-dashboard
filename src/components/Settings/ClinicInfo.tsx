@@ -11,6 +11,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import toast from "react-hot-toast";
+import { Label } from "../ui/label";
+import { Input } from "../ui/input";
 
 interface DoctorInfo {
   doctorName: string;
@@ -77,119 +79,85 @@ const ClinicInfo = () => {
   return (
     <Card className="mx-auto max-w-4xl 2xl:mx-0 shadow-none border h-min bg-sidebar/70 2xl:max-w-2xl">
       <CardHeader className="border-b p-5">
-        <CardTitle className="font-medium tracking-normal">Clinic Information</CardTitle>
+        <CardTitle className="font-medium tracking-normal">
+          Clinic Information
+        </CardTitle>
         <CardDescription>Update your basic clinic information.</CardDescription>
       </CardHeader>
       <CardContent className="p-0">
         <form onSubmit={handleSubmit} autoFocus={false} autoComplete="off">
           <fieldset disabled={loader}>
-            <div className="py-2 px-3 md:px-8 grid grid-cols-6 gap-1 md:gap-4">
+            <div className="py-4 px-3 md:px-8 grid grid-cols-6 gap-2 md:gap-4">
               {/* Doctor Name */}
-              <div className="col-span-6 sm:col-span-3">
-                <label
-                  htmlFor="doctorName"
-                  className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-                >
-                  Doctor Name
-                </label>
-                <input
+              <div className="col-span-6 sm:col-span-3 space-y-2">
+                <Label htmlFor="doctorName">Doctor Name</Label>
+                <Input
                   required
                   type="text"
                   id="doctorName"
                   name="doctorName"
-                  className="disabled:text-gray-400 form-input shadow-sm py-[6px] mt-1 w-full rounded-md border-border bg-transparent text-sm md:text-base font-medium"
                   value={formdata?.doctorName}
                   onChange={handleChange}
                 />
               </div>
 
               {/* Degree */}
-              <div className="col-span-6 sm:col-span-3">
-                <label
-                  htmlFor="clinicName"
-                  className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-                >
-                  Degree
-                </label>
-                <input
+              <div className="col-span-6 sm:col-span-3 space-y-2">
+                <Label htmlFor="clinicName">Degree</Label>
+                <Input
                   required
                   type="text"
                   id="degree"
                   name="degree"
-                  className="disabled:text-gray-400 form-input shadow-sm py-[6px] mt-1 w-full rounded-md border-border bg-transparent text-sm md:text-base font-medium"
                   value={formdata?.degree}
                   onChange={handleChange}
                 />
               </div>
               {/* Registraion number */}
-              <div className="col-span-6 sm:col-span-3">
-                <label
-                  htmlFor="doctorName"
-                  className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-                >
-                  Registration Number
-                </label>
-                <input
+              <div className="col-span-6 sm:col-span-3 space-y-2">
+                <Label htmlFor="doctorName">Registration Number</Label>
+                <Input
                   required
                   type="text"
                   id="registrationNumber"
                   name="registrationNumber"
-                  className="disabled:text-gray-400 form-input shadow-sm py-[6px] mt-1 w-full rounded-md border-border bg-transparent text-sm md:text-base font-medium"
                   value={formdata?.registrationNumber}
                   onChange={handleChange}
                 />
               </div>
 
               {/* Clinic Number */}
-              <div className="col-span-6 sm:col-span-3">
-                <label
-                  htmlFor="clinicNumber"
-                  className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-                >
-                  Clinic Number
-                </label>
-                <input
+              <div className="col-span-6 sm:col-span-3 space-y-2">
+                <Label htmlFor="clinicNumber">Clinic Number</Label>
+                <Input
                   required
                   type="number"
                   id="clinicNumber"
                   name="clinicNumber"
-                  className="disabled:text-gray-400 form-input shadow-sm py-[6px] mt-1 w-full rounded-md border-border bg-transparent text-sm md:text-base font-medium"
                   value={formdata?.clinicNumber}
                   onChange={handleChange}
                 />
               </div>
               {/* Phone Number */}
-              <div className="col-span-6 sm:col-span-3">
-                <label
-                  htmlFor="phoneNumber"
-                  className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-                >
-                  Phone Number
-                </label>
-                <input
+              <div className="col-span-6 sm:col-span-3 space-y-2">
+                <Label htmlFor="phoneNumber">Phone Number</Label>
+                <Input
                   required
                   type="number"
                   id="phoneNumber"
                   name="phoneNumber"
-                  className="disabled:text-gray-400 form-input shadow-sm py-[6px] mt-1 w-full rounded-md border-border bg-transparent text-sm md:text-base font-medium"
                   value={formdata?.phoneNumber}
                   onChange={handleChange}
                 />
               </div>
               {/* Clinic Address */}
-              <div className="col-span-6">
-                <label
-                  htmlFor="clinicAddress"
-                  className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-                >
-                  Clinic Address
-                </label>
-                <input
+              <div className="col-span-6 space-y-2">
+                <Label htmlFor="clinicAddress">Clinic Address</Label>
+                <Input
                   required
                   type="text"
                   id="clinicAddress"
                   name="clinicAddress"
-                  className="disabled:text-gray-400 form-input shadow-sm py-[6px] mt-1 w-full rounded-md border-border bg-transparent text-sm md:text-base font-medium"
                   value={formdata?.clinicAddress}
                   onChange={handleChange}
                 />

@@ -578,17 +578,11 @@ const EditMedicineDataModel: React.FC<EditMedicineDataModel> = ({
         <form onSubmit={submitHandler} autoComplete="off">
           <fieldset
             disabled={updateLoader}
-            className="w-full rounded-lg grid grid-cols-6 gap-1 md:gap-4"
+            className="w-full rounded-lg grid grid-cols-6 gap-2 md:gap-4"
           >
-            <div className="col-span-6">
-              <label
-                htmlFor="medicineName"
-                className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-              >
-                Medicine Name
-              </label>
-              <input
-                className="h-min mt-1 form-input w-full block bg-background rounded-md border-border py-1.5 shadow-sm placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+            <div className="col-span-6 space-y-2">
+              <Label htmlFor="medicineName">Medicine Name</Label>
+              <Input
                 name="medicineName"
                 id="medicineName"
                 placeholder="Medicine Name.."
@@ -600,39 +594,31 @@ const EditMedicineDataModel: React.FC<EditMedicineDataModel> = ({
                 required
               />
             </div>
-            <div className="col-span-6">
-              <label
-                htmlFor="type"
-                className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-              >
-                Type
-              </label>
-              <select
+            <div className="col-span-6 space-y-2">
+              <Label htmlFor="type">Type</Label>
+              <Select
                 name="type"
-                id="type"
                 defaultValue={
                   medicines?.find(
                     (medicine) => medicine.id === editForMedicineId
                   )?.type
                 }
-                className="h-min mt-1 form-select w-full border-border rounded-md py-1.5 placeholder:text-gray-400 shadow-sm bg-background focus:ring-1 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
               >
-                {options.map((type, index) => (
-                  <option key={index} value={type.value}>
-                    {type.value}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select type..." />
+                </SelectTrigger>
+                <SelectContent className="max-h-96">
+                  {options.map((type, index) => (
+                    <SelectItem key={index} value={type.value}>
+                      {type.value}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-            <div className="col-span-6">
-              <label
-                htmlFor="instruction"
-                className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-              >
-                Instruction
-              </label>
-              <input
-                className="h-min mt-1 form-input w-full block bg-background rounded-md border-border py-1.5 shadow-sm placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+            <div className="col-span-6 space-y-2">
+              <Label htmlFor="instruction">Instruction</Label>
+              <Input
                 name="instruction"
                 id="instruction"
                 placeholder="Instruction..."

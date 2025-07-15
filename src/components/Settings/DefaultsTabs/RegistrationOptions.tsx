@@ -33,6 +33,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { updateRegistrationReceiptDefaults } from "@/app/dashboard/settings/defaults/_actions";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
 export const RegistrationOptions = () => {
   const { orgId } = useAuth();
@@ -168,7 +170,9 @@ export const RegistrationOptions = () => {
       <Dialog open={receiptEditModel} onOpenChange={setReceiptEditModel}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle className="font-medium tracking-normal">Edit Receipt Type</DialogTitle>
+            <DialogTitle className="font-medium tracking-normal">
+              Edit Receipt Type
+            </DialogTitle>
             <DialogDescription>
               Modify details for{" "}
               {
@@ -180,17 +184,11 @@ export const RegistrationOptions = () => {
           <form onSubmit={UpdateType} autoComplete="off">
             <fieldset
               disabled={addLoader}
-              className="w-full rounded-lg grid grid-cols-6 gap-1 md:gap-4"
+              className="w-full rounded-lg grid grid-cols-6 gap-2 md:gap-4"
             >
-              <div className="col-span-6">
-                <label
-                  htmlFor="receiptType"
-                  className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-                >
-                  Receipt Type
-                </label>
-                <input
-                  className="h-min mt-1 form-input w-full block bg-background rounded-md border-border py-1.5 shadow-sm placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              <div className="col-span-6 space-y-2">
+                <Label htmlFor="receiptType">Receipt Type</Label>
+                <Input
                   name="receiptType"
                   id="receiptType"
                   placeholder="e.g., Registration Fee"
@@ -201,15 +199,9 @@ export const RegistrationOptions = () => {
                   }
                 />
               </div>
-              <div className="col-span-6">
-                <label
-                  htmlFor="amount"
-                  className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-                >
-                  Amount (₹)
-                </label>
-                <input
-                  className="h-min mt-1 form-input w-full block bg-background rounded-md border-border py-1.5 shadow-sm placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              <div className="col-span-6 space-y-2">
+                <Label htmlFor="amount">Amount (₹)</Label>
+                <Input
                   name="amount"
                   id="amount"
                   placeholder="e.g., 500"
@@ -259,17 +251,11 @@ export const RegistrationOptions = () => {
           <form onSubmit={AddNewType} autoComplete="off">
             <fieldset
               disabled={addLoader}
-              className="w-full rounded-lg grid grid-cols-6 gap-1 md:gap-4"
+              className="w-full rounded-lg grid grid-cols-6 gap-2 md:gap-4"
             >
-              <div className="col-span-6 sm:col-span-3">
-                <label
-                  htmlFor="receiptType"
-                  className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-                >
-                  Receipt Type
-                </label>
-                <input
-                  className="h-min mt-1 form-input w-full block bg-background rounded-md border-border py-1.5 shadow-sm placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              <div className="col-span-6 sm:col-span-3 space-y-2">
+                <Label htmlFor="receiptType">Receipt Type</Label>
+                <Input
                   name="receiptType"
                   id="receiptType"
                   placeholder="e.g., Registration Fee"
@@ -277,15 +263,9 @@ export const RegistrationOptions = () => {
                 />
               </div>
 
-              <div className="col-span-6 sm:col-span-3">
-                <label
-                  htmlFor="amount"
-                  className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-                >
-                  Amount (₹)
-                </label>
-                <input
-                  className="h-min mt-1 form-input w-full block bg-background rounded-md border-border py-1.5 shadow-sm placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              <div className="col-span-6 sm:col-span-3 space-y-2">
+                <Label htmlFor="amount">Amount (₹)</Label>
+                <Input
                   name="amount"
                   id="amount"
                   placeholder="e.g., 500"

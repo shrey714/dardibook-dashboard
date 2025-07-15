@@ -35,6 +35,15 @@ import {
   updateBillDefaults,
   updateServicesDefaults,
 } from "@/app/dashboard/settings/defaults/_actions";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface ServiceItems {
   service_id: string;
@@ -60,7 +69,7 @@ export const PharmacyOptions = () => {
 
 const BillDefaults = () => {
   const [updateLoader, setUpdateLoader] = useState(false);
-  const { organization, isLoaded } = useOrganization();
+  const { organization } = useOrganization();
 
   const billDefaults = organization?.publicMetadata?.bill_defaults as
     | BillDefaultsType
@@ -122,17 +131,11 @@ const BillDefaults = () => {
         <form onSubmit={updateDefaults} autoComplete="off">
           <fieldset
             disabled={updateLoader}
-            className="w-full rounded-lg grid grid-cols-6 gap-1 md:gap-4"
+            className="w-full rounded-lg grid grid-cols-6 gap-2 md:gap-4"
           >
-            <div className="col-span-6 sm:col-span-3">
-              <label
-                htmlFor="discount"
-                className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-              >
-                Discount (%)
-              </label>
-              <input
-                className="h-min mt-1 form-input w-full block bg-background rounded-md border-border py-1.5 shadow-sm placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+            <div className="col-span-6 sm:col-span-3 space-y-2">
+              <Label htmlFor="discount">Discount (%)</Label>
+              <Input
                 name="discount"
                 id="discount"
                 placeholder="e.g., 10"
@@ -142,15 +145,9 @@ const BillDefaults = () => {
               />
             </div>
 
-            <div className="col-span-6 sm:col-span-3">
-              <label
-                htmlFor="tax"
-                className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-              >
-                Tax (%)
-              </label>
-              <input
-                className="h-min mt-1 form-input w-full block bg-background rounded-md border-border py-1.5 shadow-sm placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+            <div className="col-span-6 sm:col-span-3 space-y-2">
+              <Label htmlFor="tax">Tax (%)</Label>
+              <Input
                 name="tax"
                 id="tax"
                 placeholder="e.g., 13"
@@ -160,46 +157,42 @@ const BillDefaults = () => {
               />
             </div>
 
-            <div className="col-span-6 sm:col-span-3">
-              <label
-                className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-                htmlFor="payment_status"
-              >
-                Payment Status
-              </label>
-              <select
+            <div className="col-span-6 sm:col-span-3 space-y-2">
+              <Label htmlFor="payment_status">Payment Status</Label>
+              <Select
                 required
-                id="payment_status"
                 name="payment_status"
                 defaultValue={payment_status}
-                className="h-min mt-1 form-select disabled:opacity-100 w-full block bg-background rounded-md border-border py-1.5 shadow-sm placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
               >
-                <option value="Paid">Paid</option>
-                <option value="Unpaid">Unpaid</option>
-                <option value="Not Required">Not Required</option>
-                <option value="Refunded">Refunded</option>
-              </select>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select status..." />
+                </SelectTrigger>
+                <SelectContent className="max-h-96">
+                  <SelectItem value="Paid">Paid</SelectItem>
+                  <SelectItem value="Unpaid">Unpaid</SelectItem>
+                  <SelectItem value="Not Required">Not Required</SelectItem>
+                  <SelectItem value="Refunded">Refunded</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
-            <div className="col-span-6 sm:col-span-3">
-              <label
-                className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-                htmlFor="payment_method"
-              >
-                Payment Method
-              </label>
-              <select
+            <div className="col-span-6 sm:col-span-3 space-y-2">
+              <Label htmlFor="payment_method">Payment Method</Label>
+              <Select
                 required
-                id="payment_method"
                 name="payment_method"
                 defaultValue={payment_method}
-                className="h-min mt-1 form-select disabled:opacity-100 w-full block bg-background rounded-md border-border py-1.5 shadow-sm placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
               >
-                <option value="Cash">Cash</option>
-                <option value="Card">Card</option>
-                <option value="UPI">UPI</option>
-                <option value="Online">Online</option>
-              </select>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select status..." />
+                </SelectTrigger>
+                <SelectContent className="max-h-96">
+                  <SelectItem value="Cash">Cash</SelectItem>
+                  <SelectItem value="Card">Card</SelectItem>
+                  <SelectItem value="UPI">UPI</SelectItem>
+                  <SelectItem value="Online">Online</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <Separator className="w-full col-span-6" />
@@ -361,17 +354,11 @@ const ServicesUpdateModal = () => {
           <form onSubmit={UpdateType} autoComplete="off">
             <fieldset
               disabled={addLoader}
-              className="w-full rounded-lg grid grid-cols-6 gap-1 md:gap-4"
+              className="w-full rounded-lg grid grid-cols-6 gap-2 md:gap-4"
             >
-              <div className="col-span-6">
-                <label
-                  htmlFor="service_name"
-                  className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-                >
-                  Service Name
-                </label>
-                <input
-                  className="h-min mt-1 form-input w-full block bg-background rounded-md border-border py-1.5 shadow-sm placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              <div className="col-span-6 space-y-2">
+                <Label htmlFor="service_name">Service Name</Label>
+                <Input
                   name="service_name"
                   id="service_name"
                   placeholder="e.g., Health Screenings"
@@ -383,15 +370,9 @@ const ServicesUpdateModal = () => {
                   }
                 />
               </div>
-              <div className="col-span-6">
-                <label
-                  htmlFor="price"
-                  className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-                >
-                  Price (₹)
-                </label>
-                <input
-                  className="h-min mt-1 form-input w-full block bg-background rounded-md border-border py-1.5 shadow-sm placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              <div className="col-span-6 space-y-2">
+                <Label htmlFor="price">Price (₹)</Label>
+                <Input
                   name="price"
                   id="price"
                   placeholder="e.g., 500"
@@ -442,17 +423,11 @@ const ServicesUpdateModal = () => {
           <form onSubmit={AddNewType} autoComplete="off">
             <fieldset
               disabled={addLoader}
-              className="w-full rounded-lg grid grid-cols-6 gap-1 md:gap-4"
+              className="w-full rounded-lg grid grid-cols-6 gap-2 md:gap-4"
             >
-              <div className="col-span-6 sm:col-span-3">
-                <label
-                  htmlFor="service_name"
-                  className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-                >
-                  Service Name
-                </label>
-                <input
-                  className="h-min mt-1 form-input w-full block bg-background rounded-md border-border py-1.5 shadow-sm placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              <div className="col-span-6 sm:col-span-3 space-y-2">
+                <Label htmlFor="service_name">Service Name</Label>
+                <Input
                   name="service_name"
                   id="service_name"
                   placeholder="e.g., Health Screenings"
@@ -460,15 +435,9 @@ const ServicesUpdateModal = () => {
                 />
               </div>
 
-              <div className="col-span-6 sm:col-span-3">
-                <label
-                  htmlFor="price"
-                  className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-                >
-                  Price (₹)
-                </label>
-                <input
-                  className="h-min mt-1 form-input w-full block bg-background rounded-md border-border py-1.5 shadow-sm placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              <div className="col-span-6 sm:col-span-3 space-y-2">
+                <Label htmlFor="price">Price (₹)</Label>
+                <Input
                   name="price"
                   id="price"
                   placeholder="e.g., 500"

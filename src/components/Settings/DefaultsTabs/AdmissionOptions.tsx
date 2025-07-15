@@ -25,6 +25,8 @@ import { updateBedDefaults } from "@/app/dashboard/settings/defaults/_actions";
 import { useBedsStore } from "@/lib/stores/useBedsStore";
 import { Skeleton } from "@/components/ui/skeleton";
 import CreatableSelect from "react-select/creatable";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
 interface BedDefaultsType {
   bed_id: string;
@@ -208,20 +210,15 @@ export const AdmissionOptions = () => {
           <form onSubmit={UpdateBed} autoComplete="off">
             <fieldset
               disabled={addLoader}
-              className="w-full rounded-lg space-y-1 md:space-y-4"
+              className="w-full rounded-lg space-y-2 md:space-y-4"
             >
-              <div className="w-full">
-                <label
-                  htmlFor="ward"
-                  className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-                >
-                  Ward
-                </label>
+              <div className="w-full space-y-2">
+                <Label htmlFor="ward">Ward</Label>
 
                 <CreatableSelect
                   name="ward"
                   id="ward"
-                  className="h-min mt-1 w-full block bg-background"
+                  className="h-min mt-1 w-full block bg-transparent dark:bg-input/30"
                   backspaceRemovesValue={true}
                   defaultValue={{
                     label: clerkBeds?.find(
@@ -346,15 +343,9 @@ export const AdmissionOptions = () => {
               disabled={addLoader}
               className="w-full rounded-lg grid grid-cols-6 gap-1 md:gap-4"
             >
-              <div className="col-span-6 sm:col-span-3">
-                <label
-                  htmlFor="bed_id"
-                  className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-                >
-                  Bed Number/ID
-                </label>
-                <input
-                  className="h-min mt-1 form-input w-full block bg-background rounded-md border-border py-1.5 shadow-sm placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              <div className="col-span-6 sm:col-span-3 space-y-2">
+                <Label htmlFor="bed_id">Bed Number/ID</Label>
+                <Input
                   name="bed_id"
                   id="bed_id"
                   placeholder="e.g., Bed 01"
@@ -364,17 +355,12 @@ export const AdmissionOptions = () => {
                 />
               </div>
 
-              <div className="col-span-6 sm:col-span-3">
-                <label
-                  htmlFor="ward"
-                  className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-                >
-                  Ward
-                </label>
+              <div className="col-span-6 sm:col-span-3 space-y-2">
+                <Label htmlFor="ward">Ward</Label>
                 <CreatableSelect
                   name="ward"
                   id="ward"
-                  className="h-min mt-1 w-full block bg-background"
+                  className="h-min mt-1 w-full block bg-transparent dark:bg-input/30"
                   backspaceRemovesValue={true}
                   options={[
                     ...new Set(clerkBeds.map((clerkBed) => clerkBed.ward)),
