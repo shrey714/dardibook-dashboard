@@ -1,7 +1,14 @@
 "use client";
 
 import React, { FormEvent, useEffect, useState } from "react";
-import { CirclePlus, InboxIcon, Pencil } from "lucide-react";
+import {
+  CirclePlus,
+  InboxIcon,
+  Pencil,
+  PlusIcon,
+  Settings2Icon,
+  StarIcon,
+} from "lucide-react";
 import uniqid from "uniqid";
 import Loader from "@/components/common/Loader";
 import toast from "react-hot-toast";
@@ -18,10 +25,15 @@ import {
   DialogTitle,
   DialogDescription,
   DialogHeader,
+  DialogTrigger,
+  DialogClose,
 } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 
-import { useAuth, useOrganization } from "@clerk/nextjs";
+import { useOrganization } from "@clerk/nextjs";
 import { Separator } from "@/components/ui/separator";
 import { ReceiptDetails } from "@/types/FormTypes";
 import {
@@ -32,7 +44,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { updatePrescriptionReceiptDefaults } from "@/app/dashboard/settings/defaults/_actions";
+import {
+  updateMedicineTypesDefaults,
+  updatePrescriptionReceiptDefaults,
+} from "@/app/dashboard/settings/defaults/_actions";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const PrescriptionOptions = () => {
   return (
@@ -44,7 +61,6 @@ export const PrescriptionOptions = () => {
 };
 
 const PrescriptionReceiptType = () => {
-  const { orgId } = useAuth();
   const { organization, isLoaded } = useOrganization();
   const [receipts, setReceipts] = useState<ReceiptDetails[]>([]);
   const [addLoader, setAddLoader] = useState(false);
@@ -64,7 +80,7 @@ const PrescriptionReceiptType = () => {
     } else {
       setReceipts([]);
     }
-  }, [isLoaded, orgId, organization]);
+  }, [isLoaded, organization]);
 
   // --------------add new receipt type-----------
   const AddNewType = async (e: FormEvent<HTMLFormElement>) => {
@@ -368,16 +384,384 @@ const PrescriptionReceiptType = () => {
   );
 };
 
+interface Medicine_Types {
+  value: string;
+  isDefault: boolean;
+}
+
 const MedicineTypes = () => {
+  const { organization, isLoaded } = useOrganization();
+  const [medicineTypeEditModel, setMedicineTypeEditModel] =
+    useState<boolean>(false);
+  const [editForMedicineType, setEditForMedicineType] = useState<
+    (typeof medicineTypes)[0] | null
+  >(null);
+  const [loader, setLoader] = useState(false);
+  const [medicineTypes, setMedicineTypes] = useState<Medicine_Types[]>([]);
+
+  useEffect(() => {
+    if (
+      isLoaded &&
+      organization &&
+      organization.publicMetadata.medicine_types
+    ) {
+      setMedicineTypes(
+        organization.publicMetadata.medicine_types as Medicine_Types[]
+      );
+    } else {
+      setMedicineTypes([]);
+    }
+  }, [isLoaded, organization]);
+
+  // --------------add new medicine type-----------
+  const AddNewMedicineType = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!organization) return;
+
+    const form = e.target as HTMLFormElement;
+    const formData = new FormData(form);
+    const newType = (formData.get("type") as string).trim();
+    const isDefault = formData.get("default") === "on";
+
+    if (!newType) return;
+
+    // Check for duplicate (case-insensitive)
+    const isDuplicate = medicineTypes.some(
+      (t) => t.value.toLowerCase() === newType.toLowerCase()
+    );
+    if (isDuplicate) {
+      toast.error(`Duplicate type not added: ${newType}`);
+      return;
+    }
+
+    const updatedTypes = [
+      ...medicineTypes.map((t) => ({
+        ...t,
+        isDefault: isDefault ? false : t.isDefault,
+      })),
+      { value: newType, isDefault },
+    ];
+
+    toast.promise(
+      async () => {
+        setLoader(true);
+        await updateMedicineTypesDefaults(updatedTypes).then(
+          () => {
+            organization.reload();
+            setLoader(false);
+            form.reset();
+          },
+          (error) => {
+            console.error("Operation failed. Please try again : ", error);
+            setLoader(false);
+          }
+        );
+      },
+      {
+        loading: "Adding medicine type...",
+        success: "Medicine type added successfully",
+        error: "Error adding medicine type",
+      },
+      {
+        position: "bottom-right",
+      }
+    );
+  };
+
+  // --------------update medicine type-----------
+  const UpdateMedicineType = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!organization || !editForMedicineType) return;
+
+    const form = e.target as HTMLFormElement;
+    const formData = new FormData(form);
+    const updatedValue = (formData.get("type") as string).trim();
+    const isDefault = formData.get("default") === "on";
+
+    if (!updatedValue) return;
+
+    // Check for duplicate (case-insensitive), excluding the current type
+    const isDuplicate = medicineTypes.some(
+      (t) =>
+        t.value.toLowerCase() === updatedValue.toLowerCase() &&
+        t.value.toLowerCase() !== editForMedicineType.value.toLowerCase()
+    );
+    if (isDuplicate) {
+      toast.error(`Duplicate type not updated: ${updatedValue}`);
+      return;
+    }
+
+    const updatedTypes = medicineTypes.map((t) => {
+      if (t.value.toLowerCase() === editForMedicineType.value.toLowerCase()) {
+        return { value: updatedValue, isDefault };
+      }
+      return {
+        ...t,
+        isDefault: isDefault ? false : t.isDefault,
+      };
+    });
+
+    toast.promise(
+      async () => {
+        setLoader(true);
+        await updateMedicineTypesDefaults(updatedTypes).then(
+          () => {
+            organization.reload();
+            setLoader(false);
+            setMedicineTypeEditModel(false);
+          },
+          (error) => {
+            console.error("Operation failed. Please try again : ", error);
+            setLoader(false);
+          }
+        );
+      },
+      {
+        loading: "Updating medicine type...",
+        success: "Medicine type updated successfully",
+        error: "Error updating medicine type",
+      },
+      {
+        position: "bottom-right",
+      }
+    );
+  };
+
+  // --------------delete medicine type-----------
+  const DeleteMedicineType = async () => {
+    if (!organization || !editForMedicineType) return;
+
+    const remainingTypes = medicineTypes.filter(
+      (t) => t.value.toLowerCase() !== editForMedicineType.value.toLowerCase()
+    );
+
+    let updatedTypes: Medicine_Types[];
+
+    if (editForMedicineType.isDefault && remainingTypes.length > 0) {
+      updatedTypes = remainingTypes.map((t, index) => ({
+        ...t,
+        isDefault: index === 0,
+      }));
+    } else {
+      updatedTypes = remainingTypes;
+    }
+
+    toast.promise(
+      async () => {
+        setLoader(true);
+        await updateMedicineTypesDefaults(updatedTypes).then(
+          () => {
+            organization.reload();
+            setLoader(false);
+            setMedicineTypeEditModel(false);
+          },
+          (error) => {
+            console.error("Operation failed. Please try again : ", error);
+            setLoader(false);
+          }
+        );
+      },
+      {
+        loading: "Deleting medicine type...",
+        success: "Medicine type deleted successfully",
+        error: "Error deleting medicine type",
+      },
+      {
+        position: "bottom-right",
+      }
+    );
+  };
+
   return (
-    <Card className="border rounded-md bg-sidebar/70 w-full shadow-none h-min mx-auto mt-2 md:mt-5">
-      <CardHeader className="border-b p-4">
-        <CardTitle className="font-medium tracking-normal">
-          Add New Medicine Type
-        </CardTitle>
-        <CardDescription hidden></CardDescription>
-      </CardHeader>
-      <CardContent className="py-4 px-3 md:px-8">HELLOW</CardContent>
-    </Card>
+    <>
+      <Dialog
+        open={medicineTypeEditModel}
+        onOpenChange={setMedicineTypeEditModel}
+      >
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle className="font-medium tracking-normal">
+              Edit Medicine Type
+            </DialogTitle>
+            <DialogDescription>
+              Modify details for {editForMedicineType?.value}
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={UpdateMedicineType} autoComplete="off">
+            <fieldset disabled={loader} className="w-full flex flex-col gap-4">
+              <div className="flex w-full items-start gap-2 flex-col">
+                <Label htmlFor="type" className="text-muted-foreground">
+                  Medicine Type
+                </Label>
+                <Input
+                  name="type"
+                  autoFocus
+                  type="text"
+                  placeholder="Injection..."
+                  defaultValue={editForMedicineType?.value}
+                />
+              </div>
+
+              <div className="flex w-full items-start gap-2 flex-row">
+                <Label htmlFor="default" className="text-muted-foreground">
+                  Make it default ?
+                </Label>
+
+                <Checkbox
+                  defaultChecked={editForMedicineType?.isDefault}
+                  name="default"
+                />
+              </div>
+
+              <Separator className="w-full col-span-6" />
+              <div className="flex col-span-6 w-full items-center justify-between">
+                <Button
+                  role="button"
+                  variant={"destructive"}
+                  className="text-sm gap-2 px-6"
+                  type="button"
+                  onClick={DeleteMedicineType}
+                >
+                  Delete
+                </Button>
+                <Button
+                  tabIndex={0}
+                  role="button"
+                  variant={"outline"}
+                  className="text-sm gap-2 px-6"
+                  type="submit"
+                >
+                  Update
+                </Button>
+              </div>
+            </fieldset>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      <Card className="border rounded-md bg-sidebar/70 w-full shadow-none h-min mx-auto mt-2 md:mt-5">
+        <CardHeader className="border-b p-4">
+          <CardTitle className="font-medium tracking-normal">
+            Add New Medicine Type
+          </CardTitle>
+          <CardDescription hidden></CardDescription>
+        </CardHeader>
+        <CardContent className="py-4 px-3 md:px-6 flex flex-row gap-2 flex-wrap">
+          {!isLoaded ? (
+            Array.from({ length: 5 }).map((_, index) => (
+              <Skeleton key={index} className="w-28 h-10 rounded-full" />
+            ))
+          ) : medicineTypes.length === 0 ? (
+            <Badge
+              variant="outline"
+              className={`rounded-full py-1 h-10 transition-all px-10`}
+            >
+              <InboxIcon className="size-4" />
+            </Badge>
+          ) : (
+            medicineTypes.map((type, index) => (
+              <Badge
+                variant="outline"
+                className={`group rounded-full text-sm font-medium leading-normal gap-2 py-1 h-10 transition-all pl-3 pr-1`}
+                key={index}
+              >
+                {type.isDefault && (
+                  <StarIcon className="size-4 fill-foreground" />
+                )}
+                {type.value}
+                <Button
+                  variant="secondary"
+                  className="items-center justify-center h-full aspect-square w-auto px-1 py-1 rounded-full shadow-none flex"
+                  size="icon"
+                  onClick={() => {
+                    setEditForMedicineType(type);
+                    setMedicineTypeEditModel(true);
+                  }}
+                >
+                  <Settings2Icon />
+                </Button>
+              </Badge>
+            ))
+          )}
+
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button
+                variant="outline"
+                className="rounded-full p-1 pr-3 h-10 text-sm font-medium leading-normal border-dashed"
+              >
+                <span className="gap-2 h-full flex flex-row items-center">
+                  <span className="flex items-center justify-center h-full aspect-square px-1 py-1 rounded-full bg-white/10">
+                    <PlusIcon />
+                  </span>
+                  Add New
+                </span>
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle className="font-medium tracking-normal">
+                  Add New Type
+                </DialogTitle>
+                <DialogDescription>
+                  Add new medicine type. Click add when you&apos;re done.
+                </DialogDescription>
+              </DialogHeader>
+              <form onSubmit={AddNewMedicineType} autoComplete="off">
+                <fieldset
+                  disabled={loader}
+                  className="w-full flex flex-col gap-4"
+                >
+                  <div className="flex w-full items-start gap-2 flex-col">
+                    <Label htmlFor="type" className="text-muted-foreground">
+                      Medicine Type
+                    </Label>
+                    <Input
+                      name="type"
+                      autoFocus
+                      type="text"
+                      placeholder="Injection..."
+                      className=""
+                      required
+                    />
+                  </div>
+
+                  <div className="flex w-full items-start gap-2 flex-row">
+                    <Label htmlFor="default" className="text-muted-foreground">
+                      Make it default ?
+                    </Label>
+
+                    <Checkbox name="default" />
+                  </div>
+
+                  <Separator className="w-full col-span-6" />
+                  <div className="flex col-span-6 w-full items-center justify-between">
+                    <DialogClose asChild>
+                      <Button
+                        role="button"
+                        variant="secondary"
+                        className="text-sm gap-2 px-6"
+                        type="button"
+                      >
+                        Cancel
+                      </Button>
+                    </DialogClose>
+                    <Button
+                      tabIndex={0}
+                      role="button"
+                      variant={"outline"}
+                      className="text-sm gap-2 px-6"
+                      type="submit"
+                    >
+                      Add
+                    </Button>
+                  </div>
+                </fieldset>
+              </form>
+            </DialogContent>
+          </Dialog>
+        </CardContent>
+      </Card>
+    </>
   );
 };
