@@ -2,7 +2,14 @@
 
 import React, { FormEvent, useEffect, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
-import { CirclePlus, Download, FileText, InboxIcon } from "lucide-react";
+import {
+  CirclePlus,
+  Download,
+  FileText,
+  InboxIcon,
+  SaveIcon,
+  Trash2Icon,
+} from "lucide-react";
 import DiseaseRow from "@/components/Settings/DiseaseInfo/DiseaseRow";
 import uniqid from "uniqid";
 import toast from "react-hot-toast";
@@ -232,7 +239,7 @@ export default function SettingsDiseaseInfoPage() {
         setdiseases={setdiseases}
       />
       <div className="w-full py-2 sm:py-5 px-2 md:px-5 2xl:flex 2xl:flex-row 2xl:gap-5 2xl:justify-center">
-        <Card className="bg-sidebar/70 w-full shadow-none border h-min mx-auto max-w-4xl 2xl:mx-0 2xl:max-w-xl">
+        <Card className="w-full shadow-none border h-min mx-auto max-w-4xl 2xl:mx-0 2xl:max-w-xl">
           <CardHeader className="border-b p-4">
             <CardTitle className="font-medium tracking-normal">
               Add new disease
@@ -320,11 +327,12 @@ export default function SettingsDiseaseInfoPage() {
                   <Button
                     tabIndex={0}
                     role="button"
-                    variant={"outline"}
-                    className="text-sm gap-2 px-6"
                     type="submit"
+                    effect={"ringHover"}
+                    icon={CirclePlus}
+                    iconPlacement="right"
                   >
-                    <CirclePlus width={20} height={20} /> Add
+                    Add
                   </Button>
                 </div>
               </fieldset>
@@ -334,7 +342,7 @@ export default function SettingsDiseaseInfoPage() {
 
         <div className="flex flex-col mt-2 sm:mt-5 2xl:mt-0 mx-auto 2xl:mx-0 max-w-4xl gap-2 w-full">
           {/* CSV Import/Export Controls */}
-          <Card className="bg-sidebar/70 border shadow-none">
+          <Card className="border shadow-none">
             <CardHeader className="border-b p-4">
               <CardTitle className="font-medium tracking-normal">
                 Disease Management
@@ -389,7 +397,7 @@ export default function SettingsDiseaseInfoPage() {
           )}
 
           {/* diaplay disease */}
-          <div className="w-full flex flex-col flex-1 bg-sidebar/70 border rounded-md">
+          <div className="w-full flex flex-col flex-1 bg-card border rounded-md">
             {diseases === null ? (
               <div className="w-full divide-y rounded-md overflow-hidden">
                 {[...Array(5)].map((_, i) => (
@@ -649,9 +657,10 @@ const EditDiseaseDataModel: React.FC<DisplayEditDiseaseProps> = ({
               <Button
                 role="button"
                 variant={"destructive"}
-                className="text-sm gap-2 px-6"
                 type="button"
                 onClick={deleteDisease}
+                icon={Trash2Icon}
+                iconPlacement="right"
               >
                 Delete
               </Button>
@@ -659,8 +668,9 @@ const EditDiseaseDataModel: React.FC<DisplayEditDiseaseProps> = ({
                 tabIndex={0}
                 role="button"
                 variant={"outline"}
-                className="text-sm gap-2 px-6"
                 type="submit"
+                icon={SaveIcon}
+                iconPlacement="right"
               >
                 Update
               </Button>

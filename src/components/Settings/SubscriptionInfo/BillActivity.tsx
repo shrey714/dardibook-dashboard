@@ -403,7 +403,7 @@ const BillActivity = () => {
   return (
     <>
       <Card className="p-0 w-full shadow-none border overflow-hidden">
-        <CardHeader className="border-b p-4 bg-sidebar/70">
+        <CardHeader className="border-b p-4 bg-card">
           <CardTitle className="font-medium tracking-normal flex gap-x-2 items-center">
             Billing Activity & Invoices
             <TooltipProvider>
@@ -501,7 +501,7 @@ const BillActivity = () => {
             </Table>
           )}
         </CardContent>
-        <CardFooter className="border-t py-2 px-4 flex items-center justify-between space-x-2 gap-4 flex-row bg-sidebar/70">
+        <CardFooter className="border-t py-2 px-4 flex items-center justify-between space-x-2 gap-4 flex-row bg-card">
           <div className="text-sm text-muted-foreground hidden sm:block">
             {`${list.length} row(s)`}
           </div>

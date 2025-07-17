@@ -64,6 +64,7 @@ const DiseaseRow: React.FC<DisplayDiseaseProps> = ({
         <Button
           variant={"outline"}
           className={`h-9 w-9 min-w-0`}
+          effect={"ringHover"}
           onClick={() => {
             setEditForDiseaseId(disease.diseaseId);
             setDiseaseEditModel(true);

@@ -510,7 +510,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
         )}
       </AnimatePresence>
 
-      <CardContent className="overflow-auto flex-grow p-6 bg-sidebar/70">
+      <CardContent className="overflow-auto flex-grow p-6 bg-card">
         {selectedPatient ? (
           selectedPrescription ? (
             <Form {...form}>

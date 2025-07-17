@@ -1,7 +1,13 @@
 "use client";
 
 import React, { FormEvent, useEffect, useState } from "react";
-import { CirclePlus, InboxIcon, Pencil } from "lucide-react";
+import {
+  CirclePlus,
+  InboxIcon,
+  Pencil,
+  SaveIcon,
+  Trash2Icon,
+} from "lucide-react";
 import uniqid from "uniqid";
 import Loader from "@/components/common/Loader";
 import toast from "react-hot-toast";
@@ -219,18 +225,19 @@ export const RegistrationOptions = () => {
                 <Button
                   role="button"
                   variant={"destructive"}
-                  className="text-sm gap-2 px-6"
                   type="button"
                   onClick={DeleteType}
+                  icon={Trash2Icon}
+                  iconPlacement="right"
                 >
                   Delete
                 </Button>
                 <Button
                   tabIndex={0}
                   role="button"
-                  variant={"outline"}
-                  className="text-sm gap-2 px-6"
                   type="submit"
+                  icon={SaveIcon}
+                  iconPlacement="right"
                 >
                   Update
                 </Button>
@@ -240,7 +247,7 @@ export const RegistrationOptions = () => {
         </DialogContent>
       </Dialog>
 
-      <Card className="border rounded-md border-b-0 rounded-b-none bg-sidebar/70 w-full shadow-none  h-min mx-auto">
+      <Card className="border rounded-md border-b-0 rounded-b-none w-full shadow-none  h-min mx-auto">
         <CardHeader className="border-b p-4">
           <CardTitle className="font-medium tracking-normal">
             Add Registration Receipt Type
@@ -279,18 +286,20 @@ export const RegistrationOptions = () => {
                 <Button
                   tabIndex={0}
                   role="button"
-                  variant={"outline"}
-                  className="text-sm gap-2 px-6"
+                  className="text-sm px-6"
                   type="submit"
+                  effect={"ringHover"}
+                  icon={CirclePlus}
+                  iconPlacement="right"
                 >
-                  <CirclePlus width={20} height={20} /> Add
+                  Add
                 </Button>
               </div>
             </fieldset>
           </form>
         </CardContent>
       </Card>
-      <div className="rounded-t-none w-full flex flex-col flex-1 bg-sidebar/70 border rounded-md divide-y">
+      <div className="rounded-t-none w-full flex flex-col flex-1 bg-card border rounded-md divide-y">
         {!isLoaded ? (
           <div className="flex flex-1 items-center justify-center min-h-72 w-full">
             <Loader size="medium" />
@@ -319,6 +328,7 @@ export const RegistrationOptions = () => {
                     <Button
                       variant={"outline"}
                       className={`h-9 w-9 min-w-0`}
+                      effect={"ringHover"}
                       onClick={() => {
                         setReceiptEditModel(true);
                         setEditForReceiptId(receipt.id);

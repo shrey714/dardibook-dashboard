@@ -61,7 +61,7 @@ const MedicineRow: React.FC<DisplayMedicineProps> = ({
         )}
       </div>
 
-      <div className="col-span-5 [&:empty]:invisible border rounded-md flex items-center h-min py-[0px] sm:py-[5.5px] px-2 text-muted-foreground bg-background border-border text-sm w-full">
+      <div className="col-span-5 [&:empty]:invisible rounded-md flex items-center h-min py-[0px] sm:py-[5.5px] px-2 text-muted-foreground bg-background border-border text-sm w-full">
         {medicine.instruction || "No Instruction"}
       </div>
 
@@ -69,6 +69,7 @@ const MedicineRow: React.FC<DisplayMedicineProps> = ({
         <Button
           variant={"outline"}
           className={`h-9 w-9 min-w-0`}
+          effect={"ringHover"}
           onClick={() => {
             setEditForMedicineId(medicine.id);
             setMedicineEditModel(true);

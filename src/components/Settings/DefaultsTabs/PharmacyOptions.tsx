@@ -1,7 +1,13 @@
 "use client";
 
 import React, { FormEvent, useEffect, useState } from "react";
-import { CirclePlus, InboxIcon, Pencil, SaveIcon } from "lucide-react";
+import {
+  CirclePlus,
+  InboxIcon,
+  Pencil,
+  SaveIcon,
+  Trash2Icon,
+} from "lucide-react";
 import uniqid from "uniqid";
 import Loader from "@/components/common/Loader";
 import toast from "react-hot-toast";
@@ -120,7 +126,7 @@ const BillDefaults = () => {
   };
 
   return (
-    <Card className="bg-sidebar/70 rounded-md w-full shadow-none border h-min mx-auto">
+    <Card className="rounded-md w-full shadow-none border h-min mx-auto">
       <CardHeader className="border-b p-4">
         <CardTitle className="font-medium tracking-normal">
           Bill Defaults
@@ -200,11 +206,12 @@ const BillDefaults = () => {
               <Button
                 tabIndex={0}
                 role="button"
-                variant={"outline"}
-                className="text-sm gap-2 px-6"
                 type="submit"
+                effect={"ringHover"}
+                icon={SaveIcon}
+                iconPlacement="right"
               >
-                <SaveIcon width={20} height={20} /> Save
+                Save
               </Button>
             </div>
           </fieldset>
@@ -391,9 +398,10 @@ const ServicesUpdateModal = () => {
                 <Button
                   role="button"
                   variant={"destructive"}
-                  className="text-sm gap-2 px-6"
                   type="button"
                   onClick={DeleteType}
+                  icon={Trash2Icon}
+                  iconPlacement="right"
                 >
                   Delete
                 </Button>
@@ -401,8 +409,9 @@ const ServicesUpdateModal = () => {
                   tabIndex={0}
                   role="button"
                   variant={"outline"}
-                  className="text-sm gap-2 px-6"
                   type="submit"
+                  icon={SaveIcon}
+                  iconPlacement="right"
                 >
                   Update
                 </Button>
@@ -412,7 +421,7 @@ const ServicesUpdateModal = () => {
         </DialogContent>
       </Dialog>
 
-      <Card className="border rounded-md border-b-0 rounded-b-none bg-sidebar/70 w-full shadow-none h-min mx-auto mt-2 md:mt-5">
+      <Card className="border rounded-md border-b-0 rounded-b-none w-full shadow-none h-min mx-auto mt-2 md:mt-5">
         <CardHeader className="border-b p-4">
           <CardTitle className="font-medium tracking-normal">
             Add New Service
@@ -451,18 +460,19 @@ const ServicesUpdateModal = () => {
                 <Button
                   tabIndex={0}
                   role="button"
-                  variant={"outline"}
-                  className="text-sm gap-2 px-6"
                   type="submit"
+                  effect={"ringHover"}
+                  icon={CirclePlus}
+                  iconPlacement="right"
                 >
-                  <CirclePlus width={20} height={20} /> Add
+                  Add
                 </Button>
               </div>
             </fieldset>
           </form>
         </CardContent>
       </Card>
-      <div className="rounded-t-none w-full flex flex-col flex-1 bg-sidebar/70 border rounded-md divide-y">
+      <div className="rounded-t-none w-full flex flex-col flex-1 bg-card border rounded-md divide-y">
         {!isLoaded ? (
           <div className="flex flex-1 items-center justify-center min-h-72 w-full">
             <Loader size="medium" />
@@ -492,6 +502,7 @@ const ServicesUpdateModal = () => {
                   <TableCell className="text-right pr-6">
                     <Button
                       variant={"outline"}
+                      effect={"ringHover"}
                       className={`h-9 w-9 min-w-0`}
                       onClick={() => {
                         setServiceEditModel(true);

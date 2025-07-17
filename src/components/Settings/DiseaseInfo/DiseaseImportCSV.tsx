@@ -343,7 +343,7 @@ const DiseaseImportCSV: React.FC<CSVImportDialogProps> = ({
 
           {/* diaplay imported disease */}
           {validRows && (
-            <div className="mt-3 w-full flex flex-col bg-sidebar/70 border rounded-md">
+            <div className="mt-3 w-full flex flex-col bg-card border rounded-md">
               {validRows.length === 0 ? (
                 <>
                   <div className="flex flex-1 items-center justify-center text-muted-foreground min-h-40 gap-2 flex-col">
@@ -395,6 +395,7 @@ const DiseaseImportCSV: React.FC<CSVImportDialogProps> = ({
               onClick={handleImport}
               disabled={medValidationLoader}
               variant="default"
+              effect={"ringHover"}
               className="max-w-md w-max md:w-full gap-2 absolute bottom-20"
             >
               {medValidationLoader ? (
@@ -413,7 +414,7 @@ const DiseaseImportCSV: React.FC<CSVImportDialogProps> = ({
         </div>
         <DialogFooter className="py-3 px-3 sm:px-5 bg-border">
           <DialogClose asChild>
-            <Button type="submit" variant="default">
+            <Button type="submit" variant="destructive">
               Close
             </Button>
           </DialogClose>

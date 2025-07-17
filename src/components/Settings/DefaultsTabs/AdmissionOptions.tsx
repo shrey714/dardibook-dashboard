@@ -1,7 +1,14 @@
 "use client";
 
 import React, { FormEvent, useEffect, useState } from "react";
-import { AlertTriangle, Bed, CirclePlus, InboxIcon } from "lucide-react";
+import {
+  AlertTriangle,
+  Bed,
+  CirclePlus,
+  InboxIcon,
+  SaveIcon,
+  Trash2Icon,
+} from "lucide-react";
 import toast from "react-hot-toast";
 import {
   Card,
@@ -171,8 +178,8 @@ export const AdmissionOptions = () => {
 
   const getStatusColor = (status: string) => {
     return status === "occupied"
-      ? "bg-red-500/20 text-red-600 hover:text-primary hover:bg-red-500/40"
-      : "bg-green-500/20 text-green-600 hover:text-primary hover:bg-green-500/40";
+      ? "bg-red-500/20 text-red-600 hover:text-accent-foreground hover:bg-red-500/40"
+      : "bg-green-500/20 text-green-600 hover:text-accent-foreground hover:bg-green-500/40";
   };
 
   const getBedStatus = (bed_id: string) => {
@@ -271,10 +278,11 @@ export const AdmissionOptions = () => {
                 <Button
                   role="button"
                   variant={"destructive"}
-                  className="text-sm gap-2 px-6"
                   type="button"
                   disabled={!!beds.find((bed) => bed.bedId === editForBedId)}
                   onClick={DeleteBed}
+                  icon={Trash2Icon}
+                  iconPlacement="right"
                 >
                   Delete
                 </Button>
@@ -282,8 +290,9 @@ export const AdmissionOptions = () => {
                   tabIndex={0}
                   role="button"
                   variant={"outline"}
-                  className="text-sm gap-2 px-6"
                   type="submit"
+                  icon={SaveIcon}
+                  iconPlacement="right"
                 >
                   Update
                 </Button>
@@ -328,7 +337,7 @@ export const AdmissionOptions = () => {
         </DialogContent>
       </Dialog>
 
-      <Card className="border rounded-md border-b-0 rounded-b-none bg-sidebar/70 w-full shadow-none h-min mx-auto">
+      <Card className="border rounded-md border-b-0 rounded-b-none w-full shadow-none h-min mx-auto">
         <CardHeader className="border-b p-4">
           <CardTitle className="font-medium tracking-normal">
             Add New Bed
@@ -406,18 +415,19 @@ export const AdmissionOptions = () => {
                 <Button
                   tabIndex={0}
                   role="button"
-                  variant={"outline"}
-                  className="text-sm gap-2 px-6"
                   type="submit"
+                  effect={"ringHover"}
+                  icon={CirclePlus}
+                  iconPlacement="right"
                 >
-                  <CirclePlus width={20} height={20} /> Add
+                  Add
                 </Button>
               </div>
             </fieldset>
           </form>
         </CardContent>
       </Card>
-      <div className="rounded-t-none w-full flex flex-col flex-1 bg-sidebar/70 border border-t-0 rounded-md">
+      <div className="rounded-t-none w-full flex flex-col flex-1 bg-card border border-t-0 rounded-md">
         {!isLoaded || loading ? (
           <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-8 gap-2 p-2">
             {[...Array(16)].map((_, index) => (

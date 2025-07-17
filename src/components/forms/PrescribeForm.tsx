@@ -74,7 +74,7 @@ const PrescribeForm: React.FC<PrescribeFormProps> = ({
     >
       <fieldset id="prescriptionForm" className="grid grid-cols-10 gap-4" disabled={submissionLoader}>
         <div className="col-span-10 2xl:col-span-7 w-full space-y-4">
-          <div className="bg-sidebar/70 w-full border rounded-lg">
+          <div className="bg-card w-full border rounded-lg">
             {/* Disease text area */}
             <div className="sm:grid sm:grid-cols-3 sm:gap-4 p-2 md:px-8 md:py-4 border-b">
               <label
@@ -164,7 +164,7 @@ const PrescribeForm: React.FC<PrescribeFormProps> = ({
             </div>
           </div>
           {/* Higher hospital Form */}
-          <div className="bg-sidebar/70 w-full border rounded-lg">
+          <div className="bg-card w-full border rounded-lg">
             <Accordion
               type="single"
               collapsible

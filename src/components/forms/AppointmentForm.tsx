@@ -137,7 +137,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
       )}
       <fieldset
         disabled={submissionLoader}
-        className="mx-auto mt-2 sm:mt-5 2xl:mt-0 w-full 2xl:mx-0 max-w-4xl bg-sidebar/70 border rounded-lg pt-3 md:pt-6 "
+        className="mx-auto mt-2 sm:mt-5 2xl:mt-0 w-full 2xl:mx-0 max-w-4xl bg-card border rounded-lg pt-3 md:pt-6 "
       >
         {/* token selection form */}
         <div className="px-4 md:px-8">

@@ -17,7 +17,7 @@ const PersonalInfo = () => {
   const { user } = useUser();
   const { orgRole } = useAuth();
   return (
-    <Card className="mx-auto max-w-4xl 2xl:mx-0 shadow-none border h-min flex flex-1 flex-col bg-sidebar/70 2xl:max-w-xl">
+    <Card className="mx-auto max-w-4xl 2xl:mx-0 shadow-none border h-min flex flex-1 flex-col 2xl:max-w-xl">
       <CardHeader className="border-b p-5">
         <CardTitle className="font-medium tracking-normal">
           Personal Information

@@ -6,8 +6,11 @@ import {
   InboxIcon,
   Pencil,
   PlusIcon,
+  SaveIcon,
   Settings2Icon,
   StarIcon,
+  Trash2Icon,
+  XIcon,
 } from "lucide-react";
 import uniqid from "uniqid";
 import Loader from "@/components/common/Loader";
@@ -242,9 +245,10 @@ const PrescriptionReceiptType = () => {
                 <Button
                   role="button"
                   variant={"destructive"}
-                  className="text-sm gap-2 px-6"
                   type="button"
                   onClick={DeleteType}
+                  icon={Trash2Icon}
+                  iconPlacement="right"
                 >
                   Delete
                 </Button>
@@ -252,8 +256,9 @@ const PrescriptionReceiptType = () => {
                   tabIndex={0}
                   role="button"
                   variant={"outline"}
-                  className="text-sm gap-2 px-6"
                   type="submit"
+                  icon={SaveIcon}
+                  iconPlacement="right"
                 >
                   Update
                 </Button>
@@ -263,7 +268,7 @@ const PrescriptionReceiptType = () => {
         </DialogContent>
       </Dialog>
 
-      <Card className="border rounded-md border-b-0 rounded-b-none bg-sidebar/70 w-full shadow-none h-min mx-auto">
+      <Card className="border rounded-md border-b-0 rounded-b-none w-full shadow-none h-min mx-auto">
         <CardHeader className="border-b p-4">
           <CardTitle className="font-medium tracking-normal">
             Add Prescription Receipt Type
@@ -302,18 +307,19 @@ const PrescriptionReceiptType = () => {
                 <Button
                   tabIndex={0}
                   role="button"
-                  variant={"outline"}
-                  className="text-sm gap-2 px-6"
                   type="submit"
+                  icon={CirclePlus}
+                  iconPlacement="right"
+                  effect={"ringHover"}
                 >
-                  <CirclePlus width={20} height={20} /> Add
+                  Add
                 </Button>
               </div>
             </fieldset>
           </form>
         </CardContent>
       </Card>
-      <div className="rounded-t-none w-full flex flex-col flex-1 bg-sidebar/70 border rounded-md divide-y">
+      <div className="rounded-t-none w-full flex flex-col flex-1 bg-card border rounded-md divide-y">
         {!isLoaded ? (
           <div className="flex flex-1 items-center justify-center min-h-72 w-full">
             <Loader size="medium" />
@@ -342,6 +348,7 @@ const PrescriptionReceiptType = () => {
                     <Button
                       variant={"outline"}
                       className={`h-9 w-9 min-w-0`}
+                      effect={"ringHover"}
                       onClick={() => {
                         setReceiptEditModel(true);
                         setEditForReceiptId(receipt.id);
@@ -566,9 +573,7 @@ const MedicineTypes = () => {
           <form onSubmit={UpdateMedicineType} autoComplete="off">
             <fieldset disabled={loader} className="w-full flex flex-col gap-4">
               <div className="flex w-full items-start gap-2 flex-col">
-                <Label htmlFor="type" className="text-muted-foreground">
-                  Medicine Type
-                </Label>
+                <Label htmlFor="type">Medicine Type</Label>
                 <Input
                   name="type"
                   autoFocus
@@ -580,9 +585,7 @@ const MedicineTypes = () => {
               </div>
 
               <div className="flex w-full items-start gap-2 flex-row">
-                <Label htmlFor="default" className="text-muted-foreground">
-                  Make it default ?
-                </Label>
+                <Label htmlFor="default">Make it default ?</Label>
 
                 <Checkbox
                   defaultChecked={editForMedicineType?.isDefault}
@@ -595,9 +598,10 @@ const MedicineTypes = () => {
                 <Button
                   role="button"
                   variant={"destructive"}
-                  className="text-sm gap-2 px-6"
                   type="button"
                   onClick={DeleteMedicineType}
+                  icon={Trash2Icon}
+                  iconPlacement="right"
                 >
                   Delete
                 </Button>
@@ -605,8 +609,9 @@ const MedicineTypes = () => {
                   tabIndex={0}
                   role="button"
                   variant={"outline"}
-                  className="text-sm gap-2 px-6"
                   type="submit"
+                  icon={SaveIcon}
+                  iconPlacement="right"
                 >
                   Update
                 </Button>
@@ -616,7 +621,7 @@ const MedicineTypes = () => {
         </DialogContent>
       </Dialog>
 
-      <Card className="border rounded-md bg-sidebar/70 w-full shadow-none h-min mx-auto mt-2 md:mt-5">
+      <Card className="border rounded-md w-full shadow-none h-min mx-auto mt-2 md:mt-5">
         <CardHeader className="border-b p-4">
           <CardTitle className="font-medium tracking-normal">
             Add New Medicine Type
@@ -690,9 +695,7 @@ const MedicineTypes = () => {
                   className="w-full flex flex-col gap-4"
                 >
                   <div className="flex w-full items-start gap-2 flex-col">
-                    <Label htmlFor="type" className="text-muted-foreground">
-                      Medicine Type
-                    </Label>
+                    <Label htmlFor="type">Medicine Type</Label>
                     <Input
                       name="type"
                       autoFocus
@@ -704,9 +707,7 @@ const MedicineTypes = () => {
                   </div>
 
                   <div className="flex w-full items-start gap-2 flex-row">
-                    <Label htmlFor="default" className="text-muted-foreground">
-                      Make it default ?
-                    </Label>
+                    <Label htmlFor="default">Make it default ?</Label>
 
                     <Checkbox name="default" />
                   </div>
@@ -716,9 +717,10 @@ const MedicineTypes = () => {
                     <DialogClose asChild>
                       <Button
                         role="button"
-                        variant="secondary"
-                        className="text-sm gap-2 px-6"
+                        variant="outline"
                         type="button"
+                        icon={XIcon}
+                        iconPlacement="right"
                       >
                         Cancel
                       </Button>
@@ -726,9 +728,10 @@ const MedicineTypes = () => {
                     <Button
                       tabIndex={0}
                       role="button"
-                      variant={"outline"}
-                      className="text-sm gap-2 px-6"
                       type="submit"
+                      icon={CirclePlus}
+                      iconPlacement="right"
+                      effect={"ringHover"}
                     >
                       Add
                     </Button>

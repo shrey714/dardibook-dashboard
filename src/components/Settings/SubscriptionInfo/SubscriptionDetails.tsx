@@ -81,7 +81,7 @@ const SubscriptionDetails = () => {
 
   return (
     <>
-      <Card className="bg-sidebar/70 shadow-none border w-full">
+      <Card className="shadow-none border w-full">
         <CardHeader className="border-b p-4">
           <CardTitle className="font-medium tracking-normal">
             Billing & Subscription

@@ -22,7 +22,7 @@ const GeneralOptions = () => {
   const { setTheme, theme } = useTheme();
 
   return (
-    <Card className="bg-sidebar/70 rounded-md w-full shadow-none border h-min mx-auto">
+    <Card className="rounded-md w-full shadow-none border h-min mx-auto">
       <CardHeader className="border-b p-4">
         <CardTitle className="font-medium tracking-normal">
           Theme Preferences

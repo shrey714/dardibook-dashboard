@@ -98,7 +98,7 @@ export const BulkOperations: React.FC<BulkOperationsProps> = ({
 
   return (
     <>
-      <div className="flex items-center justify-between px-3 bg-muted/50 rounded-lg border min-h-12">
+      <div className="flex items-center justify-between px-3 bg-card rounded-lg border min-h-12">
         <div className="flex items-center gap-2">
           <Checkbox
             checked={

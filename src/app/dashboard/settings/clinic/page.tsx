@@ -19,6 +19,9 @@ export default function SettingsClinicPage() {
           elements: {
             rootBox:
               "mt-2 sm:mt-5 2xl:mt-0 mx-auto 2xl:mx-0 max-w-4xl border rounded-lg w-full",
+            navbar: "clerk-bg-1",
+            navbarMobileMenuRow: "clerk-bg-1",
+            scrollBox: "clerk-bg-2",
             cardBox: "rounded-md shadow-none max-w-full w-full",
           },
           baseTheme: resolvedTheme === "dark" ? dark : undefined,

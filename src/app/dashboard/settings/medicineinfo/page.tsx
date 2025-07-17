@@ -1,7 +1,7 @@
 "use client";
 
 import React, { FormEvent, useEffect, useState } from "react";
-import { CirclePlus, Download, FileText } from "lucide-react";
+import { CirclePlus, Download, FileText, SaveIcon } from "lucide-react";
 import MedicineRow from "@/components/Settings/MedicineInfo/MedicineRow";
 import uniqid from "uniqid";
 import toast from "react-hot-toast";
@@ -262,7 +262,7 @@ export default function SettingsMedicineInfoPage() {
         setmedicines={setmedicines}
       />
       <div className="w-full py-2 sm:py-5 px-2 md:px-5 2xl:flex 2xl:flex-row 2xl:gap-5 2xl:justify-center">
-        <Card className="bg-sidebar/70 w-full shadow-none border h-min mx-auto max-w-4xl 2xl:mx-0 2xl:max-w-xl">
+        <Card className="w-full shadow-none border h-min mx-auto max-w-4xl 2xl:mx-0 2xl:max-w-xl">
           <CardHeader className="border-b p-4">
             <CardTitle className="font-medium tracking-normal">
               Add new medicine
@@ -319,11 +319,12 @@ export default function SettingsMedicineInfoPage() {
                   <Button
                     tabIndex={0}
                     role="button"
-                    variant="outline"
-                    className="text-sm gap-2 px-6"
                     type="submit"
+                    icon={CirclePlus}
+                    iconPlacement="right"
+                    effect={"ringHover"}
                   >
-                    <CirclePlus width={20} height={20} /> Add
+                    Add
                   </Button>
                 </div>
               </fieldset>
@@ -333,7 +334,7 @@ export default function SettingsMedicineInfoPage() {
 
         <div className="flex flex-col mt-2 sm:mt-5 2xl:mt-0 mx-auto 2xl:mx-0 max-w-4xl gap-2 w-full">
           {/* CSV Import/Export Controls */}
-          <Card className="bg-sidebar/70 border shadow-none">
+          <Card className="border shadow-none">
             <CardHeader className="border-b p-4">
               <CardTitle className="font-medium tracking-normal">
                 Medicine Management
@@ -391,7 +392,7 @@ export default function SettingsMedicineInfoPage() {
           )}
 
           {/* diaplay medicine */}
-          <div className="w-full flex flex-col flex-1 bg-sidebar/70 border rounded-md">
+          <div className="w-full bg-card flex flex-col flex-1 border rounded-md">
             {medicines === null ? (
               <div className="w-full divide-y rounded-md overflow-hidden">
                 {[...Array(5)].map((_, i) => (
@@ -667,9 +668,9 @@ const EditMedicineDataModel: React.FC<EditMedicineDataModel> = ({
               <Button
                 tabIndex={0}
                 role="button"
-                variant={"outline"}
-                className="text-sm gap-2 px-6"
                 type="submit"
+                icon={SaveIcon}
+                iconPlacement="right"
               >
                 Update
               </Button>
