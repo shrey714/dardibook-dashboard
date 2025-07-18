@@ -29,7 +29,7 @@
     --chart-4: 262.1229 83.2558% 57.8431%;
     --chart-5: 45.3982 93.3884% 47.4510%;
     --radius: 0.5rem;
-    --sidebar: 210.0000 40.0000% 98.0392%;
+    --sidebar-background: 210.0000 40.0000% 98.0392%;
     --sidebar-foreground: 222.8571 84.0000% 4.9020%;
     --sidebar-primary: 221.2121 83.1933% 53.3333%;
     --sidebar-primary-foreground: 0 0% 100%;
@@ -67,7 +67,7 @@
     --chart-4: 258.3117 89.5349% 66.2745%;
     --chart-5: 47.9476 95.8159% 53.1373%;
     --radius: 0.5rem;
-    --sidebar: 222.2222 47.3684% 11.1765%;
+    --sidebar-background: 222.2222 47.3684% 11.1765%;
     --sidebar-foreground: 210.0000 40.0000% 98.0392%;
     --sidebar-primary: 217.2193 91.2195% 59.8039%;
     --sidebar-primary-foreground: 0 0% 100%;

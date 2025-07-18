@@ -139,13 +139,13 @@ export const BulkOperations: React.FC<BulkOperationsProps> = ({
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete Selected Diseases</DialogTitle>
+            <DialogTitle className="font-medium">Delete Selected Diseases</DialogTitle>
             <DialogDescription>
               Are you sure you want to delete {selectedCount} selected disease
               {selectedCount > 1 ? "s" : ""}? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter>
+          <DialogFooter className="gap-2">
             <DialogClose asChild>
               <Button type="button" variant="secondary">
                 Cancel

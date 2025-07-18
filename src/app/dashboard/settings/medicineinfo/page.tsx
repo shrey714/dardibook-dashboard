@@ -262,18 +262,18 @@ export default function SettingsMedicineInfoPage() {
         setmedicines={setmedicines}
       />
       <div className="w-full py-2 sm:py-5 px-2 md:px-5 2xl:flex 2xl:flex-row 2xl:gap-5 2xl:justify-center">
-        <Card className="w-full shadow-none border h-min mx-auto max-w-4xl 2xl:mx-0 2xl:max-w-xl">
-          <CardHeader className="border-b p-4">
-            <CardTitle className="font-medium tracking-normal">
-              Add new medicine
-            </CardTitle>
-            <CardDescription hidden></CardDescription>
+        <Card className="2xl:sticky top-20 w-full h-min mx-auto max-w-4xl 2xl:mx-0 2xl:max-w-xl">
+          <CardHeader>
+            <CardTitle className="font-medium">Add new medicine</CardTitle>
+            <CardDescription>
+              Add a new medicine with type and optional instructions.
+            </CardDescription>
           </CardHeader>
-          <CardContent className="py-4 px-3 md:px-8">
+          <CardContent>
             <form onSubmit={submitHandler} autoComplete="off">
               <fieldset
                 disabled={addLoader}
-                className="w-full rounded-lg grid grid-cols-6 gap-2 md:gap-4"
+                className="w-full rounded-lg grid grid-cols-6 gap-4"
               >
                 {/* Medicine Name */}
                 <div className="col-span-6 sm:col-span-3 2xl:col-span-6 space-y-2">
@@ -323,6 +323,8 @@ export default function SettingsMedicineInfoPage() {
                     icon={CirclePlus}
                     iconPlacement="right"
                     effect={"ringHover"}
+                    loading={addLoader}
+                    loadingText="Adding"
                   >
                     Add
                   </Button>
@@ -334,16 +336,14 @@ export default function SettingsMedicineInfoPage() {
 
         <div className="flex flex-col mt-2 sm:mt-5 2xl:mt-0 mx-auto 2xl:mx-0 max-w-4xl gap-2 w-full">
           {/* CSV Import/Export Controls */}
-          <Card className="border shadow-none">
-            <CardHeader className="border-b p-4">
-              <CardTitle className="font-medium tracking-normal">
-                Medicine Management
-              </CardTitle>
+          <Card>
+            <CardHeader>
+              <CardTitle className="font-medium">Medicine Management</CardTitle>
               <CardDescription>
                 Import and export medicine data using CSV files
               </CardDescription>
             </CardHeader>
-            <CardContent className="flex flex-wrap gap-2 p-3 sm:p-4">
+            <CardContent className="flex flex-wrap gap-2">
               <Button
                 variant="outline"
                 size="sm"
@@ -373,13 +373,11 @@ export default function SettingsMedicineInfoPage() {
           </Card>
 
           {/* Advanced Filters */}
-          <div className="relative w-full">
-            <AdvancedFilters
-              medicines={medicines || []}
-              filters={filters}
-              onFiltersChange={setFilters}
-            />
-          </div>
+          <AdvancedFilters
+            medicines={medicines || []}
+            filters={filters}
+            onFiltersChange={setFilters}
+          />
 
           {/* Bulk Operations */}
           {medicines && medicines.length > 0 && (
@@ -396,10 +394,34 @@ export default function SettingsMedicineInfoPage() {
             {medicines === null ? (
               <div className="w-full divide-y rounded-md overflow-hidden">
                 {[...Array(5)].map((_, i) => (
-                  <Skeleton
+                  <div
                     key={i}
-                    className="h-20 w-full rounded-none bg-sidebar/40"
-                  />
+                    className={`grid grid-cols-12 gap-1 w-full p-2 sm:p-4 ${
+                      i !== 0 ? "border-t" : "border-0"
+                    }`}
+                  >
+                    <div className="col-span-1 flex justify-start items-center">
+                      <Skeleton className="size-4 rounded-sm" />
+                    </div>
+
+                    <div className="col-span-3 h-auto flex flex-col justify-start items-start">
+                      <Skeleton className="w-32 h-4" />
+                      <Skeleton className="w-16 h-3 mt-1" />
+                    </div>
+
+                    <div className="col-span-2">
+                      <Skeleton className="w-14 h-5" />
+                    </div>
+
+                    <div className="col-span-5 h-auto flex flex-col justify-start items-start">
+                      <Skeleton className="w-32 h-4" />
+                      <Skeleton className="w-16 h-3 mt-1" />
+                    </div>
+
+                    <div className="col-span-1 flex justify-center items-center">
+                      <Skeleton className="size-9" />
+                    </div>
+                  </div>
                 ))}
               </div>
             ) : filteredMedicines.length === 0 ? (
@@ -567,7 +589,7 @@ const EditMedicineDataModel: React.FC<EditMedicineDataModel> = ({
     <Dialog open={medicineEditModel} onOpenChange={setMedicineEditModel}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle className="font-medium tracking-normal">
+          <DialogTitle className="font-medium">
             {
               medicines?.find((medicine) => medicine.id === editForMedicineId)
                 ?.medicineName
@@ -579,7 +601,7 @@ const EditMedicineDataModel: React.FC<EditMedicineDataModel> = ({
         <form onSubmit={submitHandler} autoComplete="off">
           <fieldset
             disabled={updateLoader}
-            className="w-full rounded-lg grid grid-cols-6 gap-2 md:gap-4"
+            className="w-full rounded-lg grid grid-cols-6 gap-4"
           >
             <div className="col-span-6 space-y-2">
               <Label htmlFor="medicineName">Medicine Name</Label>
@@ -671,6 +693,8 @@ const EditMedicineDataModel: React.FC<EditMedicineDataModel> = ({
                 type="submit"
                 icon={SaveIcon}
                 iconPlacement="right"
+                loading={updateLoader}
+                loadingText={"Updating"}
               >
                 Update
               </Button>

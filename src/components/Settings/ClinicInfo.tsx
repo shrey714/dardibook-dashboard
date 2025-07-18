@@ -78,17 +78,15 @@ const ClinicInfo = () => {
     );
   };
   return (
-    <Card className="mx-auto max-w-4xl 2xl:mx-0 shadow-none border h-min flex flex-1 flex-col 2xl:max-w-2xl">
-      <CardHeader className="border-b p-5">
-        <CardTitle className="font-medium tracking-normal">
-          Clinic Information
-        </CardTitle>
+    <Card className="mx-auto max-w-4xl 2xl:mx-0 h-min flex flex-1 flex-col 2xl:max-w-2xl">
+      <CardHeader>
+        <CardTitle className="font-medium">Clinic Information</CardTitle>
         <CardDescription>Update your basic clinic information.</CardDescription>
       </CardHeader>
-      <CardContent className="p-0">
+      <CardContent>
         <form onSubmit={handleSubmit} autoFocus={false} autoComplete="off">
           <fieldset disabled={loader}>
-            <div className="py-4 px-3 md:px-6 grid grid-cols-6 gap-2 md:gap-4">
+            <div className="grid grid-cols-6 gap-4">
               {/* Doctor Name */}
               <div className="col-span-6 sm:col-span-3 space-y-2">
                 <Label htmlFor="doctorName">Doctor Name</Label>
@@ -164,7 +162,7 @@ const ClinicInfo = () => {
                 />
               </div>
             </div>
-            <div className="x-3 pt-2 pb-4 px-3 md:px-8 flex flex-row items-center justify-end">
+            <div className="mt-4 flex flex-row items-center justify-end">
               <Button
                 disabled={loader}
                 type="submit"
@@ -172,6 +170,8 @@ const ClinicInfo = () => {
                 effect={"ringHover"}
                 icon={SaveIcon}
                 iconPlacement="right"
+                loading={loader}
+                loadingText={"Saving"}
               >
                 <h3 className="text-base font-medium leading-4 tracking-wide">
                   Save

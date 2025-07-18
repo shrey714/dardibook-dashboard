@@ -81,9 +81,9 @@ const SubscriptionDetails = () => {
 
   return (
     <>
-      <Card className="shadow-none border w-full">
-        <CardHeader className="border-b p-4">
-          <CardTitle className="font-medium tracking-normal">
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle className="font-medium">
             Billing & Subscription
           </CardTitle>
           <CardDescription>
@@ -93,7 +93,7 @@ const SubscriptionDetails = () => {
 
         {loading ? (
           <>
-            <CardContent className="p-5">
+            <CardContent>
               <div className="flex flex-col items-start justify-between gap-6 sm:flex-row">
                 <div>
                   <div className="flex items-center gap-2">
@@ -135,7 +135,7 @@ const SubscriptionDetails = () => {
                 </div>
               </div>
             </CardContent>
-            <CardFooter className="border-t p-3 pl-4 flex items-start justify-between gap-4 flex-row">
+            <CardFooter className="flex items-start justify-between gap-4 flex-row">
               <div className="space-y-1.5">
                 <Skeleton className="h-4 w-36" />
                 <Skeleton className="h-5 w-36" />
@@ -159,7 +159,7 @@ const SubscriptionDetails = () => {
           subscriptionDetails &&
           planDetails && (
             <>
-              <CardContent className="p-5">
+              <CardContent>
                 <div className="flex flex-col items-start justify-between gap-6 sm:flex-row">
                   <div>
                     <div className="flex items-center gap-2">
@@ -352,7 +352,7 @@ const SubscriptionDetails = () => {
                     );
                   })()}
               </CardContent>
-              <CardFooter className="border-t p-3 pl-4 flex items-start justify-between gap-4 flex-row">
+              <CardFooter className="flex items-start justify-between gap-4 flex-row">
                 <div className="space-y-1.5">
                   <h2 className="text-base font-medium leading-none">
                     Payment Method

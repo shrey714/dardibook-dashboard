@@ -61,8 +61,8 @@ const MedicineRow: React.FC<DisplayMedicineProps> = ({
         )}
       </div>
 
-      <div className="col-span-5 [&:empty]:invisible rounded-md flex items-center h-min py-[0px] sm:py-[5.5px] px-2 text-muted-foreground bg-background border-border text-sm w-full">
-        {medicine.instruction || "No Instruction"}
+      <div className="col-span-5 [&:empty]:invisible h-min px-2 text-muted-foreground text-sm w-full">
+        {medicine.instruction || "-"}
       </div>
 
       <div className="col-span-1 flex justify-center items-center">

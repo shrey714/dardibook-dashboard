@@ -1,7 +1,7 @@
 "use client";
 
 import { Command as CommandPrimitive, useCommandState } from "cmdk";
-import { X } from "lucide-react";
+import { X, ChevronDownIcon } from "lucide-react";
 import * as React from "react";
 import { forwardRef, useEffect } from "react";
 
@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
 import MedicineHoverLink from "./medicine-hover-link";
+
 export interface Option {
   value: string;
   label: string;
@@ -259,9 +260,9 @@ const MultipleSelector = React.forwardRef<
           if (e.key === "Delete" || e.key === "Backspace") {
             if (input.value === "" && selected.length > 0) {
               const lastSelectOption = selected[selected.length - 1];
-              // If last item is fixed, we should not remove it.
-              if (!lastSelectOption.fixed) {
-                handleUnselect(selected[selected.length - 1]);
+              // If there is a last item and it is not fixed, we can remove it.
+              if (lastSelectOption && !lastSelectOption.fixed) {
+                handleUnselect(lastSelectOption);
               }
             }
           }
@@ -413,7 +414,7 @@ const MultipleSelector = React.forwardRef<
         );
       }
 
-      return <CommandEmpty>{emptyIndicator}</CommandEmpty>;
+      return <CommandEmpty className="py-2">{emptyIndicator}</CommandEmpty>;
     }, [creatable, emptyIndicator, onSearch, options]);
 
     const selectables = React.useMemo<GroupOption>(
@@ -457,9 +458,10 @@ const MultipleSelector = React.forwardRef<
       >
         <div
           className={cn(
-            "min-h-9 rounded-md border-0 text-base md:text-sm focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600",
+            `flex items-center justify-between rounded-md border border-input pr-3 pl-3 py-1 text-base ring-offset-background bg-transparent dark:bg-input/30
+            transition-[color,box-shadow] focus-within:border-ring focus-within:ring-ring/50 focus-within:ring-[3px]
+            md:text-sm`,
             {
-              "px-3 py-2": selected.length !== 0,
               "cursor-text": !disabled && selected.length !== 0,
             },
             className
@@ -469,24 +471,26 @@ const MultipleSelector = React.forwardRef<
             inputRef?.current?.focus();
           }}
         >
-          <div className="relative flex flex-wrap gap-2">
+          <div className="relative flex flex-wrap gap-1">
             {selected.map((option) => {
               return (
                 <Badge
                   key={option.value}
+                  variant={"success"}
                   className={cn(
                     "data-[disabled]:bg-muted-foreground data-[disabled]:text-muted data-[disabled]:hover:bg-muted-foreground",
                     "data-[fixed]:bg-muted-foreground data-[fixed]:text-muted data-[fixed]:hover:bg-muted-foreground",
+                    "font-medium",
                     badgeClassName
                   )}
                   data-fixed={option.fixed}
                   data-disabled={disabled || undefined}
                 >
                   <MedicineHoverLink label={option.label} />
-
                   <button
+                    type="button"
                     className={cn(
-                      "ml-1 rounded-full outline-none ring-offset-background focus:ring-1 focus:ring-offset-1",
+                      "ml-1 rounded-full outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2",
                       (disabled || option.fixed) && "hidden"
                     )}
                     onKeyDown={(e) => {
@@ -500,7 +504,7 @@ const MultipleSelector = React.forwardRef<
                     }}
                     onClick={() => handleUnselect(option)}
                   >
-                    <X className="h-3 w-3 text-muted-foreground hover:text-foreground" />
+                    <X className="h-3 w-3 text-green-600" />
                   </button>
                 </Badge>
               );
@@ -531,38 +535,47 @@ const MultipleSelector = React.forwardRef<
                   : placeholder
               }
               className={cn(
-                "flex-1 bg-transparent outline-none placeholder:text-muted-foreground",
+                "flex-1 self-baseline bg-transparent outline-none placeholder:text-muted-foreground",
                 {
                   "w-full": hidePlaceholderWhenSelected,
-                  "px-3 py-1.5": selected.length === 0,
                   "ml-1": selected.length !== 0,
                 },
                 inputProps?.className
               )}
             />
-            <button
-              type="button"
-              onClick={() => {
-                setSelected(selected.filter((s) => s.fixed));
-                onChange?.(selected.filter((s) => s.fixed));
-              }}
-              className={cn(
-                "absolute right-0 h-6 w-6 p-0",
-                (hideClearAllButton ||
-                  disabled ||
-                  selected.length < 1 ||
-                  selected.filter((s) => s.fixed).length === selected.length) &&
-                  "hidden"
-              )}
-            >
-              <X />
-            </button>
           </div>
+          <button
+            type="button"
+            onClick={() => {
+              setSelected(selected.filter((s) => s.fixed));
+              onChange?.(selected.filter((s) => s.fixed));
+            }}
+            className={cn(
+              "size-5",
+              (hideClearAllButton ||
+                disabled ||
+                selected.length < 1 ||
+                selected.filter((s) => s.fixed).length === selected.length) &&
+                "hidden"
+            )}
+          >
+            <X />
+          </button>
+          <ChevronDownIcon
+            className={cn(
+              "size-5 text-muted-foreground/50",
+              (hideClearAllButton ||
+                disabled ||
+                selected.length >= 1 ||
+                selected.filter((s) => s.fixed).length !== selected.length) &&
+                "hidden"
+            )}
+          />
         </div>
         <div className="relative">
           {open && (
             <CommandList
-              className="absolute top-1 z-10 w-full rounded-md border bg-popover text-popover-foreground shadow-md outline-none animate-in"
+              className="absolute top-2 z-10 w-full rounded-md border bg-popover text-popover-foreground shadow-md outline-none animate-in"
               onMouseLeave={() => {
                 setOnScrollbar(false);
               }}
@@ -586,7 +599,7 @@ const MultipleSelector = React.forwardRef<
                     <CommandGroup
                       key={key}
                       heading={key}
-                      className="h-full overflow-auto"
+                      className="h-full overflow-auto p-0"
                     >
                       <>
                         {dropdowns.map((option) => {

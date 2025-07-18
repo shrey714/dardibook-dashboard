@@ -402,9 +402,9 @@ const BillActivity = () => {
 
   return (
     <>
-      <Card className="p-0 w-full shadow-none border overflow-hidden">
-        <CardHeader className="border-b p-4 bg-card">
-          <CardTitle className="font-medium tracking-normal flex gap-x-2 items-center">
+      <Card className="w-full overflow-hidden">
+        <CardHeader>
+          <CardTitle className="font-medium flex gap-x-2 items-center">
             Billing Activity & Invoices
             <TooltipProvider>
               <Tooltip>
@@ -420,7 +420,9 @@ const BillActivity = () => {
               </Tooltip>
             </TooltipProvider>
           </CardTitle>
-          <CardDescription hidden></CardDescription>
+          <CardDescription>
+            Track billing history, membership fees, and download invoices.
+          </CardDescription>
         </CardHeader>
         <CardContent className="p-0 w-full">
           {isLoading ? (
@@ -501,7 +503,7 @@ const BillActivity = () => {
             </Table>
           )}
         </CardContent>
-        <CardFooter className="border-t py-2 px-4 flex items-center justify-between space-x-2 gap-4 flex-row bg-card">
+        <CardFooter className="border-t pt-6 flex items-center justify-between space-x-2 gap-4 flex-row bg-card">
           <div className="text-sm text-muted-foreground hidden sm:block">
             {`${list.length} row(s)`}
           </div>

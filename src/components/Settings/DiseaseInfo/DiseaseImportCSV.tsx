@@ -58,7 +58,7 @@ const DiseaseImportCSV: React.FC<CSVImportDialogProps> = ({
   const [files, setFiles] = useState<File[]>([]);
   const [errors, setErrors] = useState<string[]>([]);
   const [validRows, setValidRows] = useState<CSVDisease[] | null>(null);
-  const [medValidationLoader, setMedValidationLoader] = useState(false);
+  const [disValidationLoader, setDisValidationLoader] = useState(false);
   const { orgId } = useAuth();
 
   const onFileValidate = useCallback(
@@ -104,7 +104,7 @@ const DiseaseImportCSV: React.FC<CSVImportDialogProps> = ({
             setErrors(result.errors);
             setValidRows(result.validRows);
             onProgress(file, 40);
-            setMedValidationLoader(true);
+            setDisValidationLoader(true);
             const invalidMedicines: string[] = [];
 
             const validationChecks = orgId
@@ -146,7 +146,7 @@ const DiseaseImportCSV: React.FC<CSVImportDialogProps> = ({
 
             setValidRows(cleanedValidRows);
             setErrors((prev) => [...prev, ...medicineErrors]);
-            setMedValidationLoader(false);
+            setDisValidationLoader(false);
             onSuccess(file);
           } catch (error) {
             onError(
@@ -171,7 +171,7 @@ const DiseaseImportCSV: React.FC<CSVImportDialogProps> = ({
   const handleImport = async () => {
     if (!orgId || !validRows) return;
 
-    setMedValidationLoader(true);
+    setDisValidationLoader(true);
     try {
       const batch = writeBatch(db);
       const newDiseases: Disease[] = [];
@@ -218,7 +218,7 @@ const DiseaseImportCSV: React.FC<CSVImportDialogProps> = ({
         position: "bottom-right",
       });
     } finally {
-      setMedValidationLoader(false);
+      setDisValidationLoader(false);
     }
   };
 
@@ -288,7 +288,7 @@ const DiseaseImportCSV: React.FC<CSVImportDialogProps> = ({
                         variant="ghost"
                         size="icon"
                         className="size-7"
-                        disabled={medValidationLoader}
+                        disabled={disValidationLoader}
                       >
                         <X />
                       </Button>
@@ -369,13 +369,13 @@ const DiseaseImportCSV: React.FC<CSVImportDialogProps> = ({
 
                         <div className="relative flex flex-wrap gap-2 col-span-8 w-full h-min">
                           {disease.medicines.map((med, i) =>
-                            medValidationLoader ? (
+                            disValidationLoader ? (
                               <Skeleton key={i} className="h-6 w-20" />
                             ) : (
                               <Badge
                                 key={i}
-                                variant={"default"}
-                                className="text-sm p-0 bg-muted-foreground"
+                                variant={"secondary"}
+                                className="text-sm"
                               >
                                 <MedicineHoverLink label={med} />
                               </Badge>
@@ -393,12 +393,12 @@ const DiseaseImportCSV: React.FC<CSVImportDialogProps> = ({
           {validRows && validRows.length > 0 && (
             <Button
               onClick={handleImport}
-              disabled={medValidationLoader}
+              disabled={disValidationLoader}
               variant="default"
               effect={"ringHover"}
               className="max-w-md w-max md:w-full gap-2 absolute bottom-20"
             >
-              {medValidationLoader ? (
+              {disValidationLoader ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
                   Importing...

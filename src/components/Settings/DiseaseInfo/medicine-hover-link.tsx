@@ -62,7 +62,7 @@ const MedicineHoverLink = ({
         <Button
           variant="link"
           className={cn(
-            "text-secondary h-auto px-2 py-0.5 rounded-sm",
+            "text-inherit h-auto px-2 py-0.5 rounded-sm",
             className
           )}
         >

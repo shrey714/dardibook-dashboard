@@ -67,6 +67,8 @@ const PrescriptionReceiptType = () => {
   const { organization, isLoaded } = useOrganization();
   const [receipts, setReceipts] = useState<ReceiptDetails[]>([]);
   const [addLoader, setAddLoader] = useState(false);
+  const [updateLoader, setUpdateLoader] = useState(false);
+  const [deleteLoader, setDeleteLoader] = useState(false);
   const [receiptEditModel, setReceiptEditModel] = useState<boolean>(false);
   const [editForReceiptId, setEditForReceiptId] = useState<string>("");
 
@@ -125,7 +127,7 @@ const PrescriptionReceiptType = () => {
   // --------------update receipt-----------
   const UpdateType = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setAddLoader(true);
+    setUpdateLoader(true);
     const form = e.target as HTMLFormElement;
     const existingReceiptType: ReceiptDetails = {
       id: editForReceiptId,
@@ -142,12 +144,12 @@ const PrescriptionReceiptType = () => {
         ).then(
           () => {
             organization.reload();
-            setAddLoader(false);
+            setUpdateLoader(false);
             setReceiptEditModel(false);
           },
           (error) => {
             console.error("Operation failed. Please try again : ", error);
-            setAddLoader(false);
+            setUpdateLoader(false);
           }
         );
       },
@@ -163,7 +165,7 @@ const PrescriptionReceiptType = () => {
   };
   // --------------delete receipt-----------
   const DeleteType = async () => {
-    setAddLoader(true);
+    setDeleteLoader(true);
     if (!organization) return;
     toast.promise(
       async () => {
@@ -172,12 +174,12 @@ const PrescriptionReceiptType = () => {
         ).then(
           () => {
             organization.reload();
-            setAddLoader(false);
+            setDeleteLoader(false);
             setReceiptEditModel(false);
           },
           (error) => {
             console.error("Operation failed. Please try again : ", error);
-            setAddLoader(false);
+            setDeleteLoader(false);
           }
         );
       },
@@ -196,9 +198,7 @@ const PrescriptionReceiptType = () => {
       <Dialog open={receiptEditModel} onOpenChange={setReceiptEditModel}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle className="font-medium tracking-normal">
-              Edit Receipt Type
-            </DialogTitle>
+            <DialogTitle className="font-medium">Edit Receipt Type</DialogTitle>
             <DialogDescription>
               Modify details for{" "}
               {
@@ -209,8 +209,8 @@ const PrescriptionReceiptType = () => {
           </DialogHeader>
           <form onSubmit={UpdateType} autoComplete="off">
             <fieldset
-              disabled={addLoader}
-              className="w-full rounded-lg grid grid-cols-6 gap-2 md:gap-4"
+              disabled={updateLoader || deleteLoader}
+              className="w-full rounded-lg grid grid-cols-6 gap-4"
             >
               <div className="col-span-6 space-y-2">
                 <Label htmlFor="receiptType">Receipt Type</Label>
@@ -249,6 +249,8 @@ const PrescriptionReceiptType = () => {
                   onClick={DeleteType}
                   icon={Trash2Icon}
                   iconPlacement="right"
+                  loading={deleteLoader}
+                  loadingText={"Deleting"}
                 >
                   Delete
                 </Button>
@@ -259,6 +261,8 @@ const PrescriptionReceiptType = () => {
                   type="submit"
                   icon={SaveIcon}
                   iconPlacement="right"
+                  loading={updateLoader}
+                  loadingText={"Updating"}
                 >
                   Update
                 </Button>
@@ -268,18 +272,20 @@ const PrescriptionReceiptType = () => {
         </DialogContent>
       </Dialog>
 
-      <Card className="border rounded-md border-b-0 rounded-b-none w-full shadow-none h-min mx-auto">
-        <CardHeader className="border-b p-4">
-          <CardTitle className="font-medium tracking-normal">
+      <Card className="border-b-0 rounded-b-none w-full h-min mx-auto">
+        <CardHeader>
+          <CardTitle className="font-medium">
             Add Prescription Receipt Type
           </CardTitle>
-          <CardDescription hidden></CardDescription>
+          <CardDescription>
+            Define new receipt types for prescription-related charges.
+          </CardDescription>
         </CardHeader>
-        <CardContent className="py-4 px-3 md:px-8">
+        <CardContent>
           <form onSubmit={AddNewType} autoComplete="off">
             <fieldset
               disabled={addLoader}
-              className="w-full rounded-lg grid grid-cols-6 gap-2 md:gap-4"
+              className="w-full rounded-lg grid grid-cols-6 gap-4"
             >
               <div className="col-span-6 sm:col-span-3 space-y-2">
                 <Label htmlFor="receiptType">Receipt Type</Label>
@@ -311,6 +317,8 @@ const PrescriptionReceiptType = () => {
                   icon={CirclePlus}
                   iconPlacement="right"
                   effect={"ringHover"}
+                  loading={addLoader}
+                  loadingText="Adding"
                 >
                   Add
                 </Button>
@@ -319,7 +327,7 @@ const PrescriptionReceiptType = () => {
           </form>
         </CardContent>
       </Card>
-      <div className="rounded-t-none w-full flex flex-col flex-1 bg-card border rounded-md divide-y">
+      <div className="rounded-t-none w-full flex flex-col flex-1 bg-card border rounded-xl divide-y">
         {!isLoaded ? (
           <div className="flex flex-1 items-center justify-center min-h-72 w-full">
             <Loader size="medium" />
@@ -379,7 +387,9 @@ const MedicineTypes = () => {
   const [editForMedicineType, setEditForMedicineType] = useState<
     (typeof medicineTypes)[0] | null
   >(null);
-  const [loader, setLoader] = useState(false);
+  const [addLoader, setAddLoader] = useState(false);
+  const [updateLoader, setUpdateLoader] = useState(false);
+  const [deleteLoader, setDeleteLoader] = useState(false);
   const [medicineTypes, setMedicineTypes] = useState<Medicine_Types[]>([]);
 
   useEffect(() => {
@@ -427,16 +437,16 @@ const MedicineTypes = () => {
 
     toast.promise(
       async () => {
-        setLoader(true);
+        setAddLoader(true);
         await updateMedicineTypesDefaults(updatedTypes).then(
           () => {
             organization.reload();
-            setLoader(false);
+            setAddLoader(false);
             form.reset();
           },
           (error) => {
             console.error("Operation failed. Please try again : ", error);
-            setLoader(false);
+            setAddLoader(false);
           }
         );
       },
@@ -486,16 +496,16 @@ const MedicineTypes = () => {
 
     toast.promise(
       async () => {
-        setLoader(true);
+        setUpdateLoader(true);
         await updateMedicineTypesDefaults(updatedTypes).then(
           () => {
             organization.reload();
-            setLoader(false);
+            setUpdateLoader(false);
             setMedicineTypeEditModel(false);
           },
           (error) => {
             console.error("Operation failed. Please try again : ", error);
-            setLoader(false);
+            setUpdateLoader(false);
           }
         );
       },
@@ -531,16 +541,16 @@ const MedicineTypes = () => {
 
     toast.promise(
       async () => {
-        setLoader(true);
+        setDeleteLoader(true);
         await updateMedicineTypesDefaults(updatedTypes).then(
           () => {
             organization.reload();
-            setLoader(false);
+            setDeleteLoader(false);
             setMedicineTypeEditModel(false);
           },
           (error) => {
             console.error("Operation failed. Please try again : ", error);
-            setLoader(false);
+            setDeleteLoader(false);
           }
         );
       },
@@ -563,7 +573,7 @@ const MedicineTypes = () => {
       >
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle className="font-medium tracking-normal">
+            <DialogTitle className="font-medium">
               Edit Medicine Type
             </DialogTitle>
             <DialogDescription>
@@ -571,7 +581,10 @@ const MedicineTypes = () => {
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={UpdateMedicineType} autoComplete="off">
-            <fieldset disabled={loader} className="w-full flex flex-col gap-4">
+            <fieldset
+              disabled={updateLoader || deleteLoader}
+              className="w-full flex flex-col gap-4"
+            >
               <div className="flex w-full items-start gap-2 flex-col">
                 <Label htmlFor="type">Medicine Type</Label>
                 <Input
@@ -602,6 +615,8 @@ const MedicineTypes = () => {
                   onClick={DeleteMedicineType}
                   icon={Trash2Icon}
                   iconPlacement="right"
+                  loading={deleteLoader}
+                  loadingText={"Deleting"}
                 >
                   Delete
                 </Button>
@@ -612,6 +627,8 @@ const MedicineTypes = () => {
                   type="submit"
                   icon={SaveIcon}
                   iconPlacement="right"
+                  loading={updateLoader}
+                  loadingText={"Updating"}
                 >
                   Update
                 </Button>
@@ -621,14 +638,14 @@ const MedicineTypes = () => {
         </DialogContent>
       </Dialog>
 
-      <Card className="border rounded-md w-full shadow-none h-min mx-auto mt-2 md:mt-5">
-        <CardHeader className="border-b p-4">
-          <CardTitle className="font-medium tracking-normal">
-            Add New Medicine Type
-          </CardTitle>
-          <CardDescription hidden></CardDescription>
+      <Card className="w-full h-min mx-auto mt-2 md:mt-5">
+        <CardHeader>
+          <CardTitle className="font-medium">Add New Medicine Type</CardTitle>
+          <CardDescription>
+            Manage and add custom medicine types for prescriptions.
+          </CardDescription>
         </CardHeader>
-        <CardContent className="py-4 px-3 md:px-6 flex flex-row gap-2 flex-wrap">
+        <CardContent className="flex flex-row gap-2 flex-wrap">
           {!isLoaded ? (
             Array.from({ length: 5 }).map((_, index) => (
               <Skeleton key={index} className="w-28 h-10 rounded-full" />
@@ -670,6 +687,7 @@ const MedicineTypes = () => {
             <DialogTrigger asChild>
               <Button
                 variant="outline"
+                effect={"ringHover"}
                 className="rounded-full p-1 pr-3 h-10 text-sm font-medium leading-normal border-dashed"
               >
                 <span className="gap-2 h-full flex flex-row items-center">
@@ -682,16 +700,14 @@ const MedicineTypes = () => {
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
-                <DialogTitle className="font-medium tracking-normal">
-                  Add New Type
-                </DialogTitle>
+                <DialogTitle className="font-medium">Add New Type</DialogTitle>
                 <DialogDescription>
                   Add new medicine type. Click add when you&apos;re done.
                 </DialogDescription>
               </DialogHeader>
               <form onSubmit={AddNewMedicineType} autoComplete="off">
                 <fieldset
-                  disabled={loader}
+                  disabled={addLoader}
                   className="w-full flex flex-col gap-4"
                 >
                   <div className="flex w-full items-start gap-2 flex-col">
@@ -732,6 +748,8 @@ const MedicineTypes = () => {
                       icon={CirclePlus}
                       iconPlacement="right"
                       effect={"ringHover"}
+                      loading={addLoader}
+                      loadingText="Adding"
                     >
                       Add
                     </Button>

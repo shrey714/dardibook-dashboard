@@ -328,18 +328,16 @@ const MedicineImportCSV: React.FC<CSVImportDialogProps> = ({
                         </div>
 
                         <div className="col-span-2">
-                          {medicine.type && (
-                            <Badge
-                              variant="outline"
-                              className="text-xs font-medium"
-                            >
-                              {medicine.type}
-                            </Badge>
-                          )}
+                          <Badge
+                            variant="outline"
+                            className="text-xs font-medium"
+                          >
+                            {medicine.type || "-"}
+                          </Badge>
                         </div>
 
-                        <div className="col-span-5 [&:empty]:invisible border rounded-md flex items-center h-min py-[0px] sm:py-[5.5px] px-2 text-muted-foreground bg-background border-border text-sm w-full">
-                          {medicine.instruction || "No Instruction"}
+                        <div className="col-span-5 [&:empty]:invisible px-2 text-muted-foreground text-sm w-full">
+                          {medicine.instruction || "-"}
                         </div>
                       </div>
                     );

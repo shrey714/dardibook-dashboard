@@ -47,6 +47,8 @@ export const RegistrationOptions = () => {
   const { organization, isLoaded } = useOrganization();
   const [receipts, setReceipts] = useState<ReceiptDetails[]>([]);
   const [addLoader, setAddLoader] = useState(false);
+  const [updateLoader, setUpdateLoader] = useState(false);
+  const [deleteLoader, setDeleteLoader] = useState(false);
   const [receiptEditModel, setReceiptEditModel] = useState<boolean>(false);
   const [editForReceiptId, setEditForReceiptId] = useState<string>("");
 
@@ -105,7 +107,7 @@ export const RegistrationOptions = () => {
   // --------------update receipt-----------
   const UpdateType = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setAddLoader(true);
+    setUpdateLoader(true);
     const form = e.target as HTMLFormElement;
     const existingReceiptType: ReceiptDetails = {
       id: editForReceiptId,
@@ -122,12 +124,12 @@ export const RegistrationOptions = () => {
         ).then(
           () => {
             organization.reload();
-            setAddLoader(false);
+            setUpdateLoader(false);
             setReceiptEditModel(false);
           },
           (error) => {
             console.error("Operation failed. Please try again : ", error);
-            setAddLoader(false);
+            setUpdateLoader(false);
           }
         );
       },
@@ -143,7 +145,7 @@ export const RegistrationOptions = () => {
   };
   // --------------delete receipt-----------
   const DeleteType = async () => {
-    setAddLoader(true);
+    setDeleteLoader(true);
     if (!organization) return;
     toast.promise(
       async () => {
@@ -152,12 +154,12 @@ export const RegistrationOptions = () => {
         ).then(
           () => {
             organization.reload();
-            setAddLoader(false);
+            setDeleteLoader(false);
             setReceiptEditModel(false);
           },
           (error) => {
             console.error("Operation failed. Please try again : ", error);
-            setAddLoader(false);
+            setDeleteLoader(false);
           }
         );
       },
@@ -176,9 +178,7 @@ export const RegistrationOptions = () => {
       <Dialog open={receiptEditModel} onOpenChange={setReceiptEditModel}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle className="font-medium tracking-normal">
-              Edit Receipt Type
-            </DialogTitle>
+            <DialogTitle className="font-medium">Edit Receipt Type</DialogTitle>
             <DialogDescription>
               Modify details for{" "}
               {
@@ -189,8 +189,8 @@ export const RegistrationOptions = () => {
           </DialogHeader>
           <form onSubmit={UpdateType} autoComplete="off">
             <fieldset
-              disabled={addLoader}
-              className="w-full rounded-lg grid grid-cols-6 gap-2 md:gap-4"
+              disabled={updateLoader || deleteLoader}
+              className="w-full rounded-lg grid grid-cols-6 gap-4"
             >
               <div className="col-span-6 space-y-2">
                 <Label htmlFor="receiptType">Receipt Type</Label>
@@ -229,15 +229,20 @@ export const RegistrationOptions = () => {
                   onClick={DeleteType}
                   icon={Trash2Icon}
                   iconPlacement="right"
+                  loading={deleteLoader}
+                  loadingText={"Deleting"}
                 >
                   Delete
                 </Button>
                 <Button
                   tabIndex={0}
                   role="button"
+                  variant={"outline"}
                   type="submit"
                   icon={SaveIcon}
                   iconPlacement="right"
+                  loading={updateLoader}
+                  loadingText={"Updating"}
                 >
                   Update
                 </Button>
@@ -247,18 +252,20 @@ export const RegistrationOptions = () => {
         </DialogContent>
       </Dialog>
 
-      <Card className="border rounded-md border-b-0 rounded-b-none w-full shadow-none  h-min mx-auto">
-        <CardHeader className="border-b p-4">
-          <CardTitle className="font-medium tracking-normal">
+      <Card className="border-b-0 rounded-b-none w-full h-min mx-auto">
+        <CardHeader>
+          <CardTitle className="font-medium">
             Add Registration Receipt Type
           </CardTitle>
-          <CardDescription hidden></CardDescription>
+          <CardDescription>
+            Create and define new receipt types with associated fees.
+          </CardDescription>
         </CardHeader>
-        <CardContent className="py-4 px-3 md:px-8">
+        <CardContent>
           <form onSubmit={AddNewType} autoComplete="off">
             <fieldset
               disabled={addLoader}
-              className="w-full rounded-lg grid grid-cols-6 gap-2 md:gap-4"
+              className="w-full rounded-lg grid grid-cols-6 gap-4"
             >
               <div className="col-span-6 sm:col-span-3 space-y-2">
                 <Label htmlFor="receiptType">Receipt Type</Label>
@@ -286,11 +293,12 @@ export const RegistrationOptions = () => {
                 <Button
                   tabIndex={0}
                   role="button"
-                  className="text-sm px-6"
                   type="submit"
                   effect={"ringHover"}
                   icon={CirclePlus}
                   iconPlacement="right"
+                  loading={addLoader}
+                  loadingText={"Adding"}
                 >
                   Add
                 </Button>
@@ -299,7 +307,7 @@ export const RegistrationOptions = () => {
           </form>
         </CardContent>
       </Card>
-      <div className="rounded-t-none w-full flex flex-col flex-1 bg-card border rounded-md divide-y">
+      <div className="rounded-t-none w-full flex flex-col flex-1 bg-card border rounded-xl divide-y">
         {!isLoaded ? (
           <div className="flex flex-1 items-center justify-center min-h-72 w-full">
             <Loader size="medium" />

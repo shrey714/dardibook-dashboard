@@ -126,18 +126,18 @@ const BillDefaults = () => {
   };
 
   return (
-    <Card className="rounded-md w-full shadow-none border h-min mx-auto">
-      <CardHeader className="border-b p-4">
-        <CardTitle className="font-medium tracking-normal">
-          Bill Defaults
-        </CardTitle>
-        <CardDescription hidden></CardDescription>
+    <Card className="w-full h-min mx-auto">
+      <CardHeader>
+        <CardTitle className="font-medium">Bill Defaults</CardTitle>
+        <CardDescription>
+          Set default values for discount, tax, payment status, and method.
+        </CardDescription>
       </CardHeader>
-      <CardContent className="py-4 px-3 md:px-8">
+      <CardContent>
         <form onSubmit={updateDefaults} autoComplete="off">
           <fieldset
             disabled={updateLoader}
-            className="w-full rounded-lg grid grid-cols-6 gap-2 md:gap-4"
+            className="w-full grid grid-cols-6 gap-4"
           >
             <div className="col-span-6 sm:col-span-3 space-y-2">
               <Label htmlFor="discount">Discount (%)</Label>
@@ -210,6 +210,8 @@ const BillDefaults = () => {
                 effect={"ringHover"}
                 icon={SaveIcon}
                 iconPlacement="right"
+                loading={updateLoader}
+                loadingText="Saving"
               >
                 Save
               </Button>
@@ -226,6 +228,8 @@ const ServicesUpdateModal = () => {
   const { organization, isLoaded } = useOrganization();
   const [services, setServices] = useState<ServiceItems[]>([]);
   const [addLoader, setAddLoader] = useState(false);
+  const [updateLoader, setUpdateLoader] = useState(false);
+  const [deleteLoader, setDeleteLoader] = useState(false);
   const [serviceEditModel, setServiceEditModel] = useState<boolean>(false);
   const [editForServiceId, setEditForServiceId] = useState<string>("");
 
@@ -240,6 +244,7 @@ const ServicesUpdateModal = () => {
   // --------------add new receipt type-----------
   const AddNewType = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!organization) return;
     setAddLoader(true);
     const form = e.target as HTMLFormElement;
     const newService: ServiceItems = {
@@ -247,7 +252,6 @@ const ServicesUpdateModal = () => {
       service_name: form.service_name.value.trim(),
       price: parseInt(form.price.value.trim()),
     };
-    if (!organization) return;
     toast.promise(
       async () => {
         await updateServicesDefaults(services.concat(newService)).then(
@@ -275,14 +279,14 @@ const ServicesUpdateModal = () => {
   // --------------update receipt-----------
   const UpdateType = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setAddLoader(true);
+    if (!organization) return;
     const form = e.target as HTMLFormElement;
     const existingService: ServiceItems = {
       service_id: editForServiceId,
       service_name: form.service_name.value.trim(),
       price: parseInt(form.price.value.trim()),
     };
-    if (!organization) return;
+    setUpdateLoader(true);
     toast.promise(
       async () => {
         await updateServicesDefaults(
@@ -292,12 +296,12 @@ const ServicesUpdateModal = () => {
         ).then(
           () => {
             organization.reload();
-            setAddLoader(false);
+            setUpdateLoader(false);
             setServiceEditModel(false);
           },
           (error) => {
             console.error("Operation failed. Please try again : ", error);
-            setAddLoader(false);
+            setUpdateLoader(false);
           }
         );
       },
@@ -313,8 +317,8 @@ const ServicesUpdateModal = () => {
   };
   // --------------delete receipt-----------
   const DeleteType = async () => {
-    setAddLoader(true);
     if (!organization) return;
+    setDeleteLoader(true);
     toast.promise(
       async () => {
         await updateServicesDefaults(
@@ -322,12 +326,12 @@ const ServicesUpdateModal = () => {
         ).then(
           () => {
             organization.reload();
-            setAddLoader(false);
+            setDeleteLoader(false);
             setServiceEditModel(false);
           },
           (error) => {
             console.error("Operation failed. Please try again : ", error);
-            setAddLoader(false);
+            setDeleteLoader(false);
           }
         );
       },
@@ -346,9 +350,7 @@ const ServicesUpdateModal = () => {
       <Dialog open={serviceEditModel} onOpenChange={setServiceEditModel}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle className="font-medium tracking-normal">
-              Edit Service
-            </DialogTitle>
+            <DialogTitle className="font-medium">Edit Service</DialogTitle>
             <DialogDescription>
               Modify details for{" "}
               {
@@ -360,8 +362,8 @@ const ServicesUpdateModal = () => {
           </DialogHeader>
           <form onSubmit={UpdateType} autoComplete="off">
             <fieldset
-              disabled={addLoader}
-              className="w-full rounded-lg grid grid-cols-6 gap-2 md:gap-4"
+              disabled={updateLoader || deleteLoader}
+              className="w-full rounded-lg grid grid-cols-6 gap-4"
             >
               <div className="col-span-6 space-y-2">
                 <Label htmlFor="service_name">Service Name</Label>
@@ -402,6 +404,8 @@ const ServicesUpdateModal = () => {
                   onClick={DeleteType}
                   icon={Trash2Icon}
                   iconPlacement="right"
+                  loading={deleteLoader}
+                  loadingText={"Deleting"}
                 >
                   Delete
                 </Button>
@@ -412,6 +416,8 @@ const ServicesUpdateModal = () => {
                   type="submit"
                   icon={SaveIcon}
                   iconPlacement="right"
+                  loading={updateLoader}
+                  loadingText={"Updating"}
                 >
                   Update
                 </Button>
@@ -421,18 +427,18 @@ const ServicesUpdateModal = () => {
         </DialogContent>
       </Dialog>
 
-      <Card className="border rounded-md border-b-0 rounded-b-none w-full shadow-none h-min mx-auto mt-2 md:mt-5">
-        <CardHeader className="border-b p-4">
-          <CardTitle className="font-medium tracking-normal">
-            Add New Service
-          </CardTitle>
-          <CardDescription hidden></CardDescription>
+      <Card className="border-b-0 rounded-b-none w-full h-min mx-auto mt-2 md:mt-5">
+        <CardHeader>
+          <CardTitle className="font-medium">Add New Service</CardTitle>
+          <CardDescription>
+            Add new medical services with their corresponding prices.
+          </CardDescription>
         </CardHeader>
-        <CardContent className="py-4 px-3 md:px-8">
+        <CardContent>
           <form onSubmit={AddNewType} autoComplete="off">
             <fieldset
               disabled={addLoader}
-              className="w-full rounded-lg grid grid-cols-6 gap-2 md:gap-4"
+              className="w-full grid grid-cols-6 gap-4"
             >
               <div className="col-span-6 sm:col-span-3 space-y-2">
                 <Label htmlFor="service_name">Service Name</Label>
@@ -464,6 +470,8 @@ const ServicesUpdateModal = () => {
                   effect={"ringHover"}
                   icon={CirclePlus}
                   iconPlacement="right"
+                  loading={addLoader}
+                  loadingText="Adding"
                 >
                   Add
                 </Button>
@@ -472,7 +480,7 @@ const ServicesUpdateModal = () => {
           </form>
         </CardContent>
       </Card>
-      <div className="rounded-t-none w-full flex flex-col flex-1 bg-card border rounded-md divide-y">
+      <div className="rounded-t-none w-full flex flex-col flex-1 bg-card border rounded-xl divide-y">
         {!isLoaded ? (
           <div className="flex flex-1 items-center justify-center min-h-72 w-full">
             <Loader size="medium" />

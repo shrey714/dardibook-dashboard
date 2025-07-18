@@ -1,8 +1,9 @@
 import React from "react";
-import { Pencil } from "lucide-react";
+import { InboxIcon, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import MultipleSelector from "@/components/Settings/DiseaseInfo/MedicineMultipleSelector";
 import { Checkbox } from "@/components/ui/checkbox";
+import MedicineHoverLink from "./medicine-hover-link";
+import { Badge } from "@/components/ui/badge";
 
 interface DisplayDiseaseProps {
   disease: {
@@ -44,21 +45,19 @@ const DiseaseRow: React.FC<DisplayDiseaseProps> = ({
         <p className="text-sm text-muted-foreground">{disease.diseaseId}</p>
       </div>
 
-      <MultipleSelector
-        commandProps={{
-          className:
-            "col-span-7 w-full rounded-md bg-background text-sm font-normal h-min border-none",
-        }}
-        value={disease?.medicines?.map((disease) => ({
-          label: disease,
-          value: disease,
-        }))}
-        placeholder="No Medicines"
-        disabled
-        hidePlaceholderWhenSelected
-        className={`border-none p-2 sm:p-3`}
-        badgeClassName="text-sm p-0"
-      />
+      {disease.medicines.length > 0 ? (
+        <div className="col-span-7 w-full text-sm h-min flex flex-wrap gap-2">
+          {disease.medicines.map((med, i) => (
+            <Badge key={i} variant={"secondary"} className="text-sm">
+              <MedicineHoverLink label={med} />
+            </Badge>
+          ))}
+        </div>
+      ) : (
+        <div className="col-span-7 w-full flex items-center justify-center">
+          <InboxIcon className="text-muted-foreground size-5" />
+        </div>
+      )}
 
       <div className="col-span-1 flex justify-center items-center">
         <Button

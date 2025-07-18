@@ -239,18 +239,18 @@ export default function SettingsDiseaseInfoPage() {
         setdiseases={setdiseases}
       />
       <div className="w-full py-2 sm:py-5 px-2 md:px-5 2xl:flex 2xl:flex-row 2xl:gap-5 2xl:justify-center">
-        <Card className="w-full shadow-none border h-min mx-auto max-w-4xl 2xl:mx-0 2xl:max-w-xl">
-          <CardHeader className="border-b p-4">
-            <CardTitle className="font-medium tracking-normal">
-              Add new disease
-            </CardTitle>
-            <CardDescription hidden></CardDescription>
+        <Card className="2xl:sticky top-20 w-full h-min mx-auto max-w-4xl 2xl:mx-0 2xl:max-w-xl">
+          <CardHeader>
+            <CardTitle className="font-medium">Add new disease</CardTitle>
+            <CardDescription>
+              Add a disease and associate relevant medicines for quick access.
+            </CardDescription>
           </CardHeader>
-          <CardContent className="py-4 px-3 md:px-8">
+          <CardContent>
             <form onSubmit={submitHandler} autoComplete="off">
               <fieldset
                 disabled={addLoader}
-                className="w-full rounded-lg grid grid-cols-6 gap-2 md:gap-4"
+                className="w-full rounded-lg grid grid-cols-6 gap-4"
               >
                 <div className="col-span-6 sm:col-span-3 2xl:col-span-6 space-y-2">
                   <Label htmlFor="diseaseDetail">Disease Name</Label>
@@ -303,14 +303,14 @@ export default function SettingsDiseaseInfoPage() {
                     }}
                     commandProps={{
                       className:
-                        "w-full rounded-md bg-background text-sm font-normal h-min border mt-1 shadow-sm",
+                        "w-full rounded-md text-sm font-normal min-h-9",
                     }}
                     // defaultOptions={OPTIONS}
-                    placeholder="Add Medicines.."
-                    className={`border-none h-min`}
-                    badgeClassName="text-sm p-0"
+                    placeholder="Search Medicines.."
+                    className={`min-h-9`}
+                    badgeClassName="text-sm"
                     loadingIndicator={
-                      <p className="py-1 text-center text-base text-muted-foreground">
+                      <p className="py-2 text-center text-base text-muted-foreground">
                         loading...
                       </p>
                     }
@@ -331,6 +331,8 @@ export default function SettingsDiseaseInfoPage() {
                     effect={"ringHover"}
                     icon={CirclePlus}
                     iconPlacement="right"
+                    loading={addLoader}
+                    loadingText="Adding"
                   >
                     Add
                   </Button>
@@ -342,16 +344,14 @@ export default function SettingsDiseaseInfoPage() {
 
         <div className="flex flex-col mt-2 sm:mt-5 2xl:mt-0 mx-auto 2xl:mx-0 max-w-4xl gap-2 w-full">
           {/* CSV Import/Export Controls */}
-          <Card className="border shadow-none">
-            <CardHeader className="border-b p-4">
-              <CardTitle className="font-medium tracking-normal">
-                Disease Management
-              </CardTitle>
+          <Card>
+            <CardHeader>
+              <CardTitle className="font-medium">Disease Management</CardTitle>
               <CardDescription>
                 Import and export disease data using CSV files
               </CardDescription>
             </CardHeader>
-            <CardContent className="flex flex-wrap gap-2 p-3 sm:p-4">
+            <CardContent className="flex flex-wrap gap-2">
               <Button
                 variant="outline"
                 size="sm"
@@ -378,13 +378,11 @@ export default function SettingsDiseaseInfoPage() {
           </Card>
 
           {/* search/filter disease */}
-          <div className="relative w-full">
-            <AdvancedFilters
-              diseases={diseases || []}
-              filters={filters}
-              onFiltersChange={setFilters}
-            />
-          </div>
+          <AdvancedFilters
+            diseases={diseases || []}
+            filters={filters}
+            onFiltersChange={setFilters}
+          />
 
           {/* Bulk Operations */}
           {diseases && diseases.length > 0 && (
@@ -401,10 +399,31 @@ export default function SettingsDiseaseInfoPage() {
             {diseases === null ? (
               <div className="w-full divide-y rounded-md overflow-hidden">
                 {[...Array(5)].map((_, i) => (
-                  <Skeleton
+                  <div
                     key={i}
-                    className="h-20 w-full rounded-none bg-sidebar/40"
-                  />
+                    className={`grid grid-cols-12 gap-1 w-full p-2 sm:p-4 ${
+                      i !== 0 ? "border-t" : "border-0"
+                    }`}
+                  >
+                    <div className="col-span-1 flex justify-start items-center">
+                      <Skeleton className="size-4 rounded-sm" />
+                    </div>
+
+                    <div className="col-span-3 h-auto flex flex-col justify-start items-start">
+                      <Skeleton className="w-32 h-4" />
+                      <Skeleton className="w-16 h-3 mt-1" />
+                    </div>
+
+                    <div className="col-span-7 w-full text-sm h-min flex flex-wrap gap-2">
+                      {Array.from({ length: 5 }).map((_, index) => (
+                        <Skeleton key={index} className="w-24 h-7" />
+                      ))}
+                    </div>
+
+                    <div className="col-span-1 flex justify-center items-center">
+                      <Skeleton className="size-9" />
+                    </div>
+                  </div>
                 ))}
               </div>
             ) : filteredDiseases.length === 0 ? (
@@ -464,6 +483,7 @@ const EditDiseaseDataModel: React.FC<DisplayEditDiseaseProps> = ({
   const { orgId } = useAuth();
   const [updateMedicinesData, setUpdateMedicinesData] = useState<string[]>([]);
   const [updateLoader, setUpdateLoader] = useState(false);
+  const [deleteLoader, setDeleteLoader] = useState(false);
 
   useEffect(() => {
     setUpdateMedicinesData(
@@ -530,15 +550,15 @@ const EditDiseaseDataModel: React.FC<DisplayEditDiseaseProps> = ({
   };
 
   const deleteDisease = async () => {
-    setUpdateLoader(true);
     if (orgId) {
+      setDeleteLoader(true);
       toast.promise(
         async () => {
           await deleteDoc(
             doc(db, "doctor", orgId, "diseaseData", editForDiseaseId)
           ).then(
             () => {
-              setUpdateLoader(false);
+              setDeleteLoader(false);
               setdiseases(
                 (diseases ?? []).filter(
                   (disease) => disease.diseaseId !== editForDiseaseId
@@ -547,7 +567,7 @@ const EditDiseaseDataModel: React.FC<DisplayEditDiseaseProps> = ({
               setDiseaseEditModel(false);
             },
             () => {
-              setUpdateLoader(false);
+              setDeleteLoader(false);
             }
           );
         },
@@ -567,7 +587,7 @@ const EditDiseaseDataModel: React.FC<DisplayEditDiseaseProps> = ({
     <Dialog open={diseaseEditModel} onOpenChange={setDiseaseEditModel}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle className="font-medium tracking-normal">
+          <DialogTitle className="font-medium">
             {
               diseases?.find(
                 (disease) => disease.diseaseId === editForDiseaseId
@@ -579,8 +599,8 @@ const EditDiseaseDataModel: React.FC<DisplayEditDiseaseProps> = ({
 
         <form onSubmit={submitHandler} autoComplete="off">
           <fieldset
-            disabled={updateLoader}
-            className="w-full rounded-lg grid grid-cols-6 gap-2 md:gap-4"
+            disabled={updateLoader || deleteLoader}
+            className="w-full rounded-lg grid grid-cols-6 gap-4"
           >
             <div className="col-span-6 space-y-2">
               <Label htmlFor="diseaseDetail">Disease Name</Label>
@@ -632,15 +652,14 @@ const EditDiseaseDataModel: React.FC<DisplayEditDiseaseProps> = ({
                   id: "medicines",
                 }}
                 commandProps={{
-                  className:
-                    "w-full rounded-md bg-background text-sm font-normal h-min border mt-1 shadow-sm",
+                  className: "w-full rounded-md text-sm font-normal min-h-9",
                 }}
                 // defaultOptions={OPTIONS}
-                placeholder="Add Medicines.."
-                className={`border-none h-min`}
-                badgeClassName="text-sm p-0"
+                placeholder="Search Medicines.."
+                className={`min-h-9`}
+                badgeClassName="text-sm"
                 loadingIndicator={
-                  <p className="py-1 text-center text-base text-muted-foreground">
+                  <p className="py-2 text-center text-base text-muted-foreground">
                     loading...
                   </p>
                 }
@@ -661,6 +680,8 @@ const EditDiseaseDataModel: React.FC<DisplayEditDiseaseProps> = ({
                 onClick={deleteDisease}
                 icon={Trash2Icon}
                 iconPlacement="right"
+                loading={deleteLoader}
+                loadingText={"Deleting"}
               >
                 Delete
               </Button>
@@ -671,6 +692,8 @@ const EditDiseaseDataModel: React.FC<DisplayEditDiseaseProps> = ({
                 type="submit"
                 icon={SaveIcon}
                 iconPlacement="right"
+                loading={updateLoader}
+                loadingText={"Updating"}
               >
                 Update
               </Button>

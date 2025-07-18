@@ -79,7 +79,7 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
   };
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2 w-full">
       <div className="relative flex-1">
         <Input
           startIcon={SearchIcon}

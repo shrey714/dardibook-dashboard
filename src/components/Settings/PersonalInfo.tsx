@@ -17,14 +17,14 @@ const PersonalInfo = () => {
   const { user } = useUser();
   const { orgRole } = useAuth();
   return (
-    <Card className="mx-auto max-w-4xl 2xl:mx-0 shadow-none border h-min flex flex-1 flex-col 2xl:max-w-xl">
-      <CardHeader className="border-b p-5">
-        <CardTitle className="font-medium tracking-normal">
-          Personal Information
-        </CardTitle>
-        <CardDescription hidden></CardDescription>
+    <Card className="mx-auto max-w-4xl 2xl:mx-0 h-min flex flex-1 flex-col 2xl:max-w-xl">
+      <CardHeader>
+        <CardTitle className="font-medium">Personal Information</CardTitle>
+        <CardDescription>
+          View and manage your profile details and account role.
+        </CardDescription>
       </CardHeader>
-      <CardContent className="px-5 pt-5 pb-3 flex flex-col items-center gap-2">
+      <CardContent className="flex flex-col items-center gap-2">
         <Avatar className="h-20 w-20 rounded-lg self-center">
           <AvatarImage
             src={user?.imageUrl}
@@ -56,7 +56,7 @@ const PersonalInfo = () => {
           </p>
         </div>
       </CardContent>
-      <CardFooter className="flex justify-center px-3 py-3 w-full">
+      <CardFooter className="flex justify-center w-full">
         <LogOutBTtn variant={"destructive"} className="w-full max-w-sm" />
       </CardFooter>
     </Card>

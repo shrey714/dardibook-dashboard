@@ -83,7 +83,7 @@ const Button = React.forwardRef<
       loading,
       loadingText,
       loadingIconPlacement = "right",
-      hideIconOnLoading = false,
+      hideIconOnLoading = true,
       asChild = false,
       ...props
     },
