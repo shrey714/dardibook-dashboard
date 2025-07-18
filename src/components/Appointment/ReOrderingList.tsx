@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useToken } from "@/firebase/TokenStore";
 import Link from "next/link";
-import Loader from "../common/Loader";
 import { useOrganization } from "@clerk/nextjs";
 import { AnimatePresence, Reorder } from "framer-motion";
 import { format, getTime, startOfDay } from "date-fns";
@@ -41,6 +40,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
+import { Skeleton } from "../ui/skeleton";
 
 interface TodayPatientsFilter {
   registerd_for?: string;
@@ -53,7 +53,7 @@ const filterOptions = [
     value: "Registered",
     icon: <UserRoundPlus className="h-6 w-6" />,
     classname:
-      "hover:text-blue-600 data-[state=on]:border-blue-600 data-[state=on]:bg-blue-600/10 data-[state=on]:text-blue-600",
+      "hover:text-primary data-[state=on]:border-primary data-[state=on]:bg-primary/10 data-[state=on]:text-primary",
   },
   {
     value: "Prescribed",
@@ -64,7 +64,8 @@ const filterOptions = [
   {
     value: "Bed",
     icon: <BedSingle className="h-6 w-6" />,
-    classname: "hover:text-accent-foreground data-[state=on]:border-primary",
+    classname:
+      "hover:text-accent-foreground data-[state=on]:border-accent-foreground",
   },
 ];
 
@@ -140,7 +141,7 @@ const ReOrderingList: React.FC = () => {
             >
               <SelectTrigger
                 id="registerd_for"
-                className={`w-full md:max-w-md lg:col-span-2 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input py-1 pl-2 sm:text-sm sm:leading-6 ${
+                className={`w-full md:max-w-md lg:col-span-2 ${
                   filters?.registerd_for === doctorId && "text-green-500"
                 }`}
               >
@@ -186,7 +187,7 @@ const ReOrderingList: React.FC = () => {
             >
               <SelectTrigger
                 id="registerd_by"
-                className="w-full md:max-w-md lg:col-span-2 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input py-1 pl-2 sm:text-sm sm:leading-6"
+                className="w-full md:max-w-md lg:col-span-2"
               >
                 <SelectValue placeholder="Registerd by" />
               </SelectTrigger>
@@ -227,7 +228,7 @@ const ReOrderingList: React.FC = () => {
                 value={value}
                 aria-label={value}
                 className={cn(
-                  "flex h-auto text-muted-foreground flex-row items-center justify-between border border-muted bg-popover px-4 py-2 rounded-full hover:bg-accent",
+                  "flex h-auto text-muted-foreground flex-row items-center justify-between border bg-popover px-4 py-2 rounded-full hover:bg-accent",
                   filters?.selectedFilter === value && classname
                 )}
               >
@@ -245,7 +246,7 @@ const ReOrderingList: React.FC = () => {
                   selectedFilter: "",
                 });
               }}
-              className="h-auto py-0 pl-0"
+              className="h-auto py-0 pl-0 text-foreground"
               variant={"link"}
             >
               clear
@@ -289,7 +290,7 @@ const ReOrderingList: React.FC = () => {
                   >
                     <SelectTrigger
                       id="registerd_for"
-                      className={`w-full md:max-w-md lg:col-span-2 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input py-1 pl-2 sm:text-sm sm:leading-6 ${
+                      className={`w-full md:max-w-md lg:col-span-2${
                         filters?.registerd_for === doctorId && "text-green-500"
                       }`}
                     >
@@ -337,7 +338,7 @@ const ReOrderingList: React.FC = () => {
                   >
                     <SelectTrigger
                       id="registerd_by"
-                      className="w-full md:max-w-md lg:col-span-2 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input py-1 pl-2 sm:text-sm sm:leading-6"
+                      className="w-full md:max-w-md lg:col-span-2"
                     >
                       <SelectValue placeholder="Registerd by" />
                     </SelectTrigger>
@@ -378,7 +379,7 @@ const ReOrderingList: React.FC = () => {
                       value={value}
                       aria-label={value}
                       className={cn(
-                        "flex h-auto text-muted-foreground flex-row items-center justify-between border border-muted bg-popover px-4 py-2 rounded-full hover:bg-accent",
+                        "flex h-auto text-muted-foreground flex-row items-center justify-between border bg-popover px-4 py-2 rounded-full hover:bg-accent",
                         filters?.selectedFilter === value && classname
                       )}
                     >
@@ -396,7 +397,7 @@ const ReOrderingList: React.FC = () => {
                         selectedFilter: "",
                       });
                     }}
-                    className="h-auto py-0 pl-0"
+                    className="h-auto py-0 pl-0 text-foreground"
                     variant={"link"}
                   >
                     clear
@@ -416,8 +417,10 @@ const ReOrderingList: React.FC = () => {
 
       <ScrollArea className="h-full flex flex-1">
         {loading ? (
-          <div className="w-full h-48 overflow-hidden flex items-center justify-center">
-            <Loader size="medium" />
+          <div className={`w-full flex flex-col gap-2 py-2`}>
+            {[...Array(14)].map((_, i) => (
+              <Skeleton key={i} className="rounded-full h-8 w-full" />
+            ))}
           </div>
         ) : filteredPatients?.length === 0 || filteredPatients === null ? (
           <div className="w-full h-52 overflow-hidden flex items-center justify-center">
@@ -476,7 +479,7 @@ const ReOrderingList: React.FC = () => {
                             <td className="text-center font-medium text-sm sm:text-base relative">
                               <div
                                 className={`${
-                                  select ? "bg-blue-700 text-white" : ""
+                                  select ? "bg-primary text-primary-foreground" : ""
                                 } p-1 rounded-s-full flex items-center px-3`}
                               >
                                 {filteredPatients?.length - key}
@@ -503,7 +506,7 @@ const ReOrderingList: React.FC = () => {
                                 <p
                                   className={`underline ${
                                     select
-                                      ? "bg-blue-700 text-white"
+                                      ? "bg-primary text-primary-foreground"
                                       : "bg-border rounded-s-full"
                                   } p-1 px-4`}
                                 >
@@ -515,7 +518,7 @@ const ReOrderingList: React.FC = () => {
                               <p
                                 className={` ${
                                   select
-                                    ? "bg-blue-700 text-white"
+                                    ? "bg-primary text-primary-foreground"
                                     : "bg-border full-radius-between-768-and-990 full-radius-before-480"
                                 } p-1 px-4 rounded-e-full lg:rounded-none mr-1 lg:mr-0 line-clamp-1`}
                               >
@@ -526,7 +529,7 @@ const ReOrderingList: React.FC = () => {
                               <p
                                 className={` ${
                                   select
-                                    ? "bg-blue-700 text-white"
+                                    ? "bg-primary text-primary-foreground"
                                     : "bg-border"
                                 } my-1 mr-1 p-1 px-4 rounded-e-full`}
                               >
@@ -537,10 +540,10 @@ const ReOrderingList: React.FC = () => {
                               <p
                                 className={`my-1 border-2 mr-1 py-1 px-4 rounded-full text-center flex items-center justify-center ${
                                   item.inBed
-                                    ? "border-primary"
+                                    ? "border-accent-foreground"
                                     : item.prescribed
                                     ? "bg-green-500/10 border-green-500 text-green-500"
-                                    : "bg-blue-500/10 border-blue-500 text-blue-500"
+                                    : "bg-blue-500/10 border-primary text-primary"
                                 }`}
                               >
                                 {item.inBed ? (

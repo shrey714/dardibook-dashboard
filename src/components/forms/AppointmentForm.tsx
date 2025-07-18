@@ -15,7 +15,6 @@ import {
 } from "@/components/ui/timeline";
 import { format, getTime, isSameDay, startOfDay } from "date-fns";
 import { CircleCheckBig, RotateCcw, UserPlus } from "lucide-react";
-import Loader from "@/components/common/Loader";
 import {
   Select,
   SelectContent,
@@ -25,6 +24,9 @@ import {
 } from "@/components/ui/select";
 
 import { useOrganization } from "@clerk/nextjs";
+import { Spinner } from "../ui/spinner";
+import { Label } from "../ui/label";
+import { Input } from "../ui/input";
 
 interface AppointmentFormProps {
   patientFormData: RegisterPatientFormTypes;
@@ -69,75 +71,76 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
       autoComplete="off"
     >
       {patientFormData.registered_date.length > 0 &&
-      patientFormData.prescribed_date_time.length >= 0 ? (
-        <div className="mx-auto 2xl:mx-0 max-w-4xl 2xl:max-w-2xl border rounded-lg h-min 2xl:sticky top-2 sm:top-6 overflow-x-auto">
-          <Timeline
-            orientation="horizontal"
-            className="pt-6 px-6 pb-6 2xl:pb-0 2xl:flex-col"
-          >
-            {patientFormData.registered_date
-              .concat([getTime(registerForDate)])
-              .sort((a, b) => b - a)
-              .map((registered_date, index) => {
-                const isSameDate = isSameDay(registered_date, registerForDate);
-                const attendedStatus =
-                  patientFormData.prescribed_date_time.some(
-                    (prescribed_date_time) =>
-                      registered_date ===
-                      getTime(startOfDay(prescribed_date_time))
-                  ) || false;
-                return (
-                  <TimelineItem key={index} className="2xl:flex-row">
-                    <TimelineSeparator className="2xl:flex-col">
-                      <TimelineDot className="2xl:mt-1">
-                        {isSameDate ? (
-                          <Loader size="small" />
-                        ) : attendedStatus ? (
-                          <CircleCheckBig className="text-green-500" />
-                        ) : (
-                          <UserPlus />
-                        )}
-                      </TimelineDot>
-                      <TimelineConnector
-                        className="2xl:my-2 2xl:w-0.5"
-                        hidden={
-                          index + 1 ===
-                          patientFormData.registered_date.length + 1
-                        }
-                      />
-                    </TimelineSeparator>
-                    <TimelineContent className="2xl:pb-7 2xl:first:text-right 2xl:last:text-left">
-                      <TimelineTitle
-                        className={`${
-                          attendedStatus ? "text-green-500" : ""
-                        } whitespace-nowrap`}
-                      >
-                        {isSameDate
-                          ? "Currently viewing"
-                          : attendedStatus
-                          ? "Attended"
-                          : "Registered"}
-                      </TimelineTitle>
-                      <TimelineDescription>
-                        {isSameDate
-                          ? "Registering for"
-                          : attendedStatus
-                          ? "Attended on"
-                          : "Registered for"}{" "}
-                        {format(registered_date, "do MMM yyyy")}
-                      </TimelineDescription>
-                    </TimelineContent>
-                  </TimelineItem>
-                );
-              })}
-          </Timeline>
-        </div>
-      ) : (
-        <></>
-      )}
+        patientFormData.prescribed_date_time.length >= 0 && (
+          <div className="mx-auto 2xl:mx-0 max-w-4xl 2xl:max-w-2xl border rounded-xl h-min 2xl:sticky top-2 sm:top-6 overflow-x-auto">
+            <Timeline
+              orientation="horizontal"
+              className="pt-6 px-6 pb-6 2xl:pb-0 2xl:flex-col"
+            >
+              {patientFormData.registered_date
+                .concat([getTime(registerForDate)])
+                .sort((a, b) => b - a)
+                .map((registered_date, index) => {
+                  const isSameDate = isSameDay(
+                    registered_date,
+                    registerForDate
+                  );
+                  const attendedStatus =
+                    patientFormData.prescribed_date_time.some(
+                      (prescribed_date_time) =>
+                        registered_date ===
+                        getTime(startOfDay(prescribed_date_time))
+                    ) || false;
+                  return (
+                    <TimelineItem key={index} className="2xl:flex-row">
+                      <TimelineSeparator className="2xl:flex-col">
+                        <TimelineDot className="2xl:mt-1">
+                          {isSameDate ? (
+                            <Spinner size="sm" />
+                          ) : attendedStatus ? (
+                            <CircleCheckBig className="text-green-500" />
+                          ) : (
+                            <UserPlus />
+                          )}
+                        </TimelineDot>
+                        <TimelineConnector
+                          className="2xl:my-2 2xl:w-0.5"
+                          hidden={
+                            index + 1 ===
+                            patientFormData.registered_date.length + 1
+                          }
+                        />
+                      </TimelineSeparator>
+                      <TimelineContent className="2xl:pb-7 2xl:first:text-right 2xl:last:text-left">
+                        <TimelineTitle
+                          className={`${
+                            attendedStatus ? "text-green-500" : ""
+                          } whitespace-nowrap`}
+                        >
+                          {isSameDate
+                            ? "Currently viewing"
+                            : attendedStatus
+                            ? "Attended"
+                            : "Registered"}
+                        </TimelineTitle>
+                        <TimelineDescription className="whitespace-nowrap">
+                          {isSameDate
+                            ? "Registering for"
+                            : attendedStatus
+                            ? "Attended on"
+                            : "Registered for"}{" "}
+                          {format(registered_date, "do MMM yyyy")}
+                        </TimelineDescription>
+                      </TimelineContent>
+                    </TimelineItem>
+                  );
+                })}
+            </Timeline>
+          </div>
+        )}
       <fieldset
         disabled={submissionLoader}
-        className="mx-auto mt-2 sm:mt-5 2xl:mt-0 w-full 2xl:mx-0 max-w-4xl bg-card border rounded-lg pt-3 md:pt-6 "
+        className="mx-auto mt-2 sm:mt-5 2xl:mt-0 w-full 2xl:mx-0 max-w-4xl bg-card border rounded-xl pt-3 md:pt-6 "
       >
         {/* token selection form */}
         <div className="px-4 md:px-8">
@@ -146,31 +149,24 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
             Instant appointment or schedule on date
           </p>
         </div>
-        <div className="pb-2 md:pb-0 mt-3 md:mt-6 border-t border-b">
-          <div className="px-4 py-1 md:py-6 md:grid md:grid-cols-3 md:gap-4 md:px-8">
-            <label
-              htmlFor="patient_id"
-              className="text-sm font-medium leading-6 flex items-center gap-1"
-            >
+        <div className="py-2 md:py-0 mt-3 md:mt-6 border-t border-b">
+          <div className="px-4 py-2 md:py-6 md:grid md:grid-cols-3 md:gap-2 md:px-8 space-y-2 md:space-y-0">
+            <Label htmlFor="patient_id">
               Patient ID<p className="text-red-500">*</p>
-            </label>
-            <input
+            </Label>
+            <Input
               required
               disabled
               type="text"
               name="patient_id"
               id="patient_id"
-              autoComplete="given-name"
               value={patientFormData.patient_id}
               onChange={handleInputChange}
-              className="col-span-2 cursor-not-allowed w-full md:max-w-md lg:col-span-2 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input block py-1 pl-2 sm:text-sm sm:leading-6"
+              className="col-span-2 disabled:cursor-not-allowed w-full md:max-w-md lg:col-span-2"
             />
           </div>
-          <div className="px-4 py-1 md:py-6 md:grid md:grid-cols-3 md:gap-4 md:px-8">
-            <label
-              htmlFor="last_visited"
-              className="text-sm font-medium leading-6  flex items-center justify-between md:justify-start gap-1"
-            >
+          <div className="px-4 py-2 md:py-6 md:grid md:grid-cols-3 md:gap-4 md:px-8 space-y-2 md:space-y-0">
+            <Label htmlFor="last_visited">
               Appointment date
               {/* <p className="text-red-500">*</p> */}
               <Button
@@ -178,26 +174,22 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
                 onClick={() => {
                   setRegisterForDate(new Date());
                 }}
-                variant={"outline"}
-                className="rounded-full p-1 aspect-square my-1"
-                size={"sm"}
+                variant={"ghost"}
+                className="rounded-full p-0 size-3 aspect-square"
               >
                 <RotateCcw />
               </Button>
-            </label>
+            </Label>
             <DateTimePicker
               registered_date={patientFormData.registered_date}
               date={registerForDate}
               setDate={setRegisterForDate}
             />
           </div>
-          <div className="px-4 py-1 md:py-6 md:grid md:grid-cols-3 sm:gap-4 md:px-8">
-            <label
-              htmlFor="registerd_for"
-              className="text-sm font-medium leading-6  flex items-center gap-1"
-            >
+          <div className="px-4 py-2 md:py-6 md:grid md:grid-cols-3 sm:gap-4 md:px-8 space-y-2 md:space-y-0">
+            <Label htmlFor="registerd_for">
               Doctor<p className="text-red-500">*</p>
-            </label>
+            </Label>
             <Select
               aria-hidden={false}
               required
@@ -233,7 +225,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
               <SelectTrigger
                 autoFocus={true}
                 id="registerd_for"
-                className="w-full md:max-w-md lg:col-span-2 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input py-1 pl-2 sm:text-sm sm:leading-6"
+                className="w-full md:max-w-md lg:col-span-2"
               >
                 <SelectValue placeholder="Doctor" />
               </SelectTrigger>
@@ -269,15 +261,12 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
             Please use WhatsApp number where you get the reports
           </p>
         </div>
-        <div className="pb-2 md:pb-0 mt-3 md:mt-6 border-t border-b">
-          <div className="px-4 py-1 md:py-6 md:grid md:grid-cols-3 sm:gap-4 md:px-8">
-            <label
-              htmlFor="name"
-              className="text-sm font-medium leading-6  flex items-center gap-1"
-            >
+        <div className="py-2 md:py-0 mt-3 md:mt-6 border-t border-b">
+          <div className="px-4 py-2 md:py-6 md:grid md:grid-cols-3 sm:gap-4 md:px-8 space-y-2 md:space-y-0">
+            <Label htmlFor="name">
               Full name<p className="text-red-500">*</p>
-            </label>
-            <input
+            </Label>
+            <Input
               required
               type="text"
               name="name"
@@ -286,17 +275,14 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
               placeholder="patient name"
               value={patientFormData.name.toLowerCase()}
               onChange={handleInputChange}
-              className="col-span-2 w-full md:max-w-md lg:col-span-2 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input block py-1 pl-2 sm:text-sm sm:leading-6"
+              className="col-span-2 w-full md:max-w-md lg:col-span-2"
             />
           </div>
-          <div className="px-4 py-1 md:py-6 md:grid md:grid-cols-3 sm:gap-4 md:px-8">
-            <label
-              htmlFor="mobile"
-              className="text-sm font-medium leading-6  flex items-center gap-1"
-            >
+          <div className="px-4 py-2 md:py-6 md:grid md:grid-cols-3 sm:gap-4 md:px-8 space-y-2 md:space-y-0">
+            <Label htmlFor="mobile">
               Mobile number<p className="text-red-500">*</p>
-            </label>
-            <input
+            </Label>
+            <Input
               required
               type="tel"
               name="mobile"
@@ -308,16 +294,13 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
               pattern="^\d{10}$" // Adjust the pattern to match the format you want
               title="Please enter a valid 10-digit mobile number."
               maxLength={10}
-              className="col-span-2 w-full md:max-w-md lg:col-span-2 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input block py-1 pl-2 sm:text-sm sm:leading-6"
+              className="col-span-2 w-full md:max-w-md lg:col-span-2"
             />
           </div>
-          <div className="px-4 py-1 md:py-6 md:grid md:grid-cols-3 sm:gap-4 md:px-8">
-            <label
-              htmlFor="gender"
-              className="text-sm font-medium leading-6  flex items-center gap-1"
-            >
+          <div className="px-4 py-2 md:py-6 md:grid md:grid-cols-3 sm:gap-4 md:px-8 space-y-2 md:space-y-0">
+            <Label htmlFor="gender">
               Gender<p className="text-red-500">*</p>
-            </label>
+            </Label>
             <Select
               required
               name="gender"
@@ -328,7 +311,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
             >
               <SelectTrigger
                 id="gender"
-                className="col-span-2 w-full md:max-w-md lg:col-span-2 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input py-1 pl-2 sm:text-sm sm:leading-6"
+                className="col-span-2 w-full md:max-w-md lg:col-span-2"
               >
                 <SelectValue placeholder="gender" />
               </SelectTrigger>
@@ -339,14 +322,11 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
               </SelectContent>
             </Select>
           </div>
-          <div className="px-4 py-1 md:py-6 md:grid md:grid-cols-3 sm:gap-4 md:px-8">
-            <label
-              htmlFor="age"
-              className="text-sm font-medium leading-6  flex items-center gap-1"
-            >
+          <div className="px-4 py-2 md:py-6 md:grid md:grid-cols-3 sm:gap-4 md:px-8 space-y-2 md:space-y-0">
+            <Label htmlFor="age">
               Age<p className="text-red-500">*</p>
-            </label>
-            <input
+            </Label>
+            <Input
               required
               type="number"
               name="age"
@@ -355,7 +335,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
               autoComplete="new-off"
               value={patientFormData.age}
               onChange={handleInputChange}
-              className="col-span-2 w-full md:max-w-md lg:col-span-2 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input block py-1 pl-2 sm:text-sm sm:leading-6"
+              className="col-span-2 w-full md:max-w-md lg:col-span-2"
             />
           </div>
         </div>
@@ -368,15 +348,10 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
             Please Specify full patient address
           </p>
         </div>
-        <div className="pb-2 md:pb-0 mt-3 md:mt-6 border-t">
-          <div className="px-4 py-1 md:py-6 md:grid md:grid-cols-3 sm:gap-4 md:px-8">
-            <label
-              htmlFor="street_address"
-              className="text-sm font-medium leading-6  flex items-center"
-            >
-              Street address
-            </label>
-            <input
+        <div className="py-2 md:py-0 mt-3 md:mt-6 border-t">
+          <div className="px-4 py-2 md:py-6 md:grid md:grid-cols-3 sm:gap-4 md:px-8 space-y-2 md:space-y-0">
+            <Label htmlFor="street_address">Street address</Label>
+            <Input
               type="text"
               name="street_address"
               placeholder="street address"
@@ -384,17 +359,12 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
               autoComplete="new-off"
               value={patientFormData.street_address}
               onChange={handleInputChange}
-              className="col-span-2 w-full md:max-w-md lg:col-span-2 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input block py-1 pl-2 sm:text-sm sm:leading-6"
+              className="col-span-2 w-full md:max-w-md lg:col-span-2"
             />
           </div>
-          <div className="px-4 py-1 md:py-6 md:grid md:grid-cols-3 sm:gap-4 md:px-8">
-            <label
-              htmlFor="city"
-              className="text-sm font-medium leading-6  flex items-center"
-            >
-              City
-            </label>
-            <input
+          <div className="px-4 py-2 md:py-6 md:grid md:grid-cols-3 sm:gap-4 md:px-8 space-y-2 md:space-y-0">
+            <Label htmlFor="city">City</Label>
+            <Input
               type="text"
               name="city"
               placeholder="patient city"
@@ -402,17 +372,12 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
               autoComplete="new-off"
               value={patientFormData.city}
               onChange={handleInputChange}
-              className="col-span-2 w-full md:max-w-md lg:col-span-2 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input block py-1 pl-2 sm:text-sm sm:leading-6"
+              className="col-span-2 w-full md:max-w-md lg:col-span-2"
             />
           </div>
-          <div className="px-4 py-1 md:py-6 md:grid md:grid-cols-3 sm:gap-4 md:px-8">
-            <label
-              htmlFor="state"
-              className="text-sm font-medium leading-6  flex items-center"
-            >
-              State / Province
-            </label>
-            <input
+          <div className="px-4 py-2 md:py-6 md:grid md:grid-cols-3 sm:gap-4 md:px-8 space-y-2 md:space-y-0">
+            <Label htmlFor="state">State / Province</Label>
+            <Input
               type="text"
               name="state"
               placeholder="patient state"
@@ -420,17 +385,12 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
               autoComplete="new-off"
               value={patientFormData.state}
               onChange={handleInputChange}
-              className="col-span-2 w-full md:max-w-md lg:col-span-2 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input block py-1 pl-2 sm:text-sm sm:leading-6"
+              className="col-span-2 w-full md:max-w-md lg:col-span-2"
             />
           </div>
-          <div className="px-4 py-1 md:py-6 md:grid md:grid-cols-3 sm:gap-4 md:px-8">
-            <label
-              htmlFor="zip"
-              className="text-sm font-medium leading-6  flex items-center"
-            >
-              Pin code
-            </label>
-            <input
+          <div className="px-4 py-2 md:py-6 md:grid md:grid-cols-3 sm:gap-4 md:px-8 space-y-2 md:space-y-0">
+            <Label htmlFor="zip">Pin code</Label>
+            <Input
               type="text"
               name="zip"
               placeholder="pincode"
@@ -440,7 +400,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
               pattern="^\d{6}$" // Adjust the pattern to match the format you want
               title="Please enter a valid 6-digit PIN code."
               maxLength={6}
-              className="col-span-2 w-full md:max-w-md lg:col-span-2 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input block py-1 pl-2 sm:text-sm sm:leading-6"
+              className="col-span-2 w-full md:max-w-md lg:col-span-2"
             />
           </div>
         </div>
@@ -452,17 +412,19 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
       bottom-0 py-2 border-t sm:py-3 left-0 right-0"
       >
         <Button variant={"destructive"} className="w-28 sm:w-32" asChild>
-          <Link
-            href={"./"}
-            scroll={true}
-            type="button"
-            className="border-0 text-sm font-semibold leading-6"
-          >
+          <Link href={"./"} scroll={true} type="button">
             Cancel
           </Link>
         </Button>
-        <Button className="w-28 sm:w-32" type="submit" variant={"default"}>
-          {submissionLoader ? <Loader size="medium" /> : "Register"}
+        <Button
+          className="w-28 sm:w-32"
+          type="submit"
+          loading={submissionLoader}
+          loadingText="Registering"
+          effect={"ringHover"}
+          variant={"default"}
+        >
+          Register
         </Button>
       </div>
     </form>

@@ -36,7 +36,14 @@ export interface SpinnerProps
 
 const Spinner = React.forwardRef<HTMLSpanElement, SpinnerProps>(
   (
-    { className, size, loading = true, asChild = false, variant, ...props },
+    {
+      className,
+      size,
+      loading = true,
+      asChild = false,
+      variant = "default",
+      ...props
+    },
     ref
   ) => {
     const Comp = asChild ? Slot : "span";

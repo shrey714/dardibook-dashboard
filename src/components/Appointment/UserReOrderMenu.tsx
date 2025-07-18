@@ -24,7 +24,6 @@ import { useEffect, useState } from "react";
 import { Calendar } from "../ui/calendar";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { ResetIcon } from "@radix-ui/react-icons";
-import Loader from "../common/Loader";
 import { useAuth, useOrganization } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
 import { format, getTime, startOfDay } from "date-fns";
@@ -164,20 +163,12 @@ export const UserReOrderMenu: React.FC<UserReOrderMenuProps> = ({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
-          variant="ghost"
+          variant="outline"
           disabled={disabled}
-          className={cn(
-            "flex h-8 w-8 p-0 data-[state=open]:bg-muted border rounded-full",
-            customClassName
-          )}
+          className={cn("flex h-8 w-8 p-0 rounded-full", customClassName)}
+          loading={menuLoader}
         >
-          {menuLoader ? (
-            <Loader size="small" />
-          ) : (
-            <>
-              <MoreHorizontal /> {insideText}
-            </>
-          )}
+          <MoreHorizontal /> {insideText}
           <span className="sr-only">Open menu</span>
         </Button>
       </DropdownMenuTrigger>
@@ -403,7 +394,7 @@ export const UserReOrderMenu: React.FC<UserReOrderMenuProps> = ({
           >
             <SelectTrigger
               id="registerd_for"
-              className="w-full md:max-w-md lg:col-span-2 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input py-1 pl-2 sm:text-sm sm:leading-6"
+              className="w-full md:max-w-md lg:col-span-2"
             >
               <SelectValue placeholder="Doctor" />
             </SelectTrigger>

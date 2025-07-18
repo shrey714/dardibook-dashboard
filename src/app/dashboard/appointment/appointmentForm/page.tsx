@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import uniqid from "uniqid";
 import RegisteredModal from "@/components/Appointment/RegisteredModal";
-import Loader from "@/components/common/Loader";
 import { RegisterPatientFormTypes } from "@/types/FormTypes";
 import {
   Dialog,
@@ -19,6 +18,7 @@ import { db } from "@/firebase/firebaseConfig";
 import toast from "react-hot-toast";
 import { format, getTime, startOfDay } from "date-fns";
 import { useUser } from "@clerk/nextjs";
+import { Spinner } from "@/components/ui/spinner";
 
 const Page: React.FC = () => {
   const searchParams = useSearchParams();
@@ -180,10 +180,15 @@ const Page: React.FC = () => {
 
       {patientId && formLoader ? (
         <div className="w-full h-full overflow-hidden flex items-center justify-center z-50">
-          <Loader size="medium" />
+          <Spinner className="bg-primary" size={"lg"} />
         </div>
       ) : error ? (
-        <div className="px-2 text-muted-foreground font-medium text-base justify-self-center max-w-4xl h-full flex flex-1 items-center justify-center z-10 overflow-hidden text-center">
+        <div className="w-full h-full text-muted-foreground text-sm md:text-base p-4 overflow-hidden flex items-center justify-center gap-4 flex-col">
+          <img
+            className="w-full max-w-40 lg:mx-auto"
+            src="/ErrorTriangle.svg"
+            alt="Error"
+          />
           {error}
         </div>
       ) : (
