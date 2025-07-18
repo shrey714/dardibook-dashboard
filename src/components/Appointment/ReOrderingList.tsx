@@ -290,7 +290,7 @@ const ReOrderingList: React.FC = () => {
                   >
                     <SelectTrigger
                       id="registerd_for"
-                      className={`w-full md:max-w-md lg:col-span-2${
+                      className={`w-full md:max-w-md lg:col-span-2 ${
                         filters?.registerd_for === doctorId && "text-green-500"
                       }`}
                     >

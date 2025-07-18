@@ -8,6 +8,15 @@ import { DosageTypes, MedicinesDetails } from "@/types/FormTypes";
 import { Kbd } from "../ui/kbd";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useOrganization } from "@clerk/nextjs";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface PrescribeMedicineTableProps {
   rows: MedicinesDetails[];
@@ -50,7 +59,7 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
 
   const handleInputChange = (
     rowId: string,
-    event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>
+    event: { target: { name: string; value: string } }
   ) => {
     const { name, value } = event.target;
     setRows(
@@ -166,60 +175,69 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
                 />
               </td>
               <td className="align-top px-1 py-0.5 sm:py-3">
-                <input
+                <Input
                   type="text"
                   name="instruction"
                   placeholder="instruction.."
                   autoComplete="new-off"
                   value={row.instruction}
                   onChange={(event) => handleInputChange(row.id, event)}
-                  className="py-1.5 w-full disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input block pl-2 sm:text-sm sm:leading-6"
+                  wrapClassName="w-full"
                 />
               </td>
               <td className="align-top px-1 py-0.5 sm:py-3">
                 <div className="w-full ring-1 rounded-lg ring-border p-[2px]">
                   <div className="w-full flex flex-row gap-[2px]">
-                    <input
+                    <Input
                       type="text"
                       value={`${row.dosages.morning}-${row.dosages.afternoon}-${row.dosages.evening}-${row.dosages.night}`}
                       autoComplete="new-off"
                       onChange={(event) => handleDosageChange(row.id, event)}
-                      className="disabled:text-primary tracking-wider font-mono w-[70%] shadow-sm rounded-md border-border bg-transparent form-input block py-1 pl-2 sm:text-sm sm:leading-6"
+                      className="tracking-wider font-mono"
+                      wrapClassName="w-[70%]"
                     />
-
-                    <select
-                      value={row.type || defaultType}
+                    <Select
                       name="type"
-                      onChange={(e) => {
-                        handleInputChange(row.id, e);
+                      value={row.type || defaultType}
+                      onValueChange={(val) => {
+                        handleInputChange(row.id, {
+                          target: {
+                            name: "type",
+                            value: val,
+                          },
+                        });
                       }}
-                      className="flex flex-1 disabled:text-primary shadow-sm rounded-md border-border bg-background form-select py-1 pl-2 sm:text-sm sm:leading-6"
                     >
-                      {options.map((type, index) => (
-                        <option key={index} value={type.value}>
-                          {type.value}
-                        </option>
-                      ))}
-                    </select>
+                      <SelectTrigger id="type" className="flex flex-1">
+                        <SelectValue placeholder="Doctor" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {options.map((type, index) => (
+                          <SelectItem value={type.value} key={index}>
+                            {type.value}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div className="flex w-full px-2 py-1 border-0">
                     {statusLabels.map((label, key) => (
                       <div key={key} className="flex items-center me-4">
-                        <input
+                        <Input
                           id={`checkbox-${label}-${row.id}`}
                           type="checkbox"
                           checked={row.dosages[label] ? true : false}
                           onChange={(e) => {
                             handleDosageChangeFromCheckBox(e, row, label);
                           }}
-                          className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                          className="w-4 h-4"
                         />
-                        <label
+                        <Label
                           htmlFor={`checkbox-${label}-${row.id}`}
                           className="ms-2 text-sm font-medium text-muted-foreground"
                         >
                           {label.charAt(0)}
-                        </label>
+                        </Label>
                       </div>
                     ))}
                   </div>
@@ -227,32 +245,38 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
               </td>
               <td className="align-top px-1 sm:pr-3 py-0.5 pb-2 sm:py-3 flex flex-row items-start gap-2">
                 <div className="w-full flex flex-row gap-[2px]">
-                  <input
+                  <Input
                     type="number"
                     name="duration"
                     autoComplete="new-off"
                     value={row.duration}
                     onChange={(event) => handleInputChange(row.id, event)}
-                    className="flex flex-1 w-20 py-1.5 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input pl-2 sm:text-sm sm:leading-6"
+                    wrapClassName="flex flex-1 w-20"
                   />
-                  <select
+
+                  <Select
                     value={row.durationType || "day"}
                     name="durationType"
-                    onChange={(e) => {
-                      handleInputChange(row.id, e);
+                    onValueChange={(val) => {
+                      handleInputChange(row.id, {
+                        target: {
+                          name: "durationType",
+                          value: val,
+                        },
+                      });
                     }}
-                    className="flex flex-1 py-1.5 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-select pl-2 sm:text-sm sm:leading-6"
                   >
-                    {durationTypes.map((type, index) => (
-                      <option
-                        key={index}
-                        value={type.value}
-                        // selected={type.isDefault || false}
-                      >
-                        {type.label}
-                      </option>
-                    ))}
-                  </select>
+                    <SelectTrigger id="durationType" className="flex flex-1">
+                      <SelectValue placeholder="Doctor" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {durationTypes.map((type, index) => (
+                        <SelectItem value={type.value} key={index}>
+                          {type.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="flex flex-col gap-2">
                   <Button
@@ -288,7 +312,7 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
       </table>
 
       <div className="w-full bg-border text-muted-foreground font-medium text-xs text-start pl-4 py-1">
-        Total {rows.length} medicines
+        Total {rows.length} medicine(s)
       </div>
     </div>
   );

@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import PrescribeMedicineTable from "./PrescribeMedicineTable";
-import Loader from "../common/Loader";
 import ReceiptForm from "./ReceiptForm";
 import DiseaseSuggetion from "../Prescribe/DiseaseSuggetion";
 import uniqid from "uniqid";
@@ -14,6 +13,8 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { MedicinesDetails, PrescriptionFormTypes } from "@/types/FormTypes";
+import { Label } from "../ui/label";
+import { Input } from "../ui/input";
 
 interface PrescribeFormProps {
   formData: PrescriptionFormTypes;
@@ -72,18 +73,19 @@ const PrescribeForm: React.FC<PrescribeFormProps> = ({
       autoComplete="off"
       autoFocus={true}
     >
-      <fieldset id="prescriptionForm" className="grid grid-cols-10 gap-4" disabled={submissionLoader}>
+      <fieldset
+        id="prescriptionForm"
+        className="grid grid-cols-10 gap-4"
+        disabled={submissionLoader}
+      >
         <div className="col-span-10 2xl:col-span-7 w-full space-y-4">
-          <div className="bg-card w-full border rounded-lg">
+          <div className="bg-card w-full border rounded-xl">
             {/* Disease text area */}
-            <div className="sm:grid sm:grid-cols-3 sm:gap-4 p-2 md:px-8 md:py-4 border-b">
-              <label
-                htmlFor="diseaseDetail"
-                className="flex items-center text-sm md:text-lg font-medium leading-7"
-              >
+            <div className="sm:grid sm:grid-cols-3 sm:gap-4 p-2 md:px-8 md:py-4 border-b space-y-2 sm:space-y-0">
+              <Label htmlFor="diseaseDetail" className="sm:text-lg">
                 Disease and Diagnosis
-                <span className="text-red-500 ml-1">*</span>
-              </label>
+                <span className="text-red-500">*</span>
+              </Label>
               <div className="sm:col-span-2">
                 <DiseaseSuggetion
                   required={formData.refer?.hospitalName ? false : true}
@@ -98,23 +100,21 @@ const PrescribeForm: React.FC<PrescribeFormProps> = ({
             </div>
 
             {/* Medicine list */}
-            {medicinesLoading ? (
+            {medicinesLoading && (
               <div className="w-full">
                 <div className="h-1 w-full bg-border overflow-hidden">
-                  <div className="progress w-full h-full bg-blue-600 left-right"></div>
+                  <div className="progress w-full h-full bg-primary left-right"></div>
                 </div>
               </div>
-            ) : (
-              <></>
             )}
             <div
               className={`col-span-full border-b relative ${
                 medicinesLoading ? "opacity-50 pointer-events-none" : ""
               }`}
             >
-              <label className="p-2 md:px-8 md:py-3 block text-sm md:text-lg font-medium md:leading-7 text-muted-foreground md:text-primary bg-border md:bg-transparent">
+              <Label className="p-2 md:px-8 md:py-3 block text-sm md:text-lg font-medium md:leading-7 text-muted-foreground md:text-inherit bg-border md:bg-transparent">
                 Medicines
-              </label>
+              </Label>
               <PrescribeMedicineTable
                 rows={formData.medicines}
                 setRows={(medicines) =>
@@ -125,38 +125,36 @@ const PrescribeForm: React.FC<PrescribeFormProps> = ({
 
             {/* Advice or special instructions text area */}
             <div className="p-2 md:py-4 md:px-8 space-y-2 md:space-y-4">
-              <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                <label
+              <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0 space-y-2 sm:space-y-0">
+                <Label
                   htmlFor="advice"
                   className="block text-sm md:text-lg font-medium leading-7"
                 >
                   Advice or special instructions
-                </label>
-                <textarea
+                </Label>
+                <Input
                   id="advice"
                   autoComplete="new-off"
                   placeholder="Advice..."
                   name="advice"
-                  rows={1}
-                  className="w-full sm:col-span-2 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input block py-1 pl-2 sm:text-sm sm:leading-6"
+                  wrapClassName="w-full sm:col-span-2"
                   value={formData.advice}
                   onChange={handleInputChange}
                 />
               </div>
-              <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                <label
+              <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0 space-y-2 sm:space-y-0">
+                <Label
                   htmlFor="nextVisit"
                   className="text-sm md:text-lg font-medium leading-7 flex items-center"
                 >
                   Next visit date
-                </label>
-                <input
+                </Label>
+                <Input
                   type="date"
                   name="nextVisit"
                   autoComplete="new-off"
                   id="nextVisit"
                   min={new Date().toISOString().split("T")[0]}
-                  className="disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input block py-1 pl-2 sm:text-sm sm:leading-6"
                   value={formData.nextVisit}
                   onChange={handleInputChange}
                 />
@@ -164,7 +162,7 @@ const PrescribeForm: React.FC<PrescribeFormProps> = ({
             </div>
           </div>
           {/* Higher hospital Form */}
-          <div className="bg-card w-full border rounded-lg">
+          <div className="bg-card w-full border rounded-xl">
             <Accordion
               type="single"
               collapsible
@@ -175,59 +173,45 @@ const PrescribeForm: React.FC<PrescribeFormProps> = ({
                   Refer to higher hospital
                 </AccordionTrigger>
                 <AccordionContent>
-                  <div className="px-0 space-y-2 md:space-y-4">
-                    <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                      <label
-                        htmlFor="hospitalName"
-                        className="text-sm font-medium leading-6 flex items-center"
-                      >
+                  <div className="px-0 pt-1 space-y-2 md:space-y-4">
+                    <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0 space-y-2 sm:space-y-0">
+                      <Label htmlFor="hospitalName">
                         Hospital Name
                         <span className="text-red-500 ml-1">*</span>
-                      </label>
-                      <input
+                      </Label>
+                      <Input
                         type="text"
                         placeholder="Hospital Name"
                         required={formData.diseaseDetail ? false : true}
                         name="hospitalName"
                         id="hospitalName"
                         autoComplete="new-off"
-                        className="col-span-2 w-full md:max-w-md lg:col-span-2 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input block py-1 pl-2 sm:text-sm sm:leading-6"
+                        wrapClassName="col-span-2 w-full md:max-w-md lg:col-span-2"
                         value={formData.refer.hospitalName}
                         onChange={handleHigherHospitalChange}
                       />
                     </div>
-                    <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                      <label
-                        htmlFor="doctorName"
-                        className="text-sm font-medium leading-6 flex items-center"
-                      >
-                        Appointed Doctor Name
-                      </label>
-                      <input
+                    <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0 space-y-2 sm:space-y-0">
+                      <Label htmlFor="doctorName">Appointed Doctor Name</Label>
+                      <Input
                         type="text"
                         placeholder="Doctor Name.."
                         name="doctorName"
                         id="doctorName"
                         autoComplete="new-off"
-                        className="col-span-2 w-full md:max-w-md lg:col-span-2 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input block py-1 pl-2 sm:text-sm sm:leading-6"
+                        wrapClassName="col-span-2 w-full md:max-w-md lg:col-span-2"
                         value={formData.refer.doctorName}
                         onChange={handleHigherHospitalChange}
                       />
                     </div>
-                    <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                      <label
-                        htmlFor="referMessage"
-                        className="block text-sm font-medium leading-6"
-                      >
-                        Refer message
-                      </label>
-                      <textarea
+                    <div className="sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0 space-y-2 sm:space-y-0">
+                      <Label htmlFor="referMessage">Refer message</Label>
+                      <Input
                         id="referMessage"
                         placeholder="Message.."
                         name="referMessage"
                         autoComplete="new-off"
-                        rows={1}
-                        className="col-span-2 w-full md:max-w-md lg:col-span-2 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input block py-1 pl-2 sm:text-sm sm:leading-6"
+                        wrapClassName="col-span-2 w-full md:max-w-md lg:col-span-2"
                         value={formData.refer.referMessage}
                         onChange={handleHigherHospitalChange}
                       />
@@ -261,8 +245,14 @@ const PrescribeForm: React.FC<PrescribeFormProps> = ({
               Cancel
             </Link>
           </Button>
-          <Button className="w-28 sm:w-32" type="submit" variant={"default"}>
-            {submissionLoader ? <Loader size="medium" /> : "Prescribe"}
+          <Button
+            className="w-28 sm:w-32"
+            type="submit"
+            variant={"default"}
+            effect={"ringHover"}
+            loading={submissionLoader}
+          >
+            Prescribe
           </Button>
         </div>
       </fieldset>

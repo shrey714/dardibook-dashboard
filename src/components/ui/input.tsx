@@ -6,14 +6,22 @@ import { LucideIcon } from "lucide-react";
 export interface InputProps extends React.ComponentProps<"input"> {
   startIcon?: LucideIcon;
   endIcon?: LucideIcon;
+  wrapClassName?: string;
 }
 
-function Input({ className, type, startIcon, endIcon, ...props }: InputProps) {
+function Input({
+  className,
+  wrapClassName,
+  type,
+  startIcon,
+  endIcon,
+  ...props
+}: InputProps) {
   const StartIcon = startIcon;
   const EndIcon = endIcon;
 
   return (
-    <div className="relative w-full">
+    <div className={cn("relative w-full", wrapClassName)}>
       {StartIcon && (
         <div
           className={

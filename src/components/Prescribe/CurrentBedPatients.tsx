@@ -99,10 +99,12 @@ const CurrentBedPatients = () => {
     <>
       {isDesktop ? (
         <Card
-          className={cn("w-[400px] mb-5 border-2 bg-muted/50 flex flex-col")}
+          className={cn(
+            "w-[380px] mb-2 border rounded-md bg-input/30 flex flex-col py-0 gap-0"
+          )}
         >
-          <CardHeader className="border-b py-4 px-3">
-            <CardTitle>Admitted Patients</CardTitle>
+          <CardHeader className="pt-4 pb-2 px-3">
+            <CardTitle className="font-medium">Admitted Patients</CardTitle>
             <CardDescription>
               Discharge patients or update their assigned staff.
             </CardDescription>
@@ -119,10 +121,7 @@ const CurrentBedPatients = () => {
                   setFilters((prev) => ({ ...prev, admission_for: val }));
                 }}
               >
-                <SelectTrigger
-                  id="admission_for"
-                  className="w-full md:max-w-md lg:col-span-2 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input py-1 pl-2 sm:text-sm sm:leading-6"
-                >
+                <SelectTrigger id="admission_for" className="w-full">
                   <SelectValue placeholder="Admission for" />
                 </SelectTrigger>
                 <SelectContent>
@@ -187,7 +186,7 @@ const CurrentBedPatients = () => {
                         <div
                           className={`flex flex-1 w-full items-center flex-row gap-x-2`}
                         >
-                          <HoverCardTrigger className="flex w-full flex-1 flex-row rounded-md bg-border h-[88px] overflow-hidden">
+                          <HoverCardTrigger className="flex w-full flex-1 flex-row rounded-md bg-input/45 h-[88px] overflow-hidden">
                             {isSameDay(bed.admission_at, new Date()) ? (
                               <div className="bg-green-400 w-[4px] h-full"></div>
                             ) : (
@@ -197,7 +196,7 @@ const CurrentBedPatients = () => {
                             <div className="flex flex-1 flex-col h-full">
                               <div className="relative flex flex-1 h-1/2 items-center gap-2 p-2 pb-1">
                                 <span
-                                  className={`text-lg flex flex-row gap-2 items-center bg-background justify-center font-bold rounded-md px-2 py-1 ${
+                                  className={`text-lg flex h-full flex-row gap-2 items-center bg-background justify-center font-bold rounded-md px-2 py-1 ${
                                     bed.dischargeMarked ? "text-red-600" : ""
                                   }`}
                                 >
@@ -250,8 +249,8 @@ const CurrentBedPatients = () => {
                                   disabled={bed.dischargeMarked}
                                 />
                                 <Button
-                                  variant="default"
-                                  className="p-0 border-0 rounded-md h-full aspect-square"
+                                  variant="outline"
+                                  className="aspect-square p-0"
                                   onClick={() =>
                                     openModal({
                                       patientId: bed.patient_id,
@@ -261,15 +260,16 @@ const CurrentBedPatients = () => {
                                   <History />
                                 </Button>
                                 <Button
-                                  variant="outline"
-                                  className="bg-blue-700 hover:bg-blue-900 text-white hover:text-white flex flex-1 rounded-md h-full p-0 border-0 disabled:invisible"
+                                  variant="default"
+                                  effect={"ringHover"}
+                                  className="flex flex-1"
                                   onClick={() => {
                                     router.push(
                                       `prescribe/prescribeForm?patientId=${bed.patient_id}`
                                     );
                                   }}
                                 >
-                                  <ClipboardPlusIcon className="size-4 sm:size-5" />
+                                  <ClipboardPlusIcon />
                                 </Button>
                               </div>
                             </div>
@@ -302,7 +302,7 @@ const CurrentBedPatients = () => {
                                 Age : {matchingPatient.age}
                               </h4>
                               <p className="flex text-sm items-center gap-2">
-                                <PhoneIcon size={16} className="text-primary" />{" "}
+                                <PhoneIcon size={16} />{" "}
                                 {matchingPatient.mobile}
                               </p>
                             </div>

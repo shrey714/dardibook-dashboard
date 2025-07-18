@@ -19,7 +19,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useState } from "react";
-import Loader from "../common/Loader";
 import { useAuth, useOrganization, useUser } from "@clerk/nextjs";
 import { BedPatientTypes, OrgBed, orgUserType } from "@/types/FormTypes";
 import {
@@ -153,11 +152,12 @@ export const BedManagementMenu: React.FC<BedManagementMenuProps> = ({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
-          variant="ghost"
+          variant="outline"
           disabled={disabled}
-          className="flex h-9 w-h-9 aspect-square p-0 data-[state=open]:bg-muted border rounded-md"
+          className="flex h-9 w-h-9 aspect-square p-0"
+          loading={menuLoader}
         >
-          {menuLoader ? <Loader size="small" /> : <MoreHorizontal />}
+          <MoreHorizontal />
           <span className="sr-only">Open menu</span>
         </Button>
       </DropdownMenuTrigger>
@@ -207,7 +207,7 @@ export const BedManagementMenu: React.FC<BedManagementMenuProps> = ({
           >
             <SelectTrigger
               id="admission_for"
-              className="w-full md:max-w-md lg:col-span-2 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input py-1 pl-2 sm:text-sm sm:leading-6"
+              className="w-full md:max-w-md lg:col-span-2"
             >
               <SelectValue placeholder="Doctor" />
             </SelectTrigger>

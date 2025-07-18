@@ -140,7 +140,7 @@ export const BedPatientList: React.FC<bedPatientProps> = ({
                           Age : {matchingPatient.age}
                         </h4>
                         <p className="flex text-sm items-center gap-2">
-                          <PhoneIcon size={16} className="text-primary" />{" "}
+                          <PhoneIcon size={16} />{" "}
                           {matchingPatient.mobile}
                         </p>
                       </div>

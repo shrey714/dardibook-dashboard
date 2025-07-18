@@ -13,7 +13,6 @@ import {
 } from "@/components/ui/dialog";
 import { useAuth, useOrganization, useUser } from "@clerk/nextjs";
 import { useTodayPatientStore } from "@/lib/providers/todayPatientsProvider";
-import Loader from "@/components/common/Loader";
 import { useBedsStore } from "@/lib/stores/useBedsStore";
 import {
   orgUserType,
@@ -21,7 +20,6 @@ import {
   ReceiptDetails,
 } from "@/types/FormTypes";
 import { getTime } from "date-fns";
-import Link from "next/link";
 import {
   BedSingleIcon,
   ClipboardPlusIcon,
@@ -43,6 +41,7 @@ import {
 import toast, { ToastOptions } from "react-hot-toast";
 import { arrayUnion, collection, doc, writeBatch } from "firebase/firestore";
 import { db } from "@/firebase/firebaseConfig";
+import { Spinner } from "@/components/ui/spinner";
 
 export interface patientBarDataTypes {
   patient_id: string;
@@ -345,15 +344,20 @@ const Page = () => {
 
       {todayPatientsLoading || bedsLoading ? (
         <div className="w-full h-full overflow-hidden flex items-center justify-center z-50">
-          <Loader size="medium" />
+          <Spinner className="bg-primary" size={"lg"} />
         </div>
       ) : error ? (
-        <div className="px-2 text-muted-foreground font-medium text-base justify-self-center max-w-4xl h-full flex flex-1 items-center justify-center z-10 overflow-hidden text-center">
+        <div className="px-2 text-muted-foreground font-medium text-base justify-self-center max-w-4xl h-full flex flex-col flex-1 items-center justify-center z-10 gap-4 overflow-hidden text-center">
+          <img
+            className="w-full max-w-40 lg:mx-auto"
+            src="/ErrorTriangle.svg"
+            alt="Error"
+          />
           {error}
         </div>
       ) : (
         <>
-          <div className="w-full sticky top-0 z-[1] gap-y-1 bg-slate-50 dark:bg-gray-900 border-b px-4 py-2 flex flex-wrap items-center justify-between ">
+          <div className="w-full sticky top-0 z-[1] gap-y-1 bg-sidebar border-b px-4 py-2 flex flex-wrap items-center justify-between shadow-md">
             <div className="flex flex-1 items-center space-x-2 dm:space-x-4">
               <User className="size-9 md:size-11 border border-muted-foreground rounded-full p-2 text-muted-foreground" />
               <div>
@@ -362,8 +366,8 @@ const Page = () => {
                     {patientBarData.name}
                   </h3>
                   <Badge
-                    variant={"default"}
-                    className="bg-blue-500/10 border-blue-500 text-blue-500 rounded-full line-clamp-1"
+                    variant={"success"}
+                    className="rounded-full line-clamp-1 bg-primary/10 border text-primary border-primary"
                   >
                     {patientBarData.patient_id}
                   </Badge>
@@ -450,21 +454,18 @@ const Page = () => {
             </div>
 
             {/* Action buttons */}
-            <div className="flex items-center ml-auto w-auto justify-end pl-3">
-              <Button variant="default" asChild>
-                <Link
-                  href={"#"}
-                  role="button"
-                  onClick={() =>
-                    patientId &&
-                    openModal({
-                      patientId: patientId,
-                    })
-                  }
-                  className="text-muted-foreground text-base flex flex-row gap-2 items-center"
-                >
-                  <Link2 size={16} /> History
-                </Link>
+            <div className="flex items-center ml-auto w-auto justify-end pl-4">
+              <Button
+                variant="default"
+                effect={"ringHover"}
+                onClick={() =>
+                  patientId &&
+                  openModal({
+                    patientId: patientId,
+                  })
+                }
+              >
+                <Link2 size={16} /> History
               </Button>
             </div>
           </div>
