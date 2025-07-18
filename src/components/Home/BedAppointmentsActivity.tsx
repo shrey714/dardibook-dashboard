@@ -39,9 +39,9 @@ const BedAppointmentsActivity = ({
     <>
       {isMiddleDesktop ? (
         <>
-          <Card className="relative border dark:border-0 bg-muted/50 rounded-lg col-span-3 md:col-span-6 lg:col-span-3 overflow-hidden">
+          <Card className="py-0 gap-0 relative border dark:border-0 bg-muted/50 rounded-lg col-span-3 md:col-span-6 lg:col-span-3 overflow-hidden">
             <CardHeader className="px-3 pt-3 pb-2 space-y-0.5 items-center border-b">
-              <CardTitle className="font-medium text-ring flex items-center gap-2 leading-normal">
+              <CardTitle className="font-medium flex items-center gap-2 leading-normal">
                 <BedIcon className="h-5 w-5" />
                 Patients in Bed
               </CardTitle>
@@ -97,9 +97,9 @@ const BedAppointmentsActivity = ({
             <FooterLink title="View Bed Status" link="beds" />
           </Card>
 
-          <Card className="relative border dark:border-0 bg-muted/50 rounded-lg col-span-3 md:col-span-6 lg:col-span-3 overflow-hidden">
+          <Card className="py-0 gap-0 relative border dark:border-0 bg-muted/50 rounded-lg col-span-3 md:col-span-6 lg:col-span-3 overflow-hidden">
             <CardHeader className="px-3 pt-3 pb-2 space-y-0.5 items-center border-b">
-              <CardTitle className="font-medium text-ring flex items-center gap-2 leading-normal">
+              <CardTitle className="font-medium flex items-center gap-2 leading-normal">
                 <CalendarIcon className="h-5 w-5" />
                 Upcoming Appointments
               </CardTitle>
@@ -171,9 +171,9 @@ const BedAppointmentsActivity = ({
             <FooterLink title="View All Appointments" link="calendar" />
           </Card>
 
-          <Card className="relative border dark:border-0 bg-muted/50 rounded-lg col-span-3 md:col-span-6 lg:col-span-3 overflow-hidden">
+          <Card className="py-0 gap-0 relative border dark:border-0 bg-muted/50 rounded-lg col-span-3 md:col-span-6 lg:col-span-3 overflow-hidden">
             <CardHeader className="px-3 pt-3 pb-2 space-y-0.5 items-center border-b">
-              <CardTitle className="font-medium text-ring flex items-center gap-2 leading-normal">
+              <CardTitle className="font-medium flex items-center gap-2 leading-normal">
                 <ActivityIcon className="h-5 w-5" />
                 Recent Activity
               </CardTitle>
@@ -207,7 +207,7 @@ const BedAppointmentsActivity = ({
                         <p className="line-clamp-1 w-fit text-muted-foreground">
                           {notification.title}
                         </p>
-                        <p className="text-xs text-ring text-nowrap">
+                        <p className="text-xs text-nowrap">
                           {new Date(notification.timestamp).toLocaleTimeString(
                             [],
                             {
@@ -234,49 +234,49 @@ const BedAppointmentsActivity = ({
         <Tabs defaultValue="bed" className="col-span-full">
           <TabsList className="w-full h-auto">
             <TabsTrigger value="bed" asChild>
-              <CardHeader className="data-[state=active]:flex-[0.5] data-[state=inactive]:flex-[0.25] group px-3 pt-3 pb-2 space-y-0.5 items-center">
-                <CardTitle className="font-medium text-ring flex items-center gap-2 leading-normal group-data-[state=active]:flex-col">
+              <CardHeader className="data-[state=active]:flex-[0.5] data-[state=inactive]:flex-[0.25] flex-col group px-3 pt-3 pb-2 space-y-0.5 items-center">
+                <CardTitle className="font-medium flex items-center gap-2 leading-normal group-data-[state=active]:flex-col">
                   <BedIcon className="h-5 w-5 shrink-0" />
                   <span className="hidden group-data-[state=active]:inline">
                     Patients in Bed
                   </span>
                 </CardTitle>
-                <CardDescription className="text-xs hidden md:group-data-[state=active]:inline">
+                <CardDescription className="text-xs hidden md:group-data-[state=active]:flex">
                   Currently admitted patients
                 </CardDescription>
               </CardHeader>
             </TabsTrigger>
             <TabsTrigger value="appointments" asChild>
-              <CardHeader className="data-[state=active]:flex-[0.5] data-[state=inactive]:flex-[0.25] group px-3 pt-3 pb-2 space-y-0.5 items-center">
-                <CardTitle className="font-medium text-ring flex items-center gap-2 leading-normal group-data-[state=active]:flex-col">
+              <CardHeader className="data-[state=active]:flex-[0.5] data-[state=inactive]:flex-[0.25] flex-col group px-3 pt-3 pb-2 space-y-0.5 items-center">
+                <CardTitle className="font-medium flex items-center gap-2 leading-normal group-data-[state=active]:flex-col">
                   <CalendarIcon className="h-5 w-5 shrink-0" />
                   <span className="hidden group-data-[state=active]:inline">
                     Upcoming Appointments
                   </span>
                 </CardTitle>
-                <CardDescription className="text-xs hidden md:group-data-[state=active]:inline">
+                <CardDescription className="text-xs hidden md:group-data-[state=active]:flex">
                   Scheduled patient visits.
                 </CardDescription>
               </CardHeader>
             </TabsTrigger>
             <TabsTrigger value="activity" asChild>
-              <CardHeader className="data-[state=active]:flex-[0.5] data-[state=inactive]:flex-[0.25] group px-3 pt-3 pb-2 space-y-0.5 items-center">
-                <CardTitle className="font-medium text-ring flex items-center gap-2 leading-normal group-data-[state=active]:flex-col">
+              <CardHeader className="data-[state=active]:flex-[0.5] data-[state=inactive]:flex-[0.25] flex-col group px-3 pt-3 pb-2 space-y-0.5 items-center">
+                <CardTitle className="font-medium flex items-center gap-2 leading-normal group-data-[state=active]:flex-col">
                   <ActivityIcon className="h-5 w-5 shrink-0" />
                   <span className="hidden group-data-[state=active]:inline">
                     Recent Activity
                   </span>
                 </CardTitle>
-                <CardDescription className="text-xs hidden md:group-data-[state=active]:inline">
+                <CardDescription className="text-xs hidden md:group-data-[state=active]:flex">
                   Latest updates from your clinic.
                 </CardDescription>
               </CardHeader>
             </TabsTrigger>
           </TabsList>
           <TabsContent value="bed">
-            <Card className="relative border dark:border-0 bg-muted/50 rounded-lg col-span-3 md:col-span-6 lg:col-span-3 overflow-hidden">
+            <Card className="py-0 gap-0 relative border dark:border-0 bg-muted/50 rounded-lg col-span-3 md:col-span-6 lg:col-span-3 overflow-hidden">
               <CardHeader className="px-3 pt-3 pb-2 space-y-0.5 items-center border-b">
-                <CardTitle className="font-medium text-ring flex items-center gap-2 leading-normal">
+                <CardTitle className="font-medium flex items-center gap-2 leading-normal">
                   <BedIcon className="h-5 w-5" />
                   Patients in Bed
                 </CardTitle>
@@ -335,9 +335,9 @@ const BedAppointmentsActivity = ({
             </Card>
           </TabsContent>
           <TabsContent value="appointments">
-            <Card className="relative border dark:border-0 bg-muted/50 rounded-lg col-span-3 md:col-span-6 lg:col-span-3 overflow-hidden">
+            <Card className="py-0 gap-0 relative border dark:border-0 bg-muted/50 rounded-lg col-span-3 md:col-span-6 lg:col-span-3 overflow-hidden">
               <CardHeader className="px-3 pt-3 pb-2 space-y-0.5 items-center border-b">
-                <CardTitle className="font-medium text-ring flex items-center gap-2 leading-normal">
+                <CardTitle className="font-medium flex items-center gap-2 leading-normal">
                   <CalendarIcon className="h-5 w-5" />
                   Upcoming Appointments
                 </CardTitle>
@@ -410,9 +410,9 @@ const BedAppointmentsActivity = ({
             </Card>
           </TabsContent>
           <TabsContent value="activity">
-            <Card className="relative border dark:border-0 bg-muted/50 rounded-lg col-span-3 md:col-span-6 lg:col-span-3 overflow-hidden">
+            <Card className="py-0 gap-0 relative border dark:border-0 bg-muted/50 rounded-lg col-span-3 md:col-span-6 lg:col-span-3 overflow-hidden">
               <CardHeader className="px-3 pt-3 pb-2 space-y-0.5 items-center border-b">
-                <CardTitle className="font-medium text-ring flex items-center gap-2 leading-normal">
+                <CardTitle className="font-medium flex items-center gap-2 leading-normal">
                   <ActivityIcon className="h-5 w-5" />
                   Recent Activity
                 </CardTitle>
@@ -446,7 +446,7 @@ const BedAppointmentsActivity = ({
                           <p className="line-clamp-1 w-fit text-muted-foreground">
                             {notification.title}
                           </p>
-                          <p className="text-xs text-ring text-nowrap">
+                          <p className="text-xs text-nowrap">
                             {new Date(
                               notification.timestamp
                             ).toLocaleTimeString([], {

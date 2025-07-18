@@ -81,12 +81,12 @@ const QuickLinks = ({ role }: { role: string }) => {
                 <Link
                   href={item.url}
                   key={index}
-                  className={`${item.color} col-span-1 flex flex-col items-center justify-center p-4 sm:p-5 hover:bg-accent/20 border dark:border-0 transition-colors cursor-pointer rounded-lg text-card-foreground shadow`}
+                  className={`${item.color} text-card-foreground col-span-1 flex flex-col items-center justify-center p-4 sm:p-5 hover:bg-accent/20 border dark:border-0 transition-colors cursor-pointer rounded-lg shadow`}
                 >
                   <div className="rounded-full p-3 bg-primary/10 mb-2">
-                    <item.icon className="h-6 w-6 text-ring" />
+                    <item.icon className="h-6 w-6" />
                   </div>
-                  <h3 className="font-medium text-ring text-center line-clamp-1 text-sm sm:text-base">
+                  <h3 className="font-medium text-center line-clamp-1 text-sm sm:text-base">
                     {item.title}
                   </h3>
                 </Link>
@@ -95,12 +95,12 @@ const QuickLinks = ({ role }: { role: string }) => {
               return (
                 <div
                   key={index}
-                  className={`${item.color} opacity-50 col-span-1 flex flex-col items-center justify-center p-4 sm:p-5 border dark:border-0 cursor-not-allowed rounded-lg text-card-foreground shadow`}
+                  className={`${item.color} opacity-50 text-card-foreground col-span-1 flex flex-col items-center justify-center p-4 sm:p-5 border dark:border-0 cursor-not-allowed rounded-lg shadow`}
                 >
                   <div className="rounded-full p-3 bg-primary/10 mb-2">
-                    <item.icon className="h-6 w-6 text-ring" />
+                    <item.icon className="h-6 w-6" />
                   </div>
-                  <h3 className="font-medium text-ring text-center line-clamp-1 text-sm sm:text-base">
+                  <h3 className="font-medium text-center line-clamp-1 text-sm sm:text-base">
                     {item.title}
                   </h3>
                 </div>
@@ -133,9 +133,9 @@ const QuickLinks = ({ role }: { role: string }) => {
                         className={`${item.color} col-span-1 flex flex-col items-center justify-center p-4 sm:p-5 hover:bg-accent/20 border dark:border-0 transition-colors cursor-pointer rounded-lg text-card-foreground shadow`}
                       >
                         <div className="rounded-full p-3 bg-primary/10 mb-2">
-                          <item.icon className="h-6 w-6 text-ring" />
+                          <item.icon className="h-6 w-6" />
                         </div>
-                        <h3 className="font-medium text-ring text-center line-clamp-1 text-sm sm:text-base">
+                        <h3 className="font-medium text-center line-clamp-1 text-sm sm:text-base">
                           {item.title}
                         </h3>
                       </Link>
@@ -145,9 +145,9 @@ const QuickLinks = ({ role }: { role: string }) => {
                         className={`${item.color} opacity-50 col-span-1 flex flex-col items-center justify-center p-4 sm:p-5 border dark:border-0 cursor-not-allowed rounded-lg text-card-foreground shadow`}
                       >
                         <div className="rounded-full p-3 bg-primary/10 mb-2">
-                          <item.icon className="h-6 w-6 text-ring" />
+                          <item.icon className="h-6 w-6" />
                         </div>
-                        <h3 className="font-medium text-ring text-center line-clamp-1 text-sm sm:text-base">
+                        <h3 className="font-medium text-center line-clamp-1 text-sm sm:text-base">
                           {item.title}
                         </h3>
                       </div>
