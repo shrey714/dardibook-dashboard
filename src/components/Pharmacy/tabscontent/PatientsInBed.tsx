@@ -39,6 +39,7 @@ import {
   OrgBed,
   PharmacySelectedPatientType,
 } from "@/types/FormTypes";
+import { Input } from "@/components/ui/input";
 
 const PatientsInBed = ({
   onSelectPatient,
@@ -102,14 +103,8 @@ const PatientsInBed = ({
                 const patientSnap = await getDoc(patientRef);
 
                 if (patientSnap.exists()) {
-                  const {
-                    patient_id,
-                    name,
-                    mobile,
-                    gender,
-                    age,
-                    bed_info,
-                  } = patientSnap.data();
+                  const { patient_id, name, mobile, gender, age, bed_info } =
+                    patientSnap.data();
                   patientsData[patientId] = {
                     patient_id,
                     name,
@@ -155,9 +150,9 @@ const PatientsInBed = ({
     : bedsForDate;
 
   return (
-    <Card className="h-full w-full overflow-hidden flex-col">
-      <CardHeader className="p-3 space-y-2">
-        <CardTitle className="text-lg font-semibold text-muted-foreground flex items-center justify-between">
+    <Card className="h-full w-full overflow-hidden flex-col gap-0 py-0">
+      <CardHeader className="p-3 space-y-1">
+        <CardTitle className="text-lg font-medium text-muted-foreground flex items-center justify-between">
           <span>Patients in Bed</span>
           <span className="text-sm font-normal text-muted-foreground">
             {bedsForDate.length} patients
@@ -188,10 +183,10 @@ const PatientsInBed = ({
         </Popover>
 
         <div className="relative w-full">
-          <input
+          <Input
             type="search"
             placeholder="Search by name, mobile or bed"
-            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
+            wrapClassName="w-full"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -246,8 +241,8 @@ const PatientsInBed = ({
                   </TableCell>
                   <TableCell className="text-right">
                     <Button
-                      variant="outline"
-                      size="sm"
+                      variant="default"
+                      effect={"ringHover"}
                       onClick={() =>
                         onSelectPatient({
                           name: patientsForDate[patient.patient_id].name,
@@ -256,7 +251,7 @@ const PatientsInBed = ({
                           gender: patientsForDate[patient.patient_id].gender,
                         })
                       }
-                      className="my-1 mr-1 h-7 border-0 sm:h-8 py-1 flex items-center justify-center bg-blue-700 hover:bg-blue-900 text-white hover:text-white rounded-[4px]"
+                      className="my-1 mr-1 h-7 border-0 sm:h-8 py-1 flex items-center justify-center"
                     >
                       <BriefcaseMedical />
                     </Button>

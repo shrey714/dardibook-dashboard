@@ -81,13 +81,13 @@ const Medical = () => {
           isDesktop ? "z-[1]" : "z-[2] hidden sm:flex"
         )}
       >
-        <span className="flex flex-1 h-[2px] bg-gradient-to-r from-transparent to-primary"></span>
+        <span className="flex flex-1 h-[2px] bg-gradient-to-r from-transparent to-muted-foreground"></span>
         <div className=" flex items-center justify-center">
-          <p className="text-primary w-auto px-3 bg-background py-1 font-medium text-base rounded-full border-primary border-[2px]">
+          <p className="text-muted-foreground w-auto px-3 bg-background py-1 font-medium text-base rounded-full border-muted-foreground border-[2px]">
             Pharmacy Space
           </p>
         </div>
-        <span className="flex flex-1 h-[2px] bg-gradient-to-l from-transparent to-primary"></span>
+        <span className="flex flex-1 h-[2px] bg-gradient-to-l from-transparent to-muted-foreground"></span>
       </div>
 
       <div
@@ -132,14 +132,14 @@ const Medical = () => {
               </TabsContent>
 
               <TabsContent
-                className="[--content-height:calc(100svh-294px)]"
+                className="[--content-height:calc(100svh-296px)]"
                 value="inbed"
               >
                 <PatientsInBed onSelectPatient={handleBedPatientSelect} />
               </TabsContent>
 
               <TabsContent
-                className="[--content-height:calc(100svh-294px)]"
+                className="[--content-height:calc(100svh-296px)]"
                 value="bills"
               >
                 <BillsGenerated onViewBill={handleViewBill} />

@@ -159,7 +159,7 @@ const PrescriptionsForPatient = ({
                     className={`${
                       selectedPrescription?.prescription_id ===
                       prescription.prescription_id
-                        ? "bg-blue-700 text-white hover:bg-blue-700"
+                        ? "bg-primary text-primary-foreground hover:bg-primary"
                         : "bg-border text-muted-foreground"
                     } relative text-sm w-fit h-9 shadow flex flex-row items-center justify-center px-4 py-2 gap-x-2`}
                   >

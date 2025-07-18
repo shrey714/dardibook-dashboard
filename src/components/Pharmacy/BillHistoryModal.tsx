@@ -51,12 +51,6 @@ import { useAuth } from "@clerk/nextjs";
 import toast from "react-hot-toast";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/firebase/firebaseConfig";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import PrintButton from "../PrintHandeler/PrintButton";
 
 interface BillHistoryModaltypes {
@@ -164,7 +158,7 @@ const BillHistoryModal = ({
             <DialogHeader className="shadow-sm">
               <DialogTitle hidden></DialogTitle>
               <DialogDescription hidden></DialogDescription>
-              <div className="w-full gap-y-1 bg-slate-50 dark:bg-gray-900 border-b px-4 py-2 flex flex-wrap items-center justify-between ">
+              <div className="w-full gap-y-1 bg-sidebar border-b px-4 py-2 flex flex-wrap items-center justify-between ">
                 <div className="flex flex-1 items-center space-x-2 sm:space-x-4">
                   <User className="size-9 md:size-11 border border-muted-foreground rounded-full p-2 text-muted-foreground" />
                   <div>
@@ -174,7 +168,7 @@ const BillHistoryModal = ({
                       </h3>
                       <Badge
                         variant={"outline"}
-                        className="bg-blue-500/10 border-blue-500 text-blue-500 rounded-full line-clamp-1"
+                        className="bg-primary/10 border-primary text-primary rounded-full line-clamp-1"
                       >
                         {selectedBillData.patient_id ?? "-"}
                       </Badge>
@@ -288,8 +282,8 @@ const BillHistoryModal = ({
                   </div>
                 </div>
 
-                <Card className="flex flex-col overflow-hidden">
-                  <CardHeader className="py-3 bg-muted/50 border-b">
+                <Card className="flex flex-col overflow-hidden p-0 gap-0">
+                  <CardHeader className="py-3 bg-muted/50 border-b gap-0">
                     <CardTitle className="text-lg font-medium">
                       Bill Summary
                     </CardTitle>
@@ -561,16 +555,16 @@ const BillHistoryModal = ({
                 value={selectedBillData.payment_status}
               >
                 <SelectTrigger
-                  className={`w-min min-w-40 px-4 gap-2 border-0 shadow-sm
+                  className={`w-min min-w-40 px-4 gap-2 border shadow-sm
             ${
               selectedBillData?.payment_status === "Paid"
-                ? "bg-green-300 text-green-800 font-medium"
+                ? "bg-green-300 text-green-600 font-medium"
                 : selectedBillData?.payment_status === "Unpaid"
-                ? "bg-red-300 text-red-800 font-medium"
+                ? "bg-red-300 text-red-600 font-medium"
                 : selectedBillData?.payment_status === "Not Required"
-                ? "bg-gray-300 text-gray-800 font-medium"
+                ? "bg-gray-300 text-gray-600 font-medium"
                 : selectedBillData?.payment_status === "Refunded"
-                ? "bg-yellow-300 text-yellow-800 font-medium"
+                ? "bg-yellow-300 text-yellow-600 font-medium"
                 : ""
             }    
             `}
@@ -581,25 +575,25 @@ const BillHistoryModal = ({
                   <SelectGroup className="space-y-1">
                     <SelectLabel>Payment Status</SelectLabel>
                     <SelectItem
-                      className="bg-green-200 text-green-800 focus:bg-green-300 focus:text-green-800 focus:font-medium"
+                      className="bg-green-200 text-green-600 focus:bg-green-300 focus:text-green-600 focus:font-medium"
                       value="Paid"
                     >
                       Paid
                     </SelectItem>
                     <SelectItem
-                      className="bg-red-200 text-red-800 focus:bg-red-300 focus:text-red-800 focus:font-medium"
+                      className="bg-red-200 text-red-600 focus:bg-red-300 focus:text-red-600 focus:font-medium"
                       value="Unpaid"
                     >
                       Unpaid
                     </SelectItem>
                     <SelectItem
-                      className="bg-gray-200 text-gray-800 focus:bg-gray-300 focus:text-gray-800 focus:font-medium"
+                      className="bg-gray-200 text-gray-600 focus:bg-gray-300 focus:text-gray-600 focus:font-medium"
                       value="Not Required"
                     >
                       Not Required
                     </SelectItem>
                     <SelectItem
-                      className="bg-yellow-200 text-yellow-800 focus:bg-yellow-300 focus:text-yellow-800 focus:font-medium"
+                      className="bg-yellow-200 text-yellow-600 focus:bg-yellow-300 focus:text-yellow-600 focus:font-medium"
                       value="Refunded"
                     >
                       Refunded
