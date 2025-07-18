@@ -113,7 +113,7 @@ export const CalendarHeader = ({
           data-trackid="today-button"
           size="icon"
           variant="link"
-          className="ml-2 text-xs sm:text-sm"
+          className="ml-2 text-xs sm:text-sm text-foreground"
           disabled={date && isThisMonth(date)}
           onClick={(): void => handleDateChange("today")}
         >
