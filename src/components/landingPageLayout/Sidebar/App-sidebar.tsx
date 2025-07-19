@@ -143,7 +143,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader className="pt-[18px] pb-3">
         <LogoHandeler />
       </SidebarHeader>
-      <SidebarContent className="overflow-x-hidden">
+      <SidebarContent className="overflow-x-hidden no-scrollbar group-data-[collapsible=icon]:overflow-y-auto">
         {state === "collapsed" && !isMobile ? <Pip /> : <TokenBox />}
         <NavMain pages={pages} pathname={pathname} />
       </SidebarContent>
