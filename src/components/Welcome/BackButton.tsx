@@ -1,6 +1,6 @@
 "use client"; // Ensure this is a client component
 
-import { ArrowLeft as ArrowLeftIcon } from "lucide-react";
+import { ArrowLeft as ArrowLeftIcon, ArrowRightCircle } from "lucide-react";
 import { completeOnboarding } from "./_actions";
 import { Button } from "../ui/button";
 import { useUser } from "@clerk/nextjs";
@@ -11,12 +11,14 @@ export function BackButton() {
   const router = useRouter();
 
   return (
-    <button
-      className="group absolute left-2 top-10 z-40 rounded-full p-2 transition-all hover:bg-gray-400 sm:left-10"
+    <Button
+      variant={"outline"}
+      effect={"ringHover"}
+      className="group fixed z-50 rounded-full p-2 transition-all top-2 left-2 sm:left-8 aspect-square hover:ring-border/90"
       onClick={() => router.back()}
     >
-      <ArrowLeftIcon className="h-8 w-8 text-gray-500 group-hover:text-gray-800 group-active:scale-90" />
-    </button>
+      <ArrowLeftIcon className="h-8 w-8 group-active:scale-90" />
+    </Button>
   );
 }
 
@@ -30,7 +32,7 @@ export function OnboardCompletionButton() {
     await completeOnboarding().then(
       async () => {
         await user?.reload();
-        router.push("/");
+        router.push("/organizations");
         setloader(false);
       },
       () => {
@@ -40,17 +42,20 @@ export function OnboardCompletionButton() {
     setloader(false);
   };
   return (
-    <Button
-      onClick={() => {
-        handleSubmit();
-      }}
-      variant={"link"}
-      className={
-        "absolute right-2 top-10 z-40 p-2 text-muted-foreground sm:right-10 block"
-      }
-      loading={loader}
-    >
-      Skip to dashboard
-    </Button>
+    <div className="z-40 bg-background/50 backdrop-blur-md flex items-center px-2 sm:px-8 py-2 fixed w-full top-0">
+      <Button
+        onClick={() => {
+          handleSubmit();
+        }}
+        variant={"link"}
+        className={"z-40 p-2 text-muted-foreground mr-0 ml-auto leading-normal"}
+        loading={loader}
+        effect={"expandIcon"}
+        icon={ArrowRightCircle}
+        iconPlacement="right"
+      >
+        Skip to dashboard
+      </Button>
+    </div>
   );
 }

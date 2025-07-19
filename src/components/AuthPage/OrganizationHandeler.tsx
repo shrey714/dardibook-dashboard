@@ -46,8 +46,8 @@ const OrganizationHandeler = () => {
                   headerSubtitle: "text-gray-600 dark:text-gray-300",
                   rootBox: "w-full max-w-screen-lg",
                   cardBox:
-                    "shadow-none w-full border-2 border-border rounded-md",
-                  card: "w-full shadow-none bg-muted/50 rounded-none",
+                    "shadow-none w-full border border-border rounded-xl",
+                  card: "w-full shadow-sm bg-card rounded-none",
                   formContainer: "px-8 md:px-12 lg:px-36",
                   formFieldLabel: "text-foreground",
                   organizationListPreviewItems: "border-border",
@@ -66,7 +66,7 @@ const OrganizationHandeler = () => {
           </div>
         )
       )}
-      <Card className="w-full border-2 rounded-md overflow-hidden border-border max-w-screen-lg bg-muted/50 shadow-none">
+      <Card className="w-full overflow-hidden max-w-screen-lg py-0 gap-0">
         <CardHeader className="p-8 border-b space-y-1">
           <CardTitle className="text-foreground font-bold text-[1.0625rem] text-center leading-[1.41176] tracking-normal">
             Clinic Registration Form

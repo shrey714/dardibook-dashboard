@@ -56,7 +56,8 @@ const RightBox = ({ thisPlanDetails, handleSubscription, isValid }: any) => {
           onClick={() => {
             handleSubscription(thisPlanDetails.id);
           }}
-          className="btn btn-sm text-sm"
+          className="text-sm"
+          effect={"ringHover"}
         >
           Get started
         </Button>

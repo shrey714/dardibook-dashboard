@@ -77,10 +77,10 @@ export default function CookieConsent() {
         </p>
       </div>
       <div className="p-2 flex items-center gap-2 border-t">
-        <Button onClick={accept} className="w-full h-9">
+        <Button onClick={accept} effect={"ringHover"} className="w-full h-9">
           accept
         </Button>
-        <Button onClick={decline} className="w-full h-9" variant="secondary">
+        <Button onClick={decline} className="w-full h-9" variant="outline">
           decline
         </Button>
       </div>

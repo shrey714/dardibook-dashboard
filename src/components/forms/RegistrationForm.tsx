@@ -2,7 +2,7 @@ import React, { useState, ChangeEvent } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { CircleX, FileImage, Loader2 } from "lucide-react";
+import { CircleX, FileImage } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -393,7 +393,7 @@ const RegistrationForm: React.FC = () => {
                 href="https://dardibook.in/documents/terms-conditions"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-primary underline hover:text-primary/80"
+                className="text-foreground underline hover:text-foreground/80"
               >
                 terms and conditions
               </a>{" "}
@@ -402,7 +402,7 @@ const RegistrationForm: React.FC = () => {
                 href="https://dardibook.in/documents/privacy-policy"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-primary underline hover:text-primary/80"
+                className="text-foreground underline hover:text-foreground/80"
               >
                 privacy policy
               </a>
@@ -414,18 +414,14 @@ const RegistrationForm: React.FC = () => {
           <div className="col-span-12 flex justify-center">
             <Button
               type="submit"
+              effect={"ringHover"}
               disabled={submissionLoader}
-              className="w-full max-w-md h-10 text-base font-semibold rounded-full"
+              className="w-full max-w-md h-10 text-base font-medium rounded-full tracking-wider"
               variant="default"
+              loading={submissionLoader}
+              loadingText="Registering..."
             >
-              {submissionLoader ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Registering...
-                </>
-              ) : (
-                "Register Clinic"
-              )}
+              Register Clinic
             </Button>
           </div>
         </fieldset>

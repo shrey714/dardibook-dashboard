@@ -58,7 +58,6 @@ const RolesLink = ({ pathname }: { pathname: string }) => {
               Make changes to your role profile.
             </DialogDescription>
           </DialogHeader>
-          {/* <RolesModal userInfo={user} /> */}
           <OrganizationList
             hidePersonal={true}
             appearance={{
