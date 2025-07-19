@@ -310,7 +310,7 @@ export const RegistrationOptions = () => {
       <div className="rounded-t-none w-full flex flex-col flex-1 bg-card border rounded-xl divide-y">
         {!isLoaded ? (
           <div className="flex flex-1 items-center justify-center min-h-72 w-full">
-            <Spinner size="sm" />
+            <Spinner size="sm" className="bg-foreground" />
           </div>
         ) : receipts.length === 0 ? (
           <div className="flex flex-1 items-center justify-center text-muted-foreground min-h-72">

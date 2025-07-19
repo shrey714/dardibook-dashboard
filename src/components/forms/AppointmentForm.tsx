@@ -96,7 +96,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
                       <TimelineSeparator className="2xl:flex-col">
                         <TimelineDot className="2xl:mt-1">
                           {isSameDate ? (
-                            <Spinner size="sm" />
+                            <Spinner size="sm" className="bg-foreground" />
                           ) : attendedStatus ? (
                             <CircleCheckBig className="text-green-500" />
                           ) : (
