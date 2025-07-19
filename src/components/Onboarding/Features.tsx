@@ -107,10 +107,7 @@ export default function Features() {
             variants={STAGGER_CHILD_VARIANTS}
             className="flex flex-col items-center space-y-3"
           >
-            <p className="text-xl sm:text-2xl font-bold tracking-normal text-card-foreground leading-normal">
-              DardiBook
-            </p>
-            <h1 className="font-display max-w-2xl text-2xl sm:text-3xl md:text-4xl font-semibold">
+            <h1 className="font-display text-center max-w-2xl text-2xl sm:text-3xl md:text-4xl font-semibold">
               What would you like to explore?
             </h1>
             <p className="max-w-lg text-sm sm:text-base text-muted-foreground px-2 text-center">

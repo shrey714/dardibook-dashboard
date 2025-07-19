@@ -50,8 +50,8 @@ export default function Done() {
       exit="hidden"
       transition={{ duration: 0.3, type: "spring" }}
     >
-      <Card className="w-full border-none shadow-lg bg-gradient-to-br from-background to-muted/50 backdrop-blur-sm relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/80 via-primary to-primary/80"></div>
+      <Card className="w-full relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-primary/80 via-primary to-primary/80"></div>
         <CardContent className="px-4 sm:px-8 space-y-3 sm:space-y-6">
           <motion.div
             variants={STAGGER_CHILD_VARIANTS}

@@ -14,7 +14,7 @@ export function BackButton() {
     <Button
       variant={"outline"}
       effect={"ringHover"}
-      className="group fixed z-50 rounded-full p-2 transition-all top-2 left-2 sm:left-8 aspect-square hover:ring-border/90"
+      className="group fixed z-50 rounded-full p-2 transition-all h-auto w-auto top-2 left-2 sm:left-8 aspect-square hover:ring-border/90"
       onClick={() => router.back()}
     >
       <ArrowLeftIcon className="h-8 w-8 group-active:scale-90" />

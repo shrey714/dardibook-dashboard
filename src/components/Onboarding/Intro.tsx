@@ -162,24 +162,30 @@ export default function Intro() {
             variants={STAGGER_CHILD_VARIANTS}
             initial="hidden"
             animate="show"
-            className="md:hidden grid grid-cols-1 gap-3 mt-6"
+            className="md:hidden w-full flex flex-col mt-6 sm:mt-8 divide-y divide-border/50"
           >
-            {benefits.map((benefit) => (
-              <div
-                key={benefit.title}
-                className="flex items-center space-x-3 bg-background/50 p-3 rounded-lg border border-border/50"
-              >
-                <div className="p-1.5 rounded-full bg-primary/10">
-                  <benefit.icon className="h-4 w-4 text-primary" />
+            {benefits.map((benefit, index) => {
+              const isFirst = index === 0;
+              const isLast = index === features.length - 1;
+              return (
+                <div
+                  key={benefit.title}
+                  className={`flex items-center space-x-3 bg-background/50 p-3 border-l border-r border-border/50 ${
+                    isFirst ? "rounded-t-lg border-t" : ""
+                  } ${isLast ? "rounded-b-lg !border-b" : ""}`}
+                >
+                  <div className="p-1.5 rounded-full bg-primary/10">
+                    <benefit.icon className="h-4 w-4 text-primary" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-sm">{benefit.title}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {benefit.description}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="font-medium text-sm">{benefit.title}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {benefit.description}
-                  </p>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </motion.div>
 
           <motion.div
