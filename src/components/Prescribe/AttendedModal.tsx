@@ -3,17 +3,17 @@ import animationData from "@/lottieFiles/Registered.json";
 import Lottie from "react-lottie";
 import Link from "next/link";
 import { Button } from "../ui/button";
-import Loader from "../common/Loader";
 import { PrescriptionFormTypes } from "@/types/FormTypes";
+import { Spinner } from "../ui/spinner";
 
 interface AttendedModalProps {
-  isModalOpen:boolean;
-  setCloseModal:React.Dispatch<React.SetStateAction<boolean>>;
-  patientID:string;
-  PrescriptionAndReferData:PrescriptionFormTypes;
-} 
+  isModalOpen: boolean;
+  setCloseModal: React.Dispatch<React.SetStateAction<boolean>>;
+  patientID: string;
+  PrescriptionAndReferData: PrescriptionFormTypes;
+}
 
-const AttendedModal:React.FC<AttendedModalProps> = ({
+const AttendedModal: React.FC<AttendedModalProps> = ({
   isModalOpen,
   setCloseModal,
   patientID,
@@ -151,11 +151,11 @@ const AttendedModal:React.FC<AttendedModalProps> = ({
           </div>
           {printDataLoader ? (
             <Button disabled variant={"outline"}>
-              <Loader size="medium" />
+              <Spinner size="md" />
             </Button>
           ) : (
             <>
-            {/* <PrintHandeler
+              {/* <PrintHandeler
               styleForBtn={"bg-primary"}
               printOptions={printOptions}
               PrescriptionAndReferData={PrescriptionAndReferData}

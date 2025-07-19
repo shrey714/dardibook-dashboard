@@ -13,7 +13,6 @@ import {
   XIcon,
 } from "lucide-react";
 import uniqid from "uniqid";
-import Loader from "@/components/common/Loader";
 import toast from "react-hot-toast";
 import {
   Card,
@@ -53,6 +52,7 @@ import {
 } from "@/app/dashboard/settings/defaults/_actions";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Spinner } from "@/components/ui/spinner";
 
 export const PrescriptionOptions = () => {
   return (
@@ -330,7 +330,7 @@ const PrescriptionReceiptType = () => {
       <div className="rounded-t-none w-full flex flex-col flex-1 bg-card border rounded-xl divide-y">
         {!isLoaded ? (
           <div className="flex flex-1 items-center justify-center min-h-72 w-full">
-            <Loader size="medium" />
+            <Spinner size="sm" />
           </div>
         ) : receipts.length === 0 ? (
           <div className="flex flex-1 items-center justify-center text-muted-foreground min-h-72">

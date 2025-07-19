@@ -9,7 +9,6 @@ import {
   Trash2Icon,
 } from "lucide-react";
 import uniqid from "uniqid";
-import Loader from "@/components/common/Loader";
 import toast from "react-hot-toast";
 import {
   Card,
@@ -41,6 +40,7 @@ import {
 import { updateRegistrationReceiptDefaults } from "@/app/dashboard/settings/defaults/_actions";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Spinner } from "@/components/ui/spinner";
 
 export const RegistrationOptions = () => {
   const { orgId } = useAuth();
@@ -310,7 +310,7 @@ export const RegistrationOptions = () => {
       <div className="rounded-t-none w-full flex flex-col flex-1 bg-card border rounded-xl divide-y">
         {!isLoaded ? (
           <div className="flex flex-1 items-center justify-center min-h-72 w-full">
-            <Loader size="medium" />
+            <Spinner size="sm" />
           </div>
         ) : receipts.length === 0 ? (
           <div className="flex flex-1 items-center justify-center text-muted-foreground min-h-72">

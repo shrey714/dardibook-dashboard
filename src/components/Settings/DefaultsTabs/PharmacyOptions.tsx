@@ -9,7 +9,6 @@ import {
   Trash2Icon,
 } from "lucide-react";
 import uniqid from "uniqid";
-import Loader from "@/components/common/Loader";
 import toast from "react-hot-toast";
 import {
   Card,
@@ -50,6 +49,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Spinner } from "@/components/ui/spinner";
 
 interface ServiceItems {
   service_id: string;
@@ -483,7 +483,7 @@ const ServicesUpdateModal = () => {
       <div className="rounded-t-none w-full flex flex-col flex-1 bg-card border rounded-xl divide-y">
         {!isLoaded ? (
           <div className="flex flex-1 items-center justify-center min-h-72 w-full">
-            <Loader size="medium" />
+            <Spinner size="sm" />
           </div>
         ) : services.length === 0 ? (
           <div className="flex flex-1 items-center justify-center text-muted-foreground min-h-72">

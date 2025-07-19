@@ -6,7 +6,6 @@ import { Button } from "../ui/button";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import Loader from "../common/Loader";
 
 export function BackButton() {
   const router = useRouter();
@@ -49,8 +48,9 @@ export function OnboardCompletionButton() {
       className={
         "absolute right-2 top-10 z-40 p-2 text-muted-foreground sm:right-10 block"
       }
+      loading={loader}
     >
-      {loader ? <Loader size="small" /> : "Skip to dashboard"}
+      Skip to dashboard
     </Button>
   );
 }

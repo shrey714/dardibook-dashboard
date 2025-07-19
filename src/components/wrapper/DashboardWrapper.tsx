@@ -1,7 +1,6 @@
 "use client";
 import { ReactNode, useEffect, useState } from "react";
 import "@/styles/globals.css";
-import Loader from "../common/Loader";
 import ConnectionStatus from "../common/InternetDialog";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/landingPageLayout/Sidebar/App-sidebar";
@@ -12,6 +11,7 @@ import { ClerkSubscriptiontypes } from "@/types/SubscriptionTypes";
 import { useRouter } from "next/navigation";
 import { fromUnixTime, isWithinInterval } from "date-fns";
 import CookieConsent from "../common/CookieConsent";
+import { Spinner } from "../ui/spinner";
 const DashboardWrapper = ({ children }: { children: ReactNode }) => {
   const { organization, isLoaded } = useOrganization();
   const router = useRouter();
@@ -59,7 +59,7 @@ const DashboardWrapper = ({ children }: { children: ReactNode }) => {
           <p className="absolute bottom-2 right-2 text-muted-foreground text-xs font-medium">
             Getting your Dashboard ready as per your subscription...
           </p>
-          <Loader size="large" />
+          <Spinner size={"md"} className="bg-primary" />
         </div>
       </>
     );
