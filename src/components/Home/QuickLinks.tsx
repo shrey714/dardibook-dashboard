@@ -16,7 +16,7 @@ import {
 import { useMediaQuery } from "@/hooks/use-media-query";
 import Link from "next/link";
 
-const pages = [
+export const pages = [
   {
     title: "Register",
     url: "/dashboard/appointment",
