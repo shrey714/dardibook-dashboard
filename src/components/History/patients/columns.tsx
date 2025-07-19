@@ -135,7 +135,7 @@ const ActionButtons = ({ patientId }: { patientId: string }) => {
   return (
     <div className="min-w-min p-0 align-middle flex gap-1 flex-row items-center">
       <TooltipProvider>
-        <Tooltip delayDuration={300}>
+        <Tooltip delayDuration={300} disableHoverableContent={true}>
           <TooltipTrigger asChild>
             <Button
               className={`flex h-8 w-8 p-0 border-green-500 bg-green-500/10 text-green-600 hover:bg-green-500/20 ${
@@ -165,7 +165,7 @@ const ActionButtons = ({ patientId }: { patientId: string }) => {
           </TooltipContent>
         </Tooltip>
 
-        <Tooltip delayDuration={300}>
+        <Tooltip delayDuration={300} disableHoverableContent={true}>
           <TooltipTrigger asChild>
             <Button
               variant="ghost"
