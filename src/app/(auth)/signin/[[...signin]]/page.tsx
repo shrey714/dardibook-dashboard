@@ -1,13 +1,9 @@
-"use client";
-
 import Image from "next/image";
 import LoginBox from "@/components/AuthPage/LoginBox";
 import Link from "next/link";
-import { useState } from "react";
+import MarqueBg from "@/components/AuthPage/MarqueBg";
 
 const Page = () => {
-  const [iframeLoaded, setIframeLoaded] = useState(false);
-
   return (
     <section
       className="relative h-svh w-full overflow-hidden flex justify-center items-center"
@@ -52,18 +48,7 @@ const Page = () => {
           </p>
         </div>
       </main>
-
-      <div className="fixed top-0 left-0 w-full h-svh">
-        <iframe
-          src="https://db-marquee-frame.vercel.app"
-          width="100%"
-          height="100%"
-          title="visual"
-          style={{ opacity: iframeLoaded ? 1 : 0 }}
-          onLoad={() => setIframeLoaded(true)}
-          className="transition-opacity duration-500"
-        ></iframe>
-      </div>
+      <MarqueBg />
     </section>
   );
 };
