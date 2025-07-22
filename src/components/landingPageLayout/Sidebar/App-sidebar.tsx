@@ -147,6 +147,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent className="overflow-x-hidden gap-0 no-scrollbar group-data-[collapsible=icon]:overflow-y-auto">
         <ScrollShadow
+          size={22}
           className="w-full h-full pb-5"
           orientation="vertical"
           hideScrollBar={true}
