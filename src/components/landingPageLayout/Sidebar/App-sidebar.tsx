@@ -32,6 +32,8 @@ import { usePathname } from "next/navigation";
 import RolesLink from "./RolesLink";
 import TokenBox from "../../tokenFramer/TokenBox";
 import Pip from "@/hooks/pip";
+import ScrollShadow from "@/components/common/scroll-shadow/scroll-shadow";
+
 const pages = [
   {
     title: "Home",
@@ -143,9 +145,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader className="pt-[18px] pb-3">
         <LogoHandeler />
       </SidebarHeader>
-      <SidebarContent className="overflow-x-hidden no-scrollbar group-data-[collapsible=icon]:overflow-y-auto">
-        {state === "collapsed" && !isMobile ? <Pip /> : <TokenBox />}
-        <NavMain pages={pages} pathname={pathname} />
+      <SidebarContent className="overflow-x-hidden gap-0 no-scrollbar group-data-[collapsible=icon]:overflow-y-auto">
+        <ScrollShadow
+          className="w-full h-full pb-5"
+          orientation="vertical"
+          hideScrollBar={true}
+        >
+          {state === "collapsed" && !isMobile ? <Pip /> : <TokenBox />}
+          <NavMain pages={pages} pathname={pathname} />
+        </ScrollShadow>
       </SidebarContent>
       <SidebarFooter className="gap-1 group-data-[collapsible=icon]:gap-3.5 group-data-[collapsible=icon]:pb-4">
         <RolesLink pathname={pathname} />
