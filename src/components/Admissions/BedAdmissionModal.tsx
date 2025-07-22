@@ -24,9 +24,9 @@ import { getTime, isBefore, isAfter } from "date-fns";
 import uniqid from "uniqid";
 import Availability from "./Availability";
 import { useBedsStore } from "@/lib/stores/useBedsStore";
-import Loader from "../common/Loader";
 import { logActivity } from "@/utility/activityLogging/logActivity";
 import { PatientActivityLog } from "@/types/logTypes";
+import { Spinner } from "../ui/spinner";
 
 interface BedAdmissionModalProps {
   bedId: string;
@@ -468,7 +468,7 @@ const BedAdmissionModal: React.FC<BedAdmissionModalProps> = ({
         <p className="text-center text-red-600 font-normal pb-4">{warning}</p>
       )}
       <Button type="submit" disabled={!isFormValid() || loader}>
-        {loader ? <Loader /> : "Add Patient"}
+        {loader ? <Spinner className="bg-primary" size={"lg"} /> : "Add Patient"}
       </Button>
     </form>
   );

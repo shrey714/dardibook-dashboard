@@ -21,7 +21,6 @@ import { useOrganization } from "@clerk/nextjs";
 import { useBedsStore } from "@/lib/stores/useBedsStore";
 import toast from "react-hot-toast";
 import { Button } from "../ui/button";
-import Loader from "../common/Loader";
 import BedNavigationHeader from "./BedNavigation";
 import { AlertTriangle, Bed, PlusCircleIcon, X } from "lucide-react";
 import { updateOrgBedMetaData } from "@/app/dashboard/admissions/_actions";
@@ -35,6 +34,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Skeleton } from "../ui/skeleton";
+import { Spinner } from "../ui/spinner";
 
 export type ColumnId = string;
 
@@ -331,7 +331,7 @@ export const KanbanBoard = ({
           onClick={addNewBedHandler}
         >
           {bedAddLoader ? (
-            <Loader />
+            <Spinner className="bg-primary" size={"lg"} />
           ) : (
             <>
               <PlusCircleIcon /> Add New Bed

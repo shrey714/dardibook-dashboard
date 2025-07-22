@@ -6,13 +6,11 @@ import { writeBatch, doc, arrayUnion } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Button } from "../ui/button";
-import Loader from "../common/Loader";
 import Availability from "./Availability";
 import {
   BedInfo,
   BedPatientTypes,
   OrgBed,
-  orgUserType,
 } from "@/types/FormTypes";
 import {
   Select,
@@ -30,6 +28,11 @@ import {
   ChevronsUpDown,
   Check,
   Trash,
+  User,
+  Phone,
+  MapPinHouse,
+  MapPin,
+  Bed,
 } from "lucide-react";
 import { DateTimePicker } from "./DateTimePicker";
 import {
@@ -48,6 +51,8 @@ import {
 } from "@/components/ui/command";
 import { diff, PatientActivityLog } from "@/types/logTypes";
 import { logActivity } from "@/utility/activityLogging/logActivity";
+import { Badge } from "../ui/badge";
+import { Spinner } from "../ui/spinner";
 
 interface BedEditModalProps {
   setIsEditModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -100,7 +105,10 @@ const BedEditModal: React.FC<BedEditModalProps> = ({
     },
   });
 
-  const validateDatesForUpdate = (admissionDate: Date, dischargeDate: Date): string => {
+  const validateDatesForUpdate = (
+    admissionDate: Date,
+    dischargeDate: Date
+  ): string => {
     setWarning("");
 
     if (
@@ -137,7 +145,7 @@ const BedEditModal: React.FC<BedEditModalProps> = ({
   };
 
   const dischargePatient = async (alreadyDischarged: boolean) => {
-    if(!alreadyDischarged){
+    if (!alreadyDischarged) {
       const isClash = filteredBeds.some(
         ({ admission_at, discharge_at, bedBookingId }) => {
           if (bedBookingId === bookingId) {
@@ -145,7 +153,7 @@ const BedEditModal: React.FC<BedEditModalProps> = ({
           }
           const existingStart = getTime(admission_at);
           const existingEnd = getTime(discharge_at);
-  
+
           return (
             isBefore(getTime(fromDate), existingEnd) &&
             isAfter(Date.now(), existingStart)
@@ -153,14 +161,16 @@ const BedEditModal: React.FC<BedEditModalProps> = ({
         }
       );
       console.log(isClash);
-  
+
       if (isClash) {
-        setWarning("Discharge Time is clashing with future bookings please update the future bookings");
+        setWarning(
+          "Discharge Time is clashing with future bookings please update the future bookings"
+        );
         return;
       }
     }
-    if(alreadyDischarged)setAlreadyDischargedLoader(true)
-      else setDischargeNowLoader(true);
+    if (alreadyDischarged) setAlreadyDischargedLoader(true);
+    else setDischargeNowLoader(true);
     if (!orgId || !user) return;
 
     try {
@@ -181,7 +191,7 @@ const BedEditModal: React.FC<BedEditModalProps> = ({
           name: user.fullName,
           email: user.primaryEmailAddress?.emailAddress,
         },
-      }
+      };
       batch.update(bedRef, dischargedBookingInfo);
 
       const patientRef = doc(
@@ -196,10 +206,9 @@ const BedEditModal: React.FC<BedEditModalProps> = ({
           ? {
               ...patient_bed,
               dischargeMarked: true,
-              discharge_at:
-              alreadyDischarged
-                  ? currentBedData.discharge_at
-                  : getTime(new Date()),
+              discharge_at: alreadyDischarged
+                ? currentBedData.discharge_at
+                : getTime(new Date()),
               discharged_by: {
                 id: user.id,
                 name: user.fullName,
@@ -217,9 +226,9 @@ const BedEditModal: React.FC<BedEditModalProps> = ({
         id: bookingId,
         action: "discharged",
         timestamp: Date.now(),
-        oldData:null,
-        newData:dischargedBookingInfo,
-        module: "admission"
+        oldData: null,
+        newData: dischargedBookingInfo,
+        module: "admission",
       };
       logActivity(logData);
 
@@ -231,8 +240,8 @@ const BedEditModal: React.FC<BedEditModalProps> = ({
       console.log(error);
       toast.error("Error discharging");
     } finally {
-      if(alreadyDischarged)setAlreadyDischargedLoader(false)
-        else setDischargeNowLoader(false);
+      if (alreadyDischarged) setAlreadyDischargedLoader(false);
+      else setDischargeNowLoader(false);
       setIsEditModalOpen(false);
     }
   };
@@ -241,29 +250,29 @@ const BedEditModal: React.FC<BedEditModalProps> = ({
     const deletePromise = async () => {
       setDeleteLoader(true);
       const batch = writeBatch(db);
-  
+
       const currentBedData = beds.find((bed) => bed.bedBookingId === bookingId);
       if (!currentBedData || !orgId) throw new Error("Booking not found");
-  
+
       const patientId = currentBedData.patient_id;
       const bedRef = doc(db, "doctor", orgId, "beds", bookingId);
       const patientRef = doc(db, "doctor", orgId, "patients", patientId);
-  
+
       const bedPatientData = bedPatients[patientId];
       if (!bedPatientData) throw new Error("Patient not found");
-  
+
       const updatedBedInfo = bedPatientData.bed_info.filter(
         (patient_bed) => patient_bed.bedBookingId !== bookingId
       );
-  
+
       batch.delete(bedRef);
       batch.update(patientRef, { bed_info: updatedBedInfo });
-  
+
       await batch.commit();
     };
-  
+
     await toast.promise(
-      deletePromise().finally(()=>{
+      deletePromise().finally(() => {
         setDeleteLoader(false);
         setIsEditModalOpen(false);
       }),
@@ -326,15 +335,18 @@ const BedEditModal: React.FC<BedEditModalProps> = ({
       await batch.commit();
 
       //logging
-      const { oldData:oldLogData, newData:newLogData } = diff(selectedAdmission!, updatedBookingInfo);
+      const { oldData: oldLogData, newData: newLogData } = diff(
+        selectedAdmission!,
+        updatedBookingInfo
+      );
       const logData: PatientActivityLog = {
         agent_id: user.id,
         id: bookingId,
         action: "admission_updated", //added | updated | removed
         timestamp: Date.now(),
-        oldData:oldLogData,
-        newData:newLogData,
-        module: "admission"
+        oldData: oldLogData,
+        newData: newLogData,
+        module: "admission",
       };
       logActivity(logData);
 
@@ -350,9 +362,12 @@ const BedEditModal: React.FC<BedEditModalProps> = ({
 
   const fromDateTimeChangeHandler = (admissionDataFromCalender: Date) => {
     setFromDate(admissionDataFromCalender);
-    
+
     if (getTime(toDate) !== getTime(new Date(0))) {
-      const validationError = validateDatesForUpdate(admissionDataFromCalender, toDate);
+      const validationError = validateDatesForUpdate(
+        admissionDataFromCalender,
+        toDate
+      );
       setWarning(validationError);
     } else {
       setWarning("");
@@ -361,9 +376,12 @@ const BedEditModal: React.FC<BedEditModalProps> = ({
 
   const toDateTimeChangeHandler = (dischargeDataFromCalender: Date) => {
     setToDate(dischargeDataFromCalender);
-    
+
     if (getTime(fromDate) !== getTime(new Date(0))) {
-      const validationError = validateDatesForUpdate(fromDate, dischargeDataFromCalender);
+      const validationError = validateDatesForUpdate(
+        fromDate,
+        dischargeDataFromCalender
+      );
       setWarning(validationError);
     } else {
       setWarning("");
@@ -400,23 +418,74 @@ const BedEditModal: React.FC<BedEditModalProps> = ({
 
   return (
     <form className="flex flex-col" onSubmit={updateHandler}>
+
+      <div className="flex flex-1 items-center space-x-2 sm:space-x-4 pb-2 mb-2 border-b">
+        <User className="size-9 md:size-11 shrink-0 border border-muted-foreground rounded-full p-2 text-muted-foreground" />
+        <div>
+          <div className="flex items-center gap-2">
+            <h3 className="text-sm md:text-base font-medium line-clamp-1">
+              {patientData.name}
+            </h3>
+            <Badge
+              variant={"outline"}
+              className="bg-blue-500/10 border-blue-500 text-blue-500 rounded-full line-clamp-1"
+            >
+              {patientData.patient_id}
+            </Badge>
+          </div>
+          <div className="flex items-center mt-1 text-sm text-muted-foreground gap-x-3 flex-wrap">
+            <div className="flex items-center gap-1">
+              <span className="h-2 w-2 rounded-full bg-muted-foreground"></span>
+              <span>
+                {patientData.gender}({patientData.age})
+              </span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Phone className="h-3 w-3" />
+              <span className="line-clamp-1">{patientData.mobile}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <MapPinHouse className="h-3 w-3" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-4">
+        <p className="flex-1 text-sm sm:text-base self-center col-span-2 md:col-span-1 ">Please Select the bed <span className="text-red-500">*</span> </p>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="w-[200px] justify-between"
+            className="justify-between col-span-2 md:col-span-3"
           >
-            {bedSearchId
-              ? bedInfo.find((info) => info.bed_id === bedSearchId)?.bed_id
-              : "Select Bed..."}
+            {bedSearchId ? (() => {
+              const bed = bedInfo.find(info => info.bed_id === bedSearchId);
+              return bed ? (
+                <div className="flex items-center gap-4 justify-center pl-2">
+                  <span className="flex items-center gap-1">
+                    <Bed className="w-4 h-4 text-muted-foreground" />
+                    {bed.bed_id}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <MapPin className="w-4 h-4 text-muted-foreground" />
+                    {bed.ward}
+                  </span>
+                </div>
+              ) : "Select Bed...";
+            })() : "Select Bed..."}
             <ChevronsUpDown className="opacity-50" />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-[200px] p-0">
           <Command>
-            <CommandInput placeholder="Search bed..." className="h-9" required/>
+            <CommandInput
+              placeholder="Search bed..."
+              className="h-9"
+              required
+            />
             <CommandList>
               <CommandEmpty>No beds are available</CommandEmpty>
               <CommandGroup>
@@ -448,6 +517,7 @@ const BedEditModal: React.FC<BedEditModalProps> = ({
           </Command>
         </PopoverContent>
       </Popover>
+      </div>
       <Availability beds={filteredBeds} bedPatients={bedPatients} />
       <div className=" py-1 md:grid md:grid-cols-3 sm:gap-4 md:px-8">
         <label
@@ -543,7 +613,7 @@ const BedEditModal: React.FC<BedEditModalProps> = ({
             type="button"
           >
             {alreadyDischargedLoader ? (
-              <Loader />
+              <Spinner className="bg-primary" size={"lg"} />
             ) : (
               <>
                 <TimerOff className="w-4 h-4 mr-2" />
@@ -558,7 +628,7 @@ const BedEditModal: React.FC<BedEditModalProps> = ({
           type="button"
         >
           {dischargeNowLoader ? (
-            <Loader />
+            <Spinner className="bg-primary" size={"lg"} />
           ) : (
             <>
               <LogOut className="w-4 h-4 mr-2" />
@@ -566,9 +636,13 @@ const BedEditModal: React.FC<BedEditModalProps> = ({
             </>
           )}
         </Button>
-        <Button type="submit" className="" disabled={!isFormValid() || updateLoader}>
+        <Button
+          type="submit"
+          className=""
+          disabled={!isFormValid() || updateLoader}
+        >
           {updateLoader ? (
-            <Loader />
+            <Spinner className="bg-primary" size={"lg"} />
           ) : (
             <>
               <FileEdit className="w-4 h-4 mr-2" />
@@ -576,9 +650,17 @@ const BedEditModal: React.FC<BedEditModalProps> = ({
             </>
           )}
         </Button>
-        <Button type="button" className="" onClick={()=>{deleteBookingHandler(bookingId)}} disabled={deleteLoader}>
+        <Button
+          type="button"
+          className=""
+          onClick={() => {
+            deleteBookingHandler(bookingId);
+          }}
+          disabled={deleteLoader}
+        >
           {deleteLoader ? (
-            <Loader />
+            <Spinner className="bg-primary" size={"lg"} />
+            
           ) : (
             <>
               <Trash className="w-4 h-4 mr-2" />
