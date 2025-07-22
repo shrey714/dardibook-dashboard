@@ -24,6 +24,7 @@ import {
   Inbox,
   Bed,
   ClockAlertIcon,
+  CalendarClockIcon,
 } from "lucide-react";
 import { Link2 } from "lucide-react";
 import Link from "next/link";
@@ -61,7 +62,6 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-
 import { useOrganization } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 
@@ -83,24 +83,28 @@ const CurrentBedPatients = () => {
     },
   });
 
-  const filteredPatients = beds.filter((bed) => {
-    if (
-      filters?.admission_for &&
-      bed.admission_for.id !== filters.admission_for
-    ) {
-      return false;
-    }
+  const filteredPatients = beds
+    .filter((bed) => {
+      if (
+        filters?.admission_for &&
+        bed.admission_for.id !== filters.admission_for
+      ) {
+        return false;
+      }
 
-    return true;
-  });
+      return true;
+    })
+    .sort((a, b) => a.admission_at - b.admission_at);
   return (
     <>
       {isDesktop ? (
         <Card
-          className={cn("w-[400px] mb-5 border-2 bg-muted/50 flex flex-col")}
+          className={cn(
+            "w-[380px] mb-2 border rounded-md bg-input/30 flex flex-col py-0 gap-0"
+          )}
         >
-          <CardHeader className="border-b py-4 px-3">
-            <CardTitle>Admitted Patients</CardTitle>
+          <CardHeader className="pt-4 pb-2 px-3">
+            <CardTitle className="font-medium">Admitted Patients</CardTitle>
             <CardDescription>
               Discharge patients or update their assigned staff.
             </CardDescription>
@@ -117,10 +121,7 @@ const CurrentBedPatients = () => {
                   setFilters((prev) => ({ ...prev, admission_for: val }));
                 }}
               >
-                <SelectTrigger
-                  id="admission_for"
-                  className="w-full md:max-w-md lg:col-span-2 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input py-1 pl-2 sm:text-sm sm:leading-6"
-                >
+                <SelectTrigger id="admission_for" className="w-full">
                   <SelectValue placeholder="Admission for" />
                 </SelectTrigger>
                 <SelectContent>
@@ -177,12 +178,15 @@ const CurrentBedPatients = () => {
                     const matchingPatient = bedPatients[bed.patient_id];
                     const IsDischargeOverdue =
                       bed.discharge_at < getTime(new Date());
+                    const IsFutureAdmission =
+                      bed.admission_at > getTime(new Date());
+
                     return (
                       <HoverCard key={index} openDelay={80} closeDelay={80}>
                         <div
                           className={`flex flex-1 w-full items-center flex-row gap-x-2`}
                         >
-                          <HoverCardTrigger className="flex w-full flex-1 flex-row rounded-md bg-border h-24 overflow-hidden">
+                          <HoverCardTrigger className="flex w-full flex-1 flex-row rounded-md bg-input/45 h-[88px] overflow-hidden">
                             {isSameDay(bed.admission_at, new Date()) ? (
                               <div className="bg-green-400 w-[4px] h-full"></div>
                             ) : (
@@ -190,9 +194,9 @@ const CurrentBedPatients = () => {
                             )}
 
                             <div className="flex flex-1 flex-col h-full">
-                              <div className="relative flex flex-1 h-1/2 items-center gap-2 p-2">
+                              <div className="relative flex flex-1 h-1/2 items-center gap-2 p-2 pb-1">
                                 <span
-                                  className={`text-lg flex flex-row gap-2 items-center bg-background justify-center font-bold rounded-md px-2 py-1 ${
+                                  className={`text-lg flex h-full flex-row gap-2 items-center bg-background justify-center font-bold rounded-md px-2 py-1 ${
                                     bed.dischargeMarked ? "text-red-600" : ""
                                   }`}
                                 >
@@ -228,16 +232,25 @@ const CurrentBedPatients = () => {
                                     />
                                   </div>
                                 )}
+                                {IsFutureAdmission && (
+                                  <div className="h-full flex items-center justify-end max-w-28 pr-2 rounded-r-md flex-1 bg-gradient-to-l from-yellow-500/30 to-yellow-500/0">
+                                    <CalendarClockIcon
+                                      size={24}
+                                      strokeWidth={1.6}
+                                      className="text-yellow-500"
+                                    />
+                                  </div>
+                                )}
                               </div>
-                              <div className="relative flex flex-1 h-1/2 items-center gap-x-2 p-2">
+                              <div className="relative flex flex-1 h-1/2 items-center gap-x-2 p-2 pt-1">
                                 <BedManagementMenu
                                   patient={matchingPatient}
                                   bed={bed}
                                   disabled={bed.dischargeMarked}
                                 />
                                 <Button
-                                  variant="default"
-                                  className="p-0 border-0 rounded-md h-full aspect-square"
+                                  variant="outline"
+                                  className="aspect-square p-0"
                                   onClick={() =>
                                     openModal({
                                       patientId: bed.patient_id,
@@ -247,15 +260,16 @@ const CurrentBedPatients = () => {
                                   <History />
                                 </Button>
                                 <Button
-                                  variant="outline"
-                                  className="bg-blue-700 hover:bg-blue-900 text-white hover:text-white flex flex-1 rounded-md h-full p-0 border-0 disabled:invisible"
+                                  variant="default"
+                                  effect={"ringHover"}
+                                  className="flex flex-1"
                                   onClick={() => {
                                     router.push(
                                       `prescribe/prescribeForm?patientId=${bed.patient_id}`
                                     );
                                   }}
                                 >
-                                  <ClipboardPlusIcon className="size-4 sm:size-5" />
+                                  <ClipboardPlusIcon />
                                 </Button>
                               </div>
                             </div>
@@ -288,7 +302,7 @@ const CurrentBedPatients = () => {
                                 Age : {matchingPatient.age}
                               </h4>
                               <p className="flex text-sm items-center gap-2">
-                                <PhoneIcon size={16} className="text-primary" />{" "}
+                                <PhoneIcon size={16} />{" "}
                                 {matchingPatient.mobile}
                               </p>
                             </div>
@@ -320,9 +334,15 @@ const CurrentBedPatients = () => {
                             </div>
                           </div>
                           {IsDischargeOverdue && (
-                            <div className="bg-red-500/10 mt-2 flex-1 rounded-md text-wrap font-medium text-red-600 flex flex-row gap-4 px-3 py-1 items-center">
-                              <ClockAlertIcon className="w-5 h-5 shrink-0" />{" "}
+                            <div className="bg-red-500/10 mt-2 flex-1 rounded-md text-wrap font-medium text-red-600 flex flex-row gap-3 px-3 py-1 items-center">
+                              <ClockAlertIcon className="w-5 h-5 shrink-0" />
                               Discharge overdue.
+                            </div>
+                          )}
+                          {IsFutureAdmission && (
+                            <div className="bg-yellow-500/10 mt-2 flex-1 rounded-md text-wrap font-medium text-yellow-600 flex flex-row gap-3 px-3 py-1 items-center">
+                              <CalendarClockIcon className="w-5 h-5 shrink-0" />
+                              Upcoming admission scheduled.
                             </div>
                           )}
                         </HoverCardContent>
@@ -447,6 +467,8 @@ const CurrentBedPatients = () => {
                     const matchingPatient = bedPatients[bed.patient_id];
                     const IsDischargeOverdue =
                       bed.discharge_at < getTime(new Date());
+                    const IsFutureAdmission =
+                      bed.admission_at > getTime(new Date());
                     return (
                       <AccordionItem
                         key={index}
@@ -504,6 +526,15 @@ const CurrentBedPatients = () => {
                                       size={24}
                                       strokeWidth={1.6}
                                       className="text-red-500"
+                                    />
+                                  </div>
+                                )}
+                                {IsFutureAdmission && (
+                                  <div className="h-full flex items-center justify-end max-w-28 pr-2 rounded-r-md flex-1 bg-gradient-to-l from-yellow-500/30 to-yellow-500/0">
+                                    <CalendarClockIcon
+                                      size={24}
+                                      strokeWidth={1.6}
+                                      className="text-yellow-500"
                                     />
                                   </div>
                                 )}
@@ -597,8 +628,14 @@ const CurrentBedPatients = () => {
                           </div>
                           {IsDischargeOverdue && (
                             <div className="bg-red-500/10 mt-2 w-full font-medium text-base rounded-md text-red-600 flex flex-row gap-4 px-3 py-1 items-center">
-                              <ClockAlertIcon className="w-5 h-5 shrink-0" />{" "}
+                              <ClockAlertIcon className="w-5 h-5 shrink-0" />
                               Discharge overdue.
+                            </div>
+                          )}
+                          {IsFutureAdmission && (
+                            <div className="bg-yellow-500/10 mt-2 w-full font-medium text-base rounded-md text-yellow-600 flex flex-row gap-4 px-3 py-1 items-center">
+                              <CalendarClockIcon className="w-5 h-5 shrink-0" />
+                              Upcoming admission scheduled.
                             </div>
                           )}
                         </AccordionContent>

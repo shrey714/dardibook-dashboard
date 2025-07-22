@@ -77,17 +77,17 @@ const Medical = () => {
       />
       <div
         className={cn(
-          "w-full p-0 flex flex-row items-center absolute top-[35px]",
+          "w-full p-0 flex flex-row items-center absolute top-[33px]",
           isDesktop ? "z-[1]" : "z-[2] hidden sm:flex"
         )}
       >
-        <span className="flex flex-1 h-[2px] bg-gradient-to-r from-transparent to-primary"></span>
+        <span className="flex flex-1 h-[2px] bg-gradient-to-r from-transparent to-muted-foreground"></span>
         <div className=" flex items-center justify-center">
-          <p className="text-primary w-auto px-3 bg-background py-1 font-medium text-base rounded-full border-primary border-[2px]">
+          <p className="text-muted-foreground w-auto px-3 bg-background py-1 font-medium text-base rounded-full border-muted-foreground border-[2px]">
             Pharmacy Space
           </p>
         </div>
-        <span className="flex flex-1 h-[2px] bg-gradient-to-l from-transparent to-primary"></span>
+        <span className="flex flex-1 h-[2px] bg-gradient-to-l from-transparent to-muted-foreground"></span>
       </div>
 
       <div
@@ -123,7 +123,7 @@ const Medical = () => {
               </TabsList>
 
               <TabsContent
-                className="[--content-height:calc(100svh-252px)]"
+                className="[--content-height:calc(100svh-250px)]"
                 value="registered"
               >
                 <TodayRegisteredPatients

@@ -234,8 +234,8 @@ const PatientHistoryData: React.FC<PatientHistoryDataTypes> = ({ history }) => {
             </div>
           </div>
         </div>
-        <Card className="flex flex-col overflow-hidden">
-          <CardHeader className="py-3 bg-muted/50 border-b">
+        <Card className="flex flex-col overflow-hidden p-0 gap-0">
+          <CardHeader className="py-3 bg-muted/50 border-b gap-0">
             <CardTitle className="text-lg font-medium">
               Receipt Summary
             </CardTitle>

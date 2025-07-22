@@ -1,9 +1,14 @@
 "use client";
 
 import React, { FormEvent, useEffect, useState } from "react";
-import { CirclePlus, InboxIcon, Pencil } from "lucide-react";
+import {
+  CirclePlus,
+  InboxIcon,
+  Pencil,
+  SaveIcon,
+  Trash2Icon,
+} from "lucide-react";
 import uniqid from "uniqid";
-import Loader from "@/components/common/Loader";
 import toast from "react-hot-toast";
 import {
   Card,
@@ -33,12 +38,17 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { updateRegistrationReceiptDefaults } from "@/app/dashboard/settings/defaults/_actions";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Spinner } from "@/components/ui/spinner";
 
 export const RegistrationOptions = () => {
   const { orgId } = useAuth();
   const { organization, isLoaded } = useOrganization();
   const [receipts, setReceipts] = useState<ReceiptDetails[]>([]);
   const [addLoader, setAddLoader] = useState(false);
+  const [updateLoader, setUpdateLoader] = useState(false);
+  const [deleteLoader, setDeleteLoader] = useState(false);
   const [receiptEditModel, setReceiptEditModel] = useState<boolean>(false);
   const [editForReceiptId, setEditForReceiptId] = useState<string>("");
 
@@ -97,7 +107,7 @@ export const RegistrationOptions = () => {
   // --------------update receipt-----------
   const UpdateType = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setAddLoader(true);
+    setUpdateLoader(true);
     const form = e.target as HTMLFormElement;
     const existingReceiptType: ReceiptDetails = {
       id: editForReceiptId,
@@ -114,12 +124,12 @@ export const RegistrationOptions = () => {
         ).then(
           () => {
             organization.reload();
-            setAddLoader(false);
+            setUpdateLoader(false);
             setReceiptEditModel(false);
           },
           (error) => {
             console.error("Operation failed. Please try again : ", error);
-            setAddLoader(false);
+            setUpdateLoader(false);
           }
         );
       },
@@ -135,7 +145,7 @@ export const RegistrationOptions = () => {
   };
   // --------------delete receipt-----------
   const DeleteType = async () => {
-    setAddLoader(true);
+    setDeleteLoader(true);
     if (!organization) return;
     toast.promise(
       async () => {
@@ -144,12 +154,12 @@ export const RegistrationOptions = () => {
         ).then(
           () => {
             organization.reload();
-            setAddLoader(false);
+            setDeleteLoader(false);
             setReceiptEditModel(false);
           },
           (error) => {
             console.error("Operation failed. Please try again : ", error);
-            setAddLoader(false);
+            setDeleteLoader(false);
           }
         );
       },
@@ -168,7 +178,7 @@ export const RegistrationOptions = () => {
       <Dialog open={receiptEditModel} onOpenChange={setReceiptEditModel}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>Edit Receipt Type</DialogTitle>
+            <DialogTitle className="font-medium">Edit Receipt Type</DialogTitle>
             <DialogDescription>
               Modify details for{" "}
               {
@@ -179,18 +189,12 @@ export const RegistrationOptions = () => {
           </DialogHeader>
           <form onSubmit={UpdateType} autoComplete="off">
             <fieldset
-              disabled={addLoader}
-              className="w-full rounded-lg grid grid-cols-6 gap-1 md:gap-4"
+              disabled={updateLoader || deleteLoader}
+              className="w-full rounded-lg grid grid-cols-6 gap-4"
             >
-              <div className="col-span-6">
-                <label
-                  htmlFor="receiptType"
-                  className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-                >
-                  Receipt Type
-                </label>
-                <input
-                  className="h-min mt-1 form-input w-full block bg-background rounded-md border-border py-1.5 shadow-sm placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              <div className="col-span-6 space-y-2">
+                <Label htmlFor="receiptType">Receipt Type</Label>
+                <Input
                   name="receiptType"
                   id="receiptType"
                   placeholder="e.g., Registration Fee"
@@ -201,15 +205,9 @@ export const RegistrationOptions = () => {
                   }
                 />
               </div>
-              <div className="col-span-6">
-                <label
-                  htmlFor="amount"
-                  className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-                >
-                  Amount (₹)
-                </label>
-                <input
-                  className="h-min mt-1 form-input w-full block bg-background rounded-md border-border py-1.5 shadow-sm placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              <div className="col-span-6 space-y-2">
+                <Label htmlFor="amount">Amount (₹)</Label>
+                <Input
                   name="amount"
                   id="amount"
                   placeholder="e.g., 500"
@@ -227,9 +225,12 @@ export const RegistrationOptions = () => {
                 <Button
                   role="button"
                   variant={"destructive"}
-                  className="text-sm gap-2 px-6"
                   type="button"
                   onClick={DeleteType}
+                  icon={Trash2Icon}
+                  iconPlacement="right"
+                  loading={deleteLoader}
+                  loadingText={"Deleting"}
                 >
                   Delete
                 </Button>
@@ -237,8 +238,11 @@ export const RegistrationOptions = () => {
                   tabIndex={0}
                   role="button"
                   variant={"outline"}
-                  className="text-sm gap-2 px-6"
                   type="submit"
+                  icon={SaveIcon}
+                  iconPlacement="right"
+                  loading={updateLoader}
+                  loadingText={"Updating"}
                 >
                   Update
                 </Button>
@@ -248,28 +252,24 @@ export const RegistrationOptions = () => {
         </DialogContent>
       </Dialog>
 
-      <Card className="border border-b-0 rounded-b-none bg-sidebar/70 w-full shadow-none  h-min mx-auto">
-        <CardHeader className="border-b p-4">
-          <CardTitle className="font-normal text-muted-foreground">
+      <Card className="border-b-0 rounded-b-none w-full h-min mx-auto">
+        <CardHeader>
+          <CardTitle className="font-medium">
             Add Registration Receipt Type
           </CardTitle>
-          <CardDescription hidden></CardDescription>
+          <CardDescription>
+            Create and define new receipt types with associated fees.
+          </CardDescription>
         </CardHeader>
-        <CardContent className="py-4 px-3 md:px-8">
+        <CardContent>
           <form onSubmit={AddNewType} autoComplete="off">
             <fieldset
               disabled={addLoader}
-              className="w-full rounded-lg grid grid-cols-6 gap-1 md:gap-4"
+              className="w-full rounded-lg grid grid-cols-6 gap-4"
             >
-              <div className="col-span-6 sm:col-span-3">
-                <label
-                  htmlFor="receiptType"
-                  className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-                >
-                  Receipt Type
-                </label>
-                <input
-                  className="h-min mt-1 form-input w-full block bg-background rounded-md border-border py-1.5 shadow-sm placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              <div className="col-span-6 sm:col-span-3 space-y-2">
+                <Label htmlFor="receiptType">Receipt Type</Label>
+                <Input
                   name="receiptType"
                   id="receiptType"
                   placeholder="e.g., Registration Fee"
@@ -277,15 +277,9 @@ export const RegistrationOptions = () => {
                 />
               </div>
 
-              <div className="col-span-6 sm:col-span-3">
-                <label
-                  htmlFor="amount"
-                  className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-                >
-                  Amount (₹)
-                </label>
-                <input
-                  className="h-min mt-1 form-input w-full block bg-background rounded-md border-border py-1.5 shadow-sm placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              <div className="col-span-6 sm:col-span-3 space-y-2">
+                <Label htmlFor="amount">Amount (₹)</Label>
+                <Input
                   name="amount"
                   id="amount"
                   placeholder="e.g., 500"
@@ -299,21 +293,24 @@ export const RegistrationOptions = () => {
                 <Button
                   tabIndex={0}
                   role="button"
-                  variant={"outline"}
-                  className="text-sm gap-2 px-6"
                   type="submit"
+                  effect={"ringHover"}
+                  icon={CirclePlus}
+                  iconPlacement="right"
+                  loading={addLoader}
+                  loadingText={"Adding"}
                 >
-                  <CirclePlus width={20} height={20} /> Add
+                  Add
                 </Button>
               </div>
             </fieldset>
           </form>
         </CardContent>
       </Card>
-      <div className="rounded-t-none w-full flex flex-col flex-1 bg-sidebar/70 border rounded-md divide-y">
+      <div className="rounded-t-none w-full flex flex-col flex-1 bg-card border rounded-xl divide-y">
         {!isLoaded ? (
           <div className="flex flex-1 items-center justify-center min-h-72 w-full">
-            <Loader size="medium" />
+            <Spinner size="sm" className="bg-foreground" />
           </div>
         ) : receipts.length === 0 ? (
           <div className="flex flex-1 items-center justify-center text-muted-foreground min-h-72">
@@ -339,6 +336,7 @@ export const RegistrationOptions = () => {
                     <Button
                       variant={"outline"}
                       className={`h-9 w-9 min-w-0`}
+                      effect={"ringHover"}
                       onClick={() => {
                         setReceiptEditModel(true);
                         setEditForReceiptId(receipt.id);

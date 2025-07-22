@@ -29,7 +29,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import {
   createSubscriptionWithUserNote,
   verifyAndActivateSubscription,
-} from "@/lib/SubscriptionHelpers";
+} from "@/lib/actions/SubscriptionHelpers";
 import { fromUnixTime, isWithinInterval } from "date-fns";
 
 const SubscriptionBox = () => {
@@ -81,6 +81,8 @@ const SubscriptionBox = () => {
             response,
             subscriptionId: subscriptiondata.id,
             orgId,
+            sub_id: response.razorpay_subscription_id,
+            plan_id: planId,
           });
 
           if (result.success) {
@@ -173,11 +175,14 @@ const SubscriptionBox = () => {
         appearance={{
           elements: {
             organizationSwitcherTrigger:
-              "w-full border-0 border-border bg-muted py-4 px-5 shadow-md",
+              "w-full border-0 border-border bg-card py-4 px-5 shadow-md",
             organizationSwitcherPopoverMain:
-              "w-full shadow-none bg-muted rounded-none pt-0",
+              "w-full shadow-none bg-card rounded-none pt-0",
             organizationPreviewAvatarBox: "h-9 w-9",
             organizationSwitcherPopoverFooter: {
+              display: "none",
+            },
+            button__createOrganization: {
               display: "none",
             },
           },
@@ -303,8 +308,8 @@ const SubscriptionBox = () => {
               </div>
               <Button
                 asChild
-                className=" rounded-full shadow-sm z-10"
-                variant={"outline"}
+                className="rounded-full shadow-sm z-10"
+                effect={"ringHover"}
               >
                 <Link
                   target="_blank"

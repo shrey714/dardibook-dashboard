@@ -32,6 +32,8 @@ import { usePathname } from "next/navigation";
 import RolesLink from "./RolesLink";
 import TokenBox from "../../tokenFramer/TokenBox";
 import Pip from "@/hooks/pip";
+import ScrollShadow from "@/components/common/scroll-shadow/scroll-shadow";
+
 const pages = [
   {
     title: "Home",
@@ -57,16 +59,16 @@ const pages = [
     roles: ["org:clinic_head", "org:doctor", "org:assistant_doctor"],
   },
   {
-    title: "Admissions",
-    url: "/dashboard/admissions",
-    icon: Bed,
-    roles: ["org:clinic_head", "org:doctor", "org:assistant_doctor"],
-  },
-  {
     title: "Prescribe",
     url: "/dashboard/prescribe",
     icon: ClipboardPlusIcon,
     roles: ["org:clinic_head", "org:doctor"],
+  },
+  {
+    title: "Admissions",
+    url: "/dashboard/admissions",
+    icon: Bed,
+    roles: ["org:clinic_head", "org:doctor", "org:assistant_doctor"],
   },
   {
     title: "Pharmacy",
@@ -140,14 +142,21 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   return (
     <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader className="pb-0">
+      <SidebarHeader className="pt-[18px] pb-3">
         <LogoHandeler />
       </SidebarHeader>
-      <SidebarContent className="overflow-x-hidden pt-2">
-        {state === "collapsed" && !isMobile ? <Pip /> : <TokenBox />}
-        <NavMain pages={pages} pathname={pathname} />
+      <SidebarContent className="overflow-x-hidden gap-0 no-scrollbar group-data-[collapsible=icon]:overflow-y-auto">
+        <ScrollShadow
+          size={22}
+          className="w-full h-full pb-5"
+          orientation="vertical"
+          hideScrollBar={true}
+        >
+          {state === "collapsed" && !isMobile ? <Pip /> : <TokenBox />}
+          <NavMain pages={pages} pathname={pathname} />
+        </ScrollShadow>
       </SidebarContent>
-      <SidebarFooter className="gap-1">
+      <SidebarFooter className="gap-1 group-data-[collapsible=icon]:gap-3.5 group-data-[collapsible=icon]:pb-4">
         <RolesLink pathname={pathname} />
         <NavUser />
         <ModeToggle />

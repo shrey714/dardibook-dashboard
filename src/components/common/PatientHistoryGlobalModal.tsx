@@ -603,8 +603,8 @@ const PatientHistoryGlobalModal = () => {
                   </div>
                 </div>
 
-                <Card className="flex flex-col overflow-hidden">
-                  <CardHeader className="py-3 bg-muted/50 border-b">
+                <Card className="flex flex-col overflow-hidden gap-0 p-0">
+                  <CardHeader className="py-3 bg-muted/50 border-b gap-0">
                     <CardTitle className="text-lg font-medium">
                       Bill Summary
                     </CardTitle>
@@ -945,6 +945,7 @@ const PatientHistoryGlobalModal = () => {
               <div className="flex items-center gap-x-2 h-full justify-center ml-auto pl-3">
                 <Button
                   variant="default"
+                  effect={"ringHover"}
                   onClick={() => {
                     setIsAdmDrawerOpen(true);
                   }}
@@ -956,6 +957,7 @@ const PatientHistoryGlobalModal = () => {
 
                 <Button
                   variant="default"
+                  effect={"ringHover"}
                   onClick={() => {
                     setIsBillDrawerOpen(true);
                   }}
@@ -1131,7 +1133,6 @@ const PatientHistoryGlobalModal = () => {
                 />
               )}
             </div>
-            {/* )} */}
           </div>
         </DialogContent>
       </Dialog>

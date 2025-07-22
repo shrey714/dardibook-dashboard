@@ -26,13 +26,13 @@ import {
   collection,
   onSnapshot,
   where,
-  and,
   orderBy,
 } from "firebase/firestore";
 import { db } from "@/firebase/firebaseConfig";
 
 import { SidebarMenuSkeleton } from "@/components/ui/sidebar";
 import { PharmacyTypes } from "@/types/FormTypes";
+import { Input } from "@/components/ui/input";
 
 const BillsGenerated = ({
   onViewBill,
@@ -92,9 +92,9 @@ const BillsGenerated = ({
     : bills;
 
   return (
-    <Card className="h-full w-full overflow-hidden flex-col">
-      <CardHeader className="p-3 space-y-2">
-        <CardTitle className="text-lg font-semibold text-muted-foreground flex items-center justify-between">
+    <Card className="h-full w-full overflow-hidden flex-col gap-0 py-0">
+      <CardHeader className="p-3 space-y-1">
+        <CardTitle className="text-lg font-medium text-muted-foreground flex items-center justify-between">
           <span>Bills Generated On</span>
           <span className="text-sm font-normal text-muted-foreground">
             {bills.length} bills
@@ -123,10 +123,10 @@ const BillsGenerated = ({
           </PopoverContent>
         </Popover>
         <div className="relative w-full">
-          <input
+          <Input
             type="search"
             placeholder="Search by name, mobile or bill"
-            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
+            wrapClassName="w-full"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -188,10 +188,11 @@ const BillsGenerated = ({
                   </TableCell>
                   <TableCell className="text-right">
                     <Button
-                      variant="outline"
+                      variant="default"
+                      effect={"ringHover"}
                       size="sm"
                       onClick={() => onViewBill(bill)}
-                      className="my-1 mr-1 h-7 border-0 sm:h-8 py-1 flex items-center justify-center bg-blue-700 hover:bg-blue-900 text-white hover:text-white rounded-[4px]"
+                      className="my-1 mr-1 h-7 border-0 sm:h-8 py-1 flex items-center justify-center"
                     >
                       <Eye />
                     </Button>

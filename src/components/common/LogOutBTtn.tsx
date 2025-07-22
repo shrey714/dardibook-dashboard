@@ -35,8 +35,13 @@ const LogOutBTtn: React.FC<LogOutBtnProps> = ({ className, ...props }) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button {...props} className={className}>
-          <LogOut width={32} />
+        <Button
+          {...props}
+          className={className}
+          icon={LogOut}
+          iconPlacement="right"
+          effect="expandIcon"
+        >
           Sign Out
         </Button>
       </DialogTrigger>

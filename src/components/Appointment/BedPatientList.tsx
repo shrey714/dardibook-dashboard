@@ -14,7 +14,6 @@ import {
 } from "lucide-react";
 import { Reorder } from "framer-motion";
 import { format, startOfDay } from "date-fns";
-import Link from "next/link";
 import { BedSingle } from "lucide-react";
 import { usePatientHistoryModalStore } from "@/lib/stores/patientHistoryModalStore";
 import { BedPatientTypes, OrgBed } from "@/types/FormTypes";
@@ -79,7 +78,7 @@ export const BedPatientList: React.FC<bedPatientProps> = ({
 
                       <div className="relative flex flex-1 items-center gap-2 p-2">
                         <span
-                          className={`text-lg flex flex-row gap-2 items-center bg-background justify-center font-bold rounded-md px-2 py-1 ${
+                          className={`text-base flex flex-row gap-2 items-center bg-background justify-center font-bold rounded-md px-2 py-1 ${
                             bed.dischargeMarked ? "text-red-600" : ""
                           }`}
                         >
@@ -96,9 +95,14 @@ export const BedPatientList: React.FC<bedPatientProps> = ({
                           onClick={() =>
                             openModal({ patientId: bed.patient_id })
                           }
-                          className="py-1 text-sm h-full underline px-2 cursor-pointer"
+                          className="h-full pr-1 cursor-pointer text-start gap-0.5"
                         >
-                          {bed.patient_id}
+                          <p className="text-xs underline text-muted-foreground line-clamp-1 max-w-20 truncate">
+                            {bed.patient_id}
+                          </p>
+                          <p className="text-sm leading-none max-w-20 truncate">
+                            {matchingPatient.name}
+                          </p>
                         </button>
                       </div>
 
@@ -136,7 +140,7 @@ export const BedPatientList: React.FC<bedPatientProps> = ({
                           Age : {matchingPatient.age}
                         </h4>
                         <p className="flex text-sm items-center gap-2">
-                          <PhoneIcon size={16} className="text-primary" />{" "}
+                          <PhoneIcon size={16} />{" "}
                           {matchingPatient.mobile}
                         </p>
                       </div>

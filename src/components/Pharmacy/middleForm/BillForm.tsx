@@ -51,13 +51,12 @@ import {
   PrescriptionFormTypes,
   ServiceItems,
 } from "@/types/FormTypes";
-import { doc, setDoc } from "firebase/firestore";
+import { collection, doc, getDocs, setDoc } from "firebase/firestore";
 import { db } from "@/firebase/firebaseConfig";
 import toast from "react-hot-toast";
 import { Badge } from "@/components/ui/badge";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAuth, useOrganization, useUser } from "@clerk/nextjs";
-import { getMedicines } from "@/app/services/crudMedicine";
 
 const calculateTotalAmount = (
   medicines: MedicineItems[],
@@ -124,6 +123,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
 
   const [medicines, setMedicines] = useState<MedicinesDetails[]>([]);
   const [services, setServices] = useState<ServiceType[]>([]);
+  const [submissionLoader, setSubmissionLoader] = useState(false);
 
   const [prescribedMedicines, setprescribedMedicines] = useState<
     MedicineItems[]
@@ -144,16 +144,20 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
   useEffect(() => {
     const fetchmedicine = async () => {
       if (orgId) {
-        const data = await getMedicines(orgId);
-        if (data?.data) {
-          setMedicines(data?.data);
-        } else {
+        const diseaseDataRef = collection(db, "doctor", orgId, "medicinesData");
+        const snapshot = await getDocs(diseaseDataRef);
+
+        if (snapshot.empty) {
           setMedicines([]);
         }
+        const medicineData = snapshot.docs.map((doc) => ({
+          ...doc.data(),
+        }));
+        setMedicines(medicineData as MedicinesDetails[]);
       }
     };
     fetchmedicine();
-  }, []);
+  }, [orgId]);
 
   useEffect(() => {
     if (isLoaded && organization && organization.publicMetadata.services) {
@@ -177,6 +181,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
         gender: "Male",
       });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedPatient]);
 
   const form = useForm<{
@@ -358,13 +363,13 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
 
       toast.promise(
         async () => {
-          // setSubmissionLoader(true);
+          setSubmissionLoader(true);
           await setDoc(
             doc(db, "doctor", orgId, "bills", newBill.bill_id),
             generatdBill
           ).then(
             () => {
-              // setSubmissionLoader(false);
+              setSubmissionLoader(false);
               form.reset();
               setSelectedMedicines([]);
               setSelectedServices([]);
@@ -375,7 +380,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
               setPaymentStatus("Unpaid");
             },
             () => {
-              // setSubmissionLoader(false);
+              setSubmissionLoader(false);
             }
           );
         },
@@ -392,8 +397,8 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
   };
 
   return (
-    <Card className="flex flex-col overflow-hidden">
-      <CardHeader hidden className="p-0">
+    <Card className="flex flex-col overflow-hidden p-0 gap-0">
+      <CardHeader hidden className="p-0 gap-0">
         <CardTitle hidden></CardTitle>
         <CardDescription hidden></CardDescription>
       </CardHeader>
@@ -427,7 +432,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                       </h3>
                       <Badge
                         variant={"outline"}
-                        className="bg-blue-500/10 border-blue-500 text-blue-500 rounded-full line-clamp-1"
+                        className="bg-primary/10 border-primary text-primary rounded-full line-clamp-1"
                       >
                         {selectedPatient.patient_id ?? "-"}
                       </Badge>
@@ -507,7 +512,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
         )}
       </AnimatePresence>
 
-      <CardContent className="overflow-auto flex-grow p-6 bg-sidebar/70">
+      <CardContent className="overflow-auto flex-grow p-6 bg-card">
         {selectedPatient ? (
           selectedPrescription ? (
             <Form {...form}>
@@ -575,21 +580,18 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                               {med.duration} {med.durationType}
                             </TableCell>
                             <TableCell>
-                              <div className="flex items-center gap-2">
-                                <Input
-                                  type="number"
-                                  min="1"
-                                  value={med.quantity}
-                                  onChange={(e) =>
-                                    handleUpdatePrescribedMedicineQuantity(
-                                      index,
-                                      parseInt(e.target.value) || 1
-                                    )
-                                  }
-                                  className="w-20 h-8 focus-visible:ring-[#2563eb]"
-                                />
-                                <span className="text-sm">{med.type}</span>
-                              </div>
+                              <Input
+                                type="number"
+                                min="1"
+                                value={med.quantity}
+                                onChange={(e) =>
+                                  handleUpdatePrescribedMedicineQuantity(
+                                    index,
+                                    parseInt(e.target.value) || 1
+                                  )
+                                }
+                                wrapClassName="w-20"
+                              />
                             </TableCell>
                             <TableCell>
                               <Input
@@ -601,7 +603,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                                     parseInt(e.target.value) || 1
                                   )
                                 }
-                                className="w-28 h-8 focus-visible:ring-[#2563eb]"
+                                wrapClassName="w-28"
                               />
                             </TableCell>
                             <TableCell>
@@ -630,10 +632,9 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
 
                   <div className="space-y-3 mt-3">
                     <div className="grid grid-cols-2 gap-2">
-                      <div>
+                      <div className="space-y-2">
                         <FormLabel>Discount (%)</FormLabel>
                         <Input
-                          className="focus-visible:ring-[#2563eb]"
                           type="number"
                           min="0"
                           max="100"
@@ -644,10 +645,9 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                         />
                       </div>
 
-                      <div>
+                      <div className="space-y-2">
                         <FormLabel>Tax (%)</FormLabel>
                         <Input
-                          className="focus-visible:ring-[#2563eb]"
                           type="number"
                           min="0"
                           value={taxPercentage}
@@ -658,7 +658,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                       </div>
                     </div>
 
-                    <div>
+                    <div className="space-y-2">
                       <FormLabel>Payment Status</FormLabel>
                       <Select
                         value={paymentStatus}
@@ -672,7 +672,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                           )
                         }
                       >
-                        <SelectTrigger className="focus:ring-[#2563eb]">
+                        <SelectTrigger className="w-full">
                           <SelectValue placeholder="Select status" />
                         </SelectTrigger>
                         <SelectContent>
@@ -687,7 +687,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                     </div>
 
                     {paymentStatus === "Paid" && (
-                      <div>
+                      <div className="space-y-2">
                         <FormLabel>Payment Method</FormLabel>
                         <Select
                           value={paymentMethod}
@@ -697,7 +697,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                             )
                           }
                         >
-                          <SelectTrigger className="focus:ring-[#2563eb]">
+                          <SelectTrigger className="w-full">
                             <SelectValue placeholder="Select method" />
                           </SelectTrigger>
                           <SelectContent>
@@ -710,10 +710,9 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                       </div>
                     )}
 
-                    <div>
+                    <div className="space-y-2">
                       <FormLabel>Notes</FormLabel>
                       <Input
-                        className="focus-visible:ring-[#2563eb]"
                         value={notes}
                         onChange={(e) => setNotes(e.target.value)}
                       />
@@ -721,8 +720,8 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                   </div>
                 </div>
 
-                <Card className="flex flex-col overflow-hidden">
-                  <CardHeader className="py-3 bg-muted/50 border-b">
+                <Card className="flex flex-col overflow-hidden gap-0 p-0">
+                  <CardHeader className="py-3 bg-muted/50 border-b gap-0">
                     <CardTitle className="text-lg font-medium">
                       Bill Summary
                     </CardTitle>
@@ -794,7 +793,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                     value={medicineToAdd}
                     onValueChange={setMedicineToAdd}
                   >
-                    <SelectTrigger className="flex-grow focus:ring-[#2563eb]">
+                    <SelectTrigger className="w-full">
                       <SelectValue placeholder="Select medicine" />
                     </SelectTrigger>
                     <SelectContent>
@@ -811,13 +810,16 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                     min="1"
                     value={quantity}
                     onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
-                    className="w-24 focus-visible:ring-[#2563eb]"
+                    wrapClassName="w-24"
                     placeholder="Qty"
                   />
 
                   <Button
+                    variant={"default"}
+                    effect={"ringHover"}
                     type="button"
                     size="icon"
+                    className="shrink-0"
                     onClick={handleAddMedicine}
                     disabled={!medicineToAdd}
                   >
@@ -860,7 +862,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                                     parseInt(e.target.value) || 1
                                   )
                                 }
-                                className="w-16 h-8 focus-visible:ring-[#2563eb]"
+                                wrapClassName="w-20"
                               />
                             </TableCell>
                             <TableCell>
@@ -874,7 +876,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                                     parseInt(e.target.value) || 1
                                   )
                                 }
-                                className="w-28 h-8 focus-visible:ring-[#2563eb]"
+                                wrapClassName="w-28"
                               />
                             </TableCell>
                             <TableCell>
@@ -883,7 +885,8 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                             <TableCell>
                               <Button
                                 type="button"
-                                variant="ghost"
+                                variant="destructive"
+                                className="shrink-0"
                                 size="icon"
                                 onClick={() => handleRemoveMedicine(index)}
                               >
@@ -920,7 +923,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                       );
                     }}
                   >
-                    <SelectTrigger className="flex-grow focus:ring-[#2563eb]">
+                    <SelectTrigger className="w-full">
                       <SelectValue placeholder="Select service" />
                     </SelectTrigger>
                     <SelectContent>
@@ -936,8 +939,11 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                   </Select>
 
                   <Button
+                    variant={"default"}
+                    effect={"ringHover"}
                     type="button"
                     size="icon"
+                    className="shrink-0"
                     onClick={handleAddService}
                     disabled={!serviceToAdd}
                   >
@@ -1032,10 +1038,9 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
 
                   <div className="space-y-3 mt-3">
                     <div className="grid grid-cols-2 gap-2">
-                      <div>
+                      <div className="space-y-2">
                         <FormLabel>Discount (%)</FormLabel>
                         <Input
-                          className="focus-visible:ring-[#2563eb]"
                           type="number"
                           min="0"
                           max="100"
@@ -1046,10 +1051,9 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                         />
                       </div>
 
-                      <div>
+                      <div className="space-y-2">
                         <FormLabel>Tax (%)</FormLabel>
                         <Input
-                          className="focus-visible:ring-[#2563eb]"
                           type="number"
                           min="0"
                           value={taxPercentage}
@@ -1060,7 +1064,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                       </div>
                     </div>
 
-                    <div>
+                    <div className="space-y-2">
                       <FormLabel>Payment Status</FormLabel>
                       <Select
                         value={paymentStatus}
@@ -1074,7 +1078,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                           )
                         }
                       >
-                        <SelectTrigger className="focus:ring-[#2563eb]">
+                        <SelectTrigger className="w-full">
                           <SelectValue placeholder="Select status" />
                         </SelectTrigger>
                         <SelectContent>
@@ -1089,7 +1093,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                     </div>
 
                     {paymentStatus === "Paid" && (
-                      <div>
+                      <div className="space-y-2">
                         <FormLabel>Payment Method</FormLabel>
                         <Select
                           value={paymentMethod}
@@ -1099,7 +1103,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                             )
                           }
                         >
-                          <SelectTrigger className="focus:ring-[#2563eb]">
+                          <SelectTrigger className="w-full">
                             <SelectValue placeholder="Select method" />
                           </SelectTrigger>
                           <SelectContent>
@@ -1112,10 +1116,9 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                       </div>
                     )}
 
-                    <div>
+                    <div className="space-y-2">
                       <FormLabel>Notes</FormLabel>
                       <Input
-                        className="focus-visible:ring-[#2563eb]"
                         value={notes}
                         onChange={(e) => setNotes(e.target.value)}
                       />
@@ -1123,8 +1126,8 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                   </div>
                 </div>
 
-                <Card className="flex flex-col overflow-hidden">
-                  <CardHeader className="py-3 bg-muted/50 border-b">
+                <Card className="flex flex-col overflow-hidden gap-0 p-0">
+                  <CardHeader className="py-3 bg-muted/50 border-b gap-0">
                     <CardTitle className="text-lg font-medium">
                       Bill Summary
                     </CardTitle>
@@ -1215,12 +1218,11 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                 control={form.control}
                 name="name"
                 render={({ field }) => (
-                  <FormItem className="space-y-0">
+                  <FormItem>
                     <FormLabel>Patient Name</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="Patient Name..."
-                        className="focus-visible:ring-[#2563eb]"
                         {...field}
                         required
                       />
@@ -1233,12 +1235,11 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                 control={form.control}
                 name="mobile"
                 render={({ field }) => (
-                  <FormItem className="space-y-0">
+                  <FormItem>
                     <FormLabel>Mobile Number</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="Mobile Number..."
-                        className="focus-visible:ring-[#2563eb]"
                         {...field}
                         required
                       />
@@ -1251,11 +1252,11 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                 control={form.control}
                 name="gender"
                 render={({ field }) => (
-                  <FormItem className="space-y-0">
+                  <FormItem>
                     <FormLabel>Gender</FormLabel>
                     <Select value={field.value} onValueChange={field.onChange}>
                       <FormControl>
-                        <SelectTrigger className="focus:ring-[#2563eb]">
+                        <SelectTrigger className="w-full">
                           <SelectValue placeholder="Select gender" />
                         </SelectTrigger>
                       </FormControl>
@@ -1276,7 +1277,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
 
               <div className="flex gap-2 mb-2 mt-3">
                 <Select value={medicineToAdd} onValueChange={setMedicineToAdd}>
-                  <SelectTrigger className="flex-grow focus:ring-[#2563eb]">
+                  <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select medicine" />
                   </SelectTrigger>
                   <SelectContent>
@@ -1293,13 +1294,16 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                   min="1"
                   value={quantity}
                   onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
-                  className="w-24 focus-visible:ring-[#2563eb]"
+                  wrapClassName="w-24"
                   placeholder="Qty"
                 />
 
                 <Button
+                  variant={"default"}
+                  effect={"ringHover"}
                   type="button"
                   size="icon"
+                  className="shrink-0"
                   onClick={handleAddMedicine}
                   disabled={!medicineToAdd}
                 >
@@ -1339,7 +1343,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                                   parseInt(e.target.value) || 1
                                 )
                               }
-                              className="w-20 h-8 focus-visible:ring-[#2563eb]"
+                              wrapClassName="w-20"
                             />
                           </TableCell>
                           <TableCell>
@@ -1353,7 +1357,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                                   parseInt(e.target.value) || 1
                                 )
                               }
-                              className="w-28 h-8 focus-visible:ring-[#2563eb]"
+                              wrapClassName="w-28"
                             />
                           </TableCell>
                           <TableCell>
@@ -1362,7 +1366,8 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                           <TableCell>
                             <Button
                               type="button"
-                              variant="ghost"
+                              variant="destructive"
+                              className="shrink-0"
                               size="icon"
                               onClick={() => handleRemoveMedicine(index)}
                             >
@@ -1399,7 +1404,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                     );
                   }}
                 >
-                  <SelectTrigger className="flex-grow focus:ring-[#2563eb]">
+                  <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select service" />
                   </SelectTrigger>
                   <SelectContent>
@@ -1415,8 +1420,11 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                 </Select>
 
                 <Button
+                  variant={"default"}
+                  effect={"ringHover"}
                   type="button"
                   size="icon"
+                  className="shrink-0"
                   onClick={handleAddService}
                   disabled={!serviceToAdd}
                 >
@@ -1451,7 +1459,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                                   parseInt(e.target.value) || 1
                                 )
                               }
-                              className="w-20 h-8 focus-visible:ring-[#2563eb]"
+                              wrapClassName="w-20"
                             />
                           </TableCell>
                           <TableCell>
@@ -1465,7 +1473,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                                   parseInt(e.target.value) || 1
                                 )
                               }
-                              className="w-28 h-8 focus-visible:ring-[#2563eb]"
+                              wrapClassName="w-28"
                             />
                           </TableCell>
                           <TableCell>
@@ -1477,7 +1485,8 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                           <TableCell>
                             <Button
                               type="button"
-                              variant="ghost"
+                              variant="destructive"
+                              className="shrink-0"
                               size="icon"
                               onClick={() => handleRemoveService(index)}
                             >
@@ -1508,10 +1517,9 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
 
                 <div className="space-y-3 mt-3">
                   <div className="grid grid-cols-2 gap-2">
-                    <div>
+                    <div className="space-y-2">
                       <FormLabel>Discount (%)</FormLabel>
                       <Input
-                        className="focus-visible:ring-[#2563eb]"
                         type="number"
                         min="0"
                         max="100"
@@ -1522,10 +1530,9 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                       />
                     </div>
 
-                    <div>
+                    <div className="space-y-2">
                       <FormLabel>Tax (%)</FormLabel>
                       <Input
-                        className="focus-visible:ring-[#2563eb]"
                         type="number"
                         min="0"
                         value={taxPercentage}
@@ -1536,7 +1543,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                     </div>
                   </div>
 
-                  <div>
+                  <div className="space-y-2">
                     <FormLabel>Payment Status</FormLabel>
                     <Select
                       value={paymentStatus}
@@ -1550,7 +1557,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                         )
                       }
                     >
-                      <SelectTrigger className="focus:ring-[#2563eb]">
+                      <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select status" />
                       </SelectTrigger>
                       <SelectContent>
@@ -1565,7 +1572,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                   </div>
 
                   {paymentStatus === "Paid" && (
-                    <div>
+                    <div className="space-y-2">
                       <FormLabel>Payment Method</FormLabel>
                       <Select
                         value={paymentMethod}
@@ -1575,7 +1582,7 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                           )
                         }
                       >
-                        <SelectTrigger className="focus:ring-[#2563eb]">
+                        <SelectTrigger className="w-full">
                           <SelectValue placeholder="Select method" />
                         </SelectTrigger>
                         <SelectContent>
@@ -1588,10 +1595,9 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                     </div>
                   )}
 
-                  <div>
+                  <div className="space-y-2">
                     <FormLabel>Notes</FormLabel>
                     <Input
-                      className="focus-visible:ring-[#2563eb]"
                       value={notes}
                       onChange={(e) => setNotes(e.target.value)}
                     />
@@ -1599,8 +1605,8 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                 </div>
               </div>
 
-              <Card className="flex flex-col overflow-hidden">
-                <CardHeader className="py-3 bg-muted/50 border-b">
+              <Card className="flex flex-col overflow-hidden gap-0 p-0">
+                <CardHeader className="py-3 bg-muted/50 border-b gap-0">
                   <CardTitle className="text-lg font-medium">
                     Bill Summary
                   </CardTitle>
@@ -1699,8 +1705,8 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
 
           <Button
             type="button"
+            effect={"ringHover"}
             onClick={handleSaveBill}
-            className="gap-1"
             disabled={
               !form.getValues().name ||
               !form.getValues().mobile ||
@@ -1708,8 +1714,11 @@ const BillForm = ({ selectedPatient, selectedPrescription }: BillFormTypes) => {
                 selectedMedicines.length === 0 &&
                 selectedServices.length === 0)
             }
+            loading={submissionLoader}
+            loadingText="Saving"
+            icon={Save}
+            iconPlacement="right"
           >
-            <Save className="h-4 w-4" />
             Save Bill
           </Button>
         </div>

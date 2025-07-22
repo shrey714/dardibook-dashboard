@@ -1,4 +1,4 @@
-import { storeSubscriptionToFirestore, updateClerkSubscriptionStatus } from "@/lib/SubscriptionHelpers";
+import { storeSubscriptionToFirestore, updateClerkSubscriptionStatus } from "@/lib/actions/SubscriptionHelpers";
 import { RazorPayPaymentTypes, RazorPaySubscriptionTypes } from "@/types/SubscriptionTypes";
 import { NextRequest, NextResponse } from "next/server";
 import { validateWebhookSignature } from 'razorpay/dist/utils/razorpay-utils';
@@ -50,42 +50,42 @@ export async function POST(req: NextRequest) {
         switch (event) {
             case "subscription.activated":
                 Promise.all([
-                    await updateClerkSubscriptionStatus(OrgId, "active", response.payload.subscription?.entity.current_start, response.payload.subscription?.entity.current_end),
+                    await updateClerkSubscriptionStatus(OrgId, "active", response.payload.subscription?.entity.id || "", response.payload.subscription?.entity.plan_id || "", response.payload.subscription?.entity.current_start, response.payload.subscription?.entity.current_end),
                     await storeSubscriptionToFirestore(OrgId, response.payload, event)])
                 break;
             case "subscription.charged":
                 Promise.all([
-                    await updateClerkSubscriptionStatus(OrgId, "active", response.payload.subscription?.entity.current_start, response.payload.subscription?.entity.current_end),
+                    await updateClerkSubscriptionStatus(OrgId, "active", response.payload.subscription?.entity.id || "", response.payload.subscription?.entity.plan_id || "", response.payload.subscription?.entity.current_start, response.payload.subscription?.entity.current_end),
                     await storeSubscriptionToFirestore(OrgId, response.payload, event)])
                 break;
             case "subscription.completed":
                 Promise.all([
-                    await updateClerkSubscriptionStatus(OrgId, "completed", response.payload.subscription?.entity.current_start, response.payload.subscription?.entity.current_end),
+                    await updateClerkSubscriptionStatus(OrgId, "completed", response.payload.subscription?.entity.id || "", response.payload.subscription?.entity.plan_id || "", response.payload.subscription?.entity.current_start, response.payload.subscription?.entity.current_end),
                     await storeSubscriptionToFirestore(OrgId, response.payload, event)])
                 break;
             case "subscription.paused":
                 Promise.all([
-                    await updateClerkSubscriptionStatus(OrgId, "paused", response.payload.subscription?.entity.current_start, response.payload.subscription?.entity.current_end),
+                    await updateClerkSubscriptionStatus(OrgId, "paused", response.payload.subscription?.entity.id || "", response.payload.subscription?.entity.plan_id || "", response.payload.subscription?.entity.current_start, response.payload.subscription?.entity.current_end),
                     await storeSubscriptionToFirestore(OrgId, response.payload, event)])
                 break;
             case "subscription.resumed":
                 Promise.all([
-                    await updateClerkSubscriptionStatus(OrgId, "active", response.payload.subscription?.entity.current_start, response.payload.subscription?.entity.current_end),
+                    await updateClerkSubscriptionStatus(OrgId, "active", response.payload.subscription?.entity.id || "", response.payload.subscription?.entity.plan_id || "", response.payload.subscription?.entity.current_start, response.payload.subscription?.entity.current_end),
                     await storeSubscriptionToFirestore(OrgId, response.payload, event)])
                 break;
             case "subscription.pending":
                 Promise.all([
-                    await updateClerkSubscriptionStatus(OrgId, "pending", response.payload.subscription?.entity.current_start, response.payload.subscription?.entity.current_end),
+                    await updateClerkSubscriptionStatus(OrgId, "pending", response.payload.subscription?.entity.id || "", response.payload.subscription?.entity.plan_id || "", response.payload.subscription?.entity.current_start, response.payload.subscription?.entity.current_end),
                     await storeSubscriptionToFirestore(OrgId, response.payload, event)])
                 break;
             case "subscription.halted":
                 Promise.all([
-                    await updateClerkSubscriptionStatus(OrgId, "halted", response.payload.subscription?.entity.current_start, response.payload.subscription?.entity.current_end),
+                    await updateClerkSubscriptionStatus(OrgId, "halted", response.payload.subscription?.entity.id || "", response.payload.subscription?.entity.plan_id || "", response.payload.subscription?.entity.current_start, response.payload.subscription?.entity.current_end),
                     await storeSubscriptionToFirestore(OrgId, response.payload, event)])
                 break;
             case "subscription.cancelled":
                 Promise.all([
-                    await updateClerkSubscriptionStatus(OrgId, "cancelled", response.payload.subscription?.entity.current_start, response.payload.subscription?.entity.current_end),
+                    await updateClerkSubscriptionStatus(OrgId, "cancelled", response.payload.subscription?.entity.id || "", response.payload.subscription?.entity.plan_id || "", response.payload.subscription?.entity.current_start, response.payload.subscription?.entity.current_end),
                     await storeSubscriptionToFirestore(OrgId, response.payload, event)])
                 break;
             default:

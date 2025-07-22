@@ -1,6 +1,7 @@
 import Image from "next/image";
 import SignUpBox from "@/components/AuthPage/SignUpBox";
 import Link from "next/link";
+import MarqueBg from "@/components/AuthPage/MarqueBg";
 
 const Page = () => {
   return (
@@ -26,11 +27,11 @@ const Page = () => {
           <div className="flex flex-col gap-2">
             <SignUpBox />
           </div>
-          <p className="text-muted-foreground text-center text-xs mt-1">
+          <p className="text-slate-400 text-center text-xs mt-1">
             By clicking continue, you agree to our{" "}
             <Link
               href="https://dardibook.in/documents/terms-conditions"
-              className="hover:text-primary underline underline-offset-4"
+              className="hover:text-white underline underline-offset-4"
               target="_blank"
             >
               Terms of Service
@@ -38,7 +39,7 @@ const Page = () => {
             and{" "}
             <Link
               href="https://dardibook.in/documents/privacy-policy"
-              className="hover:text-primary underline underline-offset-4"
+              className="hover:text-white underline underline-offset-4"
               target="_blank"
             >
               Privacy Policy
@@ -47,15 +48,7 @@ const Page = () => {
           </p>
         </div>
       </main>
-
-      <div className="fixed top-0 left-0 w-full h-svh">
-        <iframe
-          src="https://db-marquee-frame.vercel.app"
-          width="100%"
-          height="100%"
-          title="visual"
-        ></iframe>
-      </div>
+      <MarqueBg />
     </section>
   );
 };

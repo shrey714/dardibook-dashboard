@@ -30,10 +30,18 @@ const SidebarBreadCrump = () => {
     .filter((path) => path && path !== "dashboard");
 
   // Create an array of breadcrumb items with name and path
-  const pathItems = pathNames.map((path, i) => ({
-    name: path,
-    path: `/${pathNames.slice(0, i + 1).join("/")}`,
-  }));
+  const pathItems =
+    pathNames.length > 0
+      ? pathNames.map((path, i) => ({
+          name: path,
+          path: `/${pathNames.slice(0, i + 1).join("/")}`,
+        }))
+      : [
+          {
+            name: "Dashboard",
+            path: `/`,
+          },
+        ];
 
   return (
     <header className="flex shrink-0 items-center justify-between gap-2 border-b px-4 py-2">
@@ -65,10 +73,10 @@ const SidebarBreadCrump = () => {
           </BreadcrumbList>
         </Breadcrumb>
       </div>
-      <div className="flex items-center pl-4">
-          <CollaborationProvider>
-            <AvatarStack />
-          </CollaborationProvider>
+      <div className="flex items-center pl-4 flex-1 overflow-hidden justify-end">
+        <CollaborationProvider>
+          <AvatarStack />
+        </CollaborationProvider>
         <NavHospital />
         <FullscreenToggle />
       </div>

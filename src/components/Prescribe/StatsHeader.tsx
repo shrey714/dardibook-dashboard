@@ -12,7 +12,7 @@ const StatsHeader = () => {
           Total Registrations
           <p className="font-medium text-xs whitespace-nowrap">done by today</p>
         </div>
-        <div className=" font-semibold text-4xl text-primary flex flex-row justify-start">
+        <div className=" font-semibold text-4xl flex flex-row justify-start">
           <div className="absolute top-0 left-[calc(50%-144px)] stat-figure size-36 opacity-20">
             <svg
               xmlns="http://www.w3.org/2000/svg"

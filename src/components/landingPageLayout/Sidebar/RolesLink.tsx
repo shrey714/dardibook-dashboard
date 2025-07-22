@@ -35,14 +35,19 @@ const RolesLink = ({ pathname }: { pathname: string }) => {
       <Dialog>
         <DialogTrigger className="group" asChild>
           <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton tooltip={"Roles"} className="pl-3 h-auto">
+            <SidebarMenuItem className="flex flex-col items-center">
+              <SidebarMenuButton tooltip={"Switch"} className="pl-3 h-auto">
                 <Blend />
-                <span>Switch</span>
+                <span className="group-data-[collapsible=icon]:hidden">
+                  Switch
+                </span>
                 <ChevronRight
                   className={`ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90 hidden group-data-[state=open]:block`}
                 />
               </SidebarMenuButton>
+              <span className="text-[10px] leading-3 font-medium mt-1 max-w-[52px] truncate hidden group-data-[collapsible=icon]:block">
+                Switch
+              </span>
             </SidebarMenuItem>
           </SidebarMenu>
         </DialogTrigger>
@@ -53,7 +58,6 @@ const RolesLink = ({ pathname }: { pathname: string }) => {
               Make changes to your role profile.
             </DialogDescription>
           </DialogHeader>
-          {/* <RolesModal userInfo={user} /> */}
           <OrganizationList
             hidePersonal={true}
             appearance={{
@@ -91,29 +95,37 @@ const RolesLink = ({ pathname }: { pathname: string }) => {
 
       <SidebarMenu>
         <SidebarMenuItem>
-          <Link href={"/dashboard/settings"} className="relative">
+          <Link
+            href={"/dashboard/settings"}
+            className="relative flex flex-col items-center"
+          >
             <SidebarMenuButton
               tooltip={"Settings"}
               isActive={isSubPath(pathname, "/dashboard/settings")}
               className="pl-3 overflow-hidden h-auto"
             >
               <span
-                className={`w-1 absolute -left-0.5 bg-foreground rounded-full transition-all duration-300 ease-in-out ${
+                className={`w-1 absolute -left-0.5 bg-foreground rounded-full transition-all duration-300 ease-in-out group-data-[collapsible=icon]:hidden ${
                   isSubPath(pathname, "/dashboard/settings")
                     ? "h-2/3 opacity-100"
                     : "h-0 opacity-0"
                 }`}
               ></span>
               <SettingsIcon />
-              <span>Settings</span>
+              <span className="group-data-[collapsible=icon]:hidden">
+                Settings
+              </span>
               <ChevronRight
-                className={`ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90 ${
+                className={`ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90 group-data-[collapsible=icon]:hidden ${
                   isSubPath(pathname, "/dashboard/settings")
                     ? "visible"
                     : "hidden"
                 }`}
               />
             </SidebarMenuButton>
+            <span className="text-[10px] leading-3 font-medium mt-1 max-w-[52px] truncate hidden group-data-[collapsible=icon]:block">
+              Settings
+            </span>
           </Link>
         </SidebarMenuItem>
       </SidebarMenu>

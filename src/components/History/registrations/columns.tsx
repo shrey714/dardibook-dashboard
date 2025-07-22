@@ -92,7 +92,7 @@ const PatientButton = ({ patientId }: { patientId: string }) => {
   return (
     <Button
       variant="link"
-      className="text-sm p-0 underline"
+      className="text-sm p-0 underline text-foreground"
       onClick={() => openModal({ patientId })}
     >
       {patientId}

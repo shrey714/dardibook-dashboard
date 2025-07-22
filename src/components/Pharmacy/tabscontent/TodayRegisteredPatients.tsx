@@ -15,6 +15,7 @@ import {
 
 import { SidebarMenuSkeleton } from "@/components/ui/sidebar";
 import { PharmacySelectedPatientType } from "@/types/FormTypes";
+import { Input } from "@/components/ui/input";
 
 const TodayRegisteredPatients = ({
   onSelectPatient,
@@ -33,19 +34,19 @@ const TodayRegisteredPatients = ({
     : todayPatients;
 
   return (
-    <Card className="h-full w-full overflow-hidden flex-col">
-      <CardHeader className="p-3 space-y-2">
-        <CardTitle className="text-lg font-semibold text-muted-foreground flex items-center justify-between">
+    <Card className="h-full w-full overflow-hidden flex-col gap-0 py-0">
+      <CardHeader className="p-3 space-y-1">
+        <CardTitle className="text-lg font-medium text-muted-foreground flex items-center justify-between">
           <span>Todays Registered Patients</span>
           <span className="text-sm font-normal text-muted-foreground">
             {todayPatients.length} patients
           </span>
         </CardTitle>
         <div className="relative w-full">
-          <input
+          <Input
             type="search"
             placeholder="Search by name or mobile"
-            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
+            wrapClassName="w-full"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -86,7 +87,8 @@ const TodayRegisteredPatients = ({
                   <TableCell>{patient.mobile}</TableCell>
                   <TableCell className="text-right">
                     <Button
-                      variant="outline"
+                      variant="default"
+                      effect={"ringHover"}
                       size="sm"
                       onClick={() =>
                         onSelectPatient({
@@ -96,7 +98,7 @@ const TodayRegisteredPatients = ({
                           gender: patient.gender,
                         })
                       }
-                      className="my-1 mr-1 h-7 border-0 sm:h-8 py-1 flex items-center justify-center bg-blue-700 hover:bg-blue-900 text-white hover:text-white rounded-[4px]"
+                      className="my-1 mr-1 h-7 border-0 sm:h-8 py-1 flex items-center justify-center"
                     >
                       <BriefcaseMedical />
                     </Button>

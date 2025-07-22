@@ -97,7 +97,7 @@ export default function Page() {
                   }`}
                 >
                   <span
-                    className={`w-1 bg-blue-500 h-3/4 self-center rounded-r-full absolute left-0 ${
+                    className={`w-1 bg-primary h-3/4 self-center rounded-r-full absolute left-0 ${
                       patient.isFocused ? "visible" : "invisible"
                     }`}
                   ></span>
@@ -138,7 +138,7 @@ export default function Page() {
           classNames={{
             control: (state) =>
               `!shadow-sm !transition-all !duration-900 !bg-slate-50 dark:!bg-sidebar !py-1.5 ${
-                state.isFocused ? "!border-blue-500" : "!border-border"
+                state.isFocused ? "!border-primary" : "!border-border"
               } 
               ${
                 state.selectProps.menuIsOpen
@@ -160,20 +160,21 @@ export default function Page() {
         />
 
         <div className="max-w-4xl w-full p-0 flex flex-row items-center mt-1">
-          <span className="flex flex-1 h-[2px] bg-gradient-to-r from-transparent to-primary"></span>
+          <span className="flex flex-1 h-[2px] bg-gradient-to-r from-transparent to-muted-foreground"></span>
           <div className=" flex items-center justify-center">
-            <p className="w-auto px-3 py-1 font-medium text-base rounded-full border-primary border-[2px]">
+            <p className="w-auto px-3 py-1 font-medium text-base rounded-full border-muted-foreground text-muted-foreground border-[2px]">
               Today&apos;s Queue
             </p>
           </div>
-          <span className="flex flex-1 h-[2px] bg-gradient-to-l from-transparent to-primary"></span>
+          <span className="flex flex-1 h-[2px] bg-gradient-to-l from-transparent to-muted-foreground"></span>
         </div>
         <ReOrderingList />
 
         <Button
-          className="px-0 w-3/4 lg:w-80 bg-blue-600 border-0 shadow-lg hover:bg-blue-700 z-10
+          className="px-0 w-3/4 lg:w-80 border-0 shadow-lg z-10
         absolute bottom-4 justify-self-center rounded-full left-0 right-0 text-white font-semibold tracking-wide"
-          variant={"link"}
+          variant={"default"}
+          effect={"ringHover"}
           asChild
         >
           <Link href={"appointment/appointmentForm"}>

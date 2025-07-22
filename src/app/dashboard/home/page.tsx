@@ -5,8 +5,8 @@ import DoctorsPerformanceChart from "@/components/Home/DoctorsPerformanceChart";
 import BedAppointmentsActivity from "@/components/Home/BedAppointmentsActivity";
 import WeekSelector from "@/components/Home/WeekSelector";
 import { DashboardDataTypes } from "@/types/FormTypes";
-import { headers } from "next/headers";
 import { auth } from "@clerk/nextjs/server";
+import { getDashboardData } from "@/lib/actions/DashboardHelpers";
 
 type PageProps = {
   searchParams: Promise<{ weekDate?: string }>;
@@ -15,45 +15,37 @@ type PageProps = {
 export default async function Home({ searchParams }: PageProps) {
   const { weekDate } = await searchParams;
   const weekTimestamp = weekDate ? parseInt(weekDate, 10) : Date.now();
-  const headersList = await headers();
-  const protocol = headersList.get("x-forwarded-proto") || "http";
-  const host = headersList.get("host") || "";
-  const baseUrl = `${protocol}://${host}`;
-
-  const authInstance = await auth();
-  if (!authInstance.orgRole) {
-    return (
-      <div className="p-4 text-center text-red-500">
-        You are not authorized for this organization..
-      </div>
-    );
-  }
 
   if (isNaN(weekTimestamp)) {
     notFound();
   }
 
+  const authInstance = await auth();
+  if (!authInstance.orgRole || !authInstance.orgId) {
+    return (
+      <div className="w-full h-full text-muted-foreground text-sm md:text-base p-4 overflow-hidden flex items-center justify-center gap-4 flex-col">
+        <img
+          className="w-full max-w-40 lg:mx-auto"
+          src="/ErrorTriangle.svg"
+          alt="Error"
+        />
+        You are not authorized for this organization..
+      </div>
+    );
+  }
+
   let dashboardData: DashboardDataTypes;
   try {
-    const res = await fetch(
-      `${baseUrl}/api/dashboard-data?weekDate=${weekTimestamp}`,
-      {
-        method: "GET",
-        headers: {
-          cookie: headersList.get("cookie") || "",
-        },
-        cache: "no-store",
-      }
-    );
-    if (!res.ok) {
-      throw new Error("Failed to fetch dashboard data");
-    }
-    const data = await res.json();
-    dashboardData = data.data;
+    dashboardData = await getDashboardData(authInstance.orgId, weekTimestamp);
   } catch (error) {
     console.error("Error loading dashboard:", error);
     return (
-      <div className="p-4 text-center text-red-500">
+      <div className="w-full h-full text-muted-foreground text-sm md:text-base p-4 overflow-hidden flex items-center justify-center gap-4 flex-col">
+        <img
+          className="w-full max-w-40 lg:mx-auto"
+          src="/ErrorTriangle.svg"
+          alt="Error"
+        />
         Failed to load dashboard data. Please try again later.
       </div>
     );

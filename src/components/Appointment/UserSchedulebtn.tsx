@@ -3,7 +3,6 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { db } from "@/firebase/firebaseConfig";
 import { Button } from "@/components/ui/button";
 import { doc, updateDoc } from "firebase/firestore";
-import Loader from "../common/Loader";
 import { ArrowLeftRight } from "lucide-react";
 import { useAuth } from "@clerk/nextjs";
 import { ScheduledPatientTypes } from "@/types/FormTypes";
@@ -49,8 +48,10 @@ const UserSchedulebtn: React.FC<UserSchedulebtnProps> = ({
           onClick={rescheduleFn}
           variant="outline"
           className="flex h-8 w-8 p-0 data-[state=open]:bg-muted border rounded-full"
+          loading={loader}
+          loadingText="Scheduling"
         >
-          {loader ? <Loader size="small" /> : <ArrowLeftRight />}
+          <ArrowLeftRight />
           <span className="sr-only">Schedule Now</span>
         </Button>
       </TooltipTrigger>

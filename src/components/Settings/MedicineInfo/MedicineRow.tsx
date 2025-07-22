@@ -1,6 +1,8 @@
 import React from "react";
 import { Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
 interface DisplayMedicineProps {
   medicine: {
     medicineName: string;
@@ -13,6 +15,8 @@ interface DisplayMedicineProps {
   index: number;
   setMedicineEditModel: React.Dispatch<React.SetStateAction<boolean>>;
   setEditForMedicineId: React.Dispatch<React.SetStateAction<string>>;
+  isSelected: boolean;
+  onSelectionChange: (selected: boolean) => void;
 }
 
 const MedicineRow: React.FC<DisplayMedicineProps> = ({
@@ -20,6 +24,8 @@ const MedicineRow: React.FC<DisplayMedicineProps> = ({
   index,
   setMedicineEditModel,
   setEditForMedicineId,
+  isSelected,
+  onSelectionChange,
 }) => {
   return (
     <div
@@ -27,10 +33,16 @@ const MedicineRow: React.FC<DisplayMedicineProps> = ({
         index !== 0 ? "border-t" : "border-0"
       }`}
     >
+      <div className="col-span-1 flex justify-start items-center">
+        <Checkbox
+          checked={isSelected}
+          onCheckedChange={onSelectionChange}
+          aria-label={`Select ${medicine.medicineName}`}
+        />
+      </div>
+
       <div className="col-span-3 h-auto flex flex-col justify-start items-start">
-        <p className="text-sm font-normal">
-          {medicine.medicineName}
-        </p>
+        <p className="text-sm font-normal">{medicine.medicineName}</p>
         <p className="text-sm text-muted-foreground gap-x-2 inline-flex items-center">
           {medicine.id}{" "}
           <span
@@ -41,17 +53,23 @@ const MedicineRow: React.FC<DisplayMedicineProps> = ({
         </p>
       </div>
 
-      <div className="col-span-3 [&:empty]:invisible border rounded-md flex items-center h-min py-[0px] sm:py-[5.5px] px-2 text-muted-foreground bg-background border-border text-sm w-full">
-        {medicine.type}
+      <div className="col-span-2">
+        {medicine.type && (
+          <Badge variant="outline" className="text-xs font-medium">
+            {medicine.type}
+          </Badge>
+        )}
       </div>
-      <div className="col-span-5 [&:empty]:invisible border rounded-md flex items-center h-min py-[0px] sm:py-[5.5px] px-2 text-muted-foreground bg-background border-border text-sm w-full">
-        {medicine.instruction}
+
+      <div className="col-span-5 [&:empty]:invisible h-min px-2 text-muted-foreground text-sm w-full">
+        {medicine.instruction || "-"}
       </div>
 
       <div className="col-span-1 flex justify-center items-center">
         <Button
           variant={"outline"}
           className={`h-9 w-9 min-w-0`}
+          effect={"ringHover"}
           onClick={() => {
             setEditForMedicineId(medicine.id);
             setMedicineEditModel(true);

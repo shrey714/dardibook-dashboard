@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AnimatePresence, motion } from "framer-motion";
 import { RegistrationOptions } from "@/components/Settings/DefaultsTabs/RegistrationOptions";
@@ -54,6 +54,7 @@ export default function SettingsMedicineInfoPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const tabParam = searchParams.get("tab");
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const defaultTab = tabs.map((t) => t.value).includes(tabParam || "")
     ? tabParam!
@@ -63,6 +64,7 @@ export default function SettingsMedicineInfoPage() {
     const params = new URLSearchParams(Array.from(searchParams.entries()));
     params.set("tab", value);
     router.push(`?${params.toString()}`, { scroll: false });
+    setDrawerOpen(false);
   };
 
   return (
@@ -72,7 +74,7 @@ export default function SettingsMedicineInfoPage() {
       onValueChange={handleTabChange}
       className="w-full flex items-start gap-2 md:gap-4 justify-center py-2 sm:py-5 px-2 md:px-5 flex-col md:flex-row 2xl:gap-5 2xl:justify-center"
     >
-      <Drawer>
+      <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
         <DrawerTrigger asChild>
           <Button
             variant="secondary"

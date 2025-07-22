@@ -6,6 +6,7 @@ import { RazorpayWebhookPayload } from '@/app/api/subscription/subscription-webh
 import Razorpay from "razorpay";
 import * as crypto from "crypto";
 import { addMonths, endOfDay, getUnixTime, startOfToday } from 'date-fns';
+import { ClerkSubscriptiontypes } from '@/types/SubscriptionTypes';
 
 const razorpay = new Razorpay({
     key_id: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
@@ -41,13 +42,15 @@ export async function storeSubscriptionToFirestore(
 export async function updateClerkSubscriptionStatus(
     orgId: string,
     status: string,
+    sub_id: string,
+    plan_id: string,
     current_start: number | null | undefined,
     current_end: number | null | undefined,
 ) {
     try {
         const client = await clerkClient();
 
-        const subscriptionMetadata: Record<string, any> = { status };
+        const subscriptionMetadata: ClerkSubscriptiontypes = { status, sub_id, plan_id };
 
         if (typeof current_start === "number") {
             subscriptionMetadata.current_start = current_start;
@@ -106,10 +109,14 @@ export async function verifyAndActivateSubscription({
     response,
     subscriptionId,
     orgId,
+    sub_id,
+    plan_id
 }: {
     response: RazorpayHandlerResponse;
     subscriptionId: string;
     orgId: string;
+    sub_id: string;
+    plan_id: string;
 }) {
     try {
         const expectedSignature = crypto
@@ -120,7 +127,7 @@ export async function verifyAndActivateSubscription({
         const isLegit = expectedSignature === response.razorpay_signature;
 
         if (isLegit && orgId) {
-            await updateClerkSubscriptionStatus(orgId, "active", getUnixTime(startOfToday()), getUnixTime(endOfDay(addMonths(new Date(), 1))));
+            await updateClerkSubscriptionStatus(orgId, "active", sub_id, plan_id, getUnixTime(startOfToday()), getUnixTime(endOfDay(addMonths(new Date(), 1))));
             return { success: true };
         } else {
             return { success: false, reason: "Invalid signature" };
@@ -128,5 +135,35 @@ export async function verifyAndActivateSubscription({
     } catch (error) {
         console.error("Error in verifyAndActivateSubscription:", error);
         return { success: false, reason: "Server error" };
+    }
+}
+
+export async function getSubscriptionDetails(id: string) {
+    try {
+        const subscription = await razorpay.subscriptions.fetch(id);
+        return subscription;
+    } catch (error) {
+        console.error("Error getting subscription:", error);
+        throw new Error("Failed to get subscription");
+    }
+}
+
+export async function getPlanDetails(id: string) {
+    try {
+        const plan = await razorpay.plans.fetch(id);
+        return plan;
+    } catch (error) {
+        console.error("Error getting plan:", error);
+        throw new Error("Failed to get plan");
+    }
+}
+
+export async function getInvoiceDetails(id: string) {
+    try {
+        const invoice = await razorpay.invoices.fetch(id);
+        return invoice;
+    } catch (error) {
+        console.error("Error getting invoice:", error);
+        throw new Error("Failed to get invoice");
     }
 }

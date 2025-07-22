@@ -260,16 +260,23 @@ const DiseaseSuggetion: React.FC<DiseaseSuggetionProps> = ({
         autoFocus={true}
         classNames={{
           control: (state) =>
-            `!shadow-sm !transition-all !duration-900 !rounded-md !bg-transparent ${
-              state.isFocused ? "!ring-blue-500 !ring-1" : "!border-border"
+            `!shadow-sm !transition-all !duration-900 !rounded-md !bg-transparent dark:!bg-input/30 ${
+              state.isFocused
+                ? "!border-ring !ring-ring/50 !ring-[3px]"
+                : "!border-border"
             }   
             `,
-          placeholder: () => "!truncate !text-sm sm:!text-base !px-4",
-          singleValue: () => "!text-primary !px-4",
-          input: () => "!text-primary !px-4",
+          placeholder: () =>
+            "!truncate !text-sm sm:!text-base !px-4 !text-muted-foreground",
+          singleValue: () => "!text-inherit !px-4",
+          input: () => "!text-inherit !px-4",
           menu: () =>
-            `!border-border !overflow-hidden !shadow-md !text-black !w-full`,
+            `!border-border !overflow-hidden !shadow-md !text-black !w-full !bg-popover !border !text-primary`,
           menuList: () => "!py-1 md:!py-2",
+          option: (state) =>
+            `bg-background p-2 border-0 text-base hover:cursor-pointer ${
+              state.isFocused && !state.isSelected ? "!bg-secondary" : ""
+            } ${state.isSelected ? "" : "hover:!bg-secondary"}`,
         }}
       />
     </div>

@@ -13,7 +13,6 @@ import { ModeToggle } from "./common/mode-toggle";
 import { Menu } from "lucide-react";
 import { Button } from "./ui/button";
 import { User } from "@clerk/nextjs/server";
-import HeaderClerkOrganizationSwitcher from "./common/ClerkOrganizationSwitcher";
 
 const HeaderMain = async ({ user }: { user: User | null }) => {
   const allPaths = [
@@ -27,18 +26,16 @@ const HeaderMain = async ({ user }: { user: User | null }) => {
 
   return (
     <nav className="sticky w-full z-20 top-0 start-0 p-4 pb-0">
-      <div className="rounded-lg shadow-lg bg-secondary max-w-screen-xl flex flex-wrap items-center justify-between mx-auto px-4 py-2">
+      <div className="rounded-lg shadow-lg bg-sidebar max-w-screen-xl flex flex-wrap items-center justify-between mx-auto px-4 py-2">
         <Link
           href={"/"}
           className="cursor-pointer flex items-center ml-0 sm:ml-4 mr-3"
         >
-          <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
+          <span className="self-center text-2xl font-semibold whitespace-nowrap">
             DardiBook
           </span>
         </Link>
         <div className="flex items-center justify-center flex-row gap-2">
-          <HeaderClerkOrganizationSwitcher />
-
           {/* user menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

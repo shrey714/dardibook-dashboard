@@ -3,9 +3,7 @@ import AppointmentForm from "@/components/forms/AppointmentForm";
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import uniqid from "uniqid";
-import { getPatientById } from "@/app/services/getPatientById";
 import RegisteredModal from "@/components/Appointment/RegisteredModal";
-import Loader from "@/components/common/Loader";
 import { RegisterPatientFormTypes } from "@/types/FormTypes";
 import {
   Dialog,
@@ -15,11 +13,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useAuth } from "@clerk/nextjs";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "@/firebase/firebaseConfig";
 import toast from "react-hot-toast";
 import { format, getTime, startOfDay } from "date-fns";
 import { useUser } from "@clerk/nextjs";
+import { Spinner } from "@/components/ui/spinner";
 
 const Page: React.FC = () => {
   const searchParams = useSearchParams();
@@ -63,13 +62,15 @@ const Page: React.FC = () => {
     const getPatientData = async () => {
       if (isLoaded && orgId && patientId) {
         setFormLoader(true);
-        const patientData = await getPatientById(patientId, orgId).catch(() => {
-          setError("Something wrong with this patient.");
-          setFormLoader(false);
-        });
-        if (patientData.data.registered_date) {
-          (patientData.data as RegisterPatientFormTypes)?.registered_date.map(
-            (registered_date) => {
+
+        try {
+          const patientRef = doc(db, "doctor", orgId, "patients", patientId);
+          const patientSnap = await getDoc(patientRef);
+
+          if (patientSnap.exists()) {
+            const patientData = patientSnap.data() as RegisterPatientFormTypes;
+
+            patientData.registered_date.map((registered_date) => {
               if (registered_date === getTime(startOfDay(new Date()))) {
                 setError(
                   "Patient is already registed today. You can reschedule to other date."
@@ -84,28 +85,27 @@ const Page: React.FC = () => {
                 );
                 return;
               }
-            }
-          );
+            });
 
-          (patientData.data as RegisterPatientFormTypes)?.bed_info.map(
-            (bed) => {
-              if (
-                bed.admission_at <= getTime(new Date()) &&
-                bed.discharge_at >= getTime(new Date())
-              ) {
+            patientData.bed_info.map((bed) => {
+              if (!bed.dischargeMarked) {
                 setError(
                   "Patient is already admitted in bed. No need to reigster patient again."
                 );
                 return;
               }
-            }
-          );
+            });
 
-          setPatientFormData(patientData.data);
-        } else {
-          setError("No patient data available for the provided PatientID.");
+            setPatientFormData(patientData);
+          } else {
+            setError("No patient data available for the provided PatientID.");
+          }
+        } catch (err) {
+          console.error(err);
+          setError("Something went wrong while fetching the patient.");
+        } finally {
+          setFormLoader(false);
         }
-        setFormLoader(false);
       } else {
         setFormLoader(false);
       }
@@ -180,10 +180,15 @@ const Page: React.FC = () => {
 
       {patientId && formLoader ? (
         <div className="w-full h-full overflow-hidden flex items-center justify-center z-50">
-          <Loader size="medium" />
+          <Spinner className="bg-primary" size={"lg"} />
         </div>
       ) : error ? (
-        <div className="px-2 text-muted-foreground font-medium text-base justify-self-center max-w-4xl h-full flex flex-1 items-center justify-center z-10 overflow-hidden text-center">
+        <div className="w-full h-full text-muted-foreground text-sm md:text-base p-4 overflow-hidden flex items-center justify-center gap-4 flex-col">
+          <img
+            className="w-full max-w-40 lg:mx-auto"
+            src="/ErrorTriangle.svg"
+            alt="Error"
+          />
           {error}
         </div>
       ) : (

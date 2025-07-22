@@ -169,8 +169,7 @@ export default function TaskPage() {
                   const patientData =
                     patientDoc.data() as RegisterPatientFormTypes;
                   patientName = patientData.name;
-                  console.log("patientName==", patientName);
-                  patientMap.set(patientData.patient_id, patientData); // cache it
+                  patientMap.set(patientData.patient_id, patientData);
                 }
               } catch (err) {
                 console.error(

@@ -6,11 +6,9 @@ import {
   CalendarClockIcon,
   Info,
   ReceiptTextIcon,
-  TableCellsMergeIcon,
   TrendingDownIcon,
   TrendingUpIcon,
   UserPlusIcon,
-  WalletIcon,
 } from "lucide-react";
 import {
   Carousel,

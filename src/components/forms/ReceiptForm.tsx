@@ -11,6 +11,7 @@ import { Plus, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import uniqid from "uniqid";
 import { PrescriptionFormTypes, ReceiptDetails } from "@/types/FormTypes";
+import { Input } from "../ui/input";
 
 interface ReceiptFormProps {
   receiptInfo: ReceiptDetails[];
@@ -69,7 +70,7 @@ const ReceiptForm: React.FC<ReceiptFormProps> = ({
   };
 
   return (
-    <Card className="bg-muted/50 border rounded-lg col-span-10 2xl:col-span-3 h-min">
+    <Card className="col-span-10 2xl:col-span-3 h-min py-0 gap-0">
       <CardHeader className="border-b p-2 md:px-4 md:py-3">
         <CardTitle className="flex items-center text-sm md:text-lg font-medium">
           Receipt Details
@@ -84,28 +85,29 @@ const ReceiptForm: React.FC<ReceiptFormProps> = ({
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
               style={{ overflow: "hidden" }}
-              className="grid grid-cols-7 gap-4"
+              className="grid grid-cols-7 gap-3"
             >
-              <input
+              <Input
                 type="text"
                 required
                 name={`title-${index}`}
                 id={`title-${index}`}
                 autoComplete="off"
                 placeholder="Title*"
-                className="col-span-3 sm:max-w-md my-1.5 disabled:text-primary shadow-sm rounded-none border-border border-0 border-b-2 ring-0 outline-none focus:ring-0 bg-transparent form-input block py-1 pl-2 sm:text-sm sm:leading-6"
+                wrapClassName={"col-span-3 sm:max-w-md my-1.5"}
                 value={particular.title}
                 onChange={(e) =>
                   handleInputChange(particular.id, "title", e.target.value)
                 }
               />
-              <input
+              <Input
                 type="number"
                 name={`amount-${index}`}
                 id={`amount-${index}`}
                 autoComplete="off"
                 placeholder="Amount"
-                className="col-span-3 sm:max-w-md my-1.5 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input block py-1 pl-2 sm:text-sm sm:leading-6"
+                wrapClassName={"col-span-3 sm:max-w-md"}
+                className="col-span-3 sm:max-w-md my-1.5"
                 value={particular.amount}
                 onChange={(e) =>
                   handleInputChange(
@@ -127,7 +129,7 @@ const ReceiptForm: React.FC<ReceiptFormProps> = ({
           ))}
         </AnimatePresence>
 
-        <div className="w-full grid grid-cols-7 gap-4">
+        <div className="w-full grid grid-cols-7 gap-3">
           <Button
             variant={"outline"}
             type="button"

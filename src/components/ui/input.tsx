@@ -1,22 +1,62 @@
-import * as React from "react"
+import * as React from "react";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
+import { LucideIcon } from "lucide-react";
 
-const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
-  ({ className, type, ...props }, ref) => {
-    return (
+export interface InputProps extends React.ComponentProps<"input"> {
+  startIcon?: LucideIcon;
+  endIcon?: LucideIcon;
+  wrapClassName?: string;
+}
+
+function Input({
+  className,
+  wrapClassName,
+  type,
+  startIcon,
+  endIcon,
+  ...props
+}: InputProps) {
+  const StartIcon = startIcon;
+  const EndIcon = endIcon;
+
+  return (
+    <div className={cn("relative w-full", wrapClassName)}>
+      {StartIcon && (
+        <div
+          className={
+            "text-muted-foreground pointer-events-none absolute inset-y-0 flex items-center justify-center  peer-disabled:opacity-50 start-0 ps-3"
+          }
+        >
+          <StartIcon className="size-4" strokeWidth={2.25} />
+        </div>
+      )}
+
       <input
         type={type}
+        data-slot="input"
         className={cn(
-          "flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
+          "file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
+          "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
+          "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+          startIcon ? "ps-9" : "",
+          endIcon ? "pe-9" : "",
           className
         )}
-        ref={ref}
         {...props}
       />
-    )
-  }
-)
-Input.displayName = "Input"
 
-export { Input }
+      {EndIcon && (
+        <div
+          className={
+            "text-muted-foreground pointer-events-none absolute inset-y-0 flex items-center justify-center  peer-disabled:opacity-50 end-0 pe-3"
+          }
+        >
+          <EndIcon className="size-4" strokeWidth={2.25} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+export { Input };

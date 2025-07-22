@@ -1,12 +1,17 @@
 "use client";
 
-import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import React, { FormEvent, useEffect, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
-import { CirclePlus } from "lucide-react";
+import {
+  CirclePlus,
+  Download,
+  FileText,
+  InboxIcon,
+  SaveIcon,
+  Trash2Icon,
+} from "lucide-react";
 import DiseaseRow from "@/components/Settings/DiseaseInfo/DiseaseRow";
 import uniqid from "uniqid";
-import { getDiseases } from "@/app/services/crudDisease";
-import Loader from "@/components/common/Loader";
 import toast from "react-hot-toast";
 import {
   Card,
@@ -35,37 +40,43 @@ import {
   DialogDescription,
   DialogHeader,
 } from "@/components/ui/dialog";
+import {
+  downloadCSV,
+  exportDiseasesToCSV,
+  generateSampleCSV,
+} from "@/lib/csv-utils";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  AdvancedFilters,
+  applyDiseaseFilters,
+} from "@/components/Settings/DiseaseInfo/DiseaseFilters";
+import DiseaseImportCSV from "@/components/Settings/DiseaseInfo/DiseaseImportCSV";
+import { BulkOperations } from "@/components/Settings/DiseaseInfo/BulkOperations";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
-interface Disease {
+export interface Disease {
   diseaseDetail: string;
   medicines: string[];
   diseaseId: string;
   searchableString: string;
 }
 
+export interface FilterCriteria {
+  searchTerm: string;
+  medicineCountMin: number | null;
+  medicineCountMax: number | null;
+  specificMedicines: string[];
+  sortBy: "name" | "medicineCount";
+  sortOrder: "asc" | "desc";
+}
+
 export default function SettingsDiseaseInfoPage() {
   const { orgId } = useAuth();
 
   const [diseases, setdiseases] = useState<Disease[] | null>(null);
-  const [searchDisease, setsearchDisease] = useState("");
   const [addMedicinesData, setAddMedicinesData] = useState<string[]>([]);
   const [addLoader, setAddLoader] = useState(false);
-  // --------------disease filter--------------
-  const filteredDIsease = (disease: Disease[]) => {
-    return disease
-      .sort((a: Disease, b: Disease) =>
-        a.diseaseDetail.localeCompare(b.diseaseDetail)
-      )
-      .filter((dname: Disease) =>
-        dname?.diseaseDetail
-          ?.toLowerCase()
-          ?.includes(searchDisease?.toLowerCase())
-      );
-  };
-  const handleFilterChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.target;
-    setsearchDisease(value);
-  };
   // --------------new disease form handeler-----------
   const submitHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -125,12 +136,16 @@ export default function SettingsDiseaseInfoPage() {
   useEffect(() => {
     const fetchdisease = async () => {
       if (orgId) {
-        const data = await getDiseases(orgId);
-        if (data?.data) {
-          setdiseases(data?.data);
-        } else {
-          setdiseases(null);
+        const diseaseDataRef = collection(db, "doctor", orgId, "diseaseData");
+        const snapshot = await getDocs(diseaseDataRef);
+
+        if (snapshot.empty) {
+          setdiseases([]);
         }
+        const data = snapshot.docs.map((doc) => ({
+          ...doc.data(),
+        }));
+        setdiseases(data as Disease[]);
       }
     };
     fetchdisease();
@@ -138,6 +153,82 @@ export default function SettingsDiseaseInfoPage() {
   // --------------Edit Disease Data-----------
   const [diseaseEditModel, setDiseaseEditModel] = useState<boolean>(false);
   const [editForDiseaseId, setEditForDiseaseId] = useState<string>("");
+
+  // -------------Export / Import diseases--------
+  const handleExportCSV = (diseasesToExport: Disease[] | null) => {
+    if (!diseasesToExport || diseasesToExport.length === 0) {
+      toast.error("No diseases to export", {
+        position: "bottom-right",
+      });
+      return;
+    }
+
+    try {
+      const csvContent = exportDiseasesToCSV(diseasesToExport);
+      const filename = `diseases-export-${
+        new Date().toISOString().split("T")[0]
+      }.csv`;
+      downloadCSV(csvContent, filename);
+
+      toast.success(`Exported ${diseasesToExport.length} diseases to CSV`, {
+        position: "bottom-right",
+      });
+    } catch (error) {
+      console.error("Export error:", error);
+      toast.error("Failed to export diseases", {
+        position: "bottom-right",
+      });
+    }
+  };
+
+  const handleDownloadSample = () => {
+    try {
+      const sampleContent = generateSampleCSV();
+      downloadCSV(sampleContent, "sample-diseases.csv");
+
+      toast.success("Sample CSV downloaded", {
+        position: "bottom-right",
+      });
+    } catch (error) {
+      console.error("Sample download error:", error);
+      toast.error("Failed to download sample", {
+        position: "bottom-right",
+      });
+    }
+  };
+
+  // -------------Advance filtering and searching-----------
+  const [filters, setFilters] = useState<FilterCriteria>({
+    searchTerm: "",
+    medicineCountMin: null,
+    medicineCountMax: null,
+    specificMedicines: [],
+    sortBy: "name",
+    sortOrder: "asc",
+  });
+  const filteredDiseases = diseases
+    ? applyDiseaseFilters(diseases, filters)
+    : [];
+
+  // -------------Bulk Edits----------------
+  const [selectedDiseases, setSelectedDiseases] = useState<Set<string>>(
+    new Set()
+  );
+
+  const handleBulkDelete = async (diseaseIds: string[]) => {
+    if (!orgId) return;
+
+    const promises = diseaseIds.map(async (id) => {
+      await deleteDoc(doc(db, "doctor", orgId, "diseaseData", id));
+    });
+
+    await Promise.all(promises).then(() => {
+      setdiseases((prev) =>
+        prev ? prev.filter((d) => !diseaseIds.includes(d.diseaseId)) : []
+      );
+    });
+  };
+
   return (
     <>
       <EditDiseaseDataModel
@@ -148,41 +239,30 @@ export default function SettingsDiseaseInfoPage() {
         setdiseases={setdiseases}
       />
       <div className="w-full py-2 sm:py-5 px-2 md:px-5 2xl:flex 2xl:flex-row 2xl:gap-5 2xl:justify-center">
-        <Card className="bg-sidebar/70 w-full shadow-none border h-min mx-auto max-w-4xl 2xl:mx-0 2xl:max-w-xl">
-          <CardHeader className="border-b p-4">
-            <CardTitle className="font-normal text-muted-foreground">
-              Add new disease
-            </CardTitle>
-            <CardDescription hidden></CardDescription>
+        <Card className="2xl:sticky top-20 w-full h-min mx-auto max-w-4xl 2xl:mx-0 2xl:max-w-xl">
+          <CardHeader>
+            <CardTitle className="font-medium">Add new disease</CardTitle>
+            <CardDescription>
+              Add a disease and associate relevant medicines for quick access.
+            </CardDescription>
           </CardHeader>
-          <CardContent className="py-4 px-3 md:px-8">
+          <CardContent>
             <form onSubmit={submitHandler} autoComplete="off">
               <fieldset
                 disabled={addLoader}
-                className="w-full rounded-lg grid grid-cols-6 gap-1 md:gap-4"
+                className="w-full rounded-lg grid grid-cols-6 gap-4"
               >
-                <div className="col-span-6 sm:col-span-3 2xl:col-span-6">
-                  <label
-                    htmlFor="diseaseDetail"
-                    className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-                  >
-                    Disease Name
-                  </label>
-                  <input
-                    className="h-min mt-1 form-input w-full block bg-background rounded-md border-border py-1.5 shadow-sm placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                <div className="col-span-6 sm:col-span-3 2xl:col-span-6 space-y-2">
+                  <Label htmlFor="diseaseDetail">Disease Name</Label>
+                  <Input
                     name="diseaseDetail"
                     id="diseaseDetail"
                     placeholder="Disease Name.."
                     required
                   />
                 </div>
-                <div className="col-span-6 sm:col-span-3 2xl:col-span-6">
-                  <label
-                    htmlFor="medicines"
-                    className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-                  >
-                    Medicines
-                  </label>
+                <div className="col-span-6 sm:col-span-3 2xl:col-span-6 space-y-2">
+                  <Label htmlFor="medicines">Medicines</Label>
                   <MultipleSelector
                     value={addMedicinesData.map((medicine) => ({
                       label: medicine,
@@ -223,14 +303,14 @@ export default function SettingsDiseaseInfoPage() {
                     }}
                     commandProps={{
                       className:
-                        "w-full rounded-md bg-background text-sm font-normal h-min border mt-1 shadow-sm",
+                        "w-full rounded-md text-sm font-normal min-h-9",
                     }}
                     // defaultOptions={OPTIONS}
-                    placeholder="Add Medicines.."
-                    className={`border-none h-min`}
-                    badgeClassName="text-sm p-0"
+                    placeholder="Search Medicines.."
+                    className={`min-h-9`}
+                    badgeClassName="text-sm"
                     loadingIndicator={
-                      <p className="py-1 text-center text-base text-muted-foreground">
+                      <p className="py-2 text-center text-base text-muted-foreground">
                         loading...
                       </p>
                     }
@@ -247,11 +327,14 @@ export default function SettingsDiseaseInfoPage() {
                   <Button
                     tabIndex={0}
                     role="button"
-                    variant={"outline"}
-                    className="text-sm gap-2 px-6"
                     type="submit"
+                    effect={"ringHover"}
+                    icon={CirclePlus}
+                    iconPlacement="right"
+                    loading={addLoader}
+                    loadingText="Adding"
                   >
-                    <CirclePlus width={20} height={20} /> Add
+                    Add
                   </Button>
                 </div>
               </fieldset>
@@ -260,49 +343,99 @@ export default function SettingsDiseaseInfoPage() {
         </Card>
 
         <div className="flex flex-col mt-2 sm:mt-5 2xl:mt-0 mx-auto 2xl:mx-0 max-w-4xl gap-2 w-full">
-          {/* search disease */}
-          <div className="relative w-full md:w-3/4">
-            <div className="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
-              <svg
-                className="w-5 h-5 text-gray-500"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-                xmlns="http://www.w3.org/2000/svg"
+          {/* CSV Import/Export Controls */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="font-medium">Disease Management</CardTitle>
+              <CardDescription>
+                Import and export disease data using CSV files
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-wrap gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  handleExportCSV(diseases);
+                }}
+                disabled={!diseases || diseases.length === 0}
+                className="gap-2"
               >
-                <path
-                  fillRule="evenodd"
-                  clipRule="evenodd"
-                  d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                ></path>
-              </svg>
-            </div>
-            <div className="flex items-center gap-1">
-              <input
-                type="text"
-                id="searchDisease"
-                placeholder="Search by disease name.."
-                value={searchDisease}
-                onChange={handleFilterChange}
-                className="form-input bg-transparent border border-border text-sm rounded-lg block w-full pl-10"
-              />
-            </div>
-          </div>
+                <Download className="h-4 w-4" />
+                <p className="hidden sm:block">Export CSV</p>
+              </Button>
+              <DiseaseImportCSV diseases={diseases} setdiseases={setdiseases} />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleDownloadSample}
+                className="gap-2 mr-0 ml-auto"
+              >
+                <FileText className="h-4 w-4" />
+                <p className="hidden sm:block">Download Sample</p>
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* search/filter disease */}
+          <AdvancedFilters
+            diseases={diseases || []}
+            filters={filters}
+            onFiltersChange={setFilters}
+          />
+
+          {/* Bulk Operations */}
+          {diseases && diseases.length > 0 && (
+            <BulkOperations
+              diseases={filteredDiseases}
+              selectedDiseases={selectedDiseases}
+              onSelectionChange={setSelectedDiseases}
+              onBulkDelete={handleBulkDelete}
+            />
+          )}
 
           {/* diaplay disease */}
-          <div className="w-full flex flex-col flex-1 bg-sidebar/70 border rounded-md">
+          <div className="w-full flex flex-col flex-1 bg-card border rounded-md">
             {diseases === null ? (
-              <div className="flex flex-1 items-center justify-center min-h-72 w-full">
-                <Loader size="medium" />
+              <div className="w-full divide-y rounded-md overflow-hidden">
+                {[...Array(5)].map((_, i) => (
+                  <div
+                    key={i}
+                    className={`grid grid-cols-12 gap-1 w-full p-2 sm:p-4 ${
+                      i !== 0 ? "border-t" : "border-0"
+                    }`}
+                  >
+                    <div className="col-span-1 flex justify-start items-center">
+                      <Skeleton className="size-4 rounded-sm" />
+                    </div>
+
+                    <div className="col-span-3 h-auto flex flex-col justify-start items-start">
+                      <Skeleton className="w-32 h-4" />
+                      <Skeleton className="w-16 h-3 mt-1" />
+                    </div>
+
+                    <div className="col-span-7 w-full text-sm h-min flex flex-wrap gap-2">
+                      {Array.from({ length: 5 }).map((_, index) => (
+                        <Skeleton key={index} className="w-24 h-7" />
+                      ))}
+                    </div>
+
+                    <div className="col-span-1 flex justify-center items-center">
+                      <Skeleton className="size-9" />
+                    </div>
+                  </div>
+                ))}
               </div>
-            ) : filteredDIsease(diseases).length === 0 ? (
+            ) : filteredDiseases.length === 0 ? (
               <>
-                <div className="flex flex-1 items-center justify-center text-muted-foreground min-h-72">
+                <div className="flex flex-1 items-center justify-center text-muted-foreground min-h-72 gap-2 flex-col">
+                  <InboxIcon />
                   No disease data available
                 </div>
               </>
             ) : (
               <>
-                {filteredDIsease(diseases).map((disease: Disease, index: number) => {
+                {filteredDiseases.map((disease: Disease, index: number) => {
                   return (
                     <DiseaseRow
                       key={index}
@@ -310,6 +443,16 @@ export default function SettingsDiseaseInfoPage() {
                       disease={disease}
                       setDiseaseEditModel={setDiseaseEditModel}
                       setEditForDiseaseId={setEditForDiseaseId}
+                      isSelected={selectedDiseases.has(disease.diseaseId)}
+                      onSelectionChange={(selected) => {
+                        const newSelection = new Set(selectedDiseases);
+                        if (selected) {
+                          newSelection.add(disease.diseaseId);
+                        } else {
+                          newSelection.delete(disease.diseaseId);
+                        }
+                        setSelectedDiseases(newSelection);
+                      }}
                     />
                   );
                 })}
@@ -340,6 +483,7 @@ const EditDiseaseDataModel: React.FC<DisplayEditDiseaseProps> = ({
   const { orgId } = useAuth();
   const [updateMedicinesData, setUpdateMedicinesData] = useState<string[]>([]);
   const [updateLoader, setUpdateLoader] = useState(false);
+  const [deleteLoader, setDeleteLoader] = useState(false);
 
   useEffect(() => {
     setUpdateMedicinesData(
@@ -406,15 +550,15 @@ const EditDiseaseDataModel: React.FC<DisplayEditDiseaseProps> = ({
   };
 
   const deleteDisease = async () => {
-    setUpdateLoader(true);
     if (orgId) {
+      setDeleteLoader(true);
       toast.promise(
         async () => {
           await deleteDoc(
             doc(db, "doctor", orgId, "diseaseData", editForDiseaseId)
           ).then(
             () => {
-              setUpdateLoader(false);
+              setDeleteLoader(false);
               setdiseases(
                 (diseases ?? []).filter(
                   (disease) => disease.diseaseId !== editForDiseaseId
@@ -423,7 +567,7 @@ const EditDiseaseDataModel: React.FC<DisplayEditDiseaseProps> = ({
               setDiseaseEditModel(false);
             },
             () => {
-              setUpdateLoader(false);
+              setDeleteLoader(false);
             }
           );
         },
@@ -443,7 +587,7 @@ const EditDiseaseDataModel: React.FC<DisplayEditDiseaseProps> = ({
     <Dialog open={diseaseEditModel} onOpenChange={setDiseaseEditModel}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>
+          <DialogTitle className="font-medium">
             {
               diseases?.find(
                 (disease) => disease.diseaseId === editForDiseaseId
@@ -455,18 +599,12 @@ const EditDiseaseDataModel: React.FC<DisplayEditDiseaseProps> = ({
 
         <form onSubmit={submitHandler} autoComplete="off">
           <fieldset
-            disabled={updateLoader}
-            className="w-full rounded-lg grid grid-cols-6 gap-1 md:gap-4"
+            disabled={updateLoader || deleteLoader}
+            className="w-full rounded-lg grid grid-cols-6 gap-4"
           >
-            <div className="col-span-6">
-              <label
-                htmlFor="diseaseDetail"
-                className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-              >
-                Disease Name
-              </label>
-              <input
-                className="h-min mt-1 form-input w-full block bg-background rounded-md border-border py-1.5 shadow-sm placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+            <div className="col-span-6 space-y-2">
+              <Label htmlFor="diseaseDetail">Disease Name</Label>
+              <Input
                 name="diseaseDetail"
                 id="diseaseDetail"
                 placeholder="Disease Name.."
@@ -478,13 +616,8 @@ const EditDiseaseDataModel: React.FC<DisplayEditDiseaseProps> = ({
                 required
               />
             </div>
-            <div className="col-span-6">
-              <label
-                htmlFor="medicines"
-                className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-              >
-                Medicines
-              </label>
+            <div className="col-span-6 space-y-2">
+              <Label htmlFor="medicines">Medicines</Label>
               <MultipleSelector
                 value={updateMedicinesData.map((medicine) => ({
                   label: medicine,
@@ -519,15 +652,14 @@ const EditDiseaseDataModel: React.FC<DisplayEditDiseaseProps> = ({
                   id: "medicines",
                 }}
                 commandProps={{
-                  className:
-                    "w-full rounded-md bg-background text-sm font-normal h-min border mt-1 shadow-sm",
+                  className: "w-full rounded-md text-sm font-normal min-h-9",
                 }}
                 // defaultOptions={OPTIONS}
-                placeholder="Add Medicines.."
-                className={`border-none h-min`}
-                badgeClassName="text-sm p-0"
+                placeholder="Search Medicines.."
+                className={`min-h-9`}
+                badgeClassName="text-sm"
                 loadingIndicator={
-                  <p className="py-1 text-center text-base text-muted-foreground">
+                  <p className="py-2 text-center text-base text-muted-foreground">
                     loading...
                   </p>
                 }
@@ -544,9 +676,12 @@ const EditDiseaseDataModel: React.FC<DisplayEditDiseaseProps> = ({
               <Button
                 role="button"
                 variant={"destructive"}
-                className="text-sm gap-2 px-6"
                 type="button"
                 onClick={deleteDisease}
+                icon={Trash2Icon}
+                iconPlacement="right"
+                loading={deleteLoader}
+                loadingText={"Deleting"}
               >
                 Delete
               </Button>
@@ -554,8 +689,11 @@ const EditDiseaseDataModel: React.FC<DisplayEditDiseaseProps> = ({
                 tabIndex={0}
                 role="button"
                 variant={"outline"}
-                className="text-sm gap-2 px-6"
                 type="submit"
+                icon={SaveIcon}
+                iconPlacement="right"
+                loading={updateLoader}
+                loadingText={"Updating"}
               >
                 Update
               </Button>

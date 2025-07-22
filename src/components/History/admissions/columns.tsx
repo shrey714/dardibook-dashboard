@@ -185,7 +185,7 @@ const PatientButton = ({ patientId }: { patientId: string }) => {
 
   return (
     <div className="min-w-min underline p-0 align-middle flex gap-1 flex-row items-center">
-      <Button variant="link" onClick={() => openModal({ patientId })}>
+      <Button variant="link" className="text-foreground" onClick={() => openModal({ patientId })}>
         {patientId}
       </Button>
     </div>

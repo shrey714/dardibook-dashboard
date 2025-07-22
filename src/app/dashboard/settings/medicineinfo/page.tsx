@@ -1,11 +1,9 @@
 "use client";
 
-import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
-import { CirclePlus } from "lucide-react";
+import React, { FormEvent, useEffect, useState } from "react";
+import { CirclePlus, Download, FileText, SaveIcon } from "lucide-react";
 import MedicineRow from "@/components/Settings/MedicineInfo/MedicineRow";
 import uniqid from "uniqid";
-import { getMedicines } from "@/app/services/crudMedicine";
-import Loader from "@/components/common/Loader";
 import toast from "react-hot-toast";
 import {
   Card,
@@ -22,7 +20,13 @@ import {
   DialogHeader,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { doc, setDoc, updateDoc } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDocs,
+  setDoc,
+  updateDoc,
+} from "firebase/firestore";
 import {
   Select,
   SelectContent,
@@ -32,8 +36,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
-interface Medicine {
+export interface Medicine {
   medicineName: string;
   type: string;
   id: string;
@@ -41,50 +47,42 @@ interface Medicine {
   searchableString: string;
   active: boolean;
 }
-const medicineTypes = [
-  { label: "Type", value: "", isDefault: true },
-  { label: "Tablet", value: "TAB" },
-  { label: "Capsule", value: "CAP" },
-  { label: "Syrup", value: "SYRUP" },
-  { label: "Drop", value: "DROP" },
-  { label: "Cream", value: "CREAM" },
-  { label: "Lotion", value: "LOTION" },
-  { label: "Serum", value: "SERUM" },
-  { label: "Soap", value: "SOAP" },
-  { label: "Spray", value: "SPRAY" },
-  { label: "Gel", value: "GEL" },
-  { label: "Ointment", value: "OINTMENT" },
-  { label: "Inhaler", value: "INHALER" },
-  { label: "Injection", value: "INJECTION" },
-  { label: "Powder", value: "POWDER" },
-  { label: "Patch", value: "PATCH" },
-  { label: "Suppository", value: "SUPPOSITORY" },
-];
-import { useAuth } from "@clerk/nextjs";
+export interface FilterCriteria {
+  searchTerm: string;
+  medicineTypes: string[];
+  activeStatus: "all" | "active" | "inactive";
+  hasInstructions: "all" | "with" | "without";
+  sortBy: "name" | "type" | "recent";
+  sortOrder: "asc" | "desc";
+}
+
+interface Medicine_Types {
+  value: string;
+  isDefault: boolean;
+}
+
+import { useAuth, useOrganization } from "@clerk/nextjs";
 import { Separator } from "@/components/ui/separator";
 import { db } from "@/firebase/firebaseConfig";
+import {
+  downloadCSV,
+  exportMedicinesToCSV,
+  generateSampleMedicinesCSV,
+} from "@/lib/csv-utils";
+import {
+  AdvancedFilters,
+  applyMedicineFilters,
+} from "@/components/Settings/MedicineInfo/MedicineFilters";
+import { Skeleton } from "@/components/ui/skeleton";
+import { BulkOperations } from "@/components/Settings/MedicineInfo/BulkOperations";
+import MedicineImportCSV from "@/components/Settings/MedicineInfo/MedicineImportCSV";
 
 export default function SettingsMedicineInfoPage() {
   const { orgId } = useAuth();
+  const { organization, isLoaded } = useOrganization();
   const [medicines, setmedicines] = useState<Medicine[] | null>(null);
-  const [searchMedicine, setsearchMedicine] = useState("");
   const [addLoader, setAddLoader] = useState(false);
-  // --------------medicine filter--------------
-  const filteredMedicine = (medicines: Medicine[]) => {
-    return medicines
-      .sort((a: Medicine, b: Medicine) =>
-        a.medicineName.localeCompare(b.medicineName)
-      )
-      .filter((mname: Medicine) =>
-        mname?.medicineName
-          ?.toLowerCase()
-          ?.includes(searchMedicine?.toLowerCase())
-      );
-  };
-  const handleFilterChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.target;
-    setsearchMedicine(value);
-  };
+
   // --------------new medicine form handeler-----------
   const submitHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -144,12 +142,16 @@ export default function SettingsMedicineInfoPage() {
   useEffect(() => {
     const fetchmedicine = async () => {
       if (orgId) {
-        const data = await getMedicines(orgId);
-        if (data?.data) {
-          setmedicines(data?.data);
-        } else {
-          setmedicines(null);
+        const diseaseDataRef = collection(db, "doctor", orgId, "medicinesData");
+        const snapshot = await getDocs(diseaseDataRef);
+
+        if (snapshot.empty) {
+          setmedicines([]);
         }
+        const data = snapshot.docs.map((doc) => ({
+          ...doc.data(),
+        }));
+        setmedicines(data as Medicine[]);
       }
     };
     fetchmedicine();
@@ -157,6 +159,99 @@ export default function SettingsMedicineInfoPage() {
   // --------------Edit Medicine Data-----------
   const [medicineEditModel, setMedicineEditModel] = useState<boolean>(false);
   const [editForMedicineId, setEditForMedicineId] = useState<string>("");
+
+  const options =
+    isLoaded &&
+    organization &&
+    Array.isArray(organization.publicMetadata.medicine_types)
+      ? (organization.publicMetadata.medicine_types as Medicine_Types[])
+      : [];
+  const defaultType = options.find((t) => t.isDefault)?.value ?? "";
+  // -------------Export / Import diseases--------
+  // CSV Export functionality
+  const handleExportCSV = () => {
+    if (!medicines || medicines.length === 0) {
+      toast.error("No medicines to export", {
+        position: "bottom-right",
+      });
+      return;
+    }
+
+    try {
+      const csvContent = exportMedicinesToCSV(medicines);
+      const filename = `medicines-export-${
+        new Date().toISOString().split("T")[0]
+      }.csv`;
+      downloadCSV(csvContent, filename);
+
+      toast.success(`Exported ${medicines.length} medicines to CSV`, {
+        position: "bottom-right",
+      });
+    } catch (error) {
+      console.error("Export error:", error);
+      toast.error("Failed to export medicines", {
+        position: "bottom-right",
+      });
+    }
+  };
+
+  // Download sample CSV
+  const handleDownloadSample = () => {
+    try {
+      const sampleContent = generateSampleMedicinesCSV();
+      downloadCSV(sampleContent, "sample-medicines.csv");
+
+      toast.success("Sample CSV downloaded", {
+        position: "bottom-right",
+      });
+    } catch (error) {
+      console.error("Sample download error:", error);
+      toast.error("Failed to download sample", {
+        position: "bottom-right",
+      });
+    }
+  };
+
+  // -------------Advance filtering and searching-----------
+  const [filters, setFilters] = useState<FilterCriteria>({
+    searchTerm: "",
+    medicineTypes: [],
+    activeStatus: "all" as "all" | "active" | "inactive",
+    hasInstructions: "all" as "all" | "with" | "without",
+    sortBy: "name" as "name" | "type" | "recent",
+    sortOrder: "asc" as "asc" | "desc",
+  });
+
+  const filteredMedicines = medicines
+    ? applyMedicineFilters(medicines, filters)
+    : [];
+
+  // -------------Bulk Edits----------------
+  const [selectedMedicines, setSelectedMedicines] = useState<Set<string>>(
+    new Set()
+  );
+
+  // Bulk status change handler
+  const handleBulkStatusChange = async (
+    medicineIds: string[],
+    active: boolean
+  ) => {
+    if (!orgId) return;
+
+    const promises = medicineIds.map(async (id) => {
+      await updateDoc(doc(db, "doctor", orgId, "medicinesData", id), {
+        active,
+      });
+    });
+    await Promise.all(promises).then(() => {
+      setmedicines((prev) =>
+        prev
+          ? prev.map((m) => (medicineIds.includes(m.id) ? { ...m, active } : m))
+          : []
+      );
+    });
+  };
+
   return (
     <>
       <EditMedicineDataModel
@@ -167,81 +262,71 @@ export default function SettingsMedicineInfoPage() {
         setmedicines={setmedicines}
       />
       <div className="w-full py-2 sm:py-5 px-2 md:px-5 2xl:flex 2xl:flex-row 2xl:gap-5 2xl:justify-center">
-        <Card className="bg-sidebar/70 w-full shadow-none border h-min mx-auto max-w-4xl 2xl:mx-0 2xl:max-w-xl">
-          <CardHeader className="border-b p-4">
-            <CardTitle className="font-normal text-muted-foreground">
-              Add new medicine
-            </CardTitle>
-            <CardDescription hidden></CardDescription>
+        <Card className="2xl:sticky top-20 w-full h-min mx-auto max-w-4xl 2xl:mx-0 2xl:max-w-xl">
+          <CardHeader>
+            <CardTitle className="font-medium">Add new medicine</CardTitle>
+            <CardDescription>
+              Add a new medicine with type and optional instructions.
+            </CardDescription>
           </CardHeader>
-          <CardContent className="py-4 px-3 md:px-8">
+          <CardContent>
             <form onSubmit={submitHandler} autoComplete="off">
               <fieldset
                 disabled={addLoader}
-                className="w-full rounded-lg grid grid-cols-6 gap-1 md:gap-4"
+                className="w-full rounded-lg grid grid-cols-6 gap-4"
               >
-                <div className="col-span-6 sm:col-span-3 2xl:col-span-6">
-                  <label
-                    htmlFor="medicineName"
-                    className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-                  >
-                    Medicine Name
-                  </label>
-                  <input
-                    className="h-min mt-1 form-input w-full block bg-background rounded-md border-border py-1.5 shadow-sm placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                    name="medicineName"
+                {/* Medicine Name */}
+                <div className="col-span-6 sm:col-span-3 2xl:col-span-6 space-y-2">
+                  <Label htmlFor="medicineName">Medicine Name</Label>
+                  <Input
                     id="medicineName"
+                    name="medicineName"
                     placeholder="Medicine name.."
                     required
                   />
                 </div>
 
-                <div className="col-span-6 sm:col-span-3 2xl:col-span-6">
-                  <label
-                    htmlFor="type"
-                    className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-                  >
-                    Type
-                  </label>
-                  <select
-                    name="type"
-                    id="type"
-                    defaultValue={""}
-                    className="h-min mt-1 form-select w-full border-border rounded-md py-1.5 placeholder:text-gray-400 shadow-sm bg-background focus:ring-1 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                  >
-                    {medicineTypes.map((type, index) => (
-                      <option key={index} value={type.value}>
-                        {type.label}
-                      </option>
-                    ))}
-                  </select>
+                {/* Medicine Type */}
+                <div className="col-span-6 sm:col-span-3 2xl:col-span-6 space-y-2">
+                  <Label htmlFor="type">Type</Label>
+                  <Select name="type" defaultValue={defaultType}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select type..." />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-96">
+                      {options.map((type, index) => (
+                        <SelectItem key={index} value={type.value}>
+                          {type.value}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
-                <div className="col-span-6">
-                  <label
-                    htmlFor="instruction"
-                    className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-                  >
-                    Instruction
-                  </label>
-                  <input
-                    className="h-min mt-1 form-input w-full block bg-background rounded-md border-border py-1.5 shadow-sm placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                    name="instruction"
+                {/* Instruction */}
+                <div className="col-span-6 space-y-2">
+                  <Label htmlFor="instruction">Instruction</Label>
+                  <Input
                     id="instruction"
+                    name="instruction"
                     placeholder="Instruction.."
                   />
                 </div>
 
+                {/* Submit */}
                 <Separator className="w-full col-span-6" />
                 <div className="flex col-span-6 w-full items-center justify-end">
                   <Button
                     tabIndex={0}
                     role="button"
-                    variant={"outline"}
-                    className="text-sm gap-2 px-6"
                     type="submit"
+                    icon={CirclePlus}
+                    iconPlacement="right"
+                    effect={"ringHover"}
+                    loading={addLoader}
+                    loadingText="Adding"
                   >
-                    <CirclePlus width={20} height={20} /> Add
+                    Add
                   </Button>
                 </div>
               </fieldset>
@@ -250,58 +335,122 @@ export default function SettingsMedicineInfoPage() {
         </Card>
 
         <div className="flex flex-col mt-2 sm:mt-5 2xl:mt-0 mx-auto 2xl:mx-0 max-w-4xl gap-2 w-full">
-          <div className="relative w-full md:w-3/4">
-            <div className="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
-              <svg
-                className="w-5 h-5 text-gray-500"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-                xmlns="http://www.w3.org/2000/svg"
+          {/* CSV Import/Export Controls */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="font-medium">Medicine Management</CardTitle>
+              <CardDescription>
+                Import and export medicine data using CSV files
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-wrap gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  handleExportCSV();
+                }}
+                disabled={!medicines || medicines.length === 0}
+                className="gap-2"
               >
-                <path
-                  fillRule="evenodd"
-                  clipRule="evenodd"
-                  d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                ></path>
-              </svg>
-            </div>
-            <div className="flex items-center gap-1">
-              <input
-                type="text"
-                id="searchMedicine"
-                placeholder="Search by medicine name.."
-                value={searchMedicine}
-                onChange={handleFilterChange}
-                className="form-input bg-transparent border border-border text-sm rounded-lg block w-full pl-10"
+                <Download className="h-4 w-4" />
+                <p className="hidden sm:block">Export CSV</p>
+              </Button>
+              <MedicineImportCSV
+                medicines={medicines}
+                setmedicines={setmedicines}
               />
-            </div>
-          </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleDownloadSample}
+                className="gap-2 mr-0 ml-auto"
+              >
+                <FileText className="h-4 w-4" />
+                <p className="hidden sm:block">Download Sample</p>
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Advanced Filters */}
+          <AdvancedFilters
+            medicines={medicines || []}
+            filters={filters}
+            onFiltersChange={setFilters}
+          />
+
+          {/* Bulk Operations */}
+          {medicines && medicines.length > 0 && (
+            <BulkOperations
+              medicines={filteredMedicines}
+              selectedMedicines={selectedMedicines}
+              onSelectionChange={setSelectedMedicines}
+              onBulkStatusChange={handleBulkStatusChange}
+            />
+          )}
 
           {/* diaplay medicine */}
-          <div className="w-full flex flex-col flex-1 bg-sidebar/70 border rounded-md">
+          <div className="w-full bg-card flex flex-col flex-1 border rounded-md">
             {medicines === null ? (
-              <div className="flex flex-1 items-center justify-center min-h-72 w-full">
-                <Loader size="medium" />
+              <div className="w-full divide-y rounded-md overflow-hidden">
+                {[...Array(5)].map((_, i) => (
+                  <div
+                    key={i}
+                    className={`grid grid-cols-12 gap-1 w-full p-2 sm:p-4 ${
+                      i !== 0 ? "border-t" : "border-0"
+                    }`}
+                  >
+                    <div className="col-span-1 flex justify-start items-center">
+                      <Skeleton className="size-4 rounded-sm" />
+                    </div>
+
+                    <div className="col-span-3 h-auto flex flex-col justify-start items-start">
+                      <Skeleton className="w-32 h-4" />
+                      <Skeleton className="w-16 h-3 mt-1" />
+                    </div>
+
+                    <div className="col-span-2">
+                      <Skeleton className="w-14 h-5" />
+                    </div>
+
+                    <div className="col-span-5 h-auto flex flex-col justify-start items-start">
+                      <Skeleton className="w-32 h-4" />
+                      <Skeleton className="w-16 h-3 mt-1" />
+                    </div>
+
+                    <div className="col-span-1 flex justify-center items-center">
+                      <Skeleton className="size-9" />
+                    </div>
+                  </div>
+                ))}
               </div>
-            ) : filteredMedicine(medicines).length === 0 ? (
+            ) : filteredMedicines.length === 0 ? (
               <div className="flex flex-1 items-center justify-center text-muted-foreground min-h-72">
                 No medicine data available
               </div>
             ) : (
               <>
-                {filteredMedicine(medicines).map(
-                  (medicine: Medicine, index: number) => {
-                    return (
-                      <MedicineRow
-                        key={index}
-                        index={index}
-                        medicine={medicine}
-                        setMedicineEditModel={setMedicineEditModel}
-                        setEditForMedicineId={setEditForMedicineId}
-                      />
-                    );
-                  }
-                )}
+                {filteredMedicines.map((medicine: Medicine, index: number) => {
+                  return (
+                    <MedicineRow
+                      key={index}
+                      index={index}
+                      medicine={medicine}
+                      setMedicineEditModel={setMedicineEditModel}
+                      setEditForMedicineId={setEditForMedicineId}
+                      isSelected={selectedMedicines.has(medicine.id)}
+                      onSelectionChange={(selected) => {
+                        const newSelection = new Set(selectedMedicines);
+                        if (selected) {
+                          newSelection.add(medicine.id);
+                        } else {
+                          newSelection.delete(medicine.id);
+                        }
+                        setSelectedMedicines(newSelection);
+                      }}
+                    />
+                  );
+                })}
               </>
             )}
           </div>
@@ -328,6 +477,14 @@ const EditMedicineDataModel: React.FC<EditMedicineDataModel> = ({
 }) => {
   const { orgId } = useAuth();
   const [updateLoader, setUpdateLoader] = useState(false);
+  const { organization, isLoaded } = useOrganization();
+
+  const options =
+    isLoaded &&
+    organization &&
+    Array.isArray(organization.publicMetadata.medicine_types)
+      ? (organization.publicMetadata.medicine_types as Medicine_Types[])
+      : [];
 
   const submitHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -432,7 +589,7 @@ const EditMedicineDataModel: React.FC<EditMedicineDataModel> = ({
     <Dialog open={medicineEditModel} onOpenChange={setMedicineEditModel}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>
+          <DialogTitle className="font-medium">
             {
               medicines?.find((medicine) => medicine.id === editForMedicineId)
                 ?.medicineName
@@ -444,17 +601,11 @@ const EditMedicineDataModel: React.FC<EditMedicineDataModel> = ({
         <form onSubmit={submitHandler} autoComplete="off">
           <fieldset
             disabled={updateLoader}
-            className="w-full rounded-lg grid grid-cols-6 gap-1 md:gap-4"
+            className="w-full rounded-lg grid grid-cols-6 gap-4"
           >
-            <div className="col-span-6">
-              <label
-                htmlFor="medicineName"
-                className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-              >
-                Medicine Name
-              </label>
-              <input
-                className="h-min mt-1 form-input w-full block bg-background rounded-md border-border py-1.5 shadow-sm placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+            <div className="col-span-6 space-y-2">
+              <Label htmlFor="medicineName">Medicine Name</Label>
+              <Input
                 name="medicineName"
                 id="medicineName"
                 placeholder="Medicine Name.."
@@ -466,39 +617,31 @@ const EditMedicineDataModel: React.FC<EditMedicineDataModel> = ({
                 required
               />
             </div>
-            <div className="col-span-6">
-              <label
-                htmlFor="type"
-                className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-              >
-                Type
-              </label>
-              <select
+            <div className="col-span-6 space-y-2">
+              <Label htmlFor="type">Type</Label>
+              <Select
                 name="type"
-                id="type"
                 defaultValue={
                   medicines?.find(
                     (medicine) => medicine.id === editForMedicineId
                   )?.type
                 }
-                className="h-min mt-1 form-select w-full border-border rounded-md py-1.5 placeholder:text-gray-400 shadow-sm bg-background focus:ring-1 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
               >
-                {medicineTypes.map((type, index) => (
-                  <option key={index} value={type.value}>
-                    {type.label}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select type..." />
+                </SelectTrigger>
+                <SelectContent className="max-h-96">
+                  {options.map((type, index) => (
+                    <SelectItem key={index} value={type.value}>
+                      {type.value}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-            <div className="col-span-6">
-              <label
-                htmlFor="instruction"
-                className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-              >
-                Instruction
-              </label>
-              <input
-                className="h-min mt-1 form-input w-full block bg-background rounded-md border-border py-1.5 shadow-sm placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+            <div className="col-span-6 space-y-2">
+              <Label htmlFor="instruction">Instruction</Label>
+              <Input
                 name="instruction"
                 id="instruction"
                 placeholder="Instruction..."
@@ -529,8 +672,8 @@ const EditMedicineDataModel: React.FC<EditMedicineDataModel> = ({
                     medicines?.find(
                       (medicine) => medicine.id === editForMedicineId
                     )?.active ?? true
-                      ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                      : "bg-destructive text-destructive-foreground hover:bg-destructive/90 "
+                      ? "!bg-primary !text-primary-foreground !hover:bg-primary/90"
+                      : "!bg-destructive !text-destructive-foreground hover:!bg-destructive/90"
                   }`}
                 >
                   <SelectValue placeholder="Status" />
@@ -547,9 +690,11 @@ const EditMedicineDataModel: React.FC<EditMedicineDataModel> = ({
               <Button
                 tabIndex={0}
                 role="button"
-                variant={"outline"}
-                className="text-sm gap-2 px-6"
                 type="submit"
+                icon={SaveIcon}
+                iconPlacement="right"
+                loading={updateLoader}
+                loadingText={"Updating"}
               >
                 Update
               </Button>

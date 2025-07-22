@@ -1,55 +1,16 @@
-"use client";
-import { useEffect, useState } from "react";
-import SubscriptionInfo from "@/components/Settings/SubscriptionInfo";
-import { useAuth, useUser } from "@clerk/nextjs";
+import BillActivity from "@/components/Settings/SubscriptionInfo/BillActivity";
+import SubscriptionDetails from "@/components/Settings/SubscriptionInfo/SubscriptionDetails";
 
-interface DoctorInfo {
-  clinicName: string;
-  doctorName: string;
-  degree: string;
-  registrationNumber: string;
-  clinicNumber: string;
-  phoneNumber: string;
-  emailId: string;
-  clinicAddress: string;
-  clinicLogo: string;
-  signaturePhoto: string;
-  subscriptionId: string;
-}
-
-export default function SettingsSubscriptionPage() {
-  const { user, isLoaded } = useUser();
-  const { orgId } = useAuth();
-
-  const [mainLoader, setmainLoader] = useState(false);
-  const [doctorData, setdoctorData] = useState<DoctorInfo>({
-    clinicName: "",
-    doctorName: "",
-    degree: "",
-    registrationNumber: "",
-    clinicNumber: "",
-    phoneNumber: "",
-    emailId: user?.emailAddresses[0]?.emailAddress || "",
-    clinicAddress: "",
-    clinicLogo: "",
-    signaturePhoto: "",
-    subscriptionId: "",
-  });
-  useEffect(() => {
-    const setDocotrData = async () => {
-      if (isLoaded && orgId) {
-        setmainLoader(true);
-        setmainLoader(false);
-      } else {
-        setmainLoader(false);
-      }
-    };
-    setDocotrData();
-  }, [isLoaded, orgId]);
-
+export default function UserBilling() {
   return (
     <div className="w-full py-2 sm:py-5 px-2 md:px-5 2xl:flex 2xl:flex-row 2xl:gap-5 2xl:justify-center">
-      <SubscriptionInfo subId={""} mainLoader={mainLoader} />
+      <div className="h-min w-full mx-auto max-w-4xl 2xl:mx-0 2xl:max-w-xl">
+        <SubscriptionDetails />
+      </div>
+
+      <div className="flex flex-col mt-2 sm:mt-5 2xl:mt-0 mx-auto 2xl:mx-0 max-w-4xl gap-2 w-full">
+        <BillActivity />
+      </div>
     </div>
   );
 }

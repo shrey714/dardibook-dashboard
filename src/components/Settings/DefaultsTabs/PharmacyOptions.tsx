@@ -1,9 +1,14 @@
 "use client";
 
 import React, { FormEvent, useEffect, useState } from "react";
-import { CirclePlus, InboxIcon, Pencil, SaveIcon } from "lucide-react";
+import {
+  CirclePlus,
+  InboxIcon,
+  Pencil,
+  SaveIcon,
+  Trash2Icon,
+} from "lucide-react";
 import uniqid from "uniqid";
-import Loader from "@/components/common/Loader";
 import toast from "react-hot-toast";
 import {
   Card,
@@ -35,6 +40,16 @@ import {
   updateBillDefaults,
   updateServicesDefaults,
 } from "@/app/dashboard/settings/defaults/_actions";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Spinner } from "@/components/ui/spinner";
 
 interface ServiceItems {
   service_id: string;
@@ -53,7 +68,6 @@ export const PharmacyOptions = () => {
   return (
     <>
       <BillDefaults />
-      <Separator className="my-3" />
       <ServicesUpdateModal />
     </>
   );
@@ -61,7 +75,7 @@ export const PharmacyOptions = () => {
 
 const BillDefaults = () => {
   const [updateLoader, setUpdateLoader] = useState(false);
-  const { organization, isLoaded } = useOrganization();
+  const { organization } = useOrganization();
 
   const billDefaults = organization?.publicMetadata?.bill_defaults as
     | BillDefaultsType
@@ -112,28 +126,22 @@ const BillDefaults = () => {
   };
 
   return (
-    <Card className="bg-sidebar/70 w-full shadow-none border h-min mx-auto">
-      <CardHeader className="border-b p-4">
-        <CardTitle className="font-normal text-muted-foreground">
-          Bill Defaults
-        </CardTitle>
-        <CardDescription hidden></CardDescription>
+    <Card className="w-full h-min mx-auto">
+      <CardHeader>
+        <CardTitle className="font-medium">Bill Defaults</CardTitle>
+        <CardDescription>
+          Set default values for discount, tax, payment status, and method.
+        </CardDescription>
       </CardHeader>
-      <CardContent className="py-4 px-3 md:px-8">
+      <CardContent>
         <form onSubmit={updateDefaults} autoComplete="off">
           <fieldset
             disabled={updateLoader}
-            className="w-full rounded-lg grid grid-cols-6 gap-1 md:gap-4"
+            className="w-full grid grid-cols-6 gap-4"
           >
-            <div className="col-span-6 sm:col-span-3">
-              <label
-                htmlFor="discount"
-                className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-              >
-                Discount (%)
-              </label>
-              <input
-                className="h-min mt-1 form-input w-full block bg-background rounded-md border-border py-1.5 shadow-sm placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+            <div className="col-span-6 sm:col-span-3 space-y-2">
+              <Label htmlFor="discount">Discount (%)</Label>
+              <Input
                 name="discount"
                 id="discount"
                 placeholder="e.g., 10"
@@ -143,15 +151,9 @@ const BillDefaults = () => {
               />
             </div>
 
-            <div className="col-span-6 sm:col-span-3">
-              <label
-                htmlFor="tax"
-                className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-              >
-                Tax (%)
-              </label>
-              <input
-                className="h-min mt-1 form-input w-full block bg-background rounded-md border-border py-1.5 shadow-sm placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+            <div className="col-span-6 sm:col-span-3 space-y-2">
+              <Label htmlFor="tax">Tax (%)</Label>
+              <Input
                 name="tax"
                 id="tax"
                 placeholder="e.g., 13"
@@ -161,46 +163,42 @@ const BillDefaults = () => {
               />
             </div>
 
-            <div className="col-span-6 sm:col-span-3">
-              <label
-                className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-                htmlFor="payment_status"
-              >
-                Payment Status
-              </label>
-              <select
+            <div className="col-span-6 sm:col-span-3 space-y-2">
+              <Label htmlFor="payment_status">Payment Status</Label>
+              <Select
                 required
-                id="payment_status"
                 name="payment_status"
                 defaultValue={payment_status}
-                className="h-min mt-1 form-select disabled:opacity-100 w-full block bg-background rounded-md border-border py-1.5 shadow-sm placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
               >
-                <option value="Paid">Paid</option>
-                <option value="Unpaid">Unpaid</option>
-                <option value="Not Required">Not Required</option>
-                <option value="Refunded">Refunded</option>
-              </select>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select status..." />
+                </SelectTrigger>
+                <SelectContent className="max-h-96">
+                  <SelectItem value="Paid">Paid</SelectItem>
+                  <SelectItem value="Unpaid">Unpaid</SelectItem>
+                  <SelectItem value="Not Required">Not Required</SelectItem>
+                  <SelectItem value="Refunded">Refunded</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
-            <div className="col-span-6 sm:col-span-3">
-              <label
-                className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-                htmlFor="payment_method"
-              >
-                Payment Method
-              </label>
-              <select
+            <div className="col-span-6 sm:col-span-3 space-y-2">
+              <Label htmlFor="payment_method">Payment Method</Label>
+              <Select
                 required
-                id="payment_method"
                 name="payment_method"
                 defaultValue={payment_method}
-                className="h-min mt-1 form-select disabled:opacity-100 w-full block bg-background rounded-md border-border py-1.5 shadow-sm placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
               >
-                <option value="Cash">Cash</option>
-                <option value="Card">Card</option>
-                <option value="UPI">UPI</option>
-                <option value="Online">Online</option>
-              </select>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select status..." />
+                </SelectTrigger>
+                <SelectContent className="max-h-96">
+                  <SelectItem value="Cash">Cash</SelectItem>
+                  <SelectItem value="Card">Card</SelectItem>
+                  <SelectItem value="UPI">UPI</SelectItem>
+                  <SelectItem value="Online">Online</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <Separator className="w-full col-span-6" />
@@ -208,11 +206,14 @@ const BillDefaults = () => {
               <Button
                 tabIndex={0}
                 role="button"
-                variant={"outline"}
-                className="text-sm gap-2 px-6"
                 type="submit"
+                effect={"ringHover"}
+                icon={SaveIcon}
+                iconPlacement="right"
+                loading={updateLoader}
+                loadingText="Saving"
               >
-                <SaveIcon width={20} height={20} /> Save
+                Save
               </Button>
             </div>
           </fieldset>
@@ -227,6 +228,8 @@ const ServicesUpdateModal = () => {
   const { organization, isLoaded } = useOrganization();
   const [services, setServices] = useState<ServiceItems[]>([]);
   const [addLoader, setAddLoader] = useState(false);
+  const [updateLoader, setUpdateLoader] = useState(false);
+  const [deleteLoader, setDeleteLoader] = useState(false);
   const [serviceEditModel, setServiceEditModel] = useState<boolean>(false);
   const [editForServiceId, setEditForServiceId] = useState<string>("");
 
@@ -241,6 +244,7 @@ const ServicesUpdateModal = () => {
   // --------------add new receipt type-----------
   const AddNewType = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!organization) return;
     setAddLoader(true);
     const form = e.target as HTMLFormElement;
     const newService: ServiceItems = {
@@ -248,7 +252,6 @@ const ServicesUpdateModal = () => {
       service_name: form.service_name.value.trim(),
       price: parseInt(form.price.value.trim()),
     };
-    if (!organization) return;
     toast.promise(
       async () => {
         await updateServicesDefaults(services.concat(newService)).then(
@@ -276,14 +279,14 @@ const ServicesUpdateModal = () => {
   // --------------update receipt-----------
   const UpdateType = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setAddLoader(true);
+    if (!organization) return;
     const form = e.target as HTMLFormElement;
     const existingService: ServiceItems = {
       service_id: editForServiceId,
       service_name: form.service_name.value.trim(),
       price: parseInt(form.price.value.trim()),
     };
-    if (!organization) return;
+    setUpdateLoader(true);
     toast.promise(
       async () => {
         await updateServicesDefaults(
@@ -293,12 +296,12 @@ const ServicesUpdateModal = () => {
         ).then(
           () => {
             organization.reload();
-            setAddLoader(false);
+            setUpdateLoader(false);
             setServiceEditModel(false);
           },
           (error) => {
             console.error("Operation failed. Please try again : ", error);
-            setAddLoader(false);
+            setUpdateLoader(false);
           }
         );
       },
@@ -314,8 +317,8 @@ const ServicesUpdateModal = () => {
   };
   // --------------delete receipt-----------
   const DeleteType = async () => {
-    setAddLoader(true);
     if (!organization) return;
+    setDeleteLoader(true);
     toast.promise(
       async () => {
         await updateServicesDefaults(
@@ -323,12 +326,12 @@ const ServicesUpdateModal = () => {
         ).then(
           () => {
             organization.reload();
-            setAddLoader(false);
+            setDeleteLoader(false);
             setServiceEditModel(false);
           },
           (error) => {
             console.error("Operation failed. Please try again : ", error);
-            setAddLoader(false);
+            setDeleteLoader(false);
           }
         );
       },
@@ -347,7 +350,7 @@ const ServicesUpdateModal = () => {
       <Dialog open={serviceEditModel} onOpenChange={setServiceEditModel}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>Edit Service</DialogTitle>
+            <DialogTitle className="font-medium">Edit Service</DialogTitle>
             <DialogDescription>
               Modify details for{" "}
               {
@@ -359,18 +362,12 @@ const ServicesUpdateModal = () => {
           </DialogHeader>
           <form onSubmit={UpdateType} autoComplete="off">
             <fieldset
-              disabled={addLoader}
-              className="w-full rounded-lg grid grid-cols-6 gap-1 md:gap-4"
+              disabled={updateLoader || deleteLoader}
+              className="w-full rounded-lg grid grid-cols-6 gap-4"
             >
-              <div className="col-span-6">
-                <label
-                  htmlFor="service_name"
-                  className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-                >
-                  Service Name
-                </label>
-                <input
-                  className="h-min mt-1 form-input w-full block bg-background rounded-md border-border py-1.5 shadow-sm placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              <div className="col-span-6 space-y-2">
+                <Label htmlFor="service_name">Service Name</Label>
+                <Input
                   name="service_name"
                   id="service_name"
                   placeholder="e.g., Health Screenings"
@@ -382,15 +379,9 @@ const ServicesUpdateModal = () => {
                   }
                 />
               </div>
-              <div className="col-span-6">
-                <label
-                  htmlFor="price"
-                  className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-                >
-                  Price (₹)
-                </label>
-                <input
-                  className="h-min mt-1 form-input w-full block bg-background rounded-md border-border py-1.5 shadow-sm placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              <div className="col-span-6 space-y-2">
+                <Label htmlFor="price">Price (₹)</Label>
+                <Input
                   name="price"
                   id="price"
                   placeholder="e.g., 500"
@@ -409,9 +400,12 @@ const ServicesUpdateModal = () => {
                 <Button
                   role="button"
                   variant={"destructive"}
-                  className="text-sm gap-2 px-6"
                   type="button"
                   onClick={DeleteType}
+                  icon={Trash2Icon}
+                  iconPlacement="right"
+                  loading={deleteLoader}
+                  loadingText={"Deleting"}
                 >
                   Delete
                 </Button>
@@ -419,8 +413,11 @@ const ServicesUpdateModal = () => {
                   tabIndex={0}
                   role="button"
                   variant={"outline"}
-                  className="text-sm gap-2 px-6"
                   type="submit"
+                  icon={SaveIcon}
+                  iconPlacement="right"
+                  loading={updateLoader}
+                  loadingText={"Updating"}
                 >
                   Update
                 </Button>
@@ -430,28 +427,22 @@ const ServicesUpdateModal = () => {
         </DialogContent>
       </Dialog>
 
-      <Card className="border border-b-0 rounded-b-none bg-sidebar/70 w-full shadow-none h-min mx-auto">
-        <CardHeader className="border-b p-4">
-          <CardTitle className="font-normal text-muted-foreground">
-            Add New Service
-          </CardTitle>
-          <CardDescription hidden></CardDescription>
+      <Card className="border-b-0 rounded-b-none w-full h-min mx-auto mt-2 md:mt-5">
+        <CardHeader>
+          <CardTitle className="font-medium">Add New Service</CardTitle>
+          <CardDescription>
+            Add new medical services with their corresponding prices.
+          </CardDescription>
         </CardHeader>
-        <CardContent className="py-4 px-3 md:px-8">
+        <CardContent>
           <form onSubmit={AddNewType} autoComplete="off">
             <fieldset
               disabled={addLoader}
-              className="w-full rounded-lg grid grid-cols-6 gap-1 md:gap-4"
+              className="w-full grid grid-cols-6 gap-4"
             >
-              <div className="col-span-6 sm:col-span-3">
-                <label
-                  htmlFor="service_name"
-                  className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-                >
-                  Service Name
-                </label>
-                <input
-                  className="h-min mt-1 form-input w-full block bg-background rounded-md border-border py-1.5 shadow-sm placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              <div className="col-span-6 sm:col-span-3 space-y-2">
+                <Label htmlFor="service_name">Service Name</Label>
+                <Input
                   name="service_name"
                   id="service_name"
                   placeholder="e.g., Health Screenings"
@@ -459,15 +450,9 @@ const ServicesUpdateModal = () => {
                 />
               </div>
 
-              <div className="col-span-6 sm:col-span-3">
-                <label
-                  htmlFor="price"
-                  className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-                >
-                  Price (₹)
-                </label>
-                <input
-                  className="h-min mt-1 form-input w-full block bg-background rounded-md border-border py-1.5 shadow-sm placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              <div className="col-span-6 sm:col-span-3 space-y-2">
+                <Label htmlFor="price">Price (₹)</Label>
+                <Input
                   name="price"
                   id="price"
                   placeholder="e.g., 500"
@@ -481,21 +466,24 @@ const ServicesUpdateModal = () => {
                 <Button
                   tabIndex={0}
                   role="button"
-                  variant={"outline"}
-                  className="text-sm gap-2 px-6"
                   type="submit"
+                  effect={"ringHover"}
+                  icon={CirclePlus}
+                  iconPlacement="right"
+                  loading={addLoader}
+                  loadingText="Adding"
                 >
-                  <CirclePlus width={20} height={20} /> Add
+                  Add
                 </Button>
               </div>
             </fieldset>
           </form>
         </CardContent>
       </Card>
-      <div className="rounded-t-none w-full flex flex-col flex-1 bg-sidebar/70 border rounded-md divide-y">
+      <div className="rounded-t-none w-full flex flex-col flex-1 bg-card border rounded-xl divide-y">
         {!isLoaded ? (
           <div className="flex flex-1 items-center justify-center min-h-72 w-full">
-            <Loader size="medium" />
+            <Spinner size="sm" className="bg-foreground" />
           </div>
         ) : services.length === 0 ? (
           <div className="flex flex-1 items-center justify-center text-muted-foreground min-h-72">
@@ -522,6 +510,7 @@ const ServicesUpdateModal = () => {
                   <TableCell className="text-right pr-6">
                     <Button
                       variant={"outline"}
+                      effect={"ringHover"}
                       className={`h-9 w-9 min-w-0`}
                       onClick={() => {
                         setServiceEditModel(true);

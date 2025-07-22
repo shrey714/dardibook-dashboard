@@ -21,6 +21,11 @@ interface BedDefaultsType {
   ward: string;
 }
 
+interface Medicine_Types {
+  value: string;
+  isDefault?: boolean;
+}
+
 export const updatePrescriptionReceiptDefaults = async (formdata: ReceiptDetails[]) => {
   const client = await clerkClient()
   const { orgId } = await auth()
@@ -104,6 +109,24 @@ export const updateBedDefaults = async (formdata: BedDefaultsType[]) => {
   try {
     await client.organizations.updateOrganizationMetadata(orgId, {
       publicMetadata: { beds: formdata },
+    })
+    return { message: 'Organization metadata updated successfully.' }
+  } catch (e) {
+    return { message: `Failed to update organization metadata: ${e}` }
+  }
+}
+
+export const updateMedicineTypesDefaults = async (formdata: Medicine_Types[]) => {
+  const client = await clerkClient()
+  const { orgId } = await auth()
+
+  if (!orgId) {
+    return { message: 'Organization ID is missing.' }
+  }
+
+  try {
+    await client.organizations.updateOrganizationMetadata(orgId, {
+      publicMetadata: { medicine_types: formdata },
     })
     return { message: 'Organization metadata updated successfully.' }
   } catch (e) {

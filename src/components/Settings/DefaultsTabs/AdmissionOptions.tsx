@@ -1,7 +1,14 @@
 "use client";
 
 import React, { FormEvent, useEffect, useState } from "react";
-import { AlertTriangle, Bed, CirclePlus, InboxIcon } from "lucide-react";
+import {
+  AlertTriangle,
+  Bed,
+  CirclePlus,
+  InboxIcon,
+  SaveIcon,
+  Trash2Icon,
+} from "lucide-react";
 import toast from "react-hot-toast";
 import {
   Card,
@@ -25,6 +32,8 @@ import { updateBedDefaults } from "@/app/dashboard/settings/defaults/_actions";
 import { useBedsStore } from "@/lib/stores/useBedsStore";
 import { Skeleton } from "@/components/ui/skeleton";
 import CreatableSelect from "react-select/creatable";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
 interface BedDefaultsType {
   bed_id: string;
@@ -36,6 +45,8 @@ export const AdmissionOptions = () => {
   const { organization, isLoaded } = useOrganization();
   const [clerkBeds, setClerkBeds] = useState<BedDefaultsType[]>([]);
   const [addLoader, setAddLoader] = useState(false);
+  const [updateLoader, setUpdateLoader] = useState(false);
+  const [deleteLoader, setDeleteLoader] = useState(false);
   const [bedEditModel, setBedEditModel] = useState<boolean>(false);
   const [editForBedId, setEditForBedId] = useState<string>("");
   const { beds, loading } = useBedsStore((state) => state);
@@ -107,7 +118,7 @@ export const AdmissionOptions = () => {
       ward: form.ward.value.trim(),
     };
 
-    setAddLoader(true);
+    setUpdateLoader(true);
     toast.promise(
       async () => {
         await updateBedDefaults(
@@ -117,12 +128,12 @@ export const AdmissionOptions = () => {
         ).then(
           () => {
             organization.reload();
-            setAddLoader(false);
+            setUpdateLoader(false);
             setBedEditModel(false);
           },
           (error) => {
             console.error("Operation failed. Please try again : ", error);
-            setAddLoader(false);
+            setUpdateLoader(false);
           }
         );
       },
@@ -138,7 +149,7 @@ export const AdmissionOptions = () => {
   };
   // --------------delete receipt-----------
   const DeleteBed = async () => {
-    setAddLoader(true);
+    setDeleteLoader(true);
     if (!organization) return;
     toast.promise(
       async () => {
@@ -147,12 +158,12 @@ export const AdmissionOptions = () => {
         ).then(
           () => {
             organization.reload();
-            setAddLoader(false);
+            setDeleteLoader(false);
             setBedEditModel(false);
           },
           (error) => {
             console.error("Operation failed. Please try again : ", error);
-            setAddLoader(false);
+            setDeleteLoader(false);
           }
         );
       },
@@ -169,8 +180,8 @@ export const AdmissionOptions = () => {
 
   const getStatusColor = (status: string) => {
     return status === "occupied"
-      ? "bg-red-500/20 text-red-600 hover:text-primary hover:bg-red-500/40"
-      : "bg-green-500/20 text-green-600 hover:text-primary hover:bg-green-500/40";
+      ? "bg-red-500/20 text-red-600 hover:text-accent-foreground hover:bg-red-500/40"
+      : "bg-green-500/20 text-green-600 hover:text-accent-foreground hover:bg-green-500/40";
   };
 
   const getBedStatus = (bed_id: string) => {
@@ -194,7 +205,7 @@ export const AdmissionOptions = () => {
       <Dialog open={bedEditModel} onOpenChange={setBedEditModel}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>Edit Bed</DialogTitle>
+            <DialogTitle className="font-medium">Edit Bed</DialogTitle>
             <DialogDescription>
               Modify details for{" "}
               {
@@ -205,21 +216,16 @@ export const AdmissionOptions = () => {
           </DialogHeader>
           <form onSubmit={UpdateBed} autoComplete="off">
             <fieldset
-              disabled={addLoader}
-              className="w-full rounded-lg space-y-1 md:space-y-4"
+              disabled={updateLoader || deleteLoader}
+              className="w-full rounded-lg space-y-4"
             >
-              <div className="w-full">
-                <label
-                  htmlFor="ward"
-                  className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-                >
-                  Ward
-                </label>
+              <div className="w-full space-y-2">
+                <Label htmlFor="ward">Ward</Label>
 
                 <CreatableSelect
                   name="ward"
                   id="ward"
-                  className="h-min mt-1 w-full block bg-background"
+                  className="h-min w-full block bg-transparent"
                   backspaceRemovesValue={true}
                   defaultValue={{
                     label: clerkBeds?.find(
@@ -245,15 +251,15 @@ export const AdmissionOptions = () => {
                   required
                   classNames={{
                     control: (state) =>
-                      `!shadow-sm !transition-all !duration-900 !rounded-md !bg-transparent ${
+                      `!shadow-sm !transition-all !duration-900 !rounded-md !h-9 !min-h-9 !bg-transparent dark:!bg-input/30 ${
                         state.isFocused
-                          ? "!ring-blue-500 !ring-1"
+                          ? "!border-ring !ring-ring/50 !ring-[3px]"
                           : "!border-border"
                       }`,
                     placeholder: () =>
-                      "!truncate !text-sm sm:!text-base !px-4 !text-gray-400",
+                      "!truncate !text-sm sm:!text-base !px-4 !text-muted-foreground",
                     singleValue: () => "!text-primary !px-4",
-                    input: () => "!text-primary !px-4",
+                    input: () => "!text-inherit !px-4",
                     menu: () =>
                       `!border-border !overflow-hidden !shadow-md !text-black !w-full !bg-popover !border !text-primary`,
                     menuList: () => "!py-1 md:!py-2",
@@ -272,10 +278,13 @@ export const AdmissionOptions = () => {
                 <Button
                   role="button"
                   variant={"destructive"}
-                  className="text-sm gap-2 px-6"
                   type="button"
                   disabled={!!beds.find((bed) => bed.bedId === editForBedId)}
                   onClick={DeleteBed}
+                  icon={Trash2Icon}
+                  iconPlacement="right"
+                  loading={deleteLoader}
+                  loadingText={"Deleting"}
                 >
                   Delete
                 </Button>
@@ -283,8 +292,11 @@ export const AdmissionOptions = () => {
                   tabIndex={0}
                   role="button"
                   variant={"outline"}
-                  className="text-sm gap-2 px-6"
                   type="submit"
+                  icon={SaveIcon}
+                  iconPlacement="right"
+                  loading={updateLoader}
+                  loadingText={"Updating"}
                 >
                   Update
                 </Button>
@@ -329,30 +341,22 @@ export const AdmissionOptions = () => {
         </DialogContent>
       </Dialog>
 
-      <Card className="border border-b-0 rounded-b-none bg-sidebar/70 w-full shadow-none h-min mx-auto">
-        <CardHeader className="border-b p-4">
-          <CardTitle className="font-normal text-muted-foreground">
-            Add New Bed
-          </CardTitle>
-          <CardDescription className="text-xs text-muted-foreground/80">
+      <Card className="border-b-0 rounded-b-none w-full h-min mx-auto">
+        <CardHeader>
+          <CardTitle className="font-medium">Add New Bed</CardTitle>
+          <CardDescription>
             Add, edit and remove beds with ward assignments
           </CardDescription>
         </CardHeader>
-        <CardContent className="py-4 px-3 md:px-8">
+        <CardContent>
           <form onSubmit={AddNewBed} autoComplete="off">
             <fieldset
               disabled={addLoader}
-              className="w-full rounded-lg grid grid-cols-6 gap-1 md:gap-4"
+              className="w-full rounded-lg grid grid-cols-6 gap-4"
             >
-              <div className="col-span-6 sm:col-span-3">
-                <label
-                  htmlFor="bed_id"
-                  className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-                >
-                  Bed Number/ID
-                </label>
-                <input
-                  className="h-min mt-1 form-input w-full block bg-background rounded-md border-border py-1.5 shadow-sm placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              <div className="col-span-6 sm:col-span-3 space-y-2">
+                <Label htmlFor="bed_id">Bed Number/ID</Label>
+                <Input
                   name="bed_id"
                   id="bed_id"
                   placeholder="e.g., Bed 01"
@@ -362,17 +366,12 @@ export const AdmissionOptions = () => {
                 />
               </div>
 
-              <div className="col-span-6 sm:col-span-3">
-                <label
-                  htmlFor="ward"
-                  className="text-xs sm:text-sm font-medium leading-3 text-gray-500"
-                >
-                  Ward
-                </label>
+              <div className="col-span-6 sm:col-span-3 space-y-2">
+                <Label htmlFor="ward">Ward</Label>
                 <CreatableSelect
                   name="ward"
                   id="ward"
-                  className="h-min mt-1 w-full block bg-background"
+                  className="h-min w-full block bg-transparent"
                   backspaceRemovesValue={true}
                   options={[
                     ...new Set(clerkBeds.map((clerkBed) => clerkBed.ward)),
@@ -391,15 +390,15 @@ export const AdmissionOptions = () => {
                   autoFocus={false}
                   classNames={{
                     control: (state) =>
-                      `!shadow-sm !transition-all !duration-900 !rounded-md !bg-transparent ${
+                      `!shadow-sm !transition-all !duration-900 !rounded-md !h-9 !min-h-9 !bg-transparent dark:!bg-input/30 ${
                         state.isFocused
-                          ? "!ring-blue-500 !ring-1"
+                          ? "!border-ring !ring-ring/50 !ring-[3px]"
                           : "!border-border"
                       }`,
                     placeholder: () =>
-                      "!truncate !text-sm sm:!text-base !px-4 !text-gray-400",
+                      "!truncate !text-sm sm:!text-base !px-4 !text-muted-foreground",
                     singleValue: () => "!text-primary !px-4",
-                    input: () => "!text-primary !px-4",
+                    input: () => "!text-inherit !px-4",
                     menu: () =>
                       `!border-border !overflow-hidden !shadow-md !text-black !w-full !bg-popover !border !text-primary`,
                     menuList: () => "!py-1 md:!py-2",
@@ -418,18 +417,21 @@ export const AdmissionOptions = () => {
                 <Button
                   tabIndex={0}
                   role="button"
-                  variant={"outline"}
-                  className="text-sm gap-2 px-6"
                   type="submit"
+                  effect={"ringHover"}
+                  icon={CirclePlus}
+                  iconPlacement="right"
+                  loading={addLoader}
+                  loadingText="Adding"
                 >
-                  <CirclePlus width={20} height={20} /> Add
+                  Add
                 </Button>
               </div>
             </fieldset>
           </form>
         </CardContent>
       </Card>
-      <div className="rounded-t-none w-full flex flex-col flex-1 bg-sidebar/70 border border-t-0 rounded-md">
+      <div className="rounded-t-none w-full flex flex-col flex-1 bg-card border border-t-0 rounded-xl">
         {!isLoaded || loading ? (
           <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-8 gap-2 p-2">
             {[...Array(16)].map((_, index) => (

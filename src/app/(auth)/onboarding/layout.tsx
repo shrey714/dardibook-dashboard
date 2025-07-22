@@ -1,6 +1,4 @@
-import { auth } from "@clerk/nextjs/server";
 import { Metadata } from "next";
-import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "DardiBook | Onboarding",
@@ -12,11 +10,5 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // Check if a user has completed onboarding
-  // If yes, redirect them to /dashboard
-  if ((await auth()).sessionClaims?.metadata?.onboardingComplete === true) {
-    redirect("/");
-  }
-
   return <>{children}</>;
 }
