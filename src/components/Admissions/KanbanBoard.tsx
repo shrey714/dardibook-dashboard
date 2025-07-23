@@ -1,4 +1,11 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  FormEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { createPortal } from "react-dom";
 
 import { BoardColumn, BoardContainer } from "./BoardColumn";
@@ -22,8 +29,7 @@ import { useBedsStore } from "@/lib/stores/useBedsStore";
 import toast from "react-hot-toast";
 import { Button } from "../ui/button";
 import BedNavigationHeader from "./BedNavigation";
-import { AlertTriangle, Bed, PlusCircleIcon, X } from "lucide-react";
-import { updateOrgBedMetaData } from "@/app/dashboard/admissions/_actions";
+import { AlertTriangle, Bed, UserPlus, X } from "lucide-react";
 import {
   Dialog,
   DialogClose,
@@ -34,7 +40,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Skeleton } from "../ui/skeleton";
-import { Spinner } from "../ui/spinner";
+import { updateBedDefaults } from "@/app/dashboard/settings/defaults/_actions";
+import AddNewBedBtn from "./AddNewBedDialog";
 
 export type ColumnId = string;
 
@@ -47,46 +54,44 @@ interface DeleteState {
 interface KanbanBoardProps {
   openAddModal: (bedId: string) => void;
   openEditModal: (bookingId: string, bedId: string) => void;
-  refresh: boolean;
   isEditModalOpen: boolean;
   setWasEdited: React.Dispatch<React.SetStateAction<boolean>>;
   wasEdited: boolean;
-  addNewBedHandler: () => Promise<void>;
-  bedAddLoader: boolean;
 }
 
-export const KanbanBoard = ({
+const KanbanBoard = ({
   openAddModal,
   openEditModal,
-  refresh,
   isEditModalOpen,
   setWasEdited,
   wasEdited,
-  addNewBedHandler,
-  bedAddLoader,
 }: KanbanBoardProps) => {
   const { organization, isLoaded } = useOrganization();
   const { beds, bedPatients, loading } = useBedsStore((state) => state);
-  const [columns, setColumns] = useState<BedInfo[]>([]);
   const pickedUpTaskColumn = useRef<ColumnId | null>(null);
-  const columnsId = useMemo(() => columns.map((col) => col.bed_id), [columns]);
   const [tasks, setTasks] = useState<OrgBed[]>([]);
   const [activeTask, setActiveTask] = useState<OrgBed | null>(null);
-  
+
   const [prevTaskState, setPrevTaskState] = useState<{
     task: OrgBed;
     bookingId: string;
   } | null>(null);
-  
+
   const sensors = useSensors(useSensor(MouseSensor), useSensor(TouchSensor));
 
   // Track which booking is currently being edited
-  const [currentEditingBookingId, setCurrentEditingBookingId] = useState<string | null>(null);
+  const [currentEditingBookingId, setCurrentEditingBookingId] = useState<
+    string | null
+  >(null);
 
   useEffect(() => {
     if (isEditModalOpen == false) {
       // Only revert if the task wasn't edited AND it matches the current editing booking
-      if (!wasEdited && prevTaskState && prevTaskState.bookingId === currentEditingBookingId) {
+      if (
+        !wasEdited &&
+        prevTaskState &&
+        prevTaskState.bookingId === currentEditingBookingId
+      ) {
         setTasks((tasks) =>
           tasks.map((t) =>
             t.bedBookingId === prevTaskState.task.bedBookingId
@@ -103,19 +108,18 @@ export const KanbanBoard = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isEditModalOpen]);
 
-  useEffect(() => {
-    const fetchBedMetaData = () => {
-      if (organization && organization.publicMetadata) {
-        const bedMetaData: BedInfo[] =
-          (organization.publicMetadata?.beds as BedInfo[]) || [];
-        setColumns(bedMetaData);
-      }
-    };
-
-    if (isLoaded && organization) {
-      fetchBedMetaData();
-    }
-  }, [isLoaded, organization, refresh]);
+  const columns: BedInfo[] = useMemo(() => {
+    return isLoaded && organization && organization.publicMetadata
+      ? (organization.publicMetadata?.beds as BedInfo[])
+      : [];
+  }, [isLoaded, organization]);
+  const columnsId = useMemo(() => columns.map((col) => col.bed_id), [columns]);
+  const wards = useMemo(() => {
+    return [...new Set(columns.map((bed) => bed.ward))].sort().map((val) => ({
+      label: val,
+      value: val,
+    }));
+  }, [columns]);
 
   useEffect(() => {
     if (!loading) setTasks(structuredClone(beds));
@@ -144,7 +148,7 @@ export const KanbanBoard = ({
   };
 
   const scrollToBooking = (bookingId: string) => {
-    console.log(bookingId)
+    console.log(bookingId);
     const bedElement = document.getElementById(`booking-${bookingId}`);
     if (bedElement) {
       bedElement.scrollIntoView({
@@ -180,10 +184,9 @@ export const KanbanBoard = ({
 
     toast.promise(
       async () => {
-        await updateOrgBedMetaData(updatedBeds).then(
+        await updateBedDefaults(updatedBeds).then(
           () => {
             organization.reload();
-            setColumns(updatedBeds);
             setDeleteState({
               ...deleteState,
               deleteModalOpen: false,
@@ -206,6 +209,64 @@ export const KanbanBoard = ({
       }
     );
   };
+
+  const [bedAddLoader, setBedAddLoader] = useState<boolean>(false);
+  const AddNewBed = useCallback(
+    async (e: FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      if (!organization)
+        return Promise.reject(new Error("No organization found"));
+
+      const form = e.target as HTMLFormElement;
+      const newBed: BedInfo = {
+        bed_id: form.bed_id.value.trim(),
+        ward: form.ward.value.trim(),
+      };
+
+      if (
+        columns.find(
+          (bed) =>
+            bed.bed_id.toLowerCase() === form.bed_id.value.trim().toLowerCase()
+        )
+      ) {
+        toast.error(
+          `Bed with id ${form.bed_id.value.trim().toLowerCase()} already exists`
+        );
+        return Promise.reject(new Error("Bed already exists"));
+      }
+
+      setBedAddLoader(true);
+
+      try {
+        await new Promise((resolve, reject) => {
+          toast
+            .promise(
+              updateBedDefaults(columns.concat(newBed)),
+              {
+                loading: "Adding new bed...",
+                success: "Bed added successfully",
+                error: "Error adding bed",
+              },
+              {
+                position: "bottom-right",
+              }
+            )
+            .then(resolve)
+            .catch(reject);
+        });
+
+        organization.reload();
+        setBedAddLoader(false);
+        form.reset();
+        return Promise.resolve();
+      } catch (error) {
+        console.error("Operation failed. Please try again: ", error);
+        setBedAddLoader(false);
+        return Promise.reject(error);
+      }
+    },
+    [columns, organization]
+  );
 
   const DoNotAllowToDeleteBed = !!beds.find(
     (bed) => bed.bedId === deleteState.bedToDelete
@@ -323,28 +384,20 @@ export const KanbanBoard = ({
         onWarningClick={scrollToBooking}
       />
 
-      <div className="w-[calc(100%-10px)] sm:w-[calc(100%-40px)] max-w-7xl mt-4 justify-self-center flex gap-2">
+      <div className="w-[calc(100%-10px)] sm:w-[calc(100%-40px)] max-w-7xl mt-4 justify-self-center flex items-end justify-end gap-2">
         <Button
-          className="w-1/2 border"
-          type="submit"
-          variant="secondary"
-          onClick={addNewBedHandler}
-        >
-          {bedAddLoader ? (
-            <Spinner className="bg-primary" size={"lg"} />
-          ) : (
-            <>
-              <PlusCircleIcon /> Add New Bed
-            </>
-          )}
-        </Button>
-        <Button
-          className="w-1/2 border"
-          variant="secondary"
+          variant="outline"
           onClick={() => openAddModal("")}
+          icon={UserPlus}
+          iconPlacement="right"
         >
-          <PlusCircleIcon /> Admit New Patient
+          Admit Patient
         </Button>
+        <AddNewBedBtn
+          bedAddLoader={bedAddLoader}
+          addNewBed={AddNewBed}
+          wards={wards}
+        />
       </div>
 
       <div className="w-full min-h-[calc(100%-5rem)] flex flex-col max-w-[2000px] justify-self-center">
@@ -353,7 +406,7 @@ export const KanbanBoard = ({
             {[...Array(10)].map((_, i) => (
               <Skeleton
                 key={i}
-                className="h-[500px] max-h-[500px] rounded-md bg-primary-foreground"
+                className="h-[500px] max-h-[500px] rounded-md"
               />
             ))}
           </div>
@@ -426,7 +479,7 @@ export const KanbanBoard = ({
       // Store the previous task state with its booking ID
       setPrevTaskState({
         task: { ...data.task },
-        bookingId: data.task.bedBookingId
+        bookingId: data.task.bedBookingId,
       });
       return;
     }
@@ -534,3 +587,5 @@ export const KanbanBoard = ({
     }
   }
 };
+
+export default KanbanBoard;
