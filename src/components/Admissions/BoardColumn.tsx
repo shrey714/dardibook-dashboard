@@ -1,9 +1,8 @@
 import { SortableContext, useSortable } from "@dnd-kit/sortable";
-import { useDndContext, type UniqueIdentifier } from "@dnd-kit/core";
+import { type UniqueIdentifier } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 import { Dispatch, SetStateAction, useMemo } from "react";
 import { TaskCard } from "./TaskCard";
-import { cva } from "class-variance-authority";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "@/components/ui/button";
 import { Bed, MapPinIcon, Trash2, UserPlus } from "lucide-react";
@@ -57,7 +56,7 @@ export function BoardColumn({
     return tasks.map((task) => task.bedBookingId);
   }, [tasks]);
 
-  const { setNodeRef, transform, transition, isDragging } = useSortable({
+  const { setNodeRef, transform, transition } = useSortable({
     id: column.bed_id,
     data: {
       type: "Column",
@@ -86,7 +85,7 @@ export function BoardColumn({
       id={`bed-${column.bed_id}`}
       ref={setNodeRef}
       style={style}
-      className={`h-[500px] max-h-[500px] rounded-md bg-primary-foreground flex flex-col flex-shrink-0 snap-center ${
+      className={`h-[500px] max-h-[500px] rounded-md flex flex-col gap-0 py-0 flex-shrink-0 snap-center ${
         isHighlighted
           ? "animate-pulse ring-2 ring-yellow-600 dark:ring-yellow-400 ring-opacity-75"
           : ""

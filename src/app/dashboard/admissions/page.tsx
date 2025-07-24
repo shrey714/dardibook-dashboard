@@ -1,14 +1,10 @@
 "use client";
 import BedAdmissionModal from "@/components/Admissions/BedAdmissionModal";
 import BedEditModal from "@/components/Admissions/BedEditModal";
-import { KanbanBoard } from "@/components/Admissions/KanbanBoard";
+import KanbanBoard from "@/components/Admissions/KanbanBoard";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { useOrganization } from "@clerk/nextjs";
-import uniqid from "uniqid";
-import { BedInfo } from "@/types/FormTypes";
-import { updateOrgBedMetaData } from "./_actions";
 import { DialogDescription } from "@radix-ui/react-dialog";
 import { useSearchParams } from "next/navigation";
 import { useBedsStore } from "@/lib/stores/useBedsStore";
@@ -19,16 +15,14 @@ function Admissions() {
   const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
   const [bedId, setbedId] = useState<string>("");
   const [bookingId, setbookingId] = useState<string>("");
-  const { organization } = useOrganization();
-  const [bedAddLoader, setBedAddLoader] = useState<boolean>(false);
-  const [refresh, setRefresh] = useState<boolean>(false);
   const [wasEdited, setWasEdited] = useState<boolean>(false);
-  const { bedPatients, loading:bpLoading } = useBedsStore((state) => state);
-  const { todayPatients, loading: tpLoading } = useTodayPatientStore((state) => state);
-
+  const { bedPatients, loading: bpLoading } = useBedsStore((state) => state);
+  const { todayPatients, loading: tpLoading } = useTodayPatientStore(
+    (state) => state
+  );
 
   const searchParams = useSearchParams();
-  const patientIdParam = searchParams.get('patientid'); 
+  const patientIdParam = searchParams.get("patientid");
 
   const openAddModal = (bedId: string) => {
     setIsModalOpen(true);
@@ -41,63 +35,30 @@ function Admissions() {
     setbedId(bedId);
   };
 
-  const addNewBedHandler = async () => {
-    if (!organization) return;
-    setBedAddLoader(true);
-    const currentBeds = (organization.publicMetadata?.beds ||
-      []) as BedInfo[];
-    const updatedBeds = [...currentBeds, { bed_id: uniqid.time(),ward:"ICU" }];
-    console.log(updatedBeds);
-    toast.promise(
-      async () => {
-        await updateOrgBedMetaData(updatedBeds)
-          .then(
-            () => {
-              organization.reload();
-              setRefresh((prev) => !prev);
-            },
-            (error) => {
-              console.error("Error Adding New Bed:", error);
-            }
-          )
-          .finally(() => {
-            setBedAddLoader(false);
-          });
-      },
-      {
-        loading: "Adding new bed...",
-        success: "New bed added successfully",
-        error: "Error when adding bed",
-      },
-      {
-        position: "bottom-right",
+  useEffect(() => {
+    if (patientIdParam && !bpLoading && !tpLoading) {
+      const isPatientAdmitted = patientIdParam in bedPatients;
+      const isTodaysPatient = patientIdParam in todayPatients;
+
+      if (isPatientAdmitted) {
+        const bookingId = bedPatients[patientIdParam].bed_info.find(
+          (bi) => bi.dischargeMarked == false
+        )?.bedBookingId;
+        const bedId = bedPatients[patientIdParam].bed_info.find(
+          (bi) => bi.dischargeMarked == false
+        )?.bedId;
+        if (bookingId && bedId) openEditModal(bookingId, bedId);
+      } else if (isTodaysPatient) {
+        setbedId("");
+        setIsModalOpen(true);
+      } else {
+        toast(`Patient with Id : ${patientIdParam} can't be admitted`, {
+          duration: 3000,
+          position: "bottom-right",
+        });
       }
-    );
-  };
-
-useEffect(() => {
-  if (
-    patientIdParam && !bpLoading && !tpLoading
-  ) {
-    const isPatientAdmitted = patientIdParam in bedPatients;
-    const isTodaysPatient = patientIdParam in todayPatients;
-
-    console.log("bedPatients:", bedPatients);
-    console.log("todayPatients:", todayPatients);
-
-    if(isPatientAdmitted){
-      const bookingId = bedPatients[patientIdParam].bed_info.find(bi=>bi.dischargeMarked==false)?.bedBookingId;
-      const bedId = bedPatients[patientIdParam].bed_info.find(bi=>bi.dischargeMarked==false)?.bedId
-      if(bookingId && bedId)openEditModal(bookingId,bedId);
     }
-    else if (isTodaysPatient) {
-      setbedId("");
-      setIsModalOpen(true);
-    }else{
-      toast(`Patient with Id : ${patientIdParam} can't be admitted`,{duration:3000,position: "bottom-right"});
-    }
-  }
-}, [patientIdParam, bpLoading, tpLoading]);
+  }, [patientIdParam, bpLoading, tpLoading, bedPatients, todayPatients]);
 
   return (
     <div className="h-auto relative">
@@ -108,7 +69,11 @@ useEffect(() => {
         <DialogTitle hidden />
         <DialogDescription hidden />
         <DialogContent className="max-w-screen-md ">
-          <BedAdmissionModal setIsModalOpen={setIsModalOpen} bedId={bedId} setbedId={setbedId}/>
+          <BedAdmissionModal
+            setIsModalOpen={setIsModalOpen}
+            bedId={bedId}
+            setbedId={setbedId}
+          />
         </DialogContent>
       </Dialog>
       <Dialog
@@ -127,15 +92,13 @@ useEffect(() => {
           />
         </DialogContent>
       </Dialog>
+
       <KanbanBoard
         isEditModalOpen={isEditModalOpen}
         openAddModal={openAddModal}
         openEditModal={openEditModal}
-        refresh={refresh}
         setWasEdited={setWasEdited}
         wasEdited={wasEdited}
-        bedAddLoader={bedAddLoader}
-        addNewBedHandler={addNewBedHandler}
       />
     </div>
   );
