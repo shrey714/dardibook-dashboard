@@ -1,5 +1,5 @@
 "use client";
-import { FormEvent, memo, useState } from "react";
+import { FormEvent, memo, useCallback, useMemo, useState } from "react";
 import { CirclePlus, SquarePlus } from "lucide-react";
 import {
   Dialog,
@@ -14,25 +14,91 @@ import { Input } from "../ui/input";
 import CreatableSelect from "react-select/creatable";
 import { Separator } from "../ui/separator";
 import { Button } from "../ui/button";
+import { useOrganization } from "@clerk/nextjs";
+import { BedInfo } from "@/types/FormTypes";
+import toast from "react-hot-toast";
+import { updateBedDefaults } from "@/app/dashboard/settings/defaults/_actions";
 
-interface AddNewBedBtnProps {
-  bedAddLoader: boolean;
-  addNewBed: (e: FormEvent<HTMLFormElement>) => Promise<void>;
-  wards: { label: string; value: string }[];
-}
-
-const AddNewBedBtn = ({
-  bedAddLoader,
-  addNewBed,
-  wards = [],
-}: AddNewBedBtnProps) => {
+const AddNewBedBtn = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { organization, isLoaded } = useOrganization();
+  const [bedAddLoader, setBedAddLoader] = useState<boolean>(false);
+
+  const columns: BedInfo[] = useMemo(() => {
+    return isLoaded && organization && organization.publicMetadata
+      ? (organization.publicMetadata?.beds as BedInfo[])
+      : [];
+  }, [isLoaded, organization]);
+  const wards = useMemo(() => {
+    return [...new Set(columns.map((bed) => bed.ward))].sort().map((val) => ({
+      label: val,
+      value: val,
+    }));
+  }, [columns]);
+
+  const AddNewBed = useCallback(
+    async (e: FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      if (!organization)
+        return Promise.reject(new Error("No organization found"));
+
+      const form = e.target as HTMLFormElement;
+      const newBed: BedInfo = {
+        bed_id: form.bed_id.value.trim(),
+        ward: form.ward.value.trim(),
+      };
+
+      if (
+        columns.find(
+          (bed) =>
+            bed.bed_id.toLowerCase() === form.bed_id.value.trim().toLowerCase()
+        )
+      ) {
+        toast.error(
+          `Bed with id ${form.bed_id.value.trim().toLowerCase()} already exists`
+        );
+        return Promise.reject(new Error("Bed already exists"));
+      }
+
+      setBedAddLoader(true);
+
+      try {
+        await new Promise((resolve, reject) => {
+          toast
+            .promise(
+              updateBedDefaults(columns.concat(newBed)),
+              {
+                loading: "Adding new bed...",
+                success: "Bed added successfully",
+                error: "Error adding bed",
+              },
+              {
+                position: "bottom-right",
+              }
+            )
+            .then(resolve)
+            .catch(reject);
+        });
+
+        organization.reload();
+        form.reset();
+        setBedAddLoader(false);
+        setIsOpen(false);
+        return Promise.resolve();
+      } catch (error) {
+        console.error("Operation failed. Please try again: ", error);
+        setBedAddLoader(false);
+        return Promise.reject(error);
+      }
+    },
+    [columns, organization]
+  );
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button variant={"outline"} icon={SquarePlus} iconPlacement="right">
-          Add Bed
+          <p className="hidden sm:block">Add Bed</p>
         </Button>
       </DialogTrigger>
 
@@ -41,17 +107,7 @@ const AddNewBedBtn = ({
           <DialogTitle className="font-medium">Add Bed</DialogTitle>
           <DialogDescription>Add bed with ward assignments</DialogDescription>
         </DialogHeader>
-        <form
-          onSubmit={async (e) => {
-            try {
-              await addNewBed(e);
-              setIsOpen(false);
-            } catch (error) {
-              console.log("Error adding bed:", error);
-            }
-          }}
-          autoComplete="off"
-        >
+        <form onSubmit={AddNewBed} autoComplete="off">
           <fieldset
             disabled={bedAddLoader}
             className="w-full rounded-lg grid grid-cols-6 gap-4"

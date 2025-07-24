@@ -1,11 +1,4 @@
-import {
-  FormEvent,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { BoardColumn, BoardContainer } from "./BoardColumn";
@@ -29,7 +22,7 @@ import { useBedsStore } from "@/lib/stores/useBedsStore";
 import toast from "react-hot-toast";
 import { Button } from "../ui/button";
 import BedNavigationHeader from "./BedNavigation";
-import { AlertTriangle, Bed, UserPlus, X } from "lucide-react";
+import { AlertTriangle, Bed, X } from "lucide-react";
 import {
   Dialog,
   DialogClose,
@@ -41,7 +34,6 @@ import {
 } from "@/components/ui/dialog";
 import { Skeleton } from "../ui/skeleton";
 import { updateBedDefaults } from "@/app/dashboard/settings/defaults/_actions";
-import AddNewBedBtn from "./AddNewBedDialog";
 
 export type ColumnId = string;
 
@@ -114,12 +106,6 @@ const KanbanBoard = ({
       : [];
   }, [isLoaded, organization]);
   const columnsId = useMemo(() => columns.map((col) => col.bed_id), [columns]);
-  const wards = useMemo(() => {
-    return [...new Set(columns.map((bed) => bed.ward))].sort().map((val) => ({
-      label: val,
-      value: val,
-    }));
-  }, [columns]);
 
   useEffect(() => {
     if (!loading) setTasks(structuredClone(beds));
@@ -209,64 +195,6 @@ const KanbanBoard = ({
       }
     );
   };
-
-  const [bedAddLoader, setBedAddLoader] = useState<boolean>(false);
-  const AddNewBed = useCallback(
-    async (e: FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-      if (!organization)
-        return Promise.reject(new Error("No organization found"));
-
-      const form = e.target as HTMLFormElement;
-      const newBed: BedInfo = {
-        bed_id: form.bed_id.value.trim(),
-        ward: form.ward.value.trim(),
-      };
-
-      if (
-        columns.find(
-          (bed) =>
-            bed.bed_id.toLowerCase() === form.bed_id.value.trim().toLowerCase()
-        )
-      ) {
-        toast.error(
-          `Bed with id ${form.bed_id.value.trim().toLowerCase()} already exists`
-        );
-        return Promise.reject(new Error("Bed already exists"));
-      }
-
-      setBedAddLoader(true);
-
-      try {
-        await new Promise((resolve, reject) => {
-          toast
-            .promise(
-              updateBedDefaults(columns.concat(newBed)),
-              {
-                loading: "Adding new bed...",
-                success: "Bed added successfully",
-                error: "Error adding bed",
-              },
-              {
-                position: "bottom-right",
-              }
-            )
-            .then(resolve)
-            .catch(reject);
-        });
-
-        organization.reload();
-        setBedAddLoader(false);
-        form.reset();
-        return Promise.resolve();
-      } catch (error) {
-        console.error("Operation failed. Please try again: ", error);
-        setBedAddLoader(false);
-        return Promise.reject(error);
-      }
-    },
-    [columns, organization]
-  );
 
   const DoNotAllowToDeleteBed = !!beds.find(
     (bed) => bed.bedId === deleteState.bedToDelete
@@ -382,24 +310,8 @@ const KanbanBoard = ({
         bedPatients={bedPatients}
         onBedClick={scrollToBed}
         onWarningClick={scrollToBooking}
+        openAddModal={openAddModal}
       />
-
-      <div className="w-[calc(100%-10px)] sm:w-[calc(100%-40px)] max-w-7xl mt-4 justify-self-center flex items-end justify-end gap-2">
-        <Button
-          variant="outline"
-          onClick={() => openAddModal("")}
-          icon={UserPlus}
-          iconPlacement="right"
-        >
-          Admit Patient
-        </Button>
-        <AddNewBedBtn
-          bedAddLoader={bedAddLoader}
-          addNewBed={AddNewBed}
-          wards={wards}
-        />
-      </div>
-
       <div className="w-full min-h-[calc(100%-5rem)] flex flex-col max-w-[2000px] justify-self-center">
         {loading || !isLoaded ? (
           <div className="grid gap-3 px-1 sm:px-3 pb-16 pt-4 grid-cols-[repeat(auto-fit,minmax(250px,350px))] sm:grid-cols-[repeat(auto-fit,minmax(350px,350px))] justify-center">

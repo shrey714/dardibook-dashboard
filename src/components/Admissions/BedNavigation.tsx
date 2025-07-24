@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Bed, User } from "lucide-react";
+import { Bed, User, UserPlus } from "lucide-react";
 import {
   Accordion,
   AccordionContent,
@@ -16,6 +16,15 @@ import {
   PopoverTrigger,
 } from "@radix-ui/react-popover";
 import { getOverdueClashes } from "./utils";
+import AddNewBedBtn from "./AddNewBedDialog";
+
+const getStatusColor = (status: string) => {
+  return status === "warning"
+    ? "bg-yellow-500/20 text-yellow-600 hover:text-accent-foreground hover:bg-yellow-400/40"
+    : status === "occupied"
+    ? "bg-red-500/20 text-red-600 hover:text-accent-foreground hover:bg-red-500/40"
+    : "bg-green-500/20 text-green-600 hover:text-accent-foreground hover:bg-green-500/40";
+};
 
 const BedNavigationHeader = ({
   beds,
@@ -23,12 +32,14 @@ const BedNavigationHeader = ({
   onBedClick,
   onWarningClick,
   bedPatients,
+  openAddModal,
 }: {
   beds: BedInfo[];
   patients: OrgBed[];
   onBedClick: (bedId: string) => void;
   onWarningClick: (bookingId: string) => void;
   bedPatients: Record<string, BedPatientTypes>;
+  openAddModal: (bedId: string) => void;
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const accordionRef = useRef<HTMLDivElement>(null);
@@ -68,12 +79,6 @@ const BedNavigationHeader = ({
     };
   }, []);
 
-  const getStatusColor = (status: string) => {
-    return status === "occupied"
-      ? "bg-red-500/20 text-red-600 hover:text-accent-foreground hover:bg-red-500/40"
-      : "bg-green-500/20 text-green-600 hover:text-accent-foreground hover:bg-green-500/40";
-  };
-
   const groupBedsByWard = beds.reduce<Record<string, BedInfo[]>>((acc, bed) => {
     if (!acc[bed.ward]) {
       acc[bed.ward] = [];
@@ -85,7 +90,7 @@ const BedNavigationHeader = ({
   return (
     <Card
       ref={accordionRef}
-      className="sticky top-0 py-0 z-[1] shadow-lg rounded-none rounded-b-xl w-[calc(100%-10px)] sm:w-[calc(100%-40px)] max-w-7xl border-t-0 justify-self-center"
+      className="sticky top-0 py-0 gap-0 z-[1] shadow-lg rounded-none overflow-hidden rounded-b-xl w-[calc(100%-10px)] sm:w-[calc(100%-40px)] max-w-7xl border-t-0 justify-self-center"
     >
       <CardContent className="p-0">
         <Accordion
@@ -96,31 +101,45 @@ const BedNavigationHeader = ({
           className="w-full"
         >
           <AccordionItem value="nav-header" className="border-b-0">
-            <AccordionTrigger className="hover:no-underline px-4 py-3">
-              <div className="flex flex-1 items-center gap-2">
-                <Badge variant="default">{beds.length} beds</Badge>
-                <Badge variant="failure">
+            <AccordionTrigger className="hover:no-underline px-4 py-2.5">
+              <div className="flex flex-1 items-center">
+                <Badge
+                  className="shadow-none text-sm font-medium border-0 rounded-r-none"
+                  variant="default"
+                >
+                  {beds.length} <p className="ml-1 hidden sm:block">beds</p>
+                </Badge>
+                <Badge
+                  className="shadow-none text-sm font-medium border-0 rounded-none"
+                  variant="failure"
+                >
                   {
                     beds.filter((bed) =>
                       patients.find((patient) => patient.bedId === bed.bed_id)
                     ).length
-                  }{" "}
-                  Occupied
+                  }
+                  <p className="ml-1 hidden sm:block">Occupied</p>
                 </Badge>
-                <Badge variant="success">
+                <Badge
+                  className="shadow-none text-sm font-medium border-0 rounded-l-none"
+                  variant="success"
+                >
                   {beds.length -
                     beds.filter((bed) =>
                       patients.find((patient) => patient.bedId === bed.bed_id)
-                    ).length}{" "}
-                  Available
+                    ).length}
+                  <p className="ml-1 hidden sm:block">Available</p>
                 </Badge>
                 {Object.keys(clashMap).length > 0 && (
-                  <Badge className="bg-yellow-500/10 text-yellow-600  hover:bg-yellow-500/20">
-                    {Object.keys(clashMap).length} warning
+                  <Badge className="shadow-none text-sm font-medium border-0 bg-yellow-500/10 text-yellow-600  hover:bg-yellow-500/20 ml-2">
+                    {Object.keys(clashMap).length}
+                    <p className="ml-1 hidden sm:block">warning</p>
                   </Badge>
                 )}
               </div>
-              <p className="mr-2 text-xs text-muted-foreground">Navigation</p>
+              <p className="mr-2 text-[10px] sm:text-xs text-muted-foreground">
+                Navigation
+              </p>
             </AccordionTrigger>
             <AccordionContent className="pb-0 max-h-[440px] overflow-y-auto">
               {beds.length === 0 && (
@@ -158,10 +177,12 @@ const BedNavigationHeader = ({
                 </div>
               ))}
 
-              <h3 className="text-sm py-1 px-2 bg-yellow-500/20 text-yellow-600 leading-none">
-                Warnings
-              </h3>
-              <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2 p-2">
+              {Object.entries(clashMap).length > 0 && (
+                <h3 className="text-sm py-1 px-2 bg-yellow-500/20 text-yellow-600 leading-none">
+                  Warnings
+                </h3>
+              )}
+              <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2 p-2 empty:p-0">
                 {Object.entries(clashMap).map(
                   ([overdueId, clashingIds], index) => {
                     return (
@@ -171,7 +192,9 @@ const BedNavigationHeader = ({
                             variant="ghost"
                             size="sm"
                             onClick={() => onWarningClick(overdueId)}
-                            className="relative h-12 flex flex-col items-center justify-center gap-1 text-xs transition-all duration-200 hover:shadow-md bg-yellow-500/20 text-yellow-600 hover:text-accent-foreground hover:bg-yellow-400/40"
+                            className={`relative h-12 flex flex-col items-center justify-center gap-1 text-xs transition-all duration-200 hover:shadow-md ${getStatusColor(
+                              "warning"
+                            )}`}
                           >
                             <User className="h-3 w-3" />
                             <span className="font-medium">
@@ -224,6 +247,17 @@ const BedNavigationHeader = ({
           </AccordionItem>
         </Accordion>
       </CardContent>
+      <CardFooter className="flex-row p-2.5 gap-2 border-t justify-end">
+        <Button
+          variant="outline"
+          onClick={() => openAddModal("")}
+          icon={UserPlus}
+          iconPlacement="right"
+        >
+          <p className="hidden sm:block">Admit Patient</p>
+        </Button>
+        <AddNewBedBtn />
+      </CardFooter>
     </Card>
   );
 };
