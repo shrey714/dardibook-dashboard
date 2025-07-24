@@ -597,9 +597,7 @@ const PrescriptionAdditionalInfo = () => {
             Additional Prescription Info
           </CardTitle>
           <CardDescription>
-            Define custom fields such as Height, Weight, BMI, Blood Pressure,
-            etc., to include relevant clinical information as part of the
-            prescription.
+            Add custom fields like BMI, BP and weight to include relevant clinical details in the prescription.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -609,7 +607,7 @@ const PrescriptionAdditionalInfo = () => {
               className="w-full rounded-lg grid grid-cols-6 gap-4"
             >
               <div className="col-span-6 sm:col-span-3 space-y-2">
-                <Label htmlFor="label">Label</Label>
+                <Label htmlFor="label">Label <span className="text-red-500">*</span></Label>
                 <Input
                   name="label"
                   id="label"
@@ -620,7 +618,7 @@ const PrescriptionAdditionalInfo = () => {
 
               <div className="col-span-6 sm:col-span-3 space-y-2">
                 <Label htmlFor="unit">Unit</Label>
-                <Input name="unit" id="unit" placeholder="e.g., kg" required />
+                <Input name="unit" id="unit" placeholder="e.g., kg" />
               </div>
 
               <Separator className="w-full col-span-6" />
@@ -666,7 +664,7 @@ const PrescriptionAdditionalInfo = () => {
                 <TableRow key={index}>
                   <TableCell className="pl-6">{index + 1}</TableCell>
                   <TableCell className="text-nowrap">{info.label}</TableCell>
-                  <TableCell>{info.value}</TableCell>
+                  <TableCell>{info.value.length>0?info.value:<span className="text-muted-foreground">Not Assigned</span>}</TableCell>
                   <TableCell className="text-right pr-6">
                     <Button
                       variant={"outline"}

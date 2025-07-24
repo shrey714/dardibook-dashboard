@@ -74,7 +74,7 @@ const PrescriptionAdditionalInfoForm: React.FC<PrescriptionAdditionalInfoFormPro
               .prescription_additional_details as PrescriptionAdditionalinfo[]
           ).find((info) => info.id == id)?.value
         : undefined;
-    return unit;
+    return unit && unit.trim() !== "" ? unit : undefined;
   };
 
   return (
