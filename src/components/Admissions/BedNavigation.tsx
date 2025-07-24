@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Bed, User, UserPlus } from "lucide-react";
+import { AlertTriangle, Bed, User } from "lucide-react";
 import {
   Accordion,
   AccordionContent,
@@ -10,15 +10,11 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { BedInfo, BedPatientTypes, OrgBed } from "@/types/FormTypes";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@radix-ui/react-popover";
 import { getOverdueClashes } from "./utils";
-import AddNewBedBtn from "./AddNewBedDialog";
+import { BedsFilterHandeler } from "./BedsFilterHandeler";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 
-const getStatusColor = (status: string) => {
+export const getStatusColor = (status: string) => {
   return status === "warning"
     ? "bg-yellow-500/20 text-yellow-600 hover:text-accent-foreground hover:bg-yellow-400/40"
     : status === "occupied"
@@ -203,40 +199,43 @@ const BedNavigationHeader = ({
                           </Button>
                         </PopoverTrigger>
 
-                        <PopoverContent className="mt-2 p-0 w-[340px] sm:w-[420px] rounded-xl shadow-lg border border-red-300">
-                          <Card className="py-0 gap-0">
-                            <div className="p-4 border-b border-red-200">
-                              <h3 className="text-base font-semibold text-red-800">
-                                Overdue Clash Detected
-                              </h3>
-                              <p className="text-sm text-red-700 mt-1">
-                                The following bookings are clashing with{" "}
-                                <span className="font-semibold">
-                                  {overdueId}
-                                </span>
-                                . Please update them accordingly.
-                              </p>
-                            </div>
-
-                            <CardContent className="p-4">
-                              <div className="flex flex-wrap gap-2">
-                                {clashingIds.map((ids, index) => (
-                                  <Button
-                                    key={index}
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => onWarningClick(ids)}
-                                    className="relative h-12 flex flex-col items-center justify-center gap-1 text-xs transition-all duration-200 hover:shadow-md bg-red-200 text-red-800 hover:bg-red-300"
-                                  >
-                                    <User className="h-4 w-4" />
-                                    <span className="font-medium">
-                                      {bedPatients[ids].name}
-                                    </span>
-                                  </Button>
-                                ))}
+                        <PopoverContent className="mt-2 p-0 w-[340px] sm:w-[420px] bg-card rounded-lg">
+                          <div className="p-3">
+                            <div className="p-3 bg-yellow-500/20 rounded-lg border border-yellow-800 flex flex-row gap-3 items-start">
+                              <AlertTriangle className="h-5 w-5 shrink-0 text-yellow-600" />
+                              <div className="flex flex-col gap-1">
+                                <p className="font-medium text-yellow-600 leading-tight">
+                                  Overdue Clash Detected
+                                </p>
+                                <p className="text-sm text-yellow-600 leading-tight">
+                                  The following bookings are clashing with{" "}
+                                  <span className="font-semibold underline">
+                                    {bedPatients[overdueId].name}
+                                  </span>
+                                  . Please update them accordingly.
+                                </p>
                               </div>
-                            </CardContent>
-                          </Card>
+                            </div>
+                          </div>
+
+                          <div className="flex flex-wrap gap-2 border-t p-2">
+                            {clashingIds.map((ids, index) => (
+                              <Button
+                                key={index}
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => onWarningClick(ids)}
+                                className={`relative h-12 flex flex-col gap-1 items-center justify-center ${getStatusColor(
+                                  "occupied"
+                                )}`}
+                              >
+                                <User className="h-4 w-4" />
+                                <span className="font-medium">
+                                  {bedPatients[ids].name}
+                                </span>
+                              </Button>
+                            ))}
+                          </div>
                         </PopoverContent>
                       </Popover>
                     );
@@ -248,15 +247,7 @@ const BedNavigationHeader = ({
         </Accordion>
       </CardContent>
       <CardFooter className="flex-row p-2.5 gap-2 border-t justify-end">
-        <Button
-          variant="outline"
-          onClick={() => openAddModal("")}
-          icon={UserPlus}
-          iconPlacement="right"
-        >
-          <p className="hidden sm:block">Admit Patient</p>
-        </Button>
-        <AddNewBedBtn />
+        <BedsFilterHandeler openAddModal={openAddModal} />
       </CardFooter>
     </Card>
   );

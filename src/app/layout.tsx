@@ -7,6 +7,7 @@ import { ThemeProvider as NextThemeProvider } from "next-themes";
 import { ClerkLoaded, ClerkLoading, ClerkProvider } from "@clerk/nextjs";
 import TopBarLoader from "@/components/common/TopBarLoader";
 import { FirebaseAuthProvider } from "@/components/wrapper/FirebaseAuthProvider";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 const DM_Sans_Font = DM_Sans({
   subsets: ["latin"],
   display: "swap",
@@ -61,7 +62,9 @@ export default async function RootLayout({
               </div>
             </ClerkLoading>
             <ClerkLoaded>
-              <FirebaseAuthProvider> {children}</FirebaseAuthProvider>
+              <FirebaseAuthProvider>
+                <NuqsAdapter> {children} </NuqsAdapter>
+              </FirebaseAuthProvider>
             </ClerkLoaded>
           </NextThemeProvider>
         </body>
