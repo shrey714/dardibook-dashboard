@@ -15,7 +15,7 @@ import {
 } from "@dnd-kit/core";
 import { SortableContext, arrayMove } from "@dnd-kit/sortable";
 import { TaskCard } from "./TaskCard";
-import { hasDraggableData } from "./utils";
+import { getOverdueClashes, hasDraggableData } from "./utils";
 import { BedInfo, OrgBed } from "@/types/FormTypes";
 import { useOrganization } from "@clerk/nextjs";
 import { useBedsStore } from "@/lib/stores/useBedsStore";
@@ -116,26 +116,45 @@ const KanbanBoard = ({
       : [];
   }, [isLoaded, organization]);
 
+  const [clashMap, setClashMap] = useState(() =>
+    Object.keys(getOverdueClashes(beds))
+  ); //clashMap is array of clashing patient ids
+
+  useEffect(() => {
+    setClashMap(Object.keys(getOverdueClashes(beds)));
+    const interval = setInterval(() => {
+      setClashMap(Object.keys(getOverdueClashes(beds)));
+    }, 60_000);
+
+    return () => clearInterval(interval);
+  }, [beds]);
+
   const columns: BedInfo[] = useMemo(() => {
     return allColumns.filter((col) => {
-      // Filter by ward
       if (!wardFilters.includes(col.ward)) {
         return false;
       }
 
-      // Filter by bed status
-      const hasPatient = tasks.some((task) => task.bedId === col.bed_id);
-      const bedStatus = hasPatient ? "occupied" : "available";
+      // Get bed patient and status
+      const bedPatient = tasks.find((task) => task.bedId === col.bed_id);
+      const hasPatient = !!bedPatient;
+      const hasWarning = bedPatient && clashMap.includes(bedPatient.patient_id);
+      
+      // Determine bed statuses (can have multiple)
+      const bedStatuses: string[] = [];
+      if (hasWarning) bedStatuses.push("warning");
+      if (hasPatient) bedStatuses.push("occupied");
+      if (!hasPatient) bedStatuses.push("available");
 
-      if (!bedFilters.includes(bedStatus)) {
+      // Check if any bed status matches selected filters
+      if (!bedStatuses.some(status => bedFilters.includes(status))) {
         return false;
       }
 
       // Filter by search query
       if (searchQuery) {
-        const patient = tasks.find((task) => task.bedId === col.bed_id);
-        const patientName = patient
-          ? bedPatients[patient.patient_id]?.name || ""
+        const patientName = bedPatient
+          ? bedPatients[bedPatient.patient_id]?.name || ""
           : "";
         const searchLower = searchQuery.toLowerCase();
 
@@ -147,7 +166,7 @@ const KanbanBoard = ({
 
       return true;
     });
-  }, [allColumns, wardFilters, bedFilters, tasks, searchQuery, bedPatients]);
+  }, [allColumns, wardFilters, bedFilters, tasks, searchQuery, bedPatients, clashMap]);
 
   const columnsId = useMemo(() => columns.map((col) => col.bed_id), [columns]);
 
