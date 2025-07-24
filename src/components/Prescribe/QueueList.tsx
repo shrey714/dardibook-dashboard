@@ -242,7 +242,7 @@ const QueueList: React.FC = () => {
                 value={value}
                 aria-label={value}
                 className={cn(
-                  "flex h-auto text-muted-foreground flex-row items-center justify-between border bg-popover px-4 py-2 rounded-full hover:bg-accent",
+                  "flex h-auto text-muted-foreground flex-row items-center justify-between border bg-popover !px-4 !py-2 !rounded-full hover:bg-accent",
                   filters?.selectedFilter === value && classname
                 )}
               >

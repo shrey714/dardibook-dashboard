@@ -17,8 +17,9 @@ import {
 } from "@radix-ui/react-popover";
 import { getOverdueClashes } from "./utils";
 import AddNewBedBtn from "./AddNewBedDialog";
+import { BedsFilterHandeler } from "./BedsFilterHandeler";
 
-const getStatusColor = (status: string) => {
+export const getStatusColor = (status: string) => {
   return status === "warning"
     ? "bg-yellow-500/20 text-yellow-600 hover:text-accent-foreground hover:bg-yellow-400/40"
     : status === "occupied"
@@ -248,6 +249,7 @@ const BedNavigationHeader = ({
         </Accordion>
       </CardContent>
       <CardFooter className="flex-row p-2.5 gap-2 border-t justify-end">
+        <BedsFilterHandeler />
         <Button
           variant="outline"
           onClick={() => openAddModal("")}

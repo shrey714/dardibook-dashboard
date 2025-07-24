@@ -1,11 +1,11 @@
 import { SortableContext, useSortable } from "@dnd-kit/sortable";
 import { type UniqueIdentifier } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
-import { Dispatch, SetStateAction, useMemo } from "react";
+import { useMemo } from "react";
 import { TaskCard } from "./TaskCard";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "@/components/ui/button";
-import { Bed, MapPinIcon, Trash2, UserPlus } from "lucide-react";
+import { Bed, MapPinIcon, UserPlus } from "lucide-react";
 import { BedInfo, BedPatientTypes, OrgBed } from "@/types/FormTypes";
 import {
   Tooltip,
@@ -24,20 +24,12 @@ export interface ColumnDragData {
   type: ColumnType;
   column: BedInfo;
 }
-
-interface DeleteState {
-  deleteModalOpen: boolean;
-  deleteLoader: boolean;
-  bedToDelete: null | string;
-}
-
 interface BoardColumnProps {
   column: BedInfo;
   tasks: OrgBed[];
   bedPatients: Record<string, BedPatientTypes>;
   openAddModal: (bedId: string) => void;
-  openEditModal: (bookingId: string, bedId: string)=>void;
-  setDeleteState: Dispatch<SetStateAction<DeleteState>>;
+  openEditModal: (bookingId: string, bedId: string) => void;
   isHighlighted?: boolean;
   highlightedBooking?: string;
 }
@@ -48,9 +40,8 @@ export function BoardColumn({
   bedPatients,
   openAddModal,
   openEditModal,
-  setDeleteState,
   isHighlighted = false,
-  highlightedBooking=""
+  highlightedBooking = "",
 }: BoardColumnProps) {
   const tasksIds = useMemo(() => {
     return tasks.map((task) => task.bedBookingId);
@@ -70,14 +61,6 @@ export function BoardColumn({
   const style = {
     transition,
     transform: CSS.Translate.toString(transform),
-  };
-
-  const deleteHandler = () => {
-    setDeleteState((state) => ({
-      ...state,
-      deleteModalOpen: true,
-      bedToDelete: column.bed_id,
-    }));
   };
 
   return (
@@ -125,21 +108,6 @@ export function BoardColumn({
                   <p>Add new patient</p>
                 </TooltipContent>
               </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-red-500 hover:text-red-700 bg-red-500/10 hover:bg-red-700/10"
-                    onClick={deleteHandler}
-                  >
-                    <Trash2 />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent className="max-w-60">
-                  <p>Remove bed</p>
-                </TooltipContent>
-              </Tooltip>
             </TooltipProvider>
           </div>
         </div>
@@ -160,18 +128,20 @@ export function BoardColumn({
         ) : (
           <div className="flex flex-col gap-4">
             <SortableContext items={tasksIds}>
-            {tasks.map((task) => {
-              return (
-                <TaskCard
-                  key={task.bedBookingId}
-                  task={task}
-                  bedPatientData={bedPatients[task.patient_id]}
-                  openEditModal={openEditModal}
-                  isHighlightedBooking={highlightedBooking===task.patient_id}
-                />
-              );
-            })}
-          </SortableContext>
+              {tasks.map((task) => {
+                return (
+                  <TaskCard
+                    key={task.bedBookingId}
+                    task={task}
+                    bedPatientData={bedPatients[task.patient_id]}
+                    openEditModal={openEditModal}
+                    isHighlightedBooking={
+                      highlightedBooking === task.patient_id
+                    }
+                  />
+                );
+              })}
+            </SortableContext>
           </div>
         )}
       </CardContent>
@@ -180,11 +150,8 @@ export function BoardColumn({
 }
 
 export function BoardContainer({ children }: { children: React.ReactNode }) {
-
   return (
-    <div
-      className="h-full grid gap-3 px-1 sm:px-3 pb-16 pt-4 grid-cols-[repeat(auto-fit,minmax(250px,350px))] sm:grid-cols-[repeat(auto-fit,minmax(350px,350px))] justify-center"
-    >
+    <div className="h-full grid gap-3 px-1 sm:px-3 pb-16 pt-4 grid-cols-[repeat(auto-fit,minmax(250px,350px))] sm:grid-cols-[repeat(auto-fit,minmax(350px,350px))] justify-center">
       {children}
     </div>
   );
