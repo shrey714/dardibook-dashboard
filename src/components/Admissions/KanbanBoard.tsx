@@ -178,7 +178,6 @@ const KanbanBoard = ({
   };
 
   const scrollToBooking = (bookingId: string) => {
-    console.log(bookingId);
     const bedElement = document.getElementById(`booking-${bookingId}`);
     if (bedElement) {
       bedElement.scrollIntoView({
