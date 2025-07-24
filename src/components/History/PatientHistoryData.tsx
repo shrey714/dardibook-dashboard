@@ -208,32 +208,48 @@ const PatientHistoryData: React.FC<PatientHistoryDataTypes> = ({ history }) => {
       </div>
 
       {/* Higher hospital and receipt details */}
-      <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-6">
-        <div>
+        <div className="w-full">
           <CommonHeader label={"Refer Details"} />
           <div className="space-y-3 mt-3 px-3">
             <div className="space-y-1">
               <p className="text-sm font-medium">Hospital Name</p>
-              <div className="flex items-center min-h-9 text-muted-foreground w-full rounded-md border px-3 py-1 text-sm shadow-sm">
+              <div className="flex items-center min-h-9 text-muted-foreground w-full lg:w-3/5 rounded-md border px-3 py-1 text-sm shadow-sm">
                 {history.refer.hospitalName}
               </div>
             </div>
 
             <div className="space-y-1">
               <p className="text-sm font-medium">Appointed Doctor Name</p>
-              <div className="flex items-center min-h-9 text-muted-foreground w-full rounded-md border px-3 py-1 text-sm shadow-sm">
+              <div className="flex items-center min-h-9 text-muted-foreground w-full lg:w-3/5 rounded-md border px-3 py-1 text-sm shadow-sm">
                 {history.refer.doctorName}
               </div>
             </div>
 
             <div className="space-y-1">
               <p className="text-sm font-medium">Refer message</p>
-              <div className="flex items-center min-h-9 text-muted-foreground w-full rounded-md border px-3 py-1 text-sm shadow-sm">
+              <div className="flex items-center min-h-9 text-muted-foreground w-full lg:w-3/5 rounded-md border px-3 py-1 text-sm shadow-sm">
                 {history.refer.referMessage}
               </div>
             </div>
           </div>
         </div>
+      <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-6">
+        <Card className="flex flex-col overflow-hidden p-0 gap-0">
+          <CardHeader className="py-3 bg-muted/50 border-b gap-0">
+            <CardTitle className="text-lg font-medium">
+              Additional Details
+            </CardTitle>
+            <CardDescription hidden></CardDescription>
+          </CardHeader>
+          <CardContent className="flex-grow space-y-2 p-2 sm:p-6">
+            {history.additional_details.map((info) => (
+              <div key={info.id} className="flex justify-between">
+                <span>{info.additionalDetailTitle}:</span>
+                <span className="self-end">{info.additionalDetailContent}</span>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
         <Card className="flex flex-col overflow-hidden p-0 gap-0">
           <CardHeader className="py-3 bg-muted/50 border-b gap-0">
             <CardTitle className="text-lg font-medium">

@@ -15,6 +15,7 @@ import { useAuth, useOrganization, useUser } from "@clerk/nextjs";
 import { useTodayPatientStore } from "@/lib/providers/todayPatientsProvider";
 import { useBedsStore } from "@/lib/stores/useBedsStore";
 import {
+  AdditionalInfo,
   orgUserType,
   PrescriptionFormTypes,
   ReceiptDetails,
@@ -144,6 +145,13 @@ const Page = () => {
         ? (organization.publicMetadata
             .prescription_receipt_types as ReceiptDetails[])
         : [],
+      additional_details:
+        isLoaded &&
+        organization &&
+        organization.publicMetadata.additional_details
+          ? (organization.publicMetadata
+              .additional_details as AdditionalInfo[])
+          : [],
   });
   const [patientBarData, setpatientBarData] = useState<patientBarDataTypes>({
     patient_id: "",

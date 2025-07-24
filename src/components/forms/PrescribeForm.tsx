@@ -15,6 +15,7 @@ import {
 import { MedicinesDetails, PrescriptionFormTypes } from "@/types/FormTypes";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
+import AdditionalInfoForm from "./AdditionalInfoForm";
 
 interface PrescribeFormProps {
   formData: PrescriptionFormTypes;
@@ -224,10 +225,17 @@ const PrescribeForm: React.FC<PrescribeFormProps> = ({
         </div>
 
         {/* fees inputs */}
+        <div className="col-span-10 2xl:col-span-3 flex flex-col gap-4">
         <ReceiptForm
           receiptInfo={formData.receipt_details}
           setReceiptInfo={setFormData}
         />
+
+        <AdditionalInfoForm
+          additionalInfo={formData.additional_details}
+          setAdditionalInfo={setFormData}
+        />
+        </div>
 
         {/* Submit-cancel button */}
         <div

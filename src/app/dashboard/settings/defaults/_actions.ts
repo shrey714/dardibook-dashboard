@@ -1,6 +1,6 @@
 'use server'
 
-import { ReceiptDetails } from '@/types/FormTypes'
+import { AdditionalInfo, ReceiptDetails } from '@/types/FormTypes'
 import { auth, clerkClient } from '@clerk/nextjs/server'
 
 interface ServiceItems {
@@ -37,6 +37,24 @@ export const updatePrescriptionReceiptDefaults = async (formdata: ReceiptDetails
   try {
     await client.organizations.updateOrganizationMetadata(orgId, {
       publicMetadata: { prescription_receipt_types: formdata },
+    })
+    return { message: 'Organization metadata updated successfully.' }
+  } catch (e) {
+    return { message: `Failed to update organization metadata: ${e}` }
+  }
+}
+
+export const updatePrescriptionAdditionalInfo = async (formdata: AdditionalInfo[]) => {
+  const client = await clerkClient()
+  const { orgId } = await auth()
+
+  if (!orgId) {
+    return { message: 'Organization ID is missing.' }
+  }
+
+  try {
+    await client.organizations.updateOrganizationMetadata(orgId, {
+      publicMetadata: { additional_details: formdata },
     })
     return { message: 'Organization metadata updated successfully.' }
   } catch (e) {
