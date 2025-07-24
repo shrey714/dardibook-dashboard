@@ -111,10 +111,10 @@ export interface ReceiptDetails {
     amount: number;
 }
 
-export interface AdditionalInfo {
+export interface PrescriptionAdditionalinfo{
     id: string;
-    additionalDetailTitle: string;
-    additionalDetailContent: string;
+    label: string;
+    value: string;
 }
 
 export interface PrescriptionFormTypes {
@@ -132,7 +132,7 @@ export interface PrescriptionFormTypes {
     prescribed_by: orgUserType;
     prescriber_assigned: orgUserType;
     receipt_details: ReceiptDetails[];
-    additional_details: AdditionalInfo[];
+    prescription_additional_details: PrescriptionAdditionalinfo[];
 }
 
 export interface MedicineItems extends MedicinesDetails {

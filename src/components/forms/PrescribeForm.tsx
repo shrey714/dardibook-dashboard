@@ -15,7 +15,7 @@ import {
 import { MedicinesDetails, PrescriptionFormTypes } from "@/types/FormTypes";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
-import AdditionalInfoForm from "./AdditionalInfoForm";
+import PrescriptionAdditionalInfoForm from "./PrescriptionAdditionalInfoForm";
 
 interface PrescribeFormProps {
   formData: PrescriptionFormTypes;
@@ -231,8 +231,8 @@ const PrescribeForm: React.FC<PrescribeFormProps> = ({
           setReceiptInfo={setFormData}
         />
 
-        <AdditionalInfoForm
-          additionalInfo={formData.additional_details}
+        <PrescriptionAdditionalInfoForm
+          additionalInfo={formData.prescription_additional_details}
           setAdditionalInfo={setFormData}
         />
         </div>

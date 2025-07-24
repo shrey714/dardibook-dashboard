@@ -242,10 +242,10 @@ const PatientHistoryData: React.FC<PatientHistoryDataTypes> = ({ history }) => {
             <CardDescription hidden></CardDescription>
           </CardHeader>
           <CardContent className="flex-grow space-y-2 p-2 sm:p-6">
-            {history.additional_details.map((info) => (
+            {history.prescription_additional_details.map((info) => (
               <div key={info.id} className="flex justify-between">
-                <span>{info.additionalDetailTitle}:</span>
-                <span className="self-end">{info.additionalDetailContent}</span>
+                <span>{info.label}:</span>
+                <span className="self-end">{info.value}</span>
               </div>
             ))}
           </CardContent>

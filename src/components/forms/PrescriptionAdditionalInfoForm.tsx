@@ -10,21 +10,29 @@ import {
 import { Plus, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import uniqid from "uniqid";
-import { AdditionalInfo, PrescriptionFormTypes, ReceiptDetails } from "@/types/FormTypes";
+import {
+  PrescriptionAdditionalinfo,
+  PrescriptionFormTypes,
+} from "@/types/FormTypes";
 import { Input } from "../ui/input";
+import { useOrganization } from "@clerk/nextjs";
 
-interface ReceiptFormProps {
-  additionalInfo: AdditionalInfo[];
-  setAdditionalInfo: React.Dispatch<React.SetStateAction<PrescriptionFormTypes>>;
+interface PrescriptionAdditionalInfoFormProps {
+  additionalInfo: PrescriptionAdditionalinfo[];
+  setAdditionalInfo: React.Dispatch<
+    React.SetStateAction<PrescriptionFormTypes>
+  >;
 }
 
-const AdditionalInfoForm: React.FC<ReceiptFormProps> = ({
+const PrescriptionAdditionalInfoForm: React.FC<PrescriptionAdditionalInfoFormProps> = ({
   additionalInfo,
   setAdditionalInfo,
 }) => {
+  const { organization, isLoaded } = useOrganization();
+
   const handleInputChange = (
     id: string,
-    name: "additionalDetailTitle" | "additionalDetailContent",
+    name: "label" | "value",
     value: string
   ) => {
     const updated_receipt_details = additionalInfo.map((item) =>
@@ -32,16 +40,16 @@ const AdditionalInfoForm: React.FC<ReceiptFormProps> = ({
     );
     setAdditionalInfo((prevData) => ({
       ...prevData,
-      additional_details: updated_receipt_details,
+      prescription_additional_details: updated_receipt_details,
     }));
   };
 
   const addParticular = () => {
     setAdditionalInfo((prevData) => ({
       ...prevData,
-      additional_details: [
-        ...prevData.additional_details,
-        { id: uniqid("Particular-"), additionalDetailTitle: "", additionalDetailContent: "" },
+      prescription_additional_details: [
+        ...prevData.prescription_additional_details,
+        { id: uniqid("Particular-"), label: "", value: "" },
       ],
     }));
   };
@@ -52,8 +60,21 @@ const AdditionalInfoForm: React.FC<ReceiptFormProps> = ({
     );
     setAdditionalInfo((prevData) => ({
       ...prevData,
-      additional_details: updated_receipt_details,
+      prescription_additional_details: updated_receipt_details,
     }));
+  };
+
+  const getUnit = (id: string) => {
+    const unit =
+      isLoaded &&
+      organization &&
+      organization.publicMetadata.prescription_additional_details
+        ? (
+            organization.publicMetadata
+              .prescription_additional_details as PrescriptionAdditionalinfo[]
+          ).find((info) => info.id == id)?.value
+        : undefined;
+    return unit;
   };
 
   return (
@@ -77,31 +98,27 @@ const AdditionalInfoForm: React.FC<ReceiptFormProps> = ({
               <Input
                 type="text"
                 required
-                name={`additionalDetailTitle-${index}`}
-                id={`additionalDetailTitle-${index}`}
+                name={`label-${index}`}
+                id={`label-${index}`}
                 autoComplete="off"
                 placeholder="Title*"
                 wrapClassName={"col-span-3 sm:max-w-md my-1.5"}
-                value={particular.additionalDetailTitle}
+                value={particular.label}
                 onChange={(e) =>
-                  handleInputChange(particular.id, "additionalDetailTitle", e.target.value)
+                  handleInputChange(particular.id, "label", e.target.value)
                 }
               />
               <Input
                 type="text"
-                name={`additionalDetailContent-${index}`}
-                id={`additionalDetailContent-${index}`}
+                name={`value-${index}`}
+                id={`value-${index}`}
                 autoComplete="off"
-                placeholder="Value"
+                placeholder={getUnit(particular.id) ?? "Value"}
                 wrapClassName={"col-span-3 sm:max-w-md"}
                 className="col-span-3 sm:max-w-md my-1.5"
-                value={particular.additionalDetailContent}
+                value={particular.value}
                 onChange={(e) =>
-                  handleInputChange(
-                    particular.id,
-                    "additionalDetailContent",
-                    e.target.value
-                  )
+                  handleInputChange(particular.id, "value", e.target.value)
                 }
               />
               <Button
@@ -131,4 +148,4 @@ const AdditionalInfoForm: React.FC<ReceiptFormProps> = ({
   );
 };
 
-export default AdditionalInfoForm;
+export default PrescriptionAdditionalInfoForm;

@@ -15,8 +15,8 @@ import { useAuth, useOrganization, useUser } from "@clerk/nextjs";
 import { useTodayPatientStore } from "@/lib/providers/todayPatientsProvider";
 import { useBedsStore } from "@/lib/stores/useBedsStore";
 import {
-  AdditionalInfo,
   orgUserType,
+  PrescriptionAdditionalinfo,
   PrescriptionFormTypes,
   ReceiptDetails,
 } from "@/types/FormTypes";
@@ -145,12 +145,14 @@ const Page = () => {
         ? (organization.publicMetadata
             .prescription_receipt_types as ReceiptDetails[])
         : [],
-      additional_details:
+      prescription_additional_details:
         isLoaded &&
         organization &&
-        organization.publicMetadata.additional_details
+        organization.publicMetadata.prescription_additional_details
           ? (organization.publicMetadata
-              .additional_details as AdditionalInfo[])
+              .prescription_additional_details as PrescriptionAdditionalinfo[]).map(({ id, label }) => ({
+                id,label,value: "",
+              }))
           : [],
   });
   const [patientBarData, setpatientBarData] = useState<patientBarDataTypes>({
@@ -170,6 +172,28 @@ const Page = () => {
     },
     inBed: false,
   });
+
+  const getUnit = (id: string) => {
+      const unit =
+        isLoaded &&
+        organization &&
+        organization.publicMetadata.prescription_additional_details
+          ? (
+              organization.publicMetadata
+                .prescription_additional_details as PrescriptionAdditionalinfo[]
+            ).find((info) => info.id == id)?.value ?? ""
+          : "";
+          console.log("unit : ",unit);
+      return unit;
+    };
+
+  const formattedDetails = (details:PrescriptionAdditionalinfo[])=>{
+      return details
+      .filter((detail) => detail.value.trim() !== "").map(detail=>({
+        ...detail,
+        value:`${detail.value} ${getUnit(detail.id)}`
+      }));
+  }
   // Submit Function
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
@@ -177,6 +201,7 @@ const Page = () => {
     if (orgId && user && patientId) {
       const prescriptionData = {
         ...formData,
+        prescription_additional_details: formattedDetails(formData.prescription_additional_details),
         orgId: orgId,
         prescription_for_bed: patientBarData.inBed,
         created_at: getTime(new Date()),

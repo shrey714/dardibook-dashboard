@@ -37,7 +37,7 @@ import { Button } from "@/components/ui/button";
 
 import { useOrganization } from "@clerk/nextjs";
 import { Separator } from "@/components/ui/separator";
-import { AdditionalInfo, ReceiptDetails } from "@/types/FormTypes";
+import { PrescriptionAdditionalinfo, ReceiptDetails } from "@/types/FormTypes";
 import {
   Table,
   TableBody,
@@ -379,7 +379,9 @@ const PrescriptionReceiptType = () => {
 
 const PrescriptionAdditionalInfo = () => {
   const { organization, isLoaded } = useOrganization();
-  const [additionalInfo, setAdditionalInfo] = useState<AdditionalInfo[]>([]);
+  const [additionalInfo, setAdditionalInfo] = useState<
+  PrescriptionAdditionalinfo[]
+  >([]);
   const [addLoader, setAddLoader] = useState(false);
   const [updateLoader, setUpdateLoader] = useState(false);
   const [deleteLoader, setDeleteLoader] = useState(false);
@@ -390,11 +392,11 @@ const PrescriptionAdditionalInfo = () => {
     if (
       isLoaded &&
       organization &&
-      organization.publicMetadata.additional_details
+      organization.publicMetadata.prescription_additional_details
     ) {
       setAdditionalInfo(
         organization.publicMetadata
-          .additional_details as AdditionalInfo[]
+          .prescription_additional_details as PrescriptionAdditionalinfo[]
       );
     } else {
       setAdditionalInfo([]);
@@ -406,10 +408,10 @@ const PrescriptionAdditionalInfo = () => {
     e.preventDefault();
     setAddLoader(true);
     const form = e.target as HTMLFormElement;
-    const newInfo: AdditionalInfo = {
+    const newInfo: PrescriptionAdditionalinfo = {
       id: uniqid(),
-      additionalDetailTitle: form.receiptType.value.trim(),
-      additionalDetailContent: form.amount.value.trim(),
+      label: form.label.value.trim(),
+      value: form.unit.value.trim(),
     };
     if (!organization) return;
     toast.promise(
@@ -443,10 +445,10 @@ const PrescriptionAdditionalInfo = () => {
     e.preventDefault();
     setUpdateLoader(true);
     const form = e.target as HTMLFormElement;
-    const existingReceiptType: AdditionalInfo = {
+    const existingReceiptType: PrescriptionAdditionalinfo = {
       id: editForInfoId,
-      additionalDetailTitle: form.additionalDetailTitle.value.trim(),
-      additionalDetailContent: form.additionalDetailContent.value.trim(),
+      label: form.label.value.trim(),
+      value: form.unit.value.trim(),
     };
     if (!organization) return;
     toast.promise(
@@ -512,12 +514,14 @@ const PrescriptionAdditionalInfo = () => {
       <Dialog open={infoEditModel} onOpenChange={setInfoEditModel}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle className="font-medium">Edit Additional Prescription Info</DialogTitle>
+            <DialogTitle className="font-medium">
+              Edit Additional Prescription Info
+            </DialogTitle>
             <DialogDescription>
               Modify details for{" "}
               {
                 additionalInfo?.find((receipt) => receipt.id === editForInfoId)
-                  ?.additionalDetailTitle
+                  ?.label
               }
             </DialogDescription>
           </DialogHeader>
@@ -527,28 +531,30 @@ const PrescriptionAdditionalInfo = () => {
               className="w-full rounded-lg grid grid-cols-6 gap-4"
             >
               <div className="col-span-6 space-y-2">
-                <Label htmlFor="additionalDetailTitle">Label</Label>
+                <Label htmlFor="label">Label</Label>
                 <Input
-                  name="additionalDetailTitle"
-                  id="additionalDetailTitle"
-                  placeholder="e.g., Consultation Fee"
+                  name="label"
+                  id="label"
+                  placeholder="e.g., Weight"
                   required
                   defaultValue={
-                    additionalInfo?.find((receipt) => receipt.id === editForInfoId)
-                      ?.additionalDetailTitle
+                    additionalInfo?.find(
+                      (receipt) => receipt.id === editForInfoId
+                    )?.label
                   }
                 />
               </div>
               <div className="col-span-6 space-y-2">
-                <Label htmlFor="additionalDetailContent">Value</Label>
+                <Label htmlFor="unit">Unit</Label>
                 <Input
-                  name="additionalDetailContent"
-                  id="additionalDetailContent"
-                  placeholder="e.g., 500"
+                  name="unit"
+                  id="unit"
+                  placeholder="e.g., kg"
                   required
                   defaultValue={
-                    additionalInfo?.find((receipt) => receipt.id === editForInfoId)
-                      ?.additionalDetailContent
+                    additionalInfo?.find(
+                      (receipt) => receipt.id === editForInfoId
+                    )?.value
                   }
                 />
               </div>
@@ -591,7 +597,9 @@ const PrescriptionAdditionalInfo = () => {
             Additional Prescription Info
           </CardTitle>
           <CardDescription>
-          Define custom fields such as Height, Weight, BMI, Blood Pressure, etc., to include relevant clinical information as part of the prescription.
+            Define custom fields such as Height, Weight, BMI, Blood Pressure,
+            etc., to include relevant clinical information as part of the
+            prescription.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -601,23 +609,18 @@ const PrescriptionAdditionalInfo = () => {
               className="w-full rounded-lg grid grid-cols-6 gap-4"
             >
               <div className="col-span-6 sm:col-span-3 space-y-2">
-                <Label htmlFor="receiptType">Label</Label>
+                <Label htmlFor="label">Label</Label>
                 <Input
-                  name="receiptType"
-                  id="receiptType"
+                  name="label"
+                  id="label"
                   placeholder="e.g., Weight"
                   required
                 />
               </div>
 
               <div className="col-span-6 sm:col-span-3 space-y-2">
-                <Label htmlFor="amount">Value</Label>
-                <Input
-                  name="amount"
-                  id="amount"
-                  placeholder="e.g., 55"
-                  required
-                />
+                <Label htmlFor="unit">Unit</Label>
+                <Input name="unit" id="unit" placeholder="e.g., kg" required />
               </div>
 
               <Separator className="w-full col-span-6" />
@@ -654,16 +657,16 @@ const PrescriptionAdditionalInfo = () => {
               <TableRow className="bg-muted/50">
                 <TableHead className="h-12 pl-6">Id</TableHead>
                 <TableHead className="h-12">Lable</TableHead>
-                <TableHead className="h-12">Value</TableHead>
+                <TableHead className="h-12">Unit</TableHead>
                 <TableHead className="h-12"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {additionalInfo.map((receipt, index) => (
+              {additionalInfo.map((info, index) => (
                 <TableRow key={index}>
                   <TableCell className="pl-6">{index + 1}</TableCell>
-                  <TableCell className="text-nowrap">{receipt.additionalDetailTitle}</TableCell>
-                  <TableCell>{receipt.additionalDetailContent}</TableCell>
+                  <TableCell className="text-nowrap">{info.label}</TableCell>
+                  <TableCell>{info.value}</TableCell>
                   <TableCell className="text-right pr-6">
                     <Button
                       variant={"outline"}
@@ -671,7 +674,7 @@ const PrescriptionAdditionalInfo = () => {
                       effect={"ringHover"}
                       onClick={() => {
                         setInfoEditModel(true);
-                        setEditForInfoId(receipt.id);
+                        setEditForInfoId(info.id);
                       }}
                     >
                       <Pencil />
