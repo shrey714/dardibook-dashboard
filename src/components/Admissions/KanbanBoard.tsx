@@ -21,6 +21,8 @@ import { useOrganization } from "@clerk/nextjs";
 import { useBedsStore } from "@/lib/stores/useBedsStore";
 import BedNavigationHeader from "./BedNavigation";
 import { Skeleton } from "../ui/skeleton";
+import { useQueryState, parseAsArrayOf, parseAsString } from "nuqs";
+import Image from "next/image";
 
 export type ColumnId = string;
 interface KanbanBoardProps {
@@ -80,11 +82,73 @@ const KanbanBoard = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isEditModalOpen]);
 
-  const columns: BedInfo[] = useMemo(() => {
+  const [bedFilters] = useQueryState(
+    "bedFilters",
+    parseAsArrayOf(parseAsString).withDefault([
+      "occupied",
+      "warning",
+      "available",
+    ])
+  );
+
+  const wards = useMemo(() => {
+    return isLoaded && organization && organization.publicMetadata
+      ? [
+          ...new Set(
+            (organization.publicMetadata?.beds as BedInfo[]).map(
+              (bed) => bed.ward
+            )
+          ),
+        ].sort()
+      : [];
+  }, [isLoaded, organization]);
+
+  const [wardFilters] = useQueryState(
+    "wardFilters",
+    parseAsArrayOf(parseAsString).withDefault(wards)
+  );
+
+  const [searchQuery] = useQueryState("search", parseAsString.withDefault(""));
+
+  const allColumns: BedInfo[] = useMemo(() => {
     return isLoaded && organization && organization.publicMetadata
       ? (organization.publicMetadata?.beds as BedInfo[])
       : [];
   }, [isLoaded, organization]);
+
+  const columns: BedInfo[] = useMemo(() => {
+    return allColumns.filter((col) => {
+      // Filter by ward
+      if (!wardFilters.includes(col.ward)) {
+        return false;
+      }
+
+      // Filter by bed status
+      const hasPatient = tasks.some((task) => task.bedId === col.bed_id);
+      const bedStatus = hasPatient ? "occupied" : "available";
+
+      if (!bedFilters.includes(bedStatus)) {
+        return false;
+      }
+
+      // Filter by search query
+      if (searchQuery) {
+        const patient = tasks.find((task) => task.bedId === col.bed_id);
+        const patientName = patient
+          ? bedPatients[patient.patient_id]?.name || ""
+          : "";
+        const searchLower = searchQuery.toLowerCase();
+
+        return (
+          col.bed_id.toLowerCase().includes(searchLower) ||
+          patientName.toLowerCase().includes(searchLower)
+        );
+      }
+
+      return true;
+    });
+  }, [allColumns, wardFilters, bedFilters, tasks, searchQuery, bedPatients]);
+
   const columnsId = useMemo(() => columns.map((col) => col.bed_id), [columns]);
 
   useEffect(() => {
@@ -136,7 +200,7 @@ const KanbanBoard = ({
     <>
       {/* Bed Navigation Header */}
       <BedNavigationHeader
-        beds={columns}
+        beds={allColumns}
         patients={beds}
         bedPatients={bedPatients}
         onBedClick={scrollToBed}
@@ -155,8 +219,15 @@ const KanbanBoard = ({
           </div>
         ) : columns.length === 0 ? (
           <div className="flex flex-1 flex-col gap-4 justify-center items-center h-full min-h-96 py-5 px-2">
-            <img className="w-full max-w-[16rem]" src="/empty.svg" alt="" />
-            <p className="text-center text-muted-foreground">
+            <Image
+              className="w-full max-w-[16rem]"
+              src="/empty.svg"
+              alt=""
+              width={256}
+              height={256}
+              priority={true}
+            />
+            <p className="text-xs sm:text-sm text-center text-muted-foreground">
               No beds found. Please add beds to get started.
             </p>
           </div>

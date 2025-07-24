@@ -97,8 +97,8 @@ const AddNewBedBtn = () => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant={"outline"} icon={SquarePlus} iconPlacement="right">
-          <p className="hidden sm:block">Add Bed</p>
+        <Button variant={"outline"} icon={SquarePlus} iconPlacement="right" className="px-2 min-w-9">
+          <p className="hidden lg:block">Add Bed</p>
         </Button>
       </DialogTrigger>
 

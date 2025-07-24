@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Bed, User, UserPlus } from "lucide-react";
+import { Bed, User } from "lucide-react";
 import {
   Accordion,
   AccordionContent,
@@ -16,7 +16,6 @@ import {
   PopoverTrigger,
 } from "@radix-ui/react-popover";
 import { getOverdueClashes } from "./utils";
-import AddNewBedBtn from "./AddNewBedDialog";
 import { BedsFilterHandeler } from "./BedsFilterHandeler";
 
 export const getStatusColor = (status: string) => {
@@ -249,16 +248,7 @@ const BedNavigationHeader = ({
         </Accordion>
       </CardContent>
       <CardFooter className="flex-row p-2.5 gap-2 border-t justify-end">
-        <BedsFilterHandeler />
-        <Button
-          variant="outline"
-          onClick={() => openAddModal("")}
-          icon={UserPlus}
-          iconPlacement="right"
-        >
-          <p className="hidden sm:block">Admit Patient</p>
-        </Button>
-        <AddNewBedBtn />
+        <BedsFilterHandeler openAddModal={openAddModal} />
       </CardFooter>
     </Card>
   );
