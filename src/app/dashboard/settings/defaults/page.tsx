@@ -20,7 +20,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronDown } from "lucide-react";
 import GeneralOptions from "@/components/Settings/DefaultsTabs/GeneralOptions";
 import { AdmissionOptions } from "@/components/Settings/DefaultsTabs/AdmissionOptions";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useQueryState, parseAsString } from "nuqs";
 
 const tabs = [
   {
@@ -51,26 +51,21 @@ const tabs = [
 ];
 
 export default function SettingsMedicineInfoPage() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const tabParam = searchParams.get("tab");
+  const [tab, setTab] = useQueryState(
+    "tab",
+    parseAsString.withDefault(tabs[0].value)
+  );
   const [drawerOpen, setDrawerOpen] = useState(false);
 
-  const defaultTab = tabs.map((t) => t.value).includes(tabParam || "")
-    ? tabParam!
-    : tabs[0].value;
-
   const handleTabChange = (value: string) => {
-    const params = new URLSearchParams(Array.from(searchParams.entries()));
-    params.set("tab", value);
-    router.push(`?${params.toString()}`, { scroll: false });
+    setTab(value);
     setDrawerOpen(false);
   };
 
   return (
     <Tabs
       orientation="vertical"
-      value={defaultTab}
+      value={tab}
       onValueChange={handleTabChange}
       className="w-full flex items-start gap-2 md:gap-4 justify-center py-2 sm:py-5 px-2 md:px-5 flex-col md:flex-row 2xl:gap-5 2xl:justify-center"
     >
@@ -79,9 +74,9 @@ export default function SettingsMedicineInfoPage() {
           <Button
             variant="secondary"
             className="sticky top-[60px] z-10 flex w-full md:hidden"
-            aria-label={`Open tab selector, current tab is ${defaultTab}`}
+            aria-label={`Open tab selector, current tab is ${tab}`}
           >
-            {defaultTab} <ChevronDown />
+            {tab} <ChevronDown />
           </Button>
         </DrawerTrigger>
         <DrawerContent className="md:hidden">
