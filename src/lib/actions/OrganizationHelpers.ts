@@ -16,7 +16,7 @@ type FormDataType = {
     signaturePhoto: File | null;
 };
 
-const uploadFile = async (file: File, path: string) => {
+export const uploadFile = async (file: File, path: string) => {
     const fileRef = ref(storage, path);
     await uploadBytes(fileRef, file);
     return getDownloadURL(fileRef);

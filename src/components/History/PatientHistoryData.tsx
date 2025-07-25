@@ -20,6 +20,7 @@ import {
   BedSingleIcon,
   CalendarClockIcon,
   ClipboardPlusIcon,
+  Download,
   PencilLineIcon,
   TriangleAlertIcon,
 } from "lucide-react";
@@ -30,12 +31,25 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { format } from "date-fns";
+import { Button } from "../ui/button";
+import { Badge } from "../ui/badge";
 
 interface PatientHistoryDataTypes {
   history: PrescriptionFormTypes;
 }
 
 const PatientHistoryData: React.FC<PatientHistoryDataTypes> = ({ history }) => {
+
+    const downloadFile = (fileUrl: string, fileName:string) => {
+      const a = document.createElement("a");
+      a.href = fileUrl;
+      a.download = fileName;
+      a.target = "_blank";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    };
+
   return (
     <div className="mx-auto max-w-7xl flex flex-1 flex-col gap-y-3 sm:gap-y-6">
       {/* prescription and receipt details */}
@@ -207,6 +221,38 @@ const PatientHistoryData: React.FC<PatientHistoryDataTypes> = ({ history }) => {
         </div>
       </div>
 
+      <div className="w-full">
+          <CommonHeader label={"Attachments"} />
+          <div className="border rounded-md mt-3">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-muted/50">
+                  <TableHead className="flex justify-center items-center">Sr No.</TableHead>
+                  <TableHead>File Name</TableHead>
+                  <TableHead className="flex justify-center items-center">Download</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {
+                  history.attachments_data && history.attachments_data.map((url,index)=>{
+                    return (
+                      <TableRow className="hover:bg-transparent" key={index}>
+                        <TableCell className="flex justify-center items-center"><Badge variant={"outline"}>{index+1}</Badge></TableCell>
+                        <TableCell>{url.name}</TableCell>
+                        <TableCell className="flex justify-center items-center">
+                        <Button onClick={()=>{downloadFile(url.url,url.name)}} variant="outline" size="sm" icon={Download} iconPlacement="right">
+                          <p className="hidden md:block">Download</p>
+                        </Button>
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })
+                }
+              </TableBody>
+            </Table>
+          </div>
+        </div>
+
       {/* Higher hospital and receipt details */}
         <div className="w-full">
           <CommonHeader label={"Refer Details"} />
@@ -233,6 +279,7 @@ const PatientHistoryData: React.FC<PatientHistoryDataTypes> = ({ history }) => {
             </div>
           </div>
         </div>
+
       <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-6">
         <Card className="flex flex-col overflow-hidden p-0 gap-0">
           <CardHeader className="py-3 bg-muted/50 border-b gap-0">

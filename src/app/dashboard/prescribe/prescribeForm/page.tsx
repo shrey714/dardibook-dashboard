@@ -19,6 +19,7 @@ import {
   PrescriptionAdditionalinfo,
   PrescriptionFormTypes,
   ReceiptDetails,
+  UploadedFileInfo,
 } from "@/types/FormTypes";
 import { getTime } from "date-fns";
 import {
@@ -43,6 +44,7 @@ import toast, { ToastOptions } from "react-hot-toast";
 import { arrayUnion, collection, doc, writeBatch } from "firebase/firestore";
 import { db } from "@/firebase/firebaseConfig";
 import { Spinner } from "@/components/ui/spinner";
+import { uploadFile } from "@/lib/actions/OrganizationHelpers";
 
 export interface patientBarDataTypes {
   patient_id: string;
@@ -194,14 +196,32 @@ const Page = () => {
         value:`${detail.value} ${getUnit(detail.id)}`
       }));
   }
+
+  const uploadFilesInBulk = async (
+    files: File[]
+  ): Promise<UploadedFileInfo[]> => {
+    const uploadTasks = files.map(async (file) => {
+      const url = await uploadFile(file,`attachments/${Date.now()}-${file.name}`);
+      return {name:file.name,url};
+    });
+  
+    return await Promise.all(uploadTasks);
+  };
+
   // Submit Function
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
 
     if (orgId && user && patientId) {
+      const { attachments, ...restFormData } = formData;
+
+      const uploadedFileData = attachments?.length
+    ? await uploadFilesInBulk(attachments)
+    : [];
+
       const prescriptionData = {
-        ...formData,
-        prescription_additional_details: formattedDetails(formData.prescription_additional_details),
+        ...restFormData,
+        prescription_additional_details: formattedDetails(restFormData.prescription_additional_details),
         orgId: orgId,
         prescription_for_bed: patientBarData.inBed,
         created_at: getTime(new Date()),
@@ -212,6 +232,7 @@ const Page = () => {
           email: user.primaryEmailAddress?.emailAddress,
         },
         prescriber_assigned: patientBarData.registerd_for,
+        attachments_data:uploadedFileData
       } as PrescriptionFormTypes;
 
       const batch = writeBatch(db);

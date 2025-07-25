@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import PrescribeMedicineTable from "./PrescribeMedicineTable";
 import ReceiptForm from "./ReceiptForm";
@@ -16,6 +16,18 @@ import { MedicinesDetails, PrescriptionFormTypes } from "@/types/FormTypes";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import PrescriptionAdditionalInfoForm from "./PrescriptionAdditionalInfoForm";
+import {
+  FileUpload,
+  FileUploadDropzone,
+  FileUploadItem,
+  FileUploadItemDelete,
+  FileUploadItemMetadata,
+  FileUploadItemPreview,
+  FileUploadList,
+  FileUploadTrigger,
+} from "@/components/ui/file-upload";
+import { Upload, X } from "lucide-react";
+import toast from "react-hot-toast";
 
 interface PrescribeFormProps {
   formData: PrescriptionFormTypes;
@@ -66,6 +78,13 @@ const PrescribeForm: React.FC<PrescribeFormProps> = ({
       diseaseDetail: data.diseaseDetail || "",
     }));
   };
+
+  const onFileReject = React.useCallback((file: File, message: string) => {
+    toast(message, {
+      duration: 3000,
+      position: "bottom-right",
+    });
+  }, []);
 
   return (
     <form
@@ -162,6 +181,55 @@ const PrescribeForm: React.FC<PrescribeFormProps> = ({
               </div>
             </div>
           </div>
+
+          <div className="bg-card w-full border rounded-xl">
+            <FileUpload
+              maxFiles={5}
+              maxSize={10 * 1024 * 1024}
+              className="w-full p-4"
+              value={formData.attachments}
+              onValueChange={(files)=>{
+                setFormData((prevData)=>({
+                  ...prevData,
+                  attachments:files
+                }))
+              }}
+              onFileReject={onFileReject}
+              multiple
+            >
+              <FileUploadDropzone>
+                <div className="flex flex-col items-center gap-1 text-center">
+                  <div className="flex items-center justify-center rounded-full border p-2.5">
+                    <Upload className="size-6 text-muted-foreground" />
+                  </div>
+                  <p className="font-medium text-sm">Drag & drop files here</p>
+                  <p className="text-muted-foreground text-xs">
+                    Or click to browse (max 5 files, up to 10MB each)
+                  </p>
+                </div>
+                <FileUploadTrigger asChild>
+                  <Button variant="outline" size="sm" className="mt-2 w-fit">
+                    Browse files
+                  </Button>
+                </FileUploadTrigger>
+              </FileUploadDropzone>
+              <FileUploadList>
+                {formData.attachments && formData.attachments.map((file, index) => (
+                  <FileUploadItem key={index} value={file}>
+                    <FileUploadItemPreview />
+                    <FileUploadItemMetadata />
+                    <FileUploadItemDelete asChild>
+                      <Button variant="ghost" size="icon" className="size-7">
+                        <X />
+                      </Button>
+                    </FileUploadItemDelete>
+                    
+                  </FileUploadItem>
+                ))}
+              </FileUploadList>
+            </FileUpload>
+          </div>
+
           {/* Higher hospital Form */}
           <div className="bg-card w-full border rounded-xl">
             <Accordion
@@ -226,15 +294,15 @@ const PrescribeForm: React.FC<PrescribeFormProps> = ({
 
         {/* fees inputs */}
         <div className="col-span-10 2xl:col-span-3 flex flex-col gap-4">
-        <ReceiptForm
-          receiptInfo={formData.receipt_details}
-          setReceiptInfo={setFormData}
-        />
+          <ReceiptForm
+            receiptInfo={formData.receipt_details}
+            setReceiptInfo={setFormData}
+          />
 
-        <PrescriptionAdditionalInfoForm
-          additionalInfo={formData.prescription_additional_details}
-          setAdditionalInfo={setFormData}
-        />
+          <PrescriptionAdditionalInfoForm
+            additionalInfo={formData.prescription_additional_details}
+            setAdditionalInfo={setFormData}
+          />
         </div>
 
         {/* Submit-cancel button */}
