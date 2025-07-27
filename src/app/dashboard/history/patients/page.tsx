@@ -8,11 +8,32 @@ import { DataTableToolbar } from "@/components/History/patients/data-table-toolb
 import { Patient } from "@/components/History/dataSchema/schema";
 import { checkPageAccess } from "@/app/dashboard/history/(history)/_actions";
 import { adminDb } from "@/server/firebaseAdmin";
+import {
+  createLoader,
+  parseAsInteger,
+} from 'nuqs/server'
+import type { SearchParams } from 'nuqs/server'
 
-export default async function Page() {
+const searchParams = {
+  page: parseAsInteger.withDefault(1),
+  pageSize: parseAsInteger.withDefault(20)
+};
+const loadSearchParams = createLoader(searchParams)
+
+type PageProps = {
+  searchParams: Promise<SearchParams>
+}
+
+export default async function Page({ searchParams }: PageProps) {
   let patients: Patient[] = [];
+  let totalRecords = 0;
+  let page;
+  let pageSize;
 
   try {
+    const query = await loadSearchParams(searchParams);
+    page = query.page;
+    pageSize = query.pageSize;
     const authInstance = await auth();
     if (!authInstance.orgId || !authInstance.orgRole) {
       throw error("User is not authorized for this organization.");
@@ -31,14 +52,22 @@ export default async function Page() {
       );
     }
 
-    const patientsQuery = adminDb
+    const patientsCollections = adminDb
       .collection("doctor")
       .doc(authInstance.orgId)
       .collection("patients");
+    
+    const patientsQuery = patientsCollections
+      .orderBy("__name__")
+      .limit(page * pageSize);
 
     const querySnapshot = await patientsQuery.get();
+    const countSnapshot = await patientsCollections.count().get();
 
-    patients = querySnapshot.docs.map((doc) => {
+    totalRecords=countSnapshot.data().count;
+    const lastRecords = page*pageSize > totalRecords ? (totalRecords%pageSize) : pageSize;
+
+    patients = querySnapshot.docs.slice(-lastRecords).map((doc) => {
       const data = doc.data() as RegisterPatientFormTypes;
       return {
         patient_id: data.patient_id,
@@ -70,6 +99,7 @@ export default async function Page() {
       <DataTable
         data={patients}
         columns={columns}
+        totalRecords={totalRecords}
         ToolbarComponent={DataTableToolbar}
       />
     </div>

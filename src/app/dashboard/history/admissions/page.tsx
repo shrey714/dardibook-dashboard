@@ -8,11 +8,31 @@ import { DataTableToolbar } from "@/components/History/admissions/data-table-too
 import { Admission } from "@/components/History/dataSchema/schema";
 import { checkPageAccess } from "@/app/dashboard/history/(history)/_actions";
 import { adminDb } from "@/server/firebaseAdmin";
+import {
+  createLoader,
+  parseAsInteger,
+} from 'nuqs/server'
+import type { SearchParams } from 'nuqs/server'
 
-export default async function Page() {
+const searchParams = {
+  page: parseAsInteger.withDefault(1),
+  pageSize: parseAsInteger.withDefault(20)
+};
+const loadSearchParams = createLoader(searchParams)
+
+type PageProps = {
+  searchParams: Promise<SearchParams>
+}
+
+export default async function Page({ searchParams }: PageProps) {
   let admissions: Admission[] = [];
-
+  let totalRecords = 0;
+  let page;
+  let pageSize;
   try {
+    const query = await loadSearchParams(searchParams);
+    page = query.page;
+    pageSize = query.pageSize;
     const authInstance = await auth();
     if (!authInstance.orgId || !authInstance.orgRole) {
       throw error("User is not authorized for this organization.");
@@ -31,15 +51,23 @@ export default async function Page() {
       );
     }
 
-    const admissionsQuery = adminDb
+    const bedsCollection = adminDb
       .collection("doctor")
       .doc(authInstance.orgId)
-      .collection("beds")
-      .orderBy("admission_at", "desc");
+      .collection("beds");
+
+    const admissionsQuery = bedsCollection
+      .orderBy("admission_at", "desc")
+      .limit(page * pageSize);
 
     const querySnapshot = await admissionsQuery.get();
+    const countSnapshot = await bedsCollection.count().get();
 
-    admissions = querySnapshot.docs.map((doc) => {
+    totalRecords=countSnapshot.data().count;
+    const lastRecords = page*pageSize > totalRecords ? (totalRecords%pageSize) : pageSize;
+
+
+    admissions = querySnapshot.docs.slice(-lastRecords).map((doc) => {
       const data = doc.data() as OrgBed;
       return {
         bedBookingId: data.bedBookingId,
@@ -71,6 +99,7 @@ export default async function Page() {
     <div className="flex flex-1 px-2 py-2 flex-col h-full overflow-hidden">
       <DataTable
         data={admissions}
+        totalRecords={totalRecords}
         columns={columns}
         ToolbarComponent={DataTableToolbar}
       />

@@ -9,11 +9,32 @@ import { Registration } from "@/components/History/dataSchema/schema";
 import { isSameDay } from "date-fns";
 import { checkPageAccess } from "@/app/dashboard/history/(history)/_actions";
 import { adminDb } from "@/server/firebaseAdmin";
+import {
+  createLoader,
+  parseAsInteger,
+} from 'nuqs/server'
+import type { SearchParams } from 'nuqs/server'
 
-export default async function Page() {
+const searchParams = {
+  page: parseAsInteger.withDefault(1),
+  pageSize: parseAsInteger.withDefault(20)
+};
+const loadSearchParams = createLoader(searchParams)
+
+type PageProps = {
+  searchParams: Promise<SearchParams>
+}
+
+export default async function Page({ searchParams }: PageProps) {
   let registrations: Registration[] = [];
+  let totalRecords = 0;
+  let page;
+  let pageSize;
 
   try {
+    const query = await loadSearchParams(searchParams);
+    page = query.page;
+    pageSize = query.pageSize;
     const authInstance = await auth();
     if (!authInstance.orgId || !authInstance.orgRole) {
       throw error("User is not authorized for this organization.");
@@ -32,12 +53,20 @@ export default async function Page() {
       );
     }
 
-    const registrationsQuery = adminDb
+    const patientsCollections = adminDb
       .collection("doctor")
       .doc(authInstance.orgId)
       .collection("patients");
 
+    const registrationsQuery = patientsCollections
+      .orderBy("__name__")
+      .limit(page * pageSize);
+
     const querySnapshot = await registrationsQuery.get();
+    const countSnapshot = await patientsCollections.count().get();
+
+    totalRecords=countSnapshot.data().count;
+    const lastRecords = page*pageSize > totalRecords ? (totalRecords%pageSize) : pageSize;
 
     registrations = querySnapshot.docs.flatMap((doc) => {
       const patient = doc.data() as RegisterPatientFormTypes;
@@ -72,6 +101,7 @@ export default async function Page() {
       <DataTable
         data={registrations}
         columns={columns}
+        totalRecords={totalRecords}
         ToolbarComponent={DataTableToolbar}
       />
     </div>

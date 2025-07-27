@@ -35,6 +35,7 @@ declare module "@tanstack/react-table" {
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
+  totalRecords: number;
   data: TData[];
   ToolbarComponent?: React.ComponentType<{ table: any }>;
 }
@@ -42,6 +43,7 @@ interface DataTableProps<TData, TValue> {
 export function DataTable<TData, TValue>({
   columns,
   data,
+  totalRecords,
   ToolbarComponent,
 }: DataTableProps<TData, TValue>) {
   const [columnVisibility, setColumnVisibility] =
@@ -130,7 +132,7 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-      <DataTablePagination table={table} />
+      <DataTablePagination table={table} totalRecords={totalRecords}/>
     </div>
   );
 }

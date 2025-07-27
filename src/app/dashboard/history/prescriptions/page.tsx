@@ -8,11 +8,32 @@ import { DataTableToolbar } from "@/components/History/prescriptions/data-table-
 import { Prescription } from "@/components/History/dataSchema/schema";
 import { checkPageAccess } from "@/app/dashboard/history/(history)/_actions";
 import { adminDb } from "@/server/firebaseAdmin";
+import {
+  createLoader,
+  parseAsInteger,
+} from 'nuqs/server'
+import type { SearchParams } from 'nuqs/server'
 
-export default async function Page() {
+const searchParams = {
+  page: parseAsInteger.withDefault(1),
+  pageSize: parseAsInteger.withDefault(20)
+};
+const loadSearchParams = createLoader(searchParams)
+
+type PageProps = {
+  searchParams: Promise<SearchParams>
+}
+
+export default async function Page({ searchParams }: PageProps) {
   let prescriptions: Prescription[] = [];
+  let totalRecords = 0;
+  let page;
+  let pageSize;
 
   try {
+    const query = await loadSearchParams(searchParams);
+    page = query.page;
+    pageSize = query.pageSize;
     const authInstance = await auth();
     if (!authInstance.orgId || !authInstance.orgRole) {
       throw error("User is not authorized for this organization.");
@@ -35,10 +56,16 @@ export default async function Page() {
       .collectionGroup("prescriptions")
       .where("orgId", "==", authInstance.orgId)
       .orderBy("created_at", "desc");
+    
+    const prescriptionsQueryWithLimit = prescriptionsQuery.limit(page * pageSize);
 
-    const querySnapshot = await prescriptionsQuery.get();
+    const querySnapshot = await prescriptionsQueryWithLimit.get();
+    const countSnapshot = await prescriptionsQuery.count().get();
 
-    prescriptions = querySnapshot.docs.map((doc) => {
+    totalRecords=countSnapshot.data().count;
+    const lastRecords = page*pageSize > totalRecords ? (totalRecords%pageSize) : pageSize;
+
+    prescriptions = querySnapshot.docs.slice(-lastRecords).map((doc) => {
       const data = doc.data() as PrescriptionFormTypes;
       return {
         patient_id: doc.ref.parent.parent?.id as string,
@@ -71,6 +98,7 @@ export default async function Page() {
       <DataTable
         data={prescriptions}
         columns={columns}
+        totalRecords={totalRecords}
         ToolbarComponent={DataTableToolbar}
       />
     </div>

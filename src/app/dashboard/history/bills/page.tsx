@@ -8,11 +8,32 @@ import { DataTableToolbar } from "@/components/History/bills/data-table-toolbar"
 import { Bill } from "@/components/History/dataSchema/schema";
 import { checkPageAccess } from "@/app/dashboard/history/(history)/_actions";
 import { adminDb } from "@/server/firebaseAdmin";
+import {
+  createLoader,
+  parseAsInteger,
+} from 'nuqs/server'
+import type { SearchParams } from 'nuqs/server'
 
-export default async function Page() {
+const searchParams = {
+  page: parseAsInteger.withDefault(1),
+  pageSize: parseAsInteger.withDefault(20)
+};
+const loadSearchParams = createLoader(searchParams)
+
+type PageProps = {
+  searchParams: Promise<SearchParams>
+}
+
+export default async function Page({ searchParams }: PageProps) {
   let bills: Bill[] = [];
+  let totalRecords = 0;
+  let page;
+  let pageSize;
 
   try {
+    const query = await loadSearchParams(searchParams);
+    page = query.page;
+    pageSize = query.pageSize;
     const authInstance = await auth();
     if (!authInstance.orgId || !authInstance.orgRole) {
       throw error("User is not authorized for this organization.");
@@ -31,15 +52,22 @@ export default async function Page() {
       );
     }
 
-    const billsQuery = adminDb
-      .collection("doctor")
-      .doc(authInstance.orgId)
-      .collection("bills")
-      .orderBy("generated_at", "desc");
+    const billsCollection = adminDb
+    .collection("doctor")
+    .doc(authInstance.orgId)
+    .collection("bills");
+
+    const billsQuery = billsCollection
+      .orderBy("generated_at", "desc")
+      .limit(page * pageSize);
 
     const querySnapshot = await billsQuery.get();
+    const countSnapshot = await billsCollection.count().get();
 
-    bills = querySnapshot.docs.map((doc) => {
+    totalRecords=countSnapshot.data().count;
+    const lastRecords = page*pageSize > totalRecords ? (totalRecords%pageSize) : pageSize;
+
+    bills = querySnapshot.docs.slice(-lastRecords).map((doc) => {
       const data = doc.data() as PharmacyTypes;
       return {
         bill_id: data.bill_id,
@@ -75,6 +103,7 @@ export default async function Page() {
       <DataTable
         data={bills}
         columns={columns}
+        totalRecords={totalRecords}
         ToolbarComponent={DataTableToolbar}
       />
     </div>
