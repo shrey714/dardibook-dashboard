@@ -68,7 +68,7 @@ export default async function Page({ searchParams }: PageProps) {
     totalRecords=countSnapshot.data().count;
     const lastRecords = page*pageSize > totalRecords ? (totalRecords%pageSize) : pageSize;
 
-    registrations = querySnapshot.docs.flatMap((doc) => {
+    registrations = querySnapshot.docs.slice(-lastRecords).flatMap((doc) => {
       const patient = doc.data() as RegisterPatientFormTypes;
 
       return patient.registered_date_time.map((register_time) => ({
