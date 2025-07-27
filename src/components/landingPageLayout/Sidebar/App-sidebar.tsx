@@ -27,7 +27,6 @@ import {
   SidebarRail,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { ModeToggle } from "@/components/common/mode-toggle";
 import { usePathname } from "next/navigation";
 import RolesLink from "./RolesLink";
 import TokenBox from "../../tokenFramer/TokenBox";
@@ -156,10 +155,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <NavMain pages={pages} pathname={pathname} />
         </ScrollShadow>
       </SidebarContent>
-      <SidebarFooter className="gap-1 group-data-[collapsible=icon]:gap-3.5 group-data-[collapsible=icon]:pb-4">
-        <RolesLink pathname={pathname} />
-        <NavUser />
-        <ModeToggle />
+      <SidebarFooter className="p-1">
+        <div className="p-1 gap-1 group-data-[collapsible=icon]:gap-3 flex flex-col border bg-input/30 dark:border-input rounded-md">
+          <RolesLink pathname={pathname} />
+          <NavUser />
+        </div>
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

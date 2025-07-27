@@ -302,8 +302,7 @@ const CurrentBedPatients = () => {
                                 Age : {matchingPatient.age}
                               </h4>
                               <p className="flex text-sm items-center gap-2">
-                                <PhoneIcon size={16} />{" "}
-                                {matchingPatient.mobile}
+                                <PhoneIcon size={16} /> {matchingPatient.mobile}
                               </p>
                             </div>
                             <div className="flex flex-col items-start space-y-1">
@@ -402,7 +401,7 @@ const CurrentBedPatients = () => {
                 >
                   <SelectTrigger
                     id="admission_for"
-                    className="w-full md:max-w-md lg:col-span-2 disabled:text-primary shadow-sm rounded-md border-border bg-transparent form-input py-1 pl-2 sm:text-sm sm:leading-6"
+                    className="w-full md:max-w-md lg:col-span-2"
                   >
                     <SelectValue placeholder="Admission for" />
                   </SelectTrigger>
@@ -476,7 +475,7 @@ const CurrentBedPatients = () => {
                         className="border-b-0"
                       >
                         <AccordionTrigger className="py-0 border-0 hover:no-underline gap-x-2 pr-2">
-                          <div className="flex w-full flex-1 flex-row rounded-md bg-border h-24 sm:h-12 overflow-hidden">
+                          <div className="flex w-full flex-1 flex-row rounded-md bg-input/45 h-24 sm:h-12 overflow-hidden">
                             {isSameDay(bed.admission_at, new Date()) ? (
                               <div className="bg-green-400 w-[4px] h-full"></div>
                             ) : (
@@ -546,8 +545,8 @@ const CurrentBedPatients = () => {
                                   disabled={bed.dischargeMarked}
                                 />
                                 <Button
-                                  variant="default"
-                                  className="p-0 border-0 rounded-md h-full aspect-square"
+                                  variant="outline"
+                                  className="aspect-square p-0"
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     openModal({
@@ -558,8 +557,9 @@ const CurrentBedPatients = () => {
                                   <History />
                                 </Button>
                                 <Button
-                                  variant="outline"
-                                  className="bg-blue-700 hover:bg-blue-900 text-white hover:text-white flex flex-1 rounded-md h-full p-0 px-2 border-0 disabled:invisible"
+                                  variant="default"
+                                  effect={"ringHover"}
+                                  className="flex flex-1"
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     router.push(

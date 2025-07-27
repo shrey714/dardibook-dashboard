@@ -289,7 +289,7 @@ export const UserReOrderMenu: React.FC<UserReOrderMenuProps> = ({
             }}
             className="cursor-pointer font-medium border-0 bg-green-500/10 text-green-600 hover:!text-green-600 hover:!bg-green-500/20 flex items-center justify-center"
           >
-            <Calendar1Icon />
+            <Calendar1Icon className="text-green-600" />
             Submit
           </Button>
         </DropdownMenuItem>

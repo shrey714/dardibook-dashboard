@@ -111,6 +111,17 @@ export interface ReceiptDetails {
     amount: number;
 }
 
+export interface PrescriptionAdditionalinfo{
+    id: string;
+    label: string;
+    value: string;
+}
+
+export interface UploadedFileInfo {
+    name: string;
+    url: string;
+  };
+
 export interface PrescriptionFormTypes {
     prescription_id: string;
     orgId: string;
@@ -126,6 +137,9 @@ export interface PrescriptionFormTypes {
     prescribed_by: orgUserType;
     prescriber_assigned: orgUserType;
     receipt_details: ReceiptDetails[];
+    prescription_additional_details: PrescriptionAdditionalinfo[];
+    attachments?: File[];
+    attachments_data?: UploadedFileInfo[];
 }
 
 export interface MedicineItems extends MedicinesDetails {

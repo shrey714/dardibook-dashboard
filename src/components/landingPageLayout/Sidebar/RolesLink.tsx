@@ -53,9 +53,9 @@ const RolesLink = ({ pathname }: { pathname: string }) => {
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Change Role</DialogTitle>
+            <DialogTitle>Switch Organization</DialogTitle>
             <DialogDescription>
-              Make changes to your role profile.
+              Switch between your available organizations.
             </DialogDescription>
           </DialogHeader>
           <OrganizationList

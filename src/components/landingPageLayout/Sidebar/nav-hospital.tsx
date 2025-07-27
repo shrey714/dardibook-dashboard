@@ -16,7 +16,7 @@ export function NavHospital() {
   const { isLoading, error } = useLogStore();
 
   return (
-    <div className="rounded-full p-0.5 bg-secondary flex items-center h-min overflow-auto">
+    <div className="rounded-full p-0.5 min-w-8 bg-background dark:bg-input/30 outline outline-1 outline-border flex items-center h-min overflow-hidden">
       {!isLoaded ? (
         <div className="flex items-center gap-1">
           <Skeleton className="size-6 rounded-full" />

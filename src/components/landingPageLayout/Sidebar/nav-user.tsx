@@ -17,11 +17,13 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import LogOutBTtn from "@/components/common/LogOutBTtn";
-import { useUser } from "@clerk/nextjs";
+import { useAuth, useUser } from "@clerk/nextjs";
+import { Badge } from "@/components/ui/badge";
 
 export function NavUser({}) {
   const { isMobile } = useSidebar();
   const { user } = useUser();
+  const { orgRole } = useAuth();
 
   return (
     <SidebarMenu>
@@ -44,6 +46,17 @@ export function NavUser({}) {
               <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden ml-2">
                 <span className="truncate font-semibold">
                   {user?.firstName}
+                  <Badge variant="outline" className="border-primary ml-1 text-primary rounded-full py-0 px-1.5 text-[11px] font-medium leading-tight">
+                    {orgRole === "org:clinic_head"
+                      ? "Admin"
+                      : orgRole === "org:doctor"
+                      ? "Doctor"
+                      : orgRole === "org:assistant_doctor"
+                      ? "SubDoctor"
+                      : orgRole === "org:medical_staff"
+                      ? "Medical"
+                      : ""}
+                  </Badge>
                 </span>
                 <span className="truncate text-xs">
                   {user?.emailAddresses[0].emailAddress}

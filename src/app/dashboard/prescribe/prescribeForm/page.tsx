@@ -16,8 +16,10 @@ import { useTodayPatientStore } from "@/lib/providers/todayPatientsProvider";
 import { useBedsStore } from "@/lib/stores/useBedsStore";
 import {
   orgUserType,
+  PrescriptionAdditionalinfo,
   PrescriptionFormTypes,
   ReceiptDetails,
+  UploadedFileInfo,
 } from "@/types/FormTypes";
 import { getTime } from "date-fns";
 import {
@@ -42,6 +44,7 @@ import toast, { ToastOptions } from "react-hot-toast";
 import { arrayUnion, collection, doc, writeBatch } from "firebase/firestore";
 import { db } from "@/firebase/firebaseConfig";
 import { Spinner } from "@/components/ui/spinner";
+import { uploadFile } from "@/lib/actions/OrganizationHelpers";
 
 export interface patientBarDataTypes {
   patient_id: string;
@@ -144,6 +147,15 @@ const Page = () => {
         ? (organization.publicMetadata
             .prescription_receipt_types as ReceiptDetails[])
         : [],
+      prescription_additional_details:
+        isLoaded &&
+        organization &&
+        organization.publicMetadata.prescription_additional_details
+          ? (organization.publicMetadata
+              .prescription_additional_details as PrescriptionAdditionalinfo[]).map(({ id, label }) => ({
+                id,label,value: "",
+              }))
+          : [],
   });
   const [patientBarData, setpatientBarData] = useState<patientBarDataTypes>({
     patient_id: "",
@@ -162,13 +174,54 @@ const Page = () => {
     },
     inBed: false,
   });
+
+  const getUnit = (id: string) => {
+      const unit =
+        isLoaded &&
+        organization &&
+        organization.publicMetadata.prescription_additional_details
+          ? (
+              organization.publicMetadata
+                .prescription_additional_details as PrescriptionAdditionalinfo[]
+            ).find((info) => info.id == id)?.value ?? ""
+          : "";
+          console.log("unit : ",unit);
+      return unit;
+    };
+
+  const formattedDetails = (details:PrescriptionAdditionalinfo[])=>{
+      return details
+      .filter((detail) => detail.value.trim() !== "").map(detail=>({
+        ...detail,
+        value:`${detail.value} ${getUnit(detail.id)}`
+      }));
+  }
+
+  const uploadFilesInBulk = async (
+    files: File[]
+  ): Promise<UploadedFileInfo[]> => {
+    const uploadTasks = files.map(async (file) => {
+      const url = await uploadFile(file,`attachments/${Date.now()}-${file.name}`);
+      return {name:file.name,url};
+    });
+  
+    return await Promise.all(uploadTasks);
+  };
+
   // Submit Function
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
 
     if (orgId && user && patientId) {
+      const { attachments, ...restFormData } = formData;
+
+      const uploadedFileData = attachments?.length
+    ? await uploadFilesInBulk(attachments)
+    : [];
+
       const prescriptionData = {
-        ...formData,
+        ...restFormData,
+        prescription_additional_details: formattedDetails(restFormData.prescription_additional_details),
         orgId: orgId,
         prescription_for_bed: patientBarData.inBed,
         created_at: getTime(new Date()),
@@ -179,6 +232,7 @@ const Page = () => {
           email: user.primaryEmailAddress?.emailAddress,
         },
         prescriber_assigned: patientBarData.registerd_for,
+        attachments_data:uploadedFileData
       } as PrescriptionFormTypes;
 
       const batch = writeBatch(db);

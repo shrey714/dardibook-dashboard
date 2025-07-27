@@ -37,7 +37,7 @@ import { Button } from "@/components/ui/button";
 
 import { useOrganization } from "@clerk/nextjs";
 import { Separator } from "@/components/ui/separator";
-import { ReceiptDetails } from "@/types/FormTypes";
+import { PrescriptionAdditionalinfo, ReceiptDetails } from "@/types/FormTypes";
 import {
   Table,
   TableBody,
@@ -48,6 +48,7 @@ import {
 } from "@/components/ui/table";
 import {
   updateMedicineTypesDefaults,
+  updatePrescriptionAdditionalInfo,
   updatePrescriptionReceiptDefaults,
 } from "@/app/dashboard/settings/defaults/_actions";
 import { Badge } from "@/components/ui/badge";
@@ -57,6 +58,7 @@ import { Spinner } from "@/components/ui/spinner";
 export const PrescriptionOptions = () => {
   return (
     <>
+      <PrescriptionAdditionalInfo />
       <PrescriptionReceiptType />
       <MedicineTypes />
     </>
@@ -372,6 +374,317 @@ const PrescriptionReceiptType = () => {
         )}
       </div>
     </>
+  );
+};
+
+const PrescriptionAdditionalInfo = () => {
+  const { organization, isLoaded } = useOrganization();
+  const [additionalInfo, setAdditionalInfo] = useState<
+  PrescriptionAdditionalinfo[]
+  >([]);
+  const [addLoader, setAddLoader] = useState(false);
+  const [updateLoader, setUpdateLoader] = useState(false);
+  const [deleteLoader, setDeleteLoader] = useState(false);
+  const [infoEditModel, setInfoEditModel] = useState<boolean>(false);
+  const [editForInfoId, setEditForInfoId] = useState<string>("");
+
+  useEffect(() => {
+    if (
+      isLoaded &&
+      organization &&
+      organization.publicMetadata.prescription_additional_details
+    ) {
+      setAdditionalInfo(
+        organization.publicMetadata
+          .prescription_additional_details as PrescriptionAdditionalinfo[]
+      );
+    } else {
+      setAdditionalInfo([]);
+    }
+  }, [isLoaded, organization]);
+
+  // --------------add new receipt type-----------
+  const AddNewType = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setAddLoader(true);
+    const form = e.target as HTMLFormElement;
+    const newInfo: PrescriptionAdditionalinfo = {
+      id: uniqid(),
+      label: form.label.value.trim(),
+      value: form.unit.value.trim(),
+    };
+    if (!organization) return;
+    toast.promise(
+      async () => {
+        await updatePrescriptionAdditionalInfo(
+          additionalInfo.concat(newInfo)
+        ).then(
+          () => {
+            organization.reload();
+            setAddLoader(false);
+            form.reset();
+          },
+          (error) => {
+            console.error("Operation failed. Please try again : ", error);
+            setAddLoader(false);
+          }
+        );
+      },
+      {
+        loading: "Adding feild...",
+        success: "Feild added successfully",
+        error: "Error adding feild",
+      },
+      {
+        position: "bottom-right",
+      }
+    );
+  };
+  // --------------update receipt-----------
+  const UpdateType = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setUpdateLoader(true);
+    const form = e.target as HTMLFormElement;
+    const existingReceiptType: PrescriptionAdditionalinfo = {
+      id: editForInfoId,
+      label: form.label.value.trim(),
+      value: form.unit.value.trim(),
+    };
+    if (!organization) return;
+    toast.promise(
+      async () => {
+        await updatePrescriptionAdditionalInfo(
+          additionalInfo.map((info) =>
+            info.id === editForInfoId ? existingReceiptType : info
+          )
+        ).then(
+          () => {
+            organization.reload();
+            setUpdateLoader(false);
+            setInfoEditModel(false);
+          },
+          (error) => {
+            console.error("Operation failed. Please try again : ", error);
+            setUpdateLoader(false);
+          }
+        );
+      },
+      {
+        loading: "Updating feild...",
+        success: "Feild updated successfully",
+        error: "Error updating feild",
+      },
+      {
+        position: "bottom-right",
+      }
+    );
+  };
+  // --------------delete receipt-----------
+  const DeleteType = async () => {
+    setDeleteLoader(true);
+    if (!organization) return;
+    toast.promise(
+      async () => {
+        await updatePrescriptionAdditionalInfo(
+          additionalInfo.filter((info) => info.id !== editForInfoId)
+        ).then(
+          () => {
+            organization.reload();
+            setDeleteLoader(false);
+            setInfoEditModel(false);
+          },
+          (error) => {
+            console.error("Operation failed. Please try again : ", error);
+            setDeleteLoader(false);
+          }
+        );
+      },
+      {
+        loading: "Deleting feild...",
+        success: "Feild deleted successfully",
+        error: "Error deleting feild",
+      },
+      {
+        position: "bottom-right",
+      }
+    );
+  };
+  return (
+    <div className="mb-4">
+      <Dialog open={infoEditModel} onOpenChange={setInfoEditModel}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle className="font-medium">
+              Edit Additional Prescription Info
+            </DialogTitle>
+            <DialogDescription>
+              Modify details for{" "}
+              {
+                additionalInfo?.find((receipt) => receipt.id === editForInfoId)
+                  ?.label
+              }
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={UpdateType} autoComplete="off">
+            <fieldset
+              disabled={updateLoader || deleteLoader}
+              className="w-full rounded-lg grid grid-cols-6 gap-4"
+            >
+              <div className="col-span-6 space-y-2">
+                <Label htmlFor="label">Label</Label>
+                <Input
+                  name="label"
+                  id="label"
+                  placeholder="e.g., Weight"
+                  required
+                  defaultValue={
+                    additionalInfo?.find(
+                      (receipt) => receipt.id === editForInfoId
+                    )?.label
+                  }
+                />
+              </div>
+              <div className="col-span-6 space-y-2">
+                <Label htmlFor="unit">Unit</Label>
+                <Input
+                  name="unit"
+                  id="unit"
+                  placeholder="e.g., kg"
+                  required
+                  defaultValue={
+                    additionalInfo?.find(
+                      (receipt) => receipt.id === editForInfoId
+                    )?.value
+                  }
+                />
+              </div>
+
+              <Separator className="w-full col-span-6" />
+              <div className="flex col-span-6 w-full items-center justify-between">
+                <Button
+                  role="button"
+                  variant={"destructive"}
+                  type="button"
+                  onClick={DeleteType}
+                  icon={Trash2Icon}
+                  iconPlacement="right"
+                  loading={deleteLoader}
+                  loadingText={"Deleting"}
+                >
+                  Delete
+                </Button>
+                <Button
+                  tabIndex={0}
+                  role="button"
+                  variant={"outline"}
+                  type="submit"
+                  icon={SaveIcon}
+                  iconPlacement="right"
+                  loading={updateLoader}
+                  loadingText={"Updating"}
+                >
+                  Update
+                </Button>
+              </div>
+            </fieldset>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      <Card className="border-b-0 rounded-b-none w-full h-min mx-auto">
+        <CardHeader>
+          <CardTitle className="font-medium">
+            Additional Prescription Info
+          </CardTitle>
+          <CardDescription>
+            Add custom fields like BMI, BP and weight to include relevant clinical details in the prescription.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={AddNewType} autoComplete="off">
+            <fieldset
+              disabled={addLoader}
+              className="w-full rounded-lg grid grid-cols-6 gap-4"
+            >
+              <div className="col-span-6 sm:col-span-3 space-y-2">
+                <Label htmlFor="label">Label <span className="text-red-500">*</span></Label>
+                <Input
+                  name="label"
+                  id="label"
+                  placeholder="e.g., Weight"
+                  required
+                />
+              </div>
+
+              <div className="col-span-6 sm:col-span-3 space-y-2">
+                <Label htmlFor="unit">Unit</Label>
+                <Input name="unit" id="unit" placeholder="e.g., kg" />
+              </div>
+
+              <Separator className="w-full col-span-6" />
+              <div className="flex col-span-6 w-full items-center justify-end">
+                <Button
+                  tabIndex={0}
+                  role="button"
+                  type="submit"
+                  icon={CirclePlus}
+                  iconPlacement="right"
+                  effect={"ringHover"}
+                  loading={addLoader}
+                  loadingText="Adding"
+                >
+                  Add
+                </Button>
+              </div>
+            </fieldset>
+          </form>
+        </CardContent>
+      </Card>
+      <div className="rounded-t-none w-full flex flex-col flex-1 bg-card border rounded-xl divide-y">
+        {!isLoaded ? (
+          <div className="flex flex-1 items-center justify-center min-h-72 w-full">
+            <Spinner size="sm" className="bg-foreground" />
+          </div>
+        ) : additionalInfo.length === 0 ? (
+          <div className="flex flex-1 items-center justify-center text-muted-foreground min-h-72">
+            <InboxIcon />
+          </div>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-muted/50">
+                <TableHead className="h-12 pl-6">Id</TableHead>
+                <TableHead className="h-12">Lable</TableHead>
+                <TableHead className="h-12">Unit</TableHead>
+                <TableHead className="h-12"></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {additionalInfo.map((info, index) => (
+                <TableRow key={index}>
+                  <TableCell className="pl-6">{index + 1}</TableCell>
+                  <TableCell className="text-nowrap">{info.label}</TableCell>
+                  <TableCell>{info.value.length>0?info.value:<span className="text-muted-foreground">Not Assigned</span>}</TableCell>
+                  <TableCell className="text-right pr-6">
+                    <Button
+                      variant={"outline"}
+                      className={`h-9 w-9 min-w-0`}
+                      effect={"ringHover"}
+                      onClick={() => {
+                        setInfoEditModel(true);
+                        setEditForInfoId(info.id);
+                      }}
+                    >
+                      <Pencil />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
+      </div>
+    </div>
   );
 };
 

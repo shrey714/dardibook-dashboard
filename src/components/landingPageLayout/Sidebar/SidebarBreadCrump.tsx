@@ -14,7 +14,7 @@ import { usePathname } from "next/navigation";
 import dynamic from "next/dynamic";
 import { AvatarStack } from "./collaboration/avatar-stack";
 import { NavHospital } from "./nav-hospital";
-import FullscreenToggle from "@/components/common/FullScreenToggler";
+import { TopBarMenu } from "@/components/common/TopBarMenu";
 const CollaborationProvider = dynamic(() =>
   import("./collaboration/collaboration-provider").then(
     (mod) => mod.CollaborationProvider
@@ -78,7 +78,7 @@ const SidebarBreadCrump = () => {
           <AvatarStack />
         </CollaborationProvider>
         <NavHospital />
-        <FullscreenToggle />
+        <TopBarMenu />
       </div>
     </header>
   );

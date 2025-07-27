@@ -1,12 +1,7 @@
+import { PatientActivityLog } from "@/types/logTypes";
 import { useLogStore } from "./useActivityLogStore";
 
-type LogData = {
-    action: string;
-    metadata?: Record<string, any>;
-    location?: string;
-};
-
-export function logActivity(data: LogData) {
+export function logActivity(data: PatientActivityLog) {
     const { setLoading, setError } = useLogStore.getState();
 
     setLoading(true);

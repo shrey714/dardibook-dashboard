@@ -93,7 +93,7 @@ export function NavMain({
                       </Link>
 
                       <CollapsibleTrigger asChild>
-                        <SidebarMenuAction className="data-[state=open]:rotate-180 bg-transparent hover:bg-transparent right-1.5 top-[calc(18px-10px)]">
+                        <SidebarMenuAction className="data-[state=open]:rotate-180 right-1.5 top-[calc(18px-10px)] border bg-background shadow-none hover:bg-accent text-muted-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50">
                           <ChevronDown />
                           <span className="sr-only">Toggle</span>
                         </SidebarMenuAction>

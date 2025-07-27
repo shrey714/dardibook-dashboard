@@ -34,16 +34,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 import CreatableSelect from "react-select/creatable";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-
-interface BedDefaultsType {
-  bed_id: string;
-  ward: string;
-}
+import { BedInfo } from "@/types/FormTypes";
 
 export const AdmissionOptions = () => {
   const { orgId } = useAuth();
   const { organization, isLoaded } = useOrganization();
-  const [clerkBeds, setClerkBeds] = useState<BedDefaultsType[]>([]);
+  const [clerkBeds, setClerkBeds] = useState<BedInfo[]>([]);
   const [addLoader, setAddLoader] = useState(false);
   const [updateLoader, setUpdateLoader] = useState(false);
   const [deleteLoader, setDeleteLoader] = useState(false);
@@ -53,7 +49,7 @@ export const AdmissionOptions = () => {
 
   useEffect(() => {
     if (isLoaded && organization && organization.publicMetadata.beds) {
-      setClerkBeds(organization.publicMetadata.beds as BedDefaultsType[]);
+      setClerkBeds(organization.publicMetadata.beds as BedInfo[]);
     } else {
       setClerkBeds([]);
     }
@@ -65,7 +61,7 @@ export const AdmissionOptions = () => {
     if (!organization) return;
 
     const form = e.target as HTMLFormElement;
-    const newBed: BedDefaultsType = {
+    const newBed: BedInfo = {
       bed_id: form.bed_id.value.trim(),
       ward: form.ward.value.trim(),
     };
@@ -113,7 +109,7 @@ export const AdmissionOptions = () => {
     if (!organization) return;
 
     const form = e.target as HTMLFormElement;
-    const existingbed: BedDefaultsType = {
+    const existingbed: BedInfo = {
       bed_id: editForBedId,
       ward: form.ward.value.trim(),
     };
@@ -189,7 +185,7 @@ export const AdmissionOptions = () => {
     return assignedPatient ? "occupied" : "available";
   };
 
-  const groupBedsByWard = clerkBeds.reduce<Record<string, BedDefaultsType[]>>(
+  const groupBedsByWard = clerkBeds.reduce<Record<string, BedInfo[]>>(
     (acc, bed) => {
       if (!acc[bed.ward]) {
         acc[bed.ward] = [];
@@ -444,7 +440,7 @@ export const AdmissionOptions = () => {
           </div>
         ) : (
           Object.entries(groupBedsByWard).map(([wardName, bedsInWard]) => (
-            <div key={wardName} className="">
+            <div key={wardName}>
               <h3 className="text-sm py-1 px-2 bg-muted/50 text-muted-foreground leading-none">
                 {wardName}
               </h3>
