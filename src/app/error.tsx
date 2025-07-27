@@ -21,7 +21,7 @@ const ServerError = () => {
             />
           </div>
           <div className="wf-ull lg:w-1/2">
-            <p className="text-sm font-medium text-blue-400">Not found !</p>
+            <p className="text-sm font-medium text-blue-400">Server Error !</p>
             <h1 className="mt-3 text-2xl font-semibold text-gray-600 md:text-3xl">
               Something went wrong !
             </h1>
@@ -29,7 +29,6 @@ const ServerError = () => {
               Sorry, please try again or report this error at the link provided
               below :
             </p>
-
             <div className="flex items-center justify-center mt-6 gap-x-3">
               <Button variant={"secondary"} asChild>
                 <Link href="/">Take me home</Link>
