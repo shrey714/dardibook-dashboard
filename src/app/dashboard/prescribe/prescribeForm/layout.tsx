@@ -5,5 +5,5 @@ export const metadata: Metadata = {
   description: "Add new prescriptions of the patients",
 };
 export default function RootLayout({ children }: { children?: ReactNode }) {
-  return <div className="relative h-svh overflow-hidden">{children}</div>;
+  return <>{children}</>;
 }

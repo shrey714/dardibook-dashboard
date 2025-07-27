@@ -1,6 +1,6 @@
 // firebaseConfig.ts
 import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider } from "firebase/auth";
+import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 import { getDatabase } from "firebase/database";
@@ -16,7 +16,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const provider = new GoogleAuthProvider();
 const storage = getStorage(app);
 const realtimeDb = getDatabase(app);
-export { auth, provider, db, storage, realtimeDb };
+export { auth, db, storage, realtimeDb };

@@ -1,6 +1,10 @@
 import { ReactNode } from "react";
 import DashboardWrapper from "@/components/wrapper/DashboardWrapper";
 import type { Metadata } from "next";
+import { RefProvider } from "@/hooks/RefContext";
+import { TodayPatientsProvider } from "@/lib/providers/todayPatientsProvider";
+import PatientHistoryGlobalModal from "@/components/common/PatientHistoryGlobalModal";
+import InitializeZustandStore from "@/components/InitializeZustandStore";
 
 export const metadata: Metadata = {
   title: "DardiBook | Dashboard",
@@ -8,8 +12,14 @@ export const metadata: Metadata = {
 };
 export default function RootLayout({ children }: { children?: ReactNode }) {
   return (
-    <DashboardWrapper>
-      {children}
-    </DashboardWrapper>
+    <RefProvider>
+      <DashboardWrapper>
+        <TodayPatientsProvider>
+          <InitializeZustandStore />
+          <PatientHistoryGlobalModal />
+          {children}
+        </TodayPatientsProvider>
+      </DashboardWrapper>
+    </RefProvider>
   );
 }

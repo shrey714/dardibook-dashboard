@@ -2,19 +2,26 @@ import React, { useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import {
-  ArrowsPointingInIcon,
-  ArrowsPointingOutIcon,
-} from "@heroicons/react/24/outline";
-import { NoSymbolIcon, PauseIcon } from "@heroicons/react/24/solid";
-const BoxContainer = ({ CurrentToken, loading, isPaused }: any) => {
+import { Maximize, Minimize, Pause } from "lucide-react";
+const BoxContainer = ({
+  CurrentToken,
+  loading,
+  isPaused,
+  allowTokenSceenExpand,
+}: {
+  CurrentToken: number;
+  loading: boolean;
+  isPaused: boolean;
+  allowTokenSceenExpand: boolean;
+}) => {
   const [isExpanded, setisExpanded] = useState(false);
+
   return (
     <>
       <AnimatePresence>
         {isExpanded && (
           <motion.div
-            key={714}
+            key={`dardibook-${CurrentToken}`}
             animate={isExpanded ? "expanded" : "collapsed"}
             variants={{
               collapsed: {
@@ -26,7 +33,9 @@ const BoxContainer = ({ CurrentToken, loading, isPaused }: any) => {
             }}
             layoutId={`card-714`}
             onClick={() => {
-              setisExpanded(!isExpanded);
+              if (allowTokenSceenExpand) {
+                setisExpanded(!isExpanded);
+              }
             }}
             style={{
               userSelect: "none",
@@ -41,10 +50,10 @@ const BoxContainer = ({ CurrentToken, loading, isPaused }: any) => {
               top: "0px",
               left: "0px",
               right: "0px",
-              height: "100vh",
-              zIndex: 999,
+              height: "100svh",
+              zIndex: 111999,
             }}
-            className="fixed md:absolute"
+            className="fixed"
           >
             <Image
               src="/Logo.svg"
@@ -53,7 +62,9 @@ const BoxContainer = ({ CurrentToken, loading, isPaused }: any) => {
               alt="logo"
             />
 
-            <ArrowsPointingInIcon className="size-4 text-white absolute top-4 right-4 opacity-20" />
+            {allowTokenSceenExpand && (
+              <Minimize className="size-4 text-white absolute top-4 right-4 opacity-20" />
+            )}
 
             <motion.h3
               layoutId={`h3-714`}
@@ -67,7 +78,7 @@ const BoxContainer = ({ CurrentToken, loading, isPaused }: any) => {
               }}
             >
               {loading || isPaused ? (
-                <PauseIcon className="size-48 text-white" />
+                <Pause className="size-48 text-white" />
               ) : (
                 CurrentToken
               )}
@@ -89,16 +100,17 @@ const BoxContainer = ({ CurrentToken, loading, isPaused }: any) => {
         }}
         layoutId={`card-714`}
         onClick={() => {
-          setisExpanded(!isExpanded);
+          if (allowTokenSceenExpand) {
+            setisExpanded(!isExpanded);
+          }
         }}
         style={{
           userSelect: "none",
-          borderRadius: "0px",
+          borderRadius: "6px",
           cursor: "pointer",
           position: "relative",
           width: "100%",
-          //   height: "100%",
-          aspectRatio: 1,
+          height: "100%",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -108,7 +120,9 @@ const BoxContainer = ({ CurrentToken, loading, isPaused }: any) => {
       >
         {/* Add image here also */}
 
-        <ArrowsPointingOutIcon className="size-4 text-white absolute top-4 right-4" />
+        {allowTokenSceenExpand && (
+          <Maximize className="size-3 text-white absolute top-2 right-2" />
+        )}
         <motion.h3
           layoutId={`h3-714`}
           style={{
@@ -121,7 +135,7 @@ const BoxContainer = ({ CurrentToken, loading, isPaused }: any) => {
           }}
         >
           {loading || isPaused ? (
-            <PauseIcon className="size-10 text-white" />
+            <Pause className="size-10 text-white" />
           ) : (
             CurrentToken
           )}

@@ -3,122 +3,205 @@ import AppointmentForm from "@/components/forms/AppointmentForm";
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import uniqid from "uniqid";
-import { useAppSelector } from "@/redux/store";
-import { getPatientById } from "@/app/services/getPatientById";
-import NoPatientsFound from "@/components/Appointment/NoPatientsFound";
-import { RegisterPatient } from "@/app/services/registerPatient";
-import CustomModal from "@/components/BlockedModal";
 import RegisteredModal from "@/components/Appointment/RegisteredModal";
-import Loader from "@/components/common/Loader";
-interface PatientFormDataTypes {
-  last_visited: number;
-  patient_unique_Id: string;
-  first_name: string;
-  last_name: string;
-  mobile_number: string;
-  gender: string;
-  age: string;
-  street_address: string;
-  city: string;
-  state: string;
-  zip: string;
-}
+import { RegisterPatientFormTypes } from "@/types/FormTypes";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { useAuth } from "@clerk/nextjs";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { db } from "@/firebase/firebaseConfig";
+import toast from "react-hot-toast";
+import { format, getTime, startOfDay } from "date-fns";
+import { useUser } from "@clerk/nextjs";
+import { Spinner } from "@/components/ui/spinner";
 
 const Page: React.FC = () => {
   const searchParams = useSearchParams();
-  const user = useAppSelector<any>((state) => state.auth.user);
+  const { isLoaded, orgId } = useAuth();
+  const { user } = useUser();
   const patientId = searchParams.get("patientId");
   const [formLoader, setFormLoader] = useState(true);
   const [uniqueId] = useState(patientId ? patientId : uniqid.time());
-  const [error, setError] = useState<string | null>(null); // State for error
-  const [patientFormData, setPatientFormData] = useState<PatientFormDataTypes>({
-    last_visited: new Date().getTime(),
-    patient_unique_Id: uniqueId,
-    first_name: "",
-    last_name: "",
-    mobile_number: "",
-    gender: "Male",
-    age: "",
-    street_address: "",
-    city: "",
-    state: "",
-    zip: "",
-  });
+  const [error, setError] = useState<string | null>(null);
+  const [patientFormData, setPatientFormData] =
+    useState<RegisterPatientFormTypes>({
+      patient_id: uniqueId,
+      name: "",
+      mobile: "",
+      gender: "Male",
+      age: "",
+      street_address: "",
+      city: "",
+      state: "",
+      zip: "",
+      registered_date: [],
+      registered_date_time: [],
+      prescribed_date_time: [],
+      bed_info: [],
+      registerd_by: {
+        id: "",
+        name: "",
+        email: "",
+      },
+      registerd_for: {
+        id: "",
+        name: "",
+        email: "",
+      },
+    });
+  const [registerForDate, setRegisterForDate] = useState<Date>(new Date());
   const [submissionLoader, setSubmissionLoader] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-    console.log("id", uniqueId);
     const getPatientData = async () => {
-      if (patientId) {
+      if (isLoaded && orgId && patientId) {
         setFormLoader(true);
-        const patientData = await getPatientById(patientId, user.uid);
-        if (patientData.data) {
-          setPatientFormData({
-            ...patientData.data,
-            last_visited: new Date().getTime(),
-            patient_unique_Id: uniqueId,
-          } as PatientFormDataTypes);
-        } else {
-          setError("No patient data available for the provided PatientID.");
+
+        try {
+          const patientRef = doc(db, "doctor", orgId, "patients", patientId);
+          const patientSnap = await getDoc(patientRef);
+
+          if (patientSnap.exists()) {
+            const patientData = patientSnap.data() as RegisterPatientFormTypes;
+
+            patientData.registered_date.map((registered_date) => {
+              if (registered_date === getTime(startOfDay(new Date()))) {
+                setError(
+                  "Patient is already registed today. You can reschedule to other date."
+                );
+                return;
+              } else if (registered_date > getTime(startOfDay(new Date()))) {
+                setError(
+                  `Patient is already registed for ${format(
+                    new Date(registered_date),
+                    "dd-MM-yyyy"
+                  )}. You can reschedule it to today.`
+                );
+                return;
+              }
+            });
+
+            patientData.bed_info.map((bed) => {
+              if (!bed.dischargeMarked) {
+                setError(
+                  "Patient is already admitted in bed. No need to reigster patient again."
+                );
+                return;
+              }
+            });
+
+            setPatientFormData(patientData);
+          } else {
+            setError("No patient data available for the provided PatientID.");
+          }
+        } catch (err) {
+          console.error(err);
+          setError("Something went wrong while fetching the patient.");
+        } finally {
+          setFormLoader(false);
         }
-        setFormLoader(false);
       } else {
         setFormLoader(false);
       }
     };
     getPatientData();
-  }, [patientId, uniqueId, user.uid]);
+  }, [patientId, uniqueId, isLoaded, orgId]);
 
   const handleSubmit = async (e: { preventDefault: () => void }) => {
-    setSubmissionLoader(true);
     e.preventDefault();
-    // console.log("data form==", {
-    //   ...patientFormData,
-    //   uid: user.uid,
-    //   id: uniqueId,
-    // });
-    const data = await RegisterPatient({
-      ...patientFormData,
-      uid: user.uid,
-      id: uniqueId,
-    });
-    // open modal on submitting the register patoent form
-    if (data?.status === 200) {
-      setIsModalOpen(true);
+    if (orgId && user) {
+      toast.promise(
+        async () => {
+          setSubmissionLoader(true);
+          await setDoc(
+            doc(db, "doctor", orgId, "patients", uniqueId),
+            {
+              ...patientFormData,
+              registered_date: patientFormData.registered_date.concat([
+                getTime(startOfDay(registerForDate)),
+              ]),
+              registered_date_time: patientFormData.registered_date_time.concat(
+                getTime(registerForDate)
+              ),
+              registerd_by: {
+                id: user.id,
+                name: user.fullName,
+                email: user.primaryEmailAddress?.emailAddress,
+              },
+            },
+            {
+              merge: true,
+            }
+          ).then(
+            () => {
+              setSubmissionLoader(false);
+              setIsModalOpen(true);
+            },
+            () => {
+              setSubmissionLoader(false);
+            }
+          );
+        },
+        {
+          loading: "Loading...",
+          success: "Registered successfully",
+          error: "Failed to register",
+        },
+        {
+          position: "bottom-right",
+        }
+      );
     }
-    setSubmissionLoader(false);
   };
 
   return (
-    <div className="w-full overflow-y-auto h-svh">
-      <CustomModal isOpen={isModalOpen} mainScreenModal={true}>
-        <RegisteredModal
-          isModalOpen={isModalOpen}
-          setCloseModal={setIsModalOpen}
-        />
-      </CustomModal>
-      {patientId && formLoader ? (
-        <div className="w-full h-svh overflow-hidden flex items-center justify-center z-50">
-          <Loader
-            size="medium"
-            color="text-primary"
-            secondaryColor="text-white"
+    <>
+      <Dialog
+        open={isModalOpen}
+        onOpenChange={(state) => setIsModalOpen(state)}
+      >
+        <DialogContent className="md:max-w-screen-md">
+          <DialogHeader>
+            <DialogTitle hidden>PRINT</DialogTitle>
+            <DialogDescription hidden>DESC</DialogDescription>
+          </DialogHeader>
+          <RegisteredModal
+            isModalOpen={isModalOpen}
+            setCloseModal={setIsModalOpen}
           />
+        </DialogContent>
+      </Dialog>
+
+      {patientId && formLoader ? (
+        <div className="w-full h-full overflow-hidden flex items-center justify-center z-50">
+          <Spinner className="bg-primary" size={"lg"} />
         </div>
       ) : error ? (
-        <NoPatientsFound message={error} />
-      ) : (
-        <div className="my-12">
-          <AppointmentForm
-            patientFormData={patientFormData}
-            setPatientFormData={setPatientFormData}
-            handleSubmit={handleSubmit}
-            submissionLoader={submissionLoader}
+        <div className="w-full h-full text-muted-foreground text-sm md:text-base p-4 overflow-hidden flex items-center justify-center gap-4 flex-col">
+          <img
+            className="w-full max-w-40 lg:mx-auto"
+            src="/ErrorTriangle.svg"
+            alt="Error"
           />
+          {error}
         </div>
+      ) : (
+        <AppointmentForm
+          patientFormData={patientFormData}
+          setPatientFormData={setPatientFormData}
+          handleSubmit={handleSubmit}
+          submissionLoader={submissionLoader}
+          registerForDate={registerForDate}
+          setRegisterForDate={setRegisterForDate}
+        />
       )}
-    </div>
+    </>
   );
 };
 

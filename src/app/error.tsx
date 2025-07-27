@@ -1,12 +1,14 @@
-"use client"
+"use client";
 /* eslint-disable @next/next/no-img-element */
 import Header from "@/components/HeaderDocument";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 import React from "react";
 
 const ServerError = () => {
   return (
-    <div className="pt-24 min-h-screen bg-white">
+    <div className="pt-24 min-h-screen">
       <Header />
 
       <section className="bg-whit">
@@ -29,18 +31,14 @@ const ServerError = () => {
             </p>
 
             <div className="flex items-center justify-center mt-6 gap-x-3">
-              <a
-                href="/"
-                className="link bg-gray-800 text-white animate-none btn-neutral btn no-underline"
-              >
-                Take me home
-              </a>
-              <a
-                href="https://dardibook.in/documents/contact-us"
-                className="link bg-gray-800 text-white animate-none btn-neutral btn no-underline"
-              >
-                Report
-              </a>
+              <Button variant={"secondary"} asChild>
+                <Link href="/">Take me home</Link>
+              </Button>
+              <Button variant={"destructive"} asChild>
+                <Link href="https://dardibook.in/documents/contact-us">
+                  Report
+                </Link>
+              </Button>
             </div>
           </div>
         </div>

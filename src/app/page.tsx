@@ -1,28 +1,30 @@
 "use client";
-import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { useAppSelector } from "@/redux/store";
-import Loader from "@/components/common/Loader";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
 
-const Home = () => {
-  const user = useAppSelector((state) => state.auth.user);
+const Page = () => {
   const router = useRouter();
 
   useEffect(() => {
-    if (user && user?.verified) {
-      router.replace("/dashboard/home");
-    }
-  }, [router, user]);
+    router.push("/dashboard/home");
+  }, [router]);
 
   return (
-    <div className="w-screen h-svh overflow-hidden flex items-center justify-center bg-white z-50">
-      <Loader
-        size="large"
-        color="text-primary"
-        secondaryColor="text-gray-300"
+    <div className="w-screen h-svh overflow-hidden flex items-center justify-center bg-background">
+      <p className="absolute bottom-2 right-2 text-muted-foreground text-xs font-medium">
+        Taking you to your dashboard...
+      </p>
+      <Image
+        src="/Logo.svg"
+        height={208}
+        width={208}
+        alt="Flowbite Logo"
+        className="h-52"
+        priority={true}
       />
     </div>
   );
 };
 
-export default Home;
+export default Page;

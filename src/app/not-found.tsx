@@ -1,9 +1,11 @@
 /* eslint-disable @next/next/no-img-element */
 import Header from "@/components/HeaderDocument";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function Custom404() {
   return (
-    <div className="pt-24 min-h-screen bg-white">
+    <div className="pt-24 min-h-screen">
       <Header />
 
       <section className="bg-whit">
@@ -17,14 +19,14 @@ export default function Custom404() {
               Page not found
             </h1>
             <p className="mt-4 text-gray-500">
-              Sorry, the page you are looking for doesn&apos;t exist.Here are
-              some helpful links:
+              Sorry, the page you are looking for doesn&apos;t exist. or you
+              don&apos;t have access to this page.
             </p>
 
             <div className="flex items-center justify-center mt-6 gap-x-3">
-              <a href="/" className="link bg-gray-800 text-white animate-none btn-neutral btn no-underline">
-                Take me home
-              </a>
+              <Button variant={"secondary"} className="" asChild>
+                <Link href="/">Take me home</Link>
+              </Button>
             </div>
           </div>
         </div>

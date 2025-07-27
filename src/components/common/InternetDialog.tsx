@@ -1,18 +1,18 @@
-import React, { useEffect } from "react";
-
+"use client";
+import React, { useEffect, useRef } from "react";
 import { toast } from "react-hot-toast";
 
 const ConnectionStatus: React.FC = () => {
-
-
-  let offlineToastId: string | undefined;
+  const offlineToastId = useRef<string | undefined>(undefined);
 
   useEffect(() => {
     console.log("useEffect is running");
     console.log("Initial online status:", navigator.onLine);
 
     const handleOnline = () => {
-      toast.dismiss(offlineToastId);
+      if (offlineToastId.current) {
+        toast.dismiss(offlineToastId.current);
+      }
       toast.success("Back online!", {
         duration: 3000,
         position: "top-right",
@@ -20,7 +20,7 @@ const ConnectionStatus: React.FC = () => {
     };
 
     const handleOffline = () => {
-      offlineToastId = toast.error("You're offline!", {
+      offlineToastId.current = toast.error("You're offline!", {
         duration: Infinity,
         position: "top-right",
       });
@@ -28,17 +28,14 @@ const ConnectionStatus: React.FC = () => {
 
     window.addEventListener("online", handleOnline);
     window.addEventListener("offline", handleOffline);
+
     return () => {
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
     };
   }, []);
 
-  return (
-    <>
-     
-    </>
-  );
+  return <></>;
 };
 
 export default ConnectionStatus;

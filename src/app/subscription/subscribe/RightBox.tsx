@@ -1,10 +1,6 @@
+import { Button } from "@/components/ui/button";
 import React from "react";
-const RightBox = ({
-  thisPlanDetails,
-  handleSubscription,
-  subscriptionFields,
-  isValid,
-}: any) => {
+const RightBox = ({ thisPlanDetails, handleSubscription, isValid }: any) => {
   return (
     <>
       <div className="flex flex-col ">
@@ -55,15 +51,16 @@ const RightBox = ({
             <span>No setup, or hidden fees</span>
           </li>
         </ul>
-        <button
+        <Button
           disabled={!isValid}
           onClick={() => {
-            handleSubscription();
+            handleSubscription(thisPlanDetails.id);
           }}
-          className="btn btn-sm text-base disabled:bg-gray-300"
+          className="text-sm"
+          effect={"ringHover"}
         >
           Get started
-        </button>
+        </Button>
       </div>
     </>
   );

@@ -1,48 +1,31 @@
 // PrescribeMedicineTable
 import { ChangeEvent, useState } from "react";
-import { XMarkIcon, PlusIcon } from "@heroicons/react/24/outline";
 import MedicineSuggetion from "../Prescribe/MedicineSuggetion";
 import uniqid from "uniqid";
-interface Dosage {
-  morning: string;
-  afternoon: string;
-  evening: string;
-  night: string;
-}
-
-interface Medicine {
-  id: string;
-  medicineName: string;
-  instruction: string;
-  dosages: Dosage;
-  duration: number;
-  durationType: string;
-  type: string;
-}
+import { Plus, X } from "lucide-react";
+import { Button } from "../ui/button";
+import { DosageTypes, MedicinesDetails } from "@/types/FormTypes";
+import { Kbd } from "../ui/kbd";
+import { useHotkeys } from "react-hotkeys-hook";
+import { useOrganization } from "@clerk/nextjs";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface PrescribeMedicineTableProps {
-  rows: Medicine[];
-  setRows: (medicines: Medicine[]) => void;
+  rows: MedicinesDetails[];
+  setRows: (medicines: MedicinesDetails[]) => void;
 }
-const medicineTypes = [
-  { label: "Type", value: "", isDefault: true },
-  { label: "Tablet", value: "TAB" },
-  { label: "Capsule", value: "CAP" },
-  { label: "Syrup", value: "SYRUP" },
-  { label: "Drop", value: "DROP" },
-  { label: "Cream", value: "CREAM" },
-  { label: "Lotion", value: "LOTION" },
-  { label: "Serum", value: "SERUM" },
-  { label: "Soap", value: "SOAP" },
-  { label: "Spray", value: "SPRAY" },
-  { label: "Gel", value: "GEL" },
-  { label: "Ointment", value: "OINTMENT" },
-  { label: "Inhaler", value: "INHALER" },
-  { label: "Injection", value: "INJECTION" },
-  { label: "Powder", value: "POWDER" },
-  { label: "Patch", value: "PATCH" },
-  { label: "Suppository", value: "SUPPOSITORY" },
-];
+interface Medicine_Types {
+  value: string;
+  isDefault: boolean;
+}
 const durationTypes = [
   { label: "day", value: "day", isDefault: true },
   { label: "month", value: "month" },
@@ -53,6 +36,7 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
   setRows,
 }) => {
   const [rowIdCounter, setRowIdCounter] = useState(uniqid());
+  const { organization, isLoaded } = useOrganization();
 
   const addRow = () => {
     const newRow = {
@@ -75,7 +59,7 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
 
   const handleInputChange = (
     rowId: string,
-    event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>
+    event: { target: { name: string; value: string } }
   ) => {
     const { name, value } = event.target;
     setRows(
@@ -86,7 +70,7 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
     setRows(rows.filter((row) => row.id !== id));
   };
 
-  const statusLabels: Array<keyof Dosage> = [
+  const statusLabels: Array<keyof DosageTypes> = [
     "morning",
     "afternoon",
     "evening",
@@ -117,7 +101,7 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
 
   const handleDosageChangeFromCheckBox = (
     event: ChangeEvent<HTMLInputElement>,
-    row: Medicine,
+    row: MedicinesDetails,
     label: string
   ) => {
     const isChecked = event.target.checked;
@@ -134,7 +118,15 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
     );
   };
 
-  const handleComingData = (rowId: any, selectedOption: any) => {
+  const handleComingData = (
+    rowId: string,
+    selectedOption: {
+      value: string;
+      type: string;
+      instruction: string;
+      id: string;
+    }
+  ) => {
     setRows(
       rows?.map((row) =>
         row.id === rowId
@@ -149,26 +141,33 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
       )
     );
   };
+
+  useHotkeys("shift+n", () => addRow());
+
+  const options =
+    isLoaded &&
+    organization &&
+    organization.publicMetadata.medicine_types &&
+    Array.isArray(organization.publicMetadata.medicine_types)
+      ? (organization.publicMetadata.medicine_types as Medicine_Types[])
+      : [];
+  const defaultType = options.find((t) => t.isDefault)?.value ?? "";
+
   return (
-    <div className="container mx-auto pt-4 px-1 text-center">
+    <div className="mx-auto px-0 text-center">
       <table className="table w-full">
-        <thead className="hidden sm:table-header-group">
-          <tr className="border-gray-300">
-            <th>Medicine Name*</th>
-            <th>Instruction</th>
-            <th>Dosages</th>
-            <th>Duration</th>
+        <thead className="hidden md:table-header-group">
+          <tr className="text-muted-foreground bg-border">
+            <th className="font-medium text-sm py-2">Medicine Name*</th>
+            <th className="font-medium text-sm py-2">Instruction</th>
+            <th className="font-medium text-sm py-2">Dosages</th>
+            <th className="font-medium text-sm py-2">Duration</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="sm:px-8">
           {rows?.map((row, index) => (
-            <tr
-              key={row.id}
-              className={
-                "border-gray-300 border-b-[1px] sm:border-0 flex flex-col sm:table-row"
-              }
-            >
-              <td className="align-top p-1 relative">
+            <tr key={row.id} className={`border-b flex flex-col sm:table-row`}>
+              <td className="align-top px-1 sm:pl-3 py-0.5 pt-2 sm:py-3 relative">
                 {/* implement search functionality here */}
                 <MedicineSuggetion
                   medicine={row.medicineName}
@@ -176,121 +175,146 @@ const PrescribeMedicineTable: React.FC<PrescribeMedicineTableProps> = ({
                   handleComingData={handleComingData}
                 />
               </td>
-              <td className="align-top p-1">
-                <input
+              <td className="align-top px-1 py-0.5 sm:py-3">
+                <Input
                   type="text"
                   name="instruction"
                   placeholder="instruction.."
                   autoComplete="new-off"
                   value={row.instruction}
                   onChange={(event) => handleInputChange(row.id, event)}
-                  className="form-input w-full block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  wrapClassName="w-full"
                 />
               </td>
-              <td className="align-top p-1">
-                <div className="w-full ring-1 rounded-lg ring-gray-300 p-[2px]">
+              <td className="align-top px-1 py-0.5 sm:py-3">
+                <div className="w-full ring-1 rounded-lg ring-border p-[2px]">
                   <div className="w-full flex flex-row gap-[2px]">
-                    <input
+                    <Input
                       type="text"
                       value={`${row.dosages.morning}-${row.dosages.afternoon}-${row.dosages.evening}-${row.dosages.night}`}
                       autoComplete="new-off"
                       onChange={(event) => handleDosageChange(row.id, event)}
-                      className="form-input border-0 rounded-[6px] tracking-wider font-mono w-[70%] block py-1.5 text-gray-900 placeholder:text-gray-400 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 text-sm sm:leading-6"
+                      className="tracking-wider font-mono"
+                      wrapClassName="w-[70%]"
                     />
-
-                    <select
-                      value={row.type}
+                    <Select
                       name="type"
-                      onChange={(e) => {
-                        handleInputChange(row.id, e);
+                      value={row.type || defaultType}
+                      onValueChange={(val) => {
+                        handleInputChange(row.id, {
+                          target: {
+                            name: "type",
+                            value: val,
+                          },
+                        });
                       }}
-                      defaultValue={""}
-                      className="form-select border-0 rounded-[6px] flex flex-1 py-1 text-gray-900 placeholder:text-gray-400 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                     >
-                      {medicineTypes.map((type, index) => (
-                        <option
-                          key={index}
-                          value={type.value}
-                          // selected={type.isDefault || false}
-                        >
-                          {type.label}
-                        </option>
-                      ))}
-                    </select>
+                      <SelectTrigger id="type" className="flex flex-1">
+                        <SelectValue placeholder="Doctor" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {options.map((type, index) => (
+                          <SelectItem value={type.value} key={index}>
+                            {type.value}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div className="flex w-full px-2 py-1 border-0">
                     {statusLabels.map((label, key) => (
                       <div key={key} className="flex items-center me-4">
-                        <input
+                        <Input
                           id={`checkbox-${label}-${row.id}`}
                           type="checkbox"
                           checked={row.dosages[label] ? true : false}
                           onChange={(e) => {
                             handleDosageChangeFromCheckBox(e, row, label);
                           }}
-                          className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                          className="w-4 h-4"
                         />
-                        <label
+                        <Label
                           htmlFor={`checkbox-${label}-${row.id}`}
-                          className="ms-2 text-sm font-medium text-gray-800"
+                          className="ms-2 text-sm font-medium text-muted-foreground"
                         >
                           {label.charAt(0)}
-                        </label>
+                        </Label>
                       </div>
                     ))}
                   </div>
                 </div>
               </td>
-              <td className="align-top p-1 flex flex-row items-center gap-2">
+              <td className="align-top px-1 sm:pr-3 py-0.5 pb-2 sm:py-3 flex flex-row items-start gap-2">
                 <div className="w-full flex flex-row gap-[2px]">
-                  <input
+                  <Input
                     type="number"
                     name="duration"
                     autoComplete="new-off"
                     value={row.duration}
                     onChange={(event) => handleInputChange(row.id, event)}
-                    className="form-input flex flex-1 w-20 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    wrapClassName="flex flex-1 w-20"
                   />
-                  <select
-                    value={row.durationType}
+
+                  <Select
+                    value={row.durationType || "day"}
                     name="durationType"
-                    onChange={(e) => {
-                      handleInputChange(row.id, e);
+                    onValueChange={(val) => {
+                      handleInputChange(row.id, {
+                        target: {
+                          name: "durationType",
+                          value: val,
+                        },
+                      });
                     }}
-                    defaultValue={"day"}
-                    className="form-select flex flex-1 border-0 rounded-[6px]  py-1 text-gray-900 placeholder:text-gray-400 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                   >
-                    {durationTypes.map((type, index) => (
-                      <option
-                        key={index}
-                        value={type.value}
-                        // selected={type.isDefault || false}
-                      >
-                        {type.label}
-                      </option>
-                    ))}
-                  </select>
+                    <SelectTrigger id="durationType" className="flex flex-1">
+                      <SelectValue placeholder="Doctor" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {durationTypes.map((type, index) => (
+                        <SelectItem value={type.value} key={index}>
+                          {type.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
-                <button
-                  type="button"
-                  disabled={rows.length > 1 ? false : true}
-                  onClick={() => deleteRow(row.id)}
-                  className="btn btn-xs btn-error btn-circle"
-                >
-                  <XMarkIcon className="size-4 text-white" />
-                </button>
+                <div className="flex flex-col gap-2">
+                  <Button
+                    type="button"
+                    variant={"destructive"}
+                    className="rounded-full size-9 aspect-square flex items-center justify-center"
+                    disabled={rows.length > 1 ? false : true}
+                    onClick={() => deleteRow(row.id)}
+                  >
+                    <X className="size-4" />
+                  </Button>
+                  <Button
+                    variant={"outline"}
+                    type="button"
+                    onClick={addRow}
+                    className={`rounded-full relative size-9 aspect-square flex items-center justify-center ${
+                      rows.length !== index + 1 ? "hidden" : ""
+                    }`}
+                  >
+                    <Plus className="size-4" />
+                    <Kbd
+                      variant="outline"
+                      className="hidden md:flex self-start absolute right-[calc(100%+8px)] border-0 rounded-full bg-border"
+                    >
+                      <span className="text-xs">⇧</span>n
+                    </Kbd>
+                  </Button>
+                </div>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-      <button
-        type="button"
-        onClick={addRow}
-        className="btn mt-2 animate-none btn-neutral btn-sm btn-wide"
-      >
-        <PlusIcon className="size-4 text-white" />
-      </button>
+
+      <div className="w-full bg-border text-muted-foreground font-medium text-xs text-start pl-4 py-1">
+        Total {rows.length} medicine(s)
+      </div>
     </div>
   );
 };

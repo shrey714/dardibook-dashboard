@@ -4,6 +4,10 @@ export const metadata: Metadata = {
   title: "DardiBook | Home",
   description: "Welcome to dardibook paltform",
 };
-export default function RootLayout({ children }: { children?: ReactNode }) {
+export default async function RootLayout({
+  children,
+}: {
+  children?: ReactNode;
+}) {
   return <>{children}</>;
 }

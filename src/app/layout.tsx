@@ -1,10 +1,13 @@
 import "@/styles/globals.css";
 import { DM_Sans } from "next/font/google";
-import Script from "next/script";
 import type { Metadata } from "next";
-import AppWrapper from "@/components/wrapper/AppWrapper";
-import ReduxWrapper from "@/components/wrapper/ReduxWrapper";
 import { Toaster } from "react-hot-toast";
+import Image from "next/image";
+import { ThemeProvider as NextThemeProvider } from "next-themes";
+import { ClerkLoaded, ClerkLoading, ClerkProvider } from "@clerk/nextjs";
+import TopBarLoader from "@/components/common/TopBarLoader";
+import { FirebaseAuthProvider } from "@/components/wrapper/FirebaseAuthProvider";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 const DM_Sans_Font = DM_Sans({
   subsets: ["latin"],
   display: "swap",
@@ -19,27 +22,53 @@ export const metadata: Metadata = {
   },
 };
 
-const RootLayout = ({ children }: { children: React.ReactNode }) => {
+export default async function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <>
-      <Script
-        id="razorpay-checkout-js"
-        src="https://checkout.razorpay.com/v1/checkout.js"
-      />
+    <ClerkProvider>
       <html
         lang="en"
         className={DM_Sans_Font.className}
         style={{ scrollbarGutter: "auto" }}
+        suppressHydrationWarning
       >
         <body className="min-h-svh" suppressHydrationWarning={true}>
-          <Toaster position="top-right" />
-          <ReduxWrapper>
-            <AppWrapper>{children}</AppWrapper>
-          </ReduxWrapper>
+          <NextThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <Toaster position="top-right" />
+            <ClerkLoading>
+              <div className="w-screen h-svh overflow-hidden flex items-center justify-center bg-background">
+                <p className="absolute bottom-2 right-2 text-muted-foreground text-xs font-medium">
+                  Welcome aboard DardiBook...
+                </p>
+                <div>
+                  <TopBarLoader />
+                </div>
+                <Image
+                  src="/Logo.svg"
+                  height={208}
+                  priority={true}
+                  width={208}
+                  alt="Flowbite Logo"
+                  className="h-52"
+                />
+              </div>
+            </ClerkLoading>
+            <ClerkLoaded>
+              <FirebaseAuthProvider>
+                <NuqsAdapter> {children} </NuqsAdapter>
+              </FirebaseAuthProvider>
+            </ClerkLoaded>
+          </NextThemeProvider>
         </body>
       </html>
-    </>
+    </ClerkProvider>
   );
-};
-
-export default RootLayout;
+}

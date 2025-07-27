@@ -2,8 +2,13 @@ import { ReactNode } from "react";
 import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "DardiBook | History",
-  description: "Previous patients history",
+  description:
+    "Organisation History of patients, registrations, prescriptions, admissions and bills",
 };
-export default function RootLayout({ children }: { children?: ReactNode }) {
-  return <div className="px-0">{children}</div>;
+export default async function RootLayout({
+  children,
+}: {
+  children?: ReactNode;
+}) {
+  return <>{children}</>;
 }

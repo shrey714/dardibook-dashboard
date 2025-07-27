@@ -5,5 +5,5 @@ export const metadata: Metadata = {
   description: "Add new appointments of the patients",
 };
 export default function RootLayout({ children }: { children?: ReactNode }) {
-  return <div className="h-svh relative">{children}</div>;
+  return <>{children}</>;
 }

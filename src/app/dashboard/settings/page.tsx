@@ -1,82 +1,32 @@
 "use client";
 import PersonalInfo from "@/components/Settings/PersonalInfo";
-import React, { useEffect, useState } from "react";
-import { useAppSelector } from "@/redux/store";
-import ClinicInfo from "@/components/Settings/ClinicInfo";
-import SubscriptionInfo from "@/components/Settings/SubscriptionInfo";
-import Links from "@/components/Settings/Links";
-import FooterLine from "@/components/Settings/FooterLine";
-import { getDocotr } from "@/app/services/getDoctor";
-import MedicineInfo from "@/components/Settings/MedicineInfo/MedicineInfo";
-import DiseaseInfo from "@/components/Settings/DiseaseInfo/DiseaseInfo";
+import { UserProfile } from "@clerk/nextjs";
+import { useTheme } from "next-themes";
+import { dark } from "@clerk/themes";
+import { Skeleton } from "@/components/ui/skeleton";
 
-interface DoctorInfo {
-  clinicName: string;
-  doctorName: string;
-  degree:string;
-  registrationNumber:string;
-  clinicNumber: string;
-  phoneNumber: string;
-  emailId: string;
-  clinicAddress: string;
-  clinicLogo: any;
-  signaturePhoto: any;
-  subscriptionId: string;
-}
-
-const Page = () => {
-  const userInfo = useAppSelector<any>((state) => state.auth.user);
-  const [mainLoader, setmainLoader] = useState(false);
-  const [doctorData, setdoctorData] = useState<DoctorInfo>({
-    clinicName: "",
-    doctorName: "",
-    degree:"",
-    registrationNumber:"",
-    clinicNumber: "",
-    phoneNumber: "",
-    emailId: userInfo?.email,
-    clinicAddress: "",
-    clinicLogo: "",
-    signaturePhoto: "",
-    subscriptionId: "",
-  });
-  useEffect(() => {
-    const setDocotrData = async () => {
-      if (userInfo) {
-        setmainLoader(true);
-        const patientData = await getDocotr(userInfo?.uid);
-        if (patientData.data) {
-          setdoctorData(patientData.data);
-        } else {
-          console.log("No data available for the provided DoctorID.");
-        }
-        setmainLoader(false);
-      } else {
-        setmainLoader(false);
-      }
-    };
-    setDocotrData();
-  }, [userInfo]);
-
+export default function SettingsProfilePage() {
+  const { resolvedTheme } = useTheme();
   return (
-    <div className="w-full self-center py-12 px-4 sm:px-6 lg:px-8">
-      <PersonalInfo userInfo={userInfo} />
-      <ClinicInfo
-        uid={userInfo?.uid}
-        doctorData={doctorData}
-        mainLoader={mainLoader}
-        setdoctorData={setdoctorData}
+    <div className="w-full py-2 sm:py-5 px-2 md:px-5 2xl:flex 2xl:flex-row 2xl:gap-5 2xl:justify-center">
+      <PersonalInfo />
+      <UserProfile
+        fallback={
+          <Skeleton className="mt-2 sm:mt-5 max-w-4xl 2xl:mt-0 mx-auto 2xl:mx-0 w-full h-[704px]" />
+        }
+        appearance={{
+          elements: {
+            rootBox:
+              "mt-2 sm:mt-5 max-w-4xl 2xl:mt-0 mx-auto 2xl:mx-0 border rounded-lg w-full",
+            navbar: "clerk-bg-1",
+            navbarMobileMenuRow: "clerk-bg-1",
+            scrollBox: "clerk-bg-2",
+            cardBox: "rounded-md shadow-none max-w-full w-full",
+          },
+          baseTheme: resolvedTheme === "dark" ? dark : undefined,
+        }}
+        routing="hash"
       />
-      <SubscriptionInfo
-        subId={doctorData?.subscriptionId}
-        mainLoader={mainLoader}
-      />
-      <MedicineInfo uid={userInfo?.uid}/>
-      <DiseaseInfo uid={userInfo?.uid}/>
-      <Links />
-      <FooterLine />
     </div>
   );
-};
-
-export default Page;
+}

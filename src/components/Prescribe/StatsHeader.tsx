@@ -1,17 +1,19 @@
+"use client";
+import { useTodayPatientStore } from "@/lib/providers/todayPatientsProvider";
 import React from "react";
 
-const StatsHeader = ({ registrations, attended }: any) => {
+const StatsHeader = () => {
+  const { todayPatients, loading } = useTodayPatientStore((state) => state);
+
   return (
-    <div className="w-auto relative overflow-hidden sm:w-full sm:max-w-[70%] bg-white flex flex-row border-2 rounded-md border-gray-400/70">
-      <div className="py-4 px-5 sm:py-4 sm:px-6 flex flex-1 flex-col">
-        <div className=" font-semibold text-sm sm:text-base text-gray-800 whitespace-nowrap">
+    <div className="relative overflow-hidden w-[calc(100%-48px)] self-start md:self-center md:w-full sm:max-w-3xl bg-gradient-to-b from-muted/50 to-muted flex flex-row border-2 rounded-md">
+      <div className="py-3 px-4 sm:px-6 justify-center flex flex-1 flex-row gap-x-4 lg:flex-col flex-wrap">
+        <div className="hidden sm:block font-semibold text-sm sm:text-base whitespace-nowrap">
           Total Registrations
+          <p className="font-medium text-xs whitespace-nowrap">done by today</p>
         </div>
-        <div className=" font-semibold text-xs whitespace-nowrap">
-          done by today
-        </div>
-        <div className=" font-semibold text-4xl text-primary flex flex-row justify-start">
-          <div className="absolute top-0 left-[calc(50%-144px)] stat-figure size-36 opacity-10">
+        <div className=" font-semibold text-4xl flex flex-row justify-start">
+          <div className="absolute top-0 left-[calc(50%-144px)] stat-figure size-36 opacity-20">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -30,19 +32,19 @@ const StatsHeader = ({ registrations, attended }: any) => {
               />
             </svg>
           </div>
-          {registrations}
+          {loading ? 0 : todayPatients.length}
         </div>
       </div>
 
-      <div className="py-4 px-5 sm:py-4 sm:px-6 flex flex-1 flex-col">
-        <div className=" font-semibold text-sm sm:text-base text-gray-800 whitespace-nowrap">
+      <div className="py-3 px-4 sm:px-6 justify-center flex flex-1 flex-row gap-x-4 lg:flex-col flex-wrap">
+        <div className="hidden sm:block font-semibold text-sm sm:text-base whitespace-nowrap">
           Total Attended
+          <p className=" font-medium text-xs whitespace-nowrap">
+            patient by today
+          </p>
         </div>
-        <div className=" font-semibold text-xs whitespace-nowrap">
-          patient by today
-        </div>
-        <div className=" font-semibold text-4xl text-secondary flex flex-row justify-start">
-          <div className="stat-figure absolute top-0 right-0 size-36 opacity-10">
+        <div className=" font-semibold text-4xl flex flex-row justify-start">
+          <div className="stat-figure absolute top-0 right-0 size-36 opacity-20">
             <svg
               className="inline-block size-full"
               viewBox="-5.7 -5.7 74.69 74.69"
@@ -65,7 +67,9 @@ const StatsHeader = ({ registrations, attended }: any) => {
               </g>
             </svg>
           </div>
-          {attended}
+          {loading
+            ? 0
+            : todayPatients.filter((patient) => patient.prescribed).length}
         </div>
       </div>
     </div>
