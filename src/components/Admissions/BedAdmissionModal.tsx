@@ -91,7 +91,7 @@ const BedAdmissionModal: React.FC<BedAdmissionModalProps> = ({
   const { organization, isLoaded } = useOrganization();
 
   const bedInfo = useMemo(() => {
-    return isLoaded && organization && organization.publicMetadata
+    return isLoaded && organization && organization.publicMetadata.beds
       ? (organization.publicMetadata?.beds as BedInfo[])
       : [];
   }, [isLoaded, organization]);

@@ -361,7 +361,7 @@ const BedEditModal: React.FC<BedEditModalProps> = ({
   };
 
   const bedInfo = useMemo(() => {
-    return isLoaded && organization && organization.publicMetadata
+    return isLoaded && organization && organization.publicMetadata.beds
       ? (organization.publicMetadata?.beds as BedInfo[])
       : [];
   }, [isLoaded, organization]);

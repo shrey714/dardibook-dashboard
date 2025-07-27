@@ -119,7 +119,11 @@ const SubscriptionBox = () => {
   useEffect(() => {
     const fetchPlans = async () => {
       setloading(true);
-      if (OrgLoaded && organization) {
+      if (
+        OrgLoaded &&
+        organization &&
+        organization.publicMetadata.subscription
+      ) {
         const subscription = organization.publicMetadata
           .subscription as ClerkSubscriptiontypes;
 

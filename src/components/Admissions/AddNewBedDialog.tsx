@@ -25,7 +25,7 @@ const AddNewBedBtn = () => {
   const [bedAddLoader, setBedAddLoader] = useState<boolean>(false);
 
   const columns: BedInfo[] = useMemo(() => {
-    return isLoaded && organization && organization.publicMetadata
+    return isLoaded && organization && organization.publicMetadata.beds
       ? (organization.publicMetadata?.beds as BedInfo[])
       : [];
   }, [isLoaded, organization]);

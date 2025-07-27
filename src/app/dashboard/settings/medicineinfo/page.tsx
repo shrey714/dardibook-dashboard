@@ -163,6 +163,7 @@ export default function SettingsMedicineInfoPage() {
   const options =
     isLoaded &&
     organization &&
+    organization.publicMetadata.medicine_types &&
     Array.isArray(organization.publicMetadata.medicine_types)
       ? (organization.publicMetadata.medicine_types as Medicine_Types[])
       : [];
@@ -482,6 +483,7 @@ const EditMedicineDataModel: React.FC<EditMedicineDataModel> = ({
   const options =
     isLoaded &&
     organization &&
+    organization.publicMetadata.medicine_types &&
     Array.isArray(organization.publicMetadata.medicine_types)
       ? (organization.publicMetadata.medicine_types as Medicine_Types[])
       : [];

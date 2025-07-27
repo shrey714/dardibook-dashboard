@@ -92,10 +92,10 @@ const KanbanBoard = ({
   );
 
   const wards = useMemo(() => {
-    return isLoaded && organization && organization.publicMetadata
+    return isLoaded && organization && organization.publicMetadata.beds
       ? [
           ...new Set(
-            (organization.publicMetadata?.beds as BedInfo[]).map(
+            (organization.publicMetadata.beds as BedInfo[]).map(
               (bed) => bed.ward
             )
           ),
@@ -111,8 +111,8 @@ const KanbanBoard = ({
   const [searchQuery] = useQueryState("search", parseAsString.withDefault(""));
 
   const allColumns: BedInfo[] = useMemo(() => {
-    return isLoaded && organization && organization.publicMetadata
-      ? (organization.publicMetadata?.beds as BedInfo[])
+    return isLoaded && organization && organization.publicMetadata.beds
+      ? (organization.publicMetadata.beds as BedInfo[])
       : [];
   }, [isLoaded, organization]);
 

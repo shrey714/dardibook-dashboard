@@ -46,7 +46,6 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { useMediaQuery } from "@/hooks/use-media-query";
-import { useBedsStore } from "@/lib/stores/useBedsStore";
 
 export function BedsFilterHandeler({
   openAddModal,
@@ -54,7 +53,6 @@ export function BedsFilterHandeler({
   openAddModal: (bedId: string | null) => void;
 }) {
   const isDesktop = useMediaQuery("(min-width: 1024px)");
-  const { loading, beds } = useBedsStore((state) => state);
 
   const [bedFilters, setBedFilters] = useQueryState(
     "bedFilters",
@@ -66,7 +64,7 @@ export function BedsFilterHandeler({
   );
   const { organization, isLoaded } = useOrganization();
   const wards = useMemo(() => {
-    return isLoaded && organization && organization.publicMetadata
+    return isLoaded && organization && organization.publicMetadata.beds
       ? [
           ...new Set(
             (organization.publicMetadata?.beds as BedInfo[]).map(
@@ -93,6 +91,14 @@ export function BedsFilterHandeler({
         : [...wardFilters, ward].sort()
     );
   };
+
+  const allowAdmit = useMemo(() => {
+    return isLoaded && organization && organization.publicMetadata.beds
+      ? (organization.publicMetadata?.beds as BedInfo[]).length > 0
+        ? true
+        : false
+      : false;
+  }, [isLoaded, organization]);
 
   const FilterOptions = () => {
     return (
@@ -241,7 +247,7 @@ export function BedsFilterHandeler({
       <Button
         variant="outline"
         onClick={() => openAddModal(null)}
-        disabled={loading || beds.length === 0}
+        disabled={!allowAdmit}
         icon={UserPlus}
         iconPlacement="right"
         className="px-2 min-w-9"
