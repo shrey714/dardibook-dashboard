@@ -31,11 +31,11 @@ export function DataTable<TData>({
       {...props}
     >
       {children}
-      <div className="overflow-hidden rounded-md border">
+      <div className="overflow-y-auto rounded-md border flex flex-1">
         <Table>
-          <TableHeader>
+          <TableHeader className="sticky top-0 z-[1] bg-background">
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
+              <TableRow key={headerGroup.id} className="bg-muted/50">
                 {headerGroup.headers.map((header) => (
                   <TableHead
                     key={header.id}

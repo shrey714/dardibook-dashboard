@@ -34,12 +34,14 @@ import { getSortingStateParser } from "@/components/History/lib/parsers";
 import type { ExtendedColumnSort } from "@/components/History/types/data-table";
 import {
   collection,
+  endBefore,
   getCountFromServer,
   getDocs,
   limit,
   orderBy,
   query,
   QueryConstraint,
+  startAfter,
 } from "firebase/firestore";
 import { db } from "@/firebase/firebaseConfig";
 import { OrgBed } from "@/types/FormTypes";
@@ -129,6 +131,8 @@ export function useDataTable<TData>(props: UseDataTableProps<TData>) {
 
   const [data, setData] = React.useState<TData[]>([]);
   const [totalRecords, setTotalRecords] = React.useState(0);
+  const [firstDoc, setFirstDoc] = React.useState<any | null>(null);
+  const [lastDoc, setLastDoc] = React.useState<any | null>(null);
 
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>(
     initialState?.rowSelection ?? {}
@@ -144,7 +148,7 @@ export function useDataTable<TData>(props: UseDataTableProps<TData>) {
     PER_PAGE_KEY,
     parseAsInteger
       .withOptions(queryStateOptions)
-      .withDefault(initialState?.pagination?.pageSize ?? 10)
+      .withDefault(initialState?.pagination?.pageSize ?? 5)
   );
 
   const pagination: PaginationState = React.useMemo(() => {
@@ -189,6 +193,8 @@ export function useDataTable<TData>(props: UseDataTableProps<TData>) {
       } else {
         setSorting(updaterOrValue as ExtendedColumnSort<TData>[]);
       }
+      setPage(1);
+      setFirstDoc(null);
     },
     [sorting, setSorting]
   );
@@ -278,6 +284,9 @@ export function useDataTable<TData>(props: UseDataTableProps<TData>) {
           }
         }
 
+        void setPage(1);
+        setFirstDoc(null);
+
         debouncedSetFilterValues(filterUpdates);
         return next;
       });
@@ -293,63 +302,78 @@ export function useDataTable<TData>(props: UseDataTableProps<TData>) {
   );
 
   React.useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      if (!orgId || !orgRole || !checkPageAccess(orgRole, "Admissions")) {
-        setError("User is not authorized for this organization.");
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const bedsCollectionRef = collection(db, "doctor", orgId, "beds");
-
-        const constraints: QueryConstraint[] = [];
-
-        if (stableSorting.length > 0) {
-          const sort = stableSorting[0];
-          constraints.push(orderBy(sort.id, sort.desc ? "desc" : "asc"));
-        } else {
-          constraints.push(orderBy("admission_at", "desc"));
-        }
-
-        constraints.push(limit(stablePagination.pageSize));
-
-        const admissionsQuery = query(bedsCollectionRef, ...constraints);
-        const snapshot = await getDocs(admissionsQuery);
-
-        const countSnap = await getCountFromServer(bedsCollectionRef);
-        setTotalRecords(countSnap.data().count);
-
-        const mapped = snapshot.docs.map((doc) => {
-          const d = doc.data() as OrgBed;
-          return {
-            bedBookingId: d.bedBookingId,
-            bedId: d.bedId,
-            patient_id: d.patient_id,
-            admission_at: d.admission_at,
-            discharge_at: d.discharge_at,
-            dischargeMarked: d.dischargeMarked ? "YES" : "NO",
-            admission_by: d.admission_by.name,
-            admission_for: d.admission_for.name,
-            discharged_by: d.discharged_by?.name,
-          } as TData;
-        });
-
-        setData(mapped);
-      } catch (err) {
-        console.error(err);
-        setError("Failed to load admissions.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (orgId) {
-      void fetchData();
+  const fetchData = async () => {
+    setLoading(true);
+    if (!orgId || !orgRole || !checkPageAccess(orgRole, "Admissions")) {
+      setError("User is not authorized for this organization.");
+      setLoading(false);
+      return;
     }
-  }, [orgId, stablePagination, stableSorting]);
 
+    try {
+      const bedsCollectionRef = collection(db, "doctor", orgId, "beds");
+      const constraints: QueryConstraint[] = [];
+
+      // sorting
+      if (stableSorting.length > 0) {
+        const sort = stableSorting[0];
+        constraints.push(orderBy(sort.id, sort.desc ? "desc" : "asc"));
+      } else {
+        constraints.push(orderBy("admission_at", "desc"));
+      }
+
+      // pagination cursor
+      if (page > 1 && lastDoc && pagination.pageIndex > 0) {
+        // when going forward
+        constraints.push(startAfter(lastDoc));
+      }
+      if (page < pagination.pageIndex + 1 && firstDoc) {
+        // when going backward
+        constraints.push(endBefore(firstDoc));
+      }
+
+      constraints.push(limit(stablePagination.pageSize));
+
+      const admissionsQuery = query(bedsCollectionRef, ...constraints);
+      const snapshot = await getDocs(admissionsQuery);
+
+      // cache first & last doc of this page
+      setFirstDoc(snapshot.docs[0] ?? null);
+      setLastDoc(snapshot.docs[snapshot.docs.length - 1] ?? null);
+
+      const countSnap = await getCountFromServer(bedsCollectionRef);
+      setTotalRecords(countSnap.data().count);
+
+      const mapped = snapshot.docs.map((doc) => {
+        const d = doc.data() as OrgBed;
+        return {
+          bedBookingId: d.bedBookingId,
+          bedId: d.bedId,
+          patient_id: d.patient_id,
+          admission_at: d.admission_at,
+          discharge_at: d.discharge_at,
+          dischargeMarked: d.dischargeMarked ? "YES" : "NO",
+          admission_by: d.admission_by.name,
+          admission_for: d.admission_for.name,
+          discharged_by: d.discharged_by?.name,
+        } as TData;
+      });
+
+      setData(mapped);
+    } catch (err) {
+      console.error(err);
+      setError("Failed to load admissions.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (orgId) {
+    void fetchData();
+  }
+}, [orgId, page, stablePagination, stableSorting]);
+
+console.log("data : ",data)
   const table = useReactTable({
     ...tableProps,
     columns,
