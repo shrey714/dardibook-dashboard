@@ -1,108 +1,144 @@
-"use server";
+"use client";
+
+import { useEffect, useState } from "react";
 import { columns } from "@/components/History/admissions/columns";
-import { DataTable } from "@/components/History/common/data-table";
-import { auth } from "@clerk/nextjs/server";
+import { DataTable } from "./common/data-table";
+import { useAuth } from "@clerk/nextjs";
 import { OrgBed } from "@/types/FormTypes";
-import { error } from "console";
-import { DataTableToolbar } from "@/components/History/admissions/data-table-toolbar";
+import { DataTableToolbar } from "./common/data-table-toolbar";
 import { Admission } from "@/components/History/dataSchema/schema";
 import { checkPageAccess } from "@/app/dashboard/history/(history)/_actions";
-import { adminDb } from "@/server/firebaseAdmin";
-import {
-  createLoader,
-  parseAsInteger,
-} from 'nuqs/server'
-import type { SearchParams } from 'nuqs/server'
+import { db } from "@/firebase/firebaseConfig";
+// import {
+//   parseAsInteger,
+//   useQueryStates,
+// } from "nuqs";
+import { collection, getCountFromServer, getDocs, limit, orderBy, query } from "firebase/firestore";
+import { useDataTable } from "@/components/History/hooks/use-data-table";
+import { DataTableSortList } from "./common/data-table-sort-list";
+import { DataTableSkeleton } from "./common/data-table-skeleton";
 
-const searchParams = {
-  page: parseAsInteger.withDefault(1),
-  pageSize: parseAsInteger.withDefault(20)
-};
-const loadSearchParams = createLoader(searchParams)
+// const searchParamsConfig = {
+//   page: parseAsInteger.withDefault(1),
+//   pageSize: parseAsInteger.withDefault(20),
+// };
 
-type PageProps = {
-  searchParams: Promise<SearchParams>
-}
+export default function Page() {
+  const { orgId, orgRole } = useAuth();
+  // const [{ page, pageSize }] = useQueryStates(searchParamsConfig);
 
-export default async function Page({ searchParams }: PageProps) {
-  let admissions: Admission[] = [];
-  let totalRecords = 0;
-  let page;
-  let pageSize;
-  try {
-    const query = await loadSearchParams(searchParams);
-    page = query.page;
-    pageSize = query.pageSize;
-    const authInstance = await auth();
-    if (!authInstance.orgId || !authInstance.orgRole) {
-      throw error("User is not authorized for this organization.");
-    }
+  const [admissions, setAdmissions] = useState<Admission[]>([]);
+  const [totalRecords, setTotalRecords] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-    if (!checkPageAccess(authInstance.orgRole, "Admissions")) {
-      return (
-        <div className="w-full h-full text-muted-foreground text-sm md:text-base p-4 overflow-hidden flex items-center justify-center gap-4 flex-col">
-          <img
-            className="w-full max-w-40 lg:mx-auto"
-            src="/NoAccess.svg"
-            alt="No Access"
-          />
-          You do not have access to view Admissions.
-        </div>
-      );
-    }
+  // useEffect(()=>{
+  //   const loadData = async ()=>{
+  //     if(!orgId || !orgRole || !checkPageAccess(orgRole, "Admissions")){
+  //       setError("User is not authorized for this organization.");
+  //       setLoading(false);
+  //       return;
+  //     }
 
-    const bedsCollection = adminDb
-      .collection("doctor")
-      .doc(authInstance.orgId)
-      .collection("beds");
+  //     try {
+  //       const bedsCollectionRef = collection(db,"doctor",orgId,"beds");
 
-    const admissionsQuery = bedsCollection
-      .orderBy("admission_at", "desc")
-      .limit(page * pageSize);
+  //       const admissionsQuery = query(bedsCollectionRef,orderBy("admission_at","desc"),limit(1*10));
 
-    const querySnapshot = await admissionsQuery.get();
-    const countSnapshot = await bedsCollection.count().get();
+  //       const querySnapshot = await getDocs(admissionsQuery);
+  //       const countSnapshot = await getCountFromServer(bedsCollectionRef);
+  //       const total = countSnapshot.data().count;
+        
+  //       setTotalRecords(total);
 
-    totalRecords=countSnapshot.data().count;
-    const lastRecords = page*pageSize > totalRecords ? (totalRecords%pageSize) : pageSize;
+  //       const data : Admission[] = querySnapshot.docs.map((doc) => {
+  //         const d = doc.data() as OrgBed;
+  //         return {
+  //           bedBookingId: d.bedBookingId,
+  //           bedId: d.bedId,
+  //           patient_id: d.patient_id,
+  //           admission_at: d.admission_at,
+  //           discharge_at: d.discharge_at,
+  //           dischargeMarked: d.dischargeMarked ? "YES" : "NO",
+  //           admission_by: d.admission_by.name,
+  //           admission_for: d.admission_for.name,
+  //           discharged_by: d.discharged_by?.name,
+  //         };
+  //       });
 
+  //       setAdmissions(data);
+  //     } catch (error) {
+  //       console.error(error);
+  //       setError("Failed to load admissions. Please try again later");
+  //     } finally {
+  //       setLoading(false)
+  //     }
+  //   }
+  //   loadData();
+  // },[])
 
-    admissions = querySnapshot.docs.slice(-lastRecords).map((doc) => {
-      const data = doc.data() as OrgBed;
-      return {
-        bedBookingId: data.bedBookingId,
-        bedId: data.bedId,
-        patient_id: data.patient_id,
-        admission_at: data.admission_at,
-        discharge_at: data.discharge_at,
-        dischargeMarked: data.dischargeMarked ? "YES" : "NO",
-        admission_by: data.admission_by.name,
-        admission_for: data.admission_for.name,
-        discharged_by: data.discharged_by?.name,
-      };
-    });
-  } catch (error) {
-    console.log(error);
+  const { table, shallow, debounceMs, throttleMs } = useDataTable({
+    data:admissions,
+    orgId,
+    orgRole,
+    columns,
+    pageCount:10,
+    // enableAdvancedFilter,
+    initialState: {
+      sorting: [{ id: "admission_at", desc: true }],
+      columnPinning: { right: ["actions"] },
+    },
+    // getRowId: (originalRow) => originalRow.id,
+    loading,
+    setLoading,
+    error,
+    setError,
+    shallow: false,
+    clearOnDefault: true,
+  });
+
+  if (error) {
     return (
-      <div className="w-full h-full text-red-600 text-sm md:text-base p-4 overflow-hidden flex items-center justify-center gap-4 flex-col">
+      loading?(
+        <DataTableSkeleton
+              columnCount={7}
+              filterCount={2}
+              cellWidths={[
+                "10rem",
+                "30rem",
+                "10rem",
+                "10rem",
+                "6rem",
+                "6rem",
+                "6rem",
+              ]}
+              shrinkZero
+            />
+      ):(
+          <div className="w-full h-full text-muted-foreground text-sm md:text-base p-4 overflow-hidden flex items-center justify-center gap-4 flex-col">
         <img
           className="w-full max-w-40 lg:mx-auto"
-          src="/ErrorTriangle.svg"
-          alt=""
+          src="/NoAccess.svg"
+          alt="No Access"
         />
-        Failed to load admissions. Please try again later.
+        {error}
       </div>
-    );
+        )
+    )
   }
+
+  
 
   return (
     <div className="flex flex-1 px-2 py-2 flex-col h-full overflow-hidden">
       <DataTable
-        data={admissions}
-        totalRecords={totalRecords}
-        columns={columns}
-        ToolbarComponent={DataTableToolbar}
-      />
+        table={table}
+        // actionBar={<TasksTableActionBar table={table} />}
+      >
+          <DataTableToolbar table={table}>
+            <DataTableSortList table={table} align="end" />
+          </DataTableToolbar>
+      </DataTable>
     </div>
   );
 }
