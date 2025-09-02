@@ -12,11 +12,20 @@ import { DataTableSkeleton } from "./common/data-table-skeleton";
 export default function Page() {
   const { orgId, orgRole } = useAuth();
 
-  const [totalRecords, setTotalRecords] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const { table, shallow, debounceMs, throttleMs } = useDataTable({
+  const {
+    table,
+    shallow,
+    debounceMs,
+    throttleMs,
+    nextPage,
+    prevPage,
+    totalRecords,
+    canGoBack,
+    canGoNext,
+  } = useDataTable({
     data: [],
     orgId,
     orgRole,
@@ -66,6 +75,11 @@ export default function Page() {
       ) : (
         <DataTable
           table={table}
+          nextPage={nextPage}
+          prevPage={prevPage}
+          totalRecords={totalRecords}
+          canGoBack={canGoBack}
+          canGoNext={canGoNext}
           // actionBar={<TasksTableActionBar table={table} />}
         >
           <DataTableToolbar table={table}>

@@ -38,6 +38,7 @@ import {
   getCountFromServer,
   getDocs,
   limit,
+  limitToLast,
   orderBy,
   query,
   QueryConstraint,
@@ -47,8 +48,6 @@ import { db } from "@/firebase/firebaseConfig";
 import { OrgBed } from "@/types/FormTypes";
 import { checkPageAccess } from "@/app/dashboard/history/(history)/_actions";
 
-const PAGE_KEY = "page";
-const PER_PAGE_KEY = "perPage";
 const SORT_KEY = "sort";
 const ARRAY_SEPARATOR = ",";
 const DEBOUNCE_MS = 300;
@@ -131,6 +130,8 @@ export function useDataTable<TData>(props: UseDataTableProps<TData>) {
 
   const [data, setData] = React.useState<TData[]>([]);
   const [totalRecords, setTotalRecords] = React.useState(0);
+
+  // Firestore cursors
   const [firstDoc, setFirstDoc] = React.useState<any | null>(null);
   const [lastDoc, setLastDoc] = React.useState<any | null>(null);
 
@@ -140,36 +141,21 @@ export function useDataTable<TData>(props: UseDataTableProps<TData>) {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>(initialState?.columnVisibility ?? {});
 
-  const [page, setPage] = useQueryState(
-    PAGE_KEY,
-    parseAsInteger.withOptions(queryStateOptions).withDefault(1)
-  );
-  const [perPage, setPerPage] = useQueryState(
-    PER_PAGE_KEY,
-    parseAsInteger
-      .withOptions(queryStateOptions)
-      .withDefault(initialState?.pagination?.pageSize ?? 5)
-  );
-
-  const pagination: PaginationState = React.useMemo(() => {
-    return {
-      pageIndex: page - 1, // zero-based index -> one-based index
-      pageSize: perPage,
-    };
-  }, [page, perPage]);
+  // local pagination size only
+  const [pagination, setPagination] = React.useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: initialState?.pagination?.pageSize ?? 10,
+  });
 
   const onPaginationChange = React.useCallback(
     (updaterOrValue: Updater<PaginationState>) => {
-      if (typeof updaterOrValue === "function") {
-        const newPagination = updaterOrValue(pagination);
-        void setPage(newPagination.pageIndex + 1);
-        void setPerPage(newPagination.pageSize);
-      } else {
-        void setPage(updaterOrValue.pageIndex + 1);
-        void setPerPage(updaterOrValue.pageSize);
-      }
+      setPagination((prev) =>
+        typeof updaterOrValue === "function"
+          ? updaterOrValue(prev)
+          : updaterOrValue
+      );
     },
-    [pagination, setPage, setPerPage]
+    []
   );
 
   const columnIds = React.useMemo(() => {
@@ -193,21 +179,21 @@ export function useDataTable<TData>(props: UseDataTableProps<TData>) {
       } else {
         setSorting(updaterOrValue as ExtendedColumnSort<TData>[]);
       }
-      setPage(1);
       setFirstDoc(null);
+      setLastDoc(null);
+      setPagination((prev) => ({ ...prev, pageIndex: 0 }));
     },
     [sorting, setSorting]
   );
 
+  // Filters (keep nuqs filters if you want them in URL)
   const filterableColumns = React.useMemo(() => {
     if (enableAdvancedFilter) return [];
-
     return columns.filter((column) => column.enableColumnFilter);
   }, [columns, enableAdvancedFilter]);
 
   const filterParsers = React.useMemo(() => {
     if (enableAdvancedFilter) return {};
-
     return filterableColumns.reduce<
       Record<string, Parser<string> | Parser<string[]>>
     >((acc, column) => {
@@ -227,15 +213,15 @@ export function useDataTable<TData>(props: UseDataTableProps<TData>) {
 
   const debouncedSetFilterValues = useDebouncedCallback(
     (values: typeof filterValues) => {
-      void setPage(1);
-      void setFilterValues(values);
+      setFirstDoc(null);
+      setLastDoc(null);
+      setFilterValues(values);
     },
     debounceMs
   );
 
   const initialColumnFilters: ColumnFiltersState = React.useMemo(() => {
     if (enableAdvancedFilter) return [];
-
     return Object.entries(filterValues).reduce<ColumnFiltersState>(
       (filters, [key, value]) => {
         if (value !== null) {
@@ -284,8 +270,9 @@ export function useDataTable<TData>(props: UseDataTableProps<TData>) {
           }
         }
 
-        void setPage(1);
         setFirstDoc(null);
+        setLastDoc(null);
+        setPagination((prev) => ({ ...prev, pageIndex: 0 }));
 
         debouncedSetFilterValues(filterUpdates);
         return next;
@@ -295,85 +282,120 @@ export function useDataTable<TData>(props: UseDataTableProps<TData>) {
   );
 
   const stableSorting = React.useMemo(() => sorting, [JSON.stringify(sorting)]);
-
   const stablePagination = React.useMemo(
     () => ({ pageIndex: pagination.pageIndex, pageSize: pagination.pageSize }),
     [pagination.pageIndex, pagination.pageSize]
   );
 
+  const fetchData = React.useCallback(
+    async (direction?: "next" | "prev") => {
+      setLoading(true);
+      if (!orgId || !orgRole || !checkPageAccess(orgRole, "Admissions")) {
+        setError("User is not authorized for this organization.");
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const bedsCollectionRef = collection(db, "doctor", orgId, "beds");
+        const constraints: QueryConstraint[] = [];
+        const countConstraints: QueryConstraint[] = [];
+
+        // sorting
+        if (stableSorting.length > 0) {
+          const sort = stableSorting[0];
+          constraints.push(orderBy(sort.id, sort.desc ? "desc" : "asc"));
+          countConstraints.push(orderBy(sort.id, sort.desc ? "desc" : "asc"));
+        } else {
+          constraints.push(orderBy("admission_at", "desc"));
+          countConstraints.push(orderBy("admission_at", "desc"));
+        }
+
+        // pagination cursor
+        if (direction === "next" && lastDoc) {
+          constraints.push(startAfter(lastDoc));
+          constraints.push(limit(stablePagination.pageSize));
+        }
+
+        if (direction === "prev" && firstDoc) {
+          constraints.push(endBefore(firstDoc));
+          constraints.push(limitToLast(stablePagination.pageSize));
+        }
+
+        if (!direction) {
+          constraints.push(limit(stablePagination.pageSize));
+        }
+
+        const admissionsQuery = query(bedsCollectionRef, ...constraints);
+        const snapshot = await getDocs(admissionsQuery);
+
+        const countQuery = query(bedsCollectionRef, ...countConstraints);
+        const countSnap = await getCountFromServer(countQuery);
+
+        if (!snapshot.empty) {
+          setFirstDoc(snapshot.docs[0]);
+          setLastDoc(snapshot.docs[snapshot.docs.length - 1]);
+        }
+
+        setTotalRecords(countSnap.data().count);
+
+        const mapped = snapshot.docs.map((doc) => {
+          const d = doc.data() as OrgBed;
+          return {
+            bedBookingId: d.bedBookingId,
+            bedId: d.bedId,
+            patient_id: d.patient_id,
+            admission_at: d.admission_at,
+            discharge_at: d.discharge_at,
+            dischargeMarked: d.dischargeMarked ? "YES" : "NO",
+            admission_by: d.admission_by.name,
+            admission_for: d.admission_for.name,
+            discharged_by: d.discharged_by?.name,
+          } as TData;
+        });
+
+        setData(mapped);
+      } catch (err) {
+        console.error(err);
+        setError("Failed to load admissions.");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [orgId, orgRole, stablePagination, stableSorting, lastDoc, firstDoc]
+  );
+
   React.useEffect(() => {
-  const fetchData = async () => {
-    setLoading(true);
-    if (!orgId || !orgRole || !checkPageAccess(orgRole, "Admissions")) {
-      setError("User is not authorized for this organization.");
-      setLoading(false);
-      return;
+    if (orgId) {
+      void fetchData();
     }
+  }, [orgId, stablePagination.pageSize, stableSorting]);
 
-    try {
-      const bedsCollectionRef = collection(db, "doctor", orgId, "beds");
-      const constraints: QueryConstraint[] = [];
+  const nextPage = React.useCallback(() => {
+    setPagination((prev) => ({
+      ...prev,
+      pageIndex: prev.pageIndex + 1,
+    }));
+    fetchData("next");
+  }, [fetchData]);
 
-      // sorting
-      if (stableSorting.length > 0) {
-        const sort = stableSorting[0];
-        constraints.push(orderBy(sort.id, sort.desc ? "desc" : "asc"));
-      } else {
-        constraints.push(orderBy("admission_at", "desc"));
-      }
+  const prevPage = React.useCallback(() => {
+    setPagination((prev) => ({
+      ...prev,
+      pageIndex: Math.max(prev.pageIndex - 1, 0),
+    }));
+    fetchData("prev");
+  }, [fetchData]);
 
-      // pagination cursor
-      if (page > 1 && lastDoc && pagination.pageIndex > 0) {
-        // when going forward
-        constraints.push(startAfter(lastDoc));
-      }
-      if (page < pagination.pageIndex + 1 && firstDoc) {
-        // when going backward
-        constraints.push(endBefore(firstDoc));
-      }
+  const canGoNext = React.useMemo(() => {
+    console.log(totalRecords);
+    return (pagination.pageIndex + 1) * pagination.pageSize < totalRecords;
+  }, [pagination.pageIndex, pagination.pageSize, totalRecords]);
 
-      constraints.push(limit(stablePagination.pageSize));
+  const canGoBack = React.useMemo(() => {
+    return pagination.pageIndex > 0 && !!firstDoc;
+  }, [pagination.pageIndex, firstDoc]);
 
-      const admissionsQuery = query(bedsCollectionRef, ...constraints);
-      const snapshot = await getDocs(admissionsQuery);
-
-      // cache first & last doc of this page
-      setFirstDoc(snapshot.docs[0] ?? null);
-      setLastDoc(snapshot.docs[snapshot.docs.length - 1] ?? null);
-
-      const countSnap = await getCountFromServer(bedsCollectionRef);
-      setTotalRecords(countSnap.data().count);
-
-      const mapped = snapshot.docs.map((doc) => {
-        const d = doc.data() as OrgBed;
-        return {
-          bedBookingId: d.bedBookingId,
-          bedId: d.bedId,
-          patient_id: d.patient_id,
-          admission_at: d.admission_at,
-          discharge_at: d.discharge_at,
-          dischargeMarked: d.dischargeMarked ? "YES" : "NO",
-          admission_by: d.admission_by.name,
-          admission_for: d.admission_for.name,
-          discharged_by: d.discharged_by?.name,
-        } as TData;
-      });
-
-      setData(mapped);
-    } catch (err) {
-      console.error(err);
-      setError("Failed to load admissions.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (orgId) {
-    void fetchData();
-  }
-}, [orgId, page, stablePagination, stableSorting]);
-
-console.log("data : ",data)
   const table = useReactTable({
     ...tableProps,
     columns,
@@ -409,5 +431,15 @@ console.log("data : ",data)
     manualFiltering: true,
   });
 
-  return { table, shallow, debounceMs, throttleMs };
+  return {
+    table,
+    shallow,
+    debounceMs,
+    throttleMs,
+    nextPage,
+    prevPage,
+    canGoNext,
+    canGoBack,
+    totalRecords,
+  };
 }
