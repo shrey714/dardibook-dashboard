@@ -80,10 +80,18 @@ const BedAdmissionModal: React.FC<BedAdmissionModalProps> = ({
     },
   });
 
+  const {
+    userId = "",
+    firstName = "",
+    lastName = "",
+    identifier = "",
+  } = memberships?.data?.find((mem) => mem.publicUserData?.userId === doctorId)
+    ?.publicUserData || {};
+
   const [admissionFor, setAdmissionFor] = useState<orgUserType>({
-    id: doctorId || "",
-    name: "",
-    email: "",
+    id: userId,
+    name: `${firstName} ${lastName}`.trim(),
+    email: identifier,
   });
   const [loader, setloader] = useState(false);
   const [warning, setWarning] = useState<string | null>(null);
@@ -170,67 +178,68 @@ const BedAdmissionModal: React.FC<BedAdmissionModalProps> = ({
       setWarning(validationError);
       return;
     }
+    console.log("admissionFor", admissionFor);
 
-    setloader(true);
+    // setloader(true);
 
-    try {
-      const bedBookingId = uniqid.time();
-      const batch = writeBatch(db);
-      const bedRef = doc(db, "doctor", orgId, "beds", bedBookingId);
-      const bedAdmissionData = {
-        admission_for: admissionFor,
-        patient_id: patientId,
-        bedBookingId: bedBookingId,
-        bedId: bedId,
-        admission_at: getTime(fromDate),
-        discharge_at: getTime(toDate),
-        dischargeMarked: false,
-        admission_by: {
-          id: user.id,
-          name: user.fullName,
-          email: user.primaryEmailAddress?.emailAddress,
-        },
-      };
-      batch.set(bedRef, bedAdmissionData, { merge: true });
-      const patientRef = doc(db, "doctor", orgId, "patients", patientId);
-      batch.set(
-        patientRef,
-        {
-          bed_info: arrayUnion({
-            admission_for: admissionFor,
-            bedBookingId: bedBookingId,
-            bedId: bedId,
-            admission_at: getTime(fromDate),
-            discharge_at: getTime(toDate),
-            dischargeMarked: false,
-            admission_by: {
-              id: user.id,
-              name: user.fullName,
-              email: user.primaryEmailAddress?.emailAddress,
-            },
-          }),
-        },
-        { merge: true }
-      );
-      await batch.commit();
-      //logging
-      const logData: PatientActivityLog = {
-        agent_id: user.id,
-        id: bedBookingId,
-        action: "admitted",
-        timestamp: Date.now(),
-        oldData: null,
-        newData: bedAdmissionData,
-        module: "admission",
-      };
-      logActivity(logData);
-    } catch (error) {
-      console.log(error);
-      toast.error("Error updating");
-    } finally {
-      setloader(false);
-      setIsModalOpen(false);
-    }
+    // try {
+    //   const bedBookingId = uniqid.time();
+    //   const batch = writeBatch(db);
+    //   const bedRef = doc(db, "doctor", orgId, "beds", bedBookingId);
+    //   const bedAdmissionData = {
+    //     admission_for: admissionFor,
+    //     patient_id: patientId,
+    //     bedBookingId: bedBookingId,
+    //     bedId: bedId,
+    //     admission_at: getTime(fromDate),
+    //     discharge_at: getTime(toDate),
+    //     dischargeMarked: false,
+    //     admission_by: {
+    //       id: user.id,
+    //       name: user.fullName,
+    //       email: user.primaryEmailAddress?.emailAddress,
+    //     },
+    //   };
+    //   batch.set(bedRef, bedAdmissionData, { merge: true });
+    //   const patientRef = doc(db, "doctor", orgId, "patients", patientId);
+    //   batch.set(
+    //     patientRef,
+    //     {
+    //       bed_info: arrayUnion({
+    //         admission_for: admissionFor,
+    //         bedBookingId: bedBookingId,
+    //         bedId: bedId,
+    //         admission_at: getTime(fromDate),
+    //         discharge_at: getTime(toDate),
+    //         dischargeMarked: false,
+    //         admission_by: {
+    //           id: user.id,
+    //           name: user.fullName,
+    //           email: user.primaryEmailAddress?.emailAddress,
+    //         },
+    //       }),
+    //     },
+    //     { merge: true }
+    //   );
+    //   await batch.commit();
+    //   //logging
+    //   const logData: PatientActivityLog = {
+    //     agent_id: user.id,
+    //     id: bedBookingId,
+    //     action: "admitted",
+    //     timestamp: Date.now(),
+    //     oldData: null,
+    //     newData: bedAdmissionData,
+    //     module: "admission",
+    //   };
+    //   logActivity(logData);
+    // } catch (error) {
+    //   console.log(error);
+    //   toast.error("Error updating");
+    // } finally {
+    //   setloader(false);
+    //   setIsModalOpen(false);
+    // }
   };
 
   const suggestedBeds = useMemo(() => {
@@ -514,6 +523,10 @@ const BedAdmissionModal: React.FC<BedAdmissionModalProps> = ({
                   if (bed.bed_id === bedId) {
                     setbedId(null);
                   } else setbedId(bed.bed_id);
+                  const validationError = validateDates(fromDate, toDate);
+                  if (validationError) {
+                    setWarning(validationError);
+                  }
                 }}
                 className={`h-auto min-w-24 flex flex-col items-center justify-center gap-0.5 p-2 text-xs bg-green-500/20 text-green-600 hover:text-green-500 hover:bg-green-500/40 transition-all duration-300 ${
                   bed.bed_id === bedId

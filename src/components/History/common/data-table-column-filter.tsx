@@ -99,11 +99,13 @@ function Filter({ column }: { column: Column<any, unknown> }) {
       </SelectTrigger>
       <SelectContent>
         <SelectItem value="all">All</SelectItem>
-        {sortedUniqueValues.map((value, index) => (
-          <SelectItem value={value} key={index}>
-            {value}
-          </SelectItem>
-        ))}
+        {sortedUniqueValues
+          .filter((x) => x)
+          .map((value, index) => (
+            <SelectItem value={value} key={index}>
+              {value}
+            </SelectItem>
+          ))}
       </SelectContent>
     </Select>
   ) : filterVariant === "date-range" ? (
