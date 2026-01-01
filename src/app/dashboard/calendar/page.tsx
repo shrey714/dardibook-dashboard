@@ -118,6 +118,10 @@ export default function TaskPage() {
               and(
                 where("discharge_at", ">=", getTime(startOfMonth(monthDate))),
                 where("discharge_at", "<=", getTime(endOfMonth(monthDate)))
+              ),
+              and(
+                where("admission_at", "<=", getTime(startOfMonth(monthDate))),
+                where("discharge_at", ">=", getTime(endOfMonth(monthDate)))
               )
             )
           );
